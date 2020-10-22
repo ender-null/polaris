@@ -1,2 +1,1 @@
-export class Plugin {
-}
+export class Plugin {}

@@ -30,6 +30,8 @@
     "node": ">=12"
   },
   "dependencies": {
+    "tdl": "^6.1.0",
+    "tdl-tdlib-ffi": "^2.0.0",
     "tglib": "^3.0.5",
     "winston": "^3.3.3"
   },

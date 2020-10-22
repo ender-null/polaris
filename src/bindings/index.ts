@@ -1,1 +1,1 @@
-export * from "./telegram-tdlib";
+export * from './telegram-tdlib';

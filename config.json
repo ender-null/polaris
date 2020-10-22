@@ -1,18 +1,18 @@
 {
-    "name": "sakubo",
-    "prefix": "#",
-    "locale": "es_ES",
-    "owner": 0,
+    "name": "polaris",
+    "prefix": "/",
+    "locale": "en_US",
+    "owner": 1108251406,
     "plugins": "*",
-    "excluded_plugins": [],
+    "excludedPlugins": [],
     "translation": "default",
     "bindings": "TelegramTDlibBindings",
-    "admin_conversation_id": "0",
-    "alerts_conversation_id": "0",
-    "api_keys": {
-        "telegram_bot_token": "",
-        "telegram_api_hash": "",
-        "telegram_app_id": "",
-        "database_encryption_key": ""
+    "adminConversationId": "-1001185276053",
+    "alertsConversationId": "-1001453669684",
+    "apiKeys": {
+        "telegramBotToken": "126457252:AAHDt4Upushu1QySdfETZgz-c7ug4uqnX08",
+        "telegramApiHash": "a02faf18185b1fbc31b06f93b08d120b",
+        "telegramAppId": 18184,
+        "databaseEncryptionKey": ""
     }
 }
