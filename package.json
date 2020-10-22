@@ -1,0 +1,66 @@
+{
+  "name": "polaris.js",
+  "version": "0.1.0",
+  "description": "A multiplatform Javascript bot using plugins!",
+  "license": "MIT",
+  "author": "luksireiku <endernull@icloud.com>",
+  "homepage": "https://github.com/luksireiku/polaris.js#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/luksireiku/polaris.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/luksireiku/polaris.js/issues"
+  },
+  "scripts": {
+    "typedoc": "typedoc",
+    "build": "tsc -p tsconfig.release.json",
+    "build:watch": "tsc -w -p tsconfig.release.json",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "format": "prettier --write src"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm test && npm run lint"
+    }
+  },
+  "type": "commonjs",
+  "engines": {
+    "node": ">=12"
+  },
+  "dependencies": {
+    "tglib": "^3.0.5",
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "@types/node": "^14.11.7",
+    "@types/node-fetch": "^2.5.7",
+    "@typescript-eslint/eslint-plugin": "^4.4.0",
+    "@typescript-eslint/parser": "^4.4.0",
+    "eslint": "^7.10.0",
+    "eslint-config-prettier": "^6.12.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-config-standard-with-typescript": "^19.0.1",
+    "eslint-plugin-ava": "^11.0.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "husky": "^4.3.0",
+    "prettier": "^2.1.2",
+    "typedoc": "^0.19.2",
+    "typescript": "4.0.3"
+  },
+  "keywords": [
+    "polaris",
+    "polaris js",
+    "polaris.js",
+    "telegram",
+    "telegram bot api",
+    "bot",
+    "botapi",
+    "bot framework"
+  ]
+}
