@@ -18,7 +18,7 @@ export class Message {
     type = 'text',
     date: number = null,
     reply: Message = null,
-    extra = null,
+    extra: Extra = null,
   ) {
     this.id = id;
     this.conversation = conversation;
