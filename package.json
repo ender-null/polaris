@@ -3,7 +3,11 @@
   "version": "0.1.0",
   "description": "A multiplatform Javascript bot using plugins!",
   "license": "MIT",
-  "author": "luksireiku <endernull@icloud.com>",
+  "author": {
+    "name": "luksireiku",
+    "email": "endernull@icloud.com",
+    "url": "https://github.com/luksireiku"
+  },
   "homepage": "https://github.com/luksireiku/polaris.js#readme",
   "repository": {
     "type": "git",
@@ -12,6 +16,7 @@
   "bugs": {
     "url": "https://github.com/luksireiku/polaris.js/issues"
   },
+  "main": "",
   "scripts": {
     "typedoc": "typedoc",
     "build": "tsc -p tsconfig.release.json",
@@ -32,7 +37,6 @@
   "dependencies": {
     "tdl": "^6.1.0",
     "tdl-tdlib-ffi": "^2.0.0",
-    "tglib": "^3.0.5",
     "winston": "^3.3.3"
   },
   "devDependencies": {

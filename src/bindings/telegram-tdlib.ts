@@ -1,9 +1,7 @@
 import { Client } from 'tdl';
 import { TDLib } from 'tdl-tdlib-ffi';
-import { message, Update } from 'tdl/types/tdlib';
-import { Conversation, Message, User } from '..';
-import { BindingsBase } from '../bindings';
-import { Bot } from '../bot';
+import { message, Update, user } from 'tdl/types/tdlib';
+import { BindingsBase, Bot, Conversation, Message, User } from '..';
 import { logger } from '../main';
 
 export class TelegramTDlibBindings extends BindingsBase {
@@ -29,7 +27,7 @@ export class TelegramTDlibBindings extends BindingsBase {
       _: method,
       ...params,
     };
-    return await this.client.invokeFuture(query);
+    return await this.client.invoke(query);
   }
 
   async start(): Promise<void> {
@@ -41,6 +39,7 @@ export class TelegramTDlibBindings extends BindingsBase {
 
     this.client.on('update', (update: Update) => this.updateHandler(update));
     this.client.on('error', console.error);
+    this.bot.outbox.on('message', (msg: Message) => this.sendMessage(msg));
   }
 
   async stop(): Promise<void> {
@@ -48,27 +47,31 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async getMe(): Promise<User> {
-    const me = await this.serverRequest('getMe');
-    logger.info('getMe: ' + me);
-    return new User(0);
+    const me: user = await this.serverRequest('getMe');
+    return new User(me.id, me.first_name, me.last_name, me.username);
   }
 
   async convertMessage(msg: message): Promise<Message> {
     const id = msg['id'];
     const extra = {};
+
+    const rawChat = await this.serverRequest('getChat', { chat_id: msg.chat_id });
     const conversation = new Conversation(msg['chat_id']);
     let sender = null;
+    if (rawChat && 'title' in rawChat) {
+      conversation.title = rawChat.title;
+    }
     if (msg['sender_user_id'] > 0) {
-      const rawSender = await this.serverRequest('getUser', { user_id: msg['sender_user_id'] });
-      sender = new User(msg['sender_user_id']);
+      const rawSender = await this.serverRequest('getUser', { user_id: msg.sender_user_id });
+      sender = new User(msg.sender_user_id);
       if ('first_name' in rawSender) {
-        sender.firstName = String(rawSender['first_name']);
+        sender.firstName = String(rawSender.first_name);
       }
       if ('last_name' in rawSender) {
-        sender.lastName = String(rawSender['last_name']);
+        sender.lastName = String(rawSender.last_name);
       }
       if ('username' in rawSender) {
-        sender.username = String(rawSender['username']);
+        sender.username = String(rawSender.username);
       }
     } else {
       sender = new User(conversation.id, conversation.title);
@@ -148,5 +151,18 @@ export class TelegramTDlibBindings extends BindingsBase {
         this.bot.inbox.emit('message', msg);
       }
     }
+  }
+
+  async sendMessage(msg: Message) {
+    await this.serverRequest('sendMessage', {
+      chat_id: msg.conversation.id,
+      input_message_content: {
+        _: 'inputMessageText',
+        text: {
+          _: 'formattedText',
+          text: msg.content,
+        },
+      },
+    });
   }
 }

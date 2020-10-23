@@ -3,5 +3,5 @@ export { Bot } from './bot';
 export { ApiKeys, Config } from './config';
 export { Conversation } from './conversation';
 export { Extra, Message } from './message';
-export { Plugin } from './plugin';
+export { Command, Parameter, PluginBase } from './plugin';
 export { User } from './user';

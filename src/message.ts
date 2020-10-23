@@ -3,7 +3,7 @@ import { Conversation, User } from '.';
 export class Message {
   id: number;
   conversation: Conversation;
-  sender: User;
+  sender: User | Conversation;
   content: string;
   type: string;
   date: number;
@@ -13,7 +13,7 @@ export class Message {
   constructor(
     id: number,
     conversation: Conversation,
-    sender: User,
+    sender: User | Conversation,
     content: string,
     type = 'text',
     date: number = null,

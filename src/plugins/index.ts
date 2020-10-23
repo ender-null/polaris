@@ -1,0 +1,1 @@
+export { EchoPlugin } from './echo';

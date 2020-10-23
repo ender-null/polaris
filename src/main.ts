@@ -14,6 +14,14 @@ export const logger = createLogger({
   ],
 });
 
+export const stop = () => {
+  bot.stop();
+  process.exit(1);
+};
+
 const config = Config.loadFromFile('config.json');
 const bot = new Bot(config);
 bot.start();
+
+process.once('SIGINT', stop);
+process.once('SIGTERM', stop);

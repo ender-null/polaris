@@ -1,7 +1,8 @@
 import { EventEmitter } from 'events';
 import * as bindings from './bindings/index';
-import { BindingsBase, Config, Extra, Message, Plugin, User } from './index';
+import { BindingsBase, Config, Extra, Message, PluginBase, User } from './index';
 import { logger } from './main';
+import * as plugins from './plugins/index';
 
 export class Bot {
   config: Config;
@@ -9,7 +10,7 @@ export class Bot {
   inbox: EventEmitter;
   outbox: EventEmitter;
   started: boolean;
-  plugins: Plugin[];
+  plugins: PluginBase[];
   user: User;
 
   constructor(config: Config) {
@@ -17,12 +18,21 @@ export class Bot {
     this.outbox = new EventEmitter();
     this.config = config;
     this.bindings = new bindings[this.config.bindings](this);
+    this.plugins = [];
   }
 
   async start(): Promise<void> {
     await this.bindings.start();
+    this.started = true;
     this.user = await this.bindings.getMe();
-    this.inbox.on('message', this.messagesHandler);
+    logger.info(`Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}]`);
+    this.inbox.on('message', (msg: Message) => this.messagesHandler(msg));
+    this.outbox.on('message', (msg: Message) => {
+      logger.info(
+        ` [${this.user.id}] ${this.user.firstName}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
+      );
+    });
+    this.initPlugins();
   }
 
   async stop(): Promise<void> {
@@ -30,11 +40,25 @@ export class Bot {
   }
 
   messagesHandler(msg: Message): void {
-    logger.info('messagesHandler: ' + msg.content);
+    if (msg.sender instanceof User) {
+      logger.info(
+        `[${msg.sender.id}] ${msg.sender.firstName}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
+      );
+    } else {
+      logger.info(
+        `[${msg.sender.id}] ${msg.sender.title}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
+      );
+    }
+
+    this.onMessageReceive(msg);
   }
 
   initPlugins(): void {
-    logger.info('initPlugins');
+    for (const plugin in plugins) {
+      if ((this.config.plugins = '*')) {
+        this.plugins.push(plugins[plugin]);
+      }
+    }
   }
 
   onMessageReceive(msg: Message): void {
@@ -45,7 +69,7 @@ export class Bot {
     command: string,
     parameters: string[],
     message: string,
-    plugin: Plugin,
+    plugin: PluginBase,
     friendly = false,
     keep_default = false,
   ): void {
