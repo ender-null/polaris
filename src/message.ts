@@ -31,4 +31,8 @@ export class Message {
   }
 }
 
-export abstract class Extra extends Object {}
+export abstract class Extra extends Object {
+  format?: string;
+  input?: string;
+  inputReply?: string;
+}

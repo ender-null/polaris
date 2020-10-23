@@ -11,9 +11,9 @@ export class TelegramTDlibBindings extends BindingsBase {
     this.client = new Client(new TDLib('bin/libtdjson.so'), {
       apiId: this.bot.config.apiKeys.telegramAppId,
       apiHash: this.bot.config.apiKeys.telegramApiHash,
-      databaseDirectory: '/home/ender/.tdlib_files/' + this.bot.config.name,
+      databaseDirectory: `/home/ender/.tdlib_files/${this.bot.config.name}`,
       databaseEncryptionKey: this.bot.config.apiKeys.databaseEncryptionKey,
-      filesDirectory: '/home/ender/.tdlib_files/' + this.bot.config.name,
+      filesDirectory: `/home/ender/.tdlib_files/${this.bot.config.name}`,
       verbosityLevel: 1,
       tdlibParameters: {
         application_version: '1.0',
@@ -153,16 +153,18 @@ export class TelegramTDlibBindings extends BindingsBase {
     }
   }
 
-  async sendMessage(msg: Message) {
-    await this.serverRequest('sendMessage', {
-      chat_id: msg.conversation.id,
-      input_message_content: {
-        _: 'inputMessageText',
-        text: {
-          _: 'formattedText',
-          text: msg.content,
+  async sendMessage(msg: Message): Promise<void> {
+    if (msg.content) {
+      await this.serverRequest('sendMessage', {
+        chat_id: msg.conversation.id,
+        input_message_content: {
+          _: 'inputMessageText',
+          text: {
+            _: 'formattedText',
+            text: msg.content,
+          },
         },
-      },
-    });
+      });
+    }
   }
 }

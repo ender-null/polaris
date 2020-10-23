@@ -14,7 +14,7 @@ export const logger = createLogger({
   ],
 });
 
-export const stop = () => {
+export const stop = (): void => {
   bot.stop();
   process.exit(1);
 };

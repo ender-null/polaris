@@ -136,7 +136,7 @@ export class Bot {
     command = command.toLocaleLowerCase();
     if (
       typeof message.content == 'string' &&
-      message.content.endsWith('@' + this.user.username) &&
+      message.content.endsWith(`@${this.user.username}`) &&
       message.content.indexOf(' ') > -1
     ) {
       message.content = message.content.replace('@' + this.user.username, '');
@@ -155,11 +155,11 @@ export class Bot {
       if (keepDefault) {
         trigger = command.replace('/', '^/');
       } else {
-        trigger = command.replace('/', '^' + this.config.prefix);
+        trigger = command.replace('/', `^${this.config.prefix}`);
       }
 
       if (!friendly) {
-        trigger = trigger.replace('@' + this.user.username.toLocaleLowerCase(), '');
+        trigger = trigger.replace(`@${this.user.username.toLocaleLowerCase()}`, '');
         if (parameters == null && trigger.startsWith('^')) {
           trigger += '$';
         } else if (
@@ -179,7 +179,7 @@ export class Bot {
         }
       }
 
-      if (message.content && typeof message.content == 'string' && new RegExp(trigger, 'gi').test(message.content)) {
+      if (message.content && typeof message.content == 'string' && new RegExp(trigger, 'gim').test(message.content)) {
         message = setInput(message, trigger);
         plugin.run(message);
 
@@ -189,7 +189,7 @@ export class Bot {
     return false;
   }
 
-  replyMessage(msg: Message, content: string, type = 'text', reply: Message = null, extra: Extra = null): void {
+  replyMessage(msg: Message, content: string, type = 'text', reply?: Message, extra?: Extra): void {
     const message = new Message(null, msg.conversation, this.user, content, type, null, reply, extra);
     this.outbox.emit('message', message);
   }
