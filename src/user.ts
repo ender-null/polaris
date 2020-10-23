@@ -5,13 +5,7 @@ export class User {
   username: string;
   isBot: boolean;
 
-  constructor(
-    id: number,
-    firstName: string = null,
-    lastName: string = null,
-    username: string = null,
-    isBot: boolean = false,
-  ) {
+  constructor(id: number, firstName: string = null, lastName: string = null, username: string = null, isBot = false) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;

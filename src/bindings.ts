@@ -1,25 +1,15 @@
-import { Message } from '.';
-import { Bot } from './bot';
-import { User } from './user';
+import { Bot, User } from '.';
 
-export class BindingsBase {
+export abstract class BindingsBase {
   bot: Bot;
 
   constructor(bot: Bot) {
     this.bot = bot;
   }
 
-  async start() {}
+  abstract async start(): Promise<void>;
 
-  getMe(): User {
-    return new User(0);
-  }
+  abstract async stop(): Promise<void>;
 
-  onMessageReceive(data: any) {}
-
-  convertMessage(data: any): Message {
-    return new Message(0, null, null, data);
-  }
-
-  sendMessage() {}
+  abstract async getMe(): Promise<User>;
 }

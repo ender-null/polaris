@@ -1,7 +1,7 @@
 export { BindingsBase } from './bindings';
-export { Config, ApiKeys } from './config';
 export { Bot } from './bot';
-export { Message } from './message';
-export { User } from './user';
+export { ApiKeys, Config } from './config';
 export { Conversation } from './conversation';
+export { Extra, Message } from './message';
 export { Plugin } from './plugin';
+export { User } from './user';

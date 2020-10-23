@@ -1,8 +1,10 @@
 import { Client } from 'tdl';
 import { TDLib } from 'tdl-tdlib-ffi';
+import { Update, updateNewMessage } from 'tdl/types/tdlib';
 import { Conversation, Message, User } from '..';
 import { BindingsBase } from '../bindings';
 import { Bot } from '../bot';
+import { logger } from '../main';
 
 export class TelegramTDlibBindings extends BindingsBase {
   client: Client;
@@ -22,7 +24,7 @@ export class TelegramTDlibBindings extends BindingsBase {
     });
   }
 
-  async start() {
+  async start(): Promise<void> {
     await this.client.connectAndLogin(() => ({
       type: 'bot',
       getToken: (retry) =>
@@ -33,18 +35,22 @@ export class TelegramTDlibBindings extends BindingsBase {
     this.client.on('error', console.error);
   }
 
-  getMe(): User {
+  async stop(): Promise<void> {
+    logger.info('stop');
+  }
+
+  async getMe(): Promise<User> {
     return new User(0);
   }
 
-  async onMessageReceive(update) {
+  async onMessageReceive(update: Update): Promise<void> {
     if (update._ == 'updateNewMessage') {
       const msg = await this.convertMessage(update);
       this.bot.inbox.emit('message', msg);
     }
   }
 
-  async convertMessage(msg): Message {
+  async convertMessage(msg: updateNewMessage): Promise<Message> {
     const id = msg['id'];
     const extra = {};
     const conversation = new Conversation(msg['chat_id']);
@@ -72,7 +78,11 @@ export class TelegramTDlibBindings extends BindingsBase {
     return new Message(id, conversation, sender, content, type, date, reply, extra);
   }
 
-  async serverRequest(method: string, params: Object = {}) {
-    return await this.client.invoke({ _: method, ...params });
+  async serverRequest(method: string, params = {}): Promise<any> {
+    const query: any = {
+      _: method,
+      ...params,
+    };
+    return await this.client.execute(query);
   }
 }

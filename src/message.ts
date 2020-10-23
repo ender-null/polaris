@@ -8,14 +8,14 @@ export class Message {
   type: string;
   date: number;
   reply: Message;
-  extra: string;
+  extra: Extra;
 
   constructor(
     id: number,
     conversation: Conversation,
     sender: User,
     content: string,
-    type: string = 'text',
+    type = 'text',
     date: number = null,
     reply: Message = null,
     extra = null,
@@ -30,3 +30,5 @@ export class Message {
     this.extra = extra;
   }
 }
+
+export abstract class Extra extends Object {}

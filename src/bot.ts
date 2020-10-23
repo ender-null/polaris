@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import * as bindings from './bindings/index';
-import { BindingsBase, Config, Message, Plugin, User } from './index';
+import { BindingsBase, Config, Extra, Message, Plugin, User } from './index';
 import { logger } from './main';
 
 export class Bot {
@@ -19,19 +19,25 @@ export class Bot {
     this.bindings = new bindings[this.config.bindings](this);
   }
 
-  async start() {
+  async start(): Promise<void> {
     await this.bindings.start();
-    this.user = this.bindings.getMe();
+    this.user = await this.bindings.getMe();
     logger.info(this.user.id);
   }
 
-  stop() {}
+  async stop(): Promise<void> {
+    logger.info('stop');
+  }
 
-  messagesHandler() {}
+  messagesHandler(): void {
+    logger.info('messagesHandler');
+  }
 
-  initPlugins() {}
+  initPlugins(): void {
+    logger.info('initPlugins');
+  }
 
-  onMessageReceive(msg: Message) {
+  onMessageReceive(msg: Message): void {
     logger.info(msg.content);
   }
 
@@ -40,13 +46,13 @@ export class Bot {
     parameters: string[],
     message: string,
     plugin: Plugin,
-    friendly: boolean = false,
-    keep_default: boolean = false,
-  ) {
+    friendly = false,
+    keep_default = false,
+  ): void {
     logger.info(command, parameters, message, plugin, friendly, keep_default);
   }
 
-  replyMessage(msg: Message, content: string, type: string = 'text', reply: Message = null, extra: any = null) {
+  replyMessage(msg: Message, content: string, type = 'text', reply: Message = null, extra: Extra = null): void {
     const message = new Message(null, msg.conversation, this.user, content, type, null, reply, extra);
     this.outbox.emit('message', message);
   }
