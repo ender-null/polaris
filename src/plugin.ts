@@ -11,11 +11,15 @@ export abstract class PluginBase {
     logger.debug(`Ignoring message [${msg.id}] because plugin "${this.constructor.name}" missing always(msg)`);
   }
 
-  async cron(): Promise<void> {}
+  async cron(): Promise<void> {
+    logger.debug(`Ignoring because plugin "${this.constructor.name}" missing cron()`);
+  }
 }
 
 export abstract class Command {
   command: string;
+  friendly: string;
+  shortcut: string;
   parameters: Parameter[];
   hidden: boolean;
   description: string;
