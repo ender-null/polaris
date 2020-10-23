@@ -58,7 +58,7 @@ export class Bot {
   initPlugins(): PluginBase[] {
     const _plugins = [];
     for (const plugin in plugins) {
-      _plugins.push(plugins[plugin]);
+      _plugins.push(new plugins[plugin](this));
     }
     return _plugins;
   }
@@ -77,8 +77,8 @@ export class Bot {
       ignoreMessage = true;
     }
 
-    for (const pluginName in this.plugins) {
-      const plugin = this.plugins[pluginName];
+    for (const i in this.plugins) {
+      const plugin = this.plugins[i];
       if ('always' in plugin) {
         plugin.always(msg);
       }
@@ -137,7 +137,7 @@ export class Bot {
     if (
       typeof message.content == 'string' &&
       message.content.endsWith('@' + this.user.username) &&
-      /\s/.test(message.content)
+      message.content.indexOf(' ') > -1
     ) {
       message.content = message.content.replace('@' + this.user.username, '');
     }
@@ -160,26 +160,26 @@ export class Bot {
 
       if (!friendly) {
         trigger = trigger.replace('@' + this.user.username.toLocaleLowerCase(), '');
-        if (parameters && trigger.startswith('^')) {
+        if (parameters == null && trigger.startsWith('^')) {
           trigger += '$';
         } else if (
-          parameters &&
+          parameters != null &&
           message.content != null &&
           typeof message.content == 'string' &&
-          ' '.indexOf(message.content) == -1
+          message.content.indexOf(' ') == -1
         ) {
           trigger += '$';
         } else if (
-          parameters &&
+          parameters != null &&
           message.content != null &&
           typeof message.content == 'string' &&
-          ' '.indexOf(message.content) > -1
+          message.content.indexOf(' ') > -1
         ) {
           trigger += ' ';
         }
       }
 
-      if (message.content && typeof message.content == 'string' && /trigger/gi.test(message.content)) {
+      if (message.content && typeof message.content == 'string' && new RegExp(trigger, 'gi').test(message.content)) {
         message = setInput(message, trigger);
         plugin.run(message);
 

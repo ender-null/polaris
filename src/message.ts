@@ -15,10 +15,10 @@ export class Message {
     conversation: Conversation,
     sender: User | Conversation,
     content: string,
-    type = 'text',
-    date: number = null,
-    reply: Message = null,
-    extra: Extra = null,
+    type?: string,
+    date?: number,
+    reply?: Message,
+    extra?: Extra,
   ) {
     this.id = id;
     this.conversation = conversation;

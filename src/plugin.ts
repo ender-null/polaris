@@ -5,6 +5,10 @@ export abstract class PluginBase {
   bot: Bot;
   commands: Command[];
 
+  constructor(bot: Bot) {
+    this.bot = bot;
+  }
+
   abstract async run(msg: Message): Promise<void>;
 
   async always(msg: Message): Promise<void> {
@@ -18,12 +22,21 @@ export abstract class PluginBase {
 
 export abstract class Command {
   command: string;
-  friendly: string;
-  shortcut: string;
-  parameters: Parameter[];
-  hidden: boolean;
-  description: string;
-  keepDefault: boolean;
+  friendly?: string;
+  shortcut?: string;
+  parameters?: Parameter[];
+  hidden?: boolean;
+  description?: string;
+  keepDefault?: boolean;
+
+  constructor() {
+    this.friendly = null;
+    this.shortcut = null;
+    this.parameters = null;
+    this.hidden = false;
+    this.description = null;
+    this.keepDefault = false;
+  }
 }
 
 export abstract class Parameter {
