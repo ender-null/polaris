@@ -8,8 +8,6 @@ services:
     depends_on:
       - database
     environment:
-      - CRACKWATCH_TOKEN
-      - CRACKWATCH_SCHEDULE
       - MONGO_HOST
       - MONGO_USER
       - MONGO_PASSWORD

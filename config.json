@@ -1,18 +1,18 @@
 {
-    "name": "polaris",
-    "prefix": "/",
-    "locale": "en_US",
-    "owner": 1108251406,
-    "plugins": "*",
-    "excludedPlugins": [],
-    "translation": "default",
-    "bindings": "TelegramTDlibBindings",
-    "adminConversationId": "-1001185276053",
-    "alertsConversationId": "-1001453669684",
-    "apiKeys": {
-        "telegramBotToken": "126457252:AAHDt4Upushu1QySdfETZgz-c7ug4uqnX08",
-        "telegramApiHash": "a02faf18185b1fbc31b06f93b08d120b",
-        "telegramAppId": 18184,
-        "databaseEncryptionKey": ""
-    }
+  "name": "polaris",
+  "prefix": "/",
+  "locale": "en_US",
+  "owner": 1108251406,
+  "plugins": "*",
+  "excludedPlugins": [],
+  "translation": "default",
+  "bindings": "TelegramTDlibBindings",
+  "adminConversationId": "-1001185276053",
+  "alertsConversationId": "-1001453669684",
+  "apiKeys": {
+    "telegramBotToken": "126457252:AAHDt4Upushu1QySdfETZgz-c7ug4uqnX08",
+    "telegramApiHash": "a02faf18185b1fbc31b06f93b08d120b",
+    "telegramAppId": 18184,
+    "databaseEncryptionKey": ""
+  }
 }

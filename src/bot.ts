@@ -22,15 +22,15 @@ export class Bot {
   async start(): Promise<void> {
     await this.bindings.start();
     this.user = await this.bindings.getMe();
-    logger.info(this.user.id);
+    this.inbox.on('message', this.messagesHandler);
   }
 
   async stop(): Promise<void> {
     logger.info('stop');
   }
 
-  messagesHandler(): void {
-    logger.info('messagesHandler');
+  messagesHandler(msg: Message): void {
+    logger.info('messagesHandler: ' + msg.content);
   }
 
   initPlugins(): void {
