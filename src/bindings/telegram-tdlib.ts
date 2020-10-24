@@ -8,12 +8,12 @@ export class TelegramTDlibBindings extends BindingsBase {
   client: Client;
   constructor(bot: Bot) {
     super(bot);
-    this.client = new Client(new TDLib('bin/libtdjson.so'), {
+    this.client = new Client(new TDLib(), {
       apiId: this.bot.config.apiKeys.telegramAppId,
       apiHash: this.bot.config.apiKeys.telegramApiHash,
-      databaseDirectory: `/home/ender/.tdlib_files/${this.bot.config.name}`,
+      databaseDirectory: `${__dirname}/.tdlib_files/${this.bot.config.name}`,
       databaseEncryptionKey: this.bot.config.apiKeys.databaseEncryptionKey,
-      filesDirectory: `/home/ender/.tdlib_files/${this.bot.config.name}`,
+      filesDirectory: `${__dirname}/.tdlib_files/${this.bot.config.name}`,
       verbosityLevel: 1,
       tdlibParameters: {
         application_version: '1.0',
