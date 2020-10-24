@@ -3,21 +3,6 @@ services:
   bot:
     build: .
     restart: unless-stopped
-    links:
-      - database
-    depends_on:
-      - database
-    environment:
-      - MONGO_HOST
-      - MONGO_USER
-      - MONGO_PASSWORD
     volumes:
       - ./error.log:/error.log
       - ./combined.log:/combined.log
-
-  database:
-    image: mongo:4.2.8
-    restart: unless-stopped
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_USER}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD}
