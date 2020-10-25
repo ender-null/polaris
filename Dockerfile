@@ -15,9 +15,11 @@ RUN npm run build
 
 FROM ghcr.io/luksireiku/polaris-js-base AS release
 
+WORKDIR /usr/src/app
+
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/build ./build
 COPY --from=builder /usr/src/app/package.json ./
 COPY --from=builder /usr/src/app/config.json ./config.json
 
-CMD ["node", "start"]
+CMD ["npm", "start"]
