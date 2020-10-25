@@ -30,7 +30,15 @@ export class DiscordBindings extends BindingsBase {
     });
 
     this.client.on('message', (message: DiscordMessage) => this.messageEventHandler(message));
-    this.client.login(this.bot.config.apiKeys.discordBotToken);
+    this.client.login(this.bot.config.apiKeys.discordBotToken).then(
+      (tok) => {
+        logger.debug(`Bot logged in successfully!\n\n${tok}\n\n`);
+      },
+      (err) => {
+        logger.error(`${this.bot.config.name} (${this.bot.config.bindings}) failed to start:\n${err}`);
+        this.client.destroy();
+      },
+    );
     this.bot.outbox.on('message', (msg: Message) => this.sendMessage(msg));
   }
 

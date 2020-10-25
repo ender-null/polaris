@@ -38,7 +38,11 @@ export class Bot {
       this.user = await this.bindings.getMe();
       logger.info(`Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}]`);
     });
-    await this.bindings.start();
+    try {
+      await this.bindings.start();
+    } catch (e) {
+      logger.error(e);
+    }
   }
 
   async stop(): Promise<void> {
