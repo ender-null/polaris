@@ -16,6 +16,15 @@ export interface ApiKeys {
   wolframAlpha?: string;
 }
 
+export interface Instance {
+  translation?: string;
+  bindings?: string;
+  owner?: string;
+  adminConversationId?: string;
+  alertsConversationId?: string;
+  plugins?: string | string[];
+}
+
 export class Config {
   name?: string;
   prefix?: string;
@@ -28,6 +37,7 @@ export class Config {
   adminConversationId?: string;
   alertsConversationId?: string;
   apiKeys?: ApiKeys;
+  instances?: Instance[];
 
   constructor() {
     (this.name = null), (this.prefix = '/');
@@ -44,12 +54,32 @@ export class Config {
       telegramApiHash: null,
       telegramAppId: null,
       databaseEncryptionKey: null,
+      discordBotToken: null,
     };
+    this.instances = null;
   }
 
   static loadFromFile(path: string): Config {
     const file = readFileSync(path, 'utf-8');
     const config: Config = { ...JSON.parse(file) };
     return config;
+  }
+
+  static loadInstancesFromFile(path: string): Config[] {
+    const config = this.loadFromFile(path);
+    const configs = [];
+    if (!config.instances) {
+      configs.push(config);
+    } else {
+      for (const instance of config.instances) {
+        const iconfig = {
+          ...config,
+          ...instance,
+        };
+        delete iconfig['instances'];
+        configs.push(iconfig);
+      }
+    }
+    return configs;
   }
 }

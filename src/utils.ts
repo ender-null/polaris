@@ -139,3 +139,57 @@ export function generateCommandHelp(plugin: PluginBase, text: string, showHidden
 
   return doc;
 }
+
+export function getExtension(filename) {
+  return '.' + filename.split('.')[1];
+}
+
+export function removeHtml(text: string): string {
+  return text.replace(new RegExp('<[^<]+?>', 'gim'), '');
+}
+
+export function replaceHtml(text: string): string {
+  text = text.replace('&lt;', '<');
+  text = text.replace('&gt;', '>');
+  return text;
+}
+
+export function htmlToDiscordMarkdown(text: string): string {
+  const replacements = [
+    { pattern: '<code class="language-([w]+)">([Ss]+)</code>', sub: '```$1\n$2```' },
+    // {pattern: '<a href=\"(.[^\<]+)\">(.[^\<]+)</a>', sub: '[$2]($1)'},
+    { pattern: '<a href="(.[^<]+)">(.[^<]+)</a>', sub: '$1' },
+    { pattern: '<[/]?i>', sub: '_' },
+    { pattern: '<[/]?b>', sub: '**' },
+    { pattern: '<[/]?u>', sub: '__' },
+    { pattern: '<[/]?code>', sub: '`' },
+    { pattern: '<[/]?pre>', sub: '```' },
+  ];
+
+  for (const rep of replacements) {
+    text = text.replace(new RegExp(rep['pattern'], 'gim'), rep['sub']);
+  }
+
+  text = replaceHtml(text);
+  return text;
+}
+
+export function splitLargeMessage(content: string, maxLength: number): string[] {
+  const lineBreak = '\n';
+  const lines = content.split(lineBreak);
+  const texts = [];
+  let text = '';
+  let length = 0;
+
+  for (const line of lines) {
+    if (length + line.length + lineBreak.length < maxLength) {
+      text += line + lineBreak;
+      length += line.length + lineBreak.length;
+    } else {
+      texts.push(text);
+      text = line + lineBreak;
+      length += line.length + lineBreak.length;
+    }
+  }
+  return texts;
+}

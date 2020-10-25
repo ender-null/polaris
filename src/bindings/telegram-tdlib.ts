@@ -38,7 +38,8 @@ export class TelegramTDlibBindings extends BindingsBase {
     }));
 
     this.client.on('update', (update: Update) => this.updateHandler(update));
-    this.client.on('error', console.error);
+    this.client.on('error', logger.error);
+    this.bot.status.emit('started');
     this.bot.outbox.on('message', (msg: Message) => this.sendMessage(msg));
   }
 
@@ -147,8 +148,7 @@ export class TelegramTDlibBindings extends BindingsBase {
         }
       }
       if (update.message) {
-        const msg = await this.convertMessage(update.message);
-        this.bot.inbox.emit('message', msg);
+        this.bot.inbox.emit('message', await this.convertMessage(update.message));
       }
     }
   }

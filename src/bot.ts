@@ -11,6 +11,7 @@ export class Bot {
   bindings: BindingsBase;
   inbox: EventEmitter;
   outbox: EventEmitter;
+  status: EventEmitter;
   started: boolean;
   plugins: PluginBase[];
   user: User;
@@ -18,13 +19,13 @@ export class Bot {
   constructor(config: Config) {
     this.inbox = new EventEmitter();
     this.outbox = new EventEmitter();
+    this.status = new EventEmitter();
     this.config = config;
     this.bindings = new bindings[this.config.bindings](this);
     this.plugins = [];
   }
 
   async start(): Promise<void> {
-    this.started = true;
     this.inbox.on('message', (msg: Message) => this.messagesHandler(msg));
     this.outbox.on('message', (msg: Message) => {
       logger.info(
@@ -32,9 +33,12 @@ export class Bot {
       );
     });
     this.plugins = this.initPlugins();
+    this.status.on('started', async () => {
+      this.started = true;
+      this.user = await this.bindings.getMe();
+      logger.info(`Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}]`);
+    });
     await this.bindings.start();
-    this.user = await this.bindings.getMe();
-    logger.info(`Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}]`);
   }
 
   async stop(): Promise<void> {

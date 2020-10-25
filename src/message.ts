@@ -1,7 +1,7 @@
 import { Conversation, User } from '.';
 
 export class Message {
-  id: number;
+  id: number | string;
   conversation: Conversation;
   sender: User | Conversation;
   content: string;
@@ -11,7 +11,7 @@ export class Message {
   extra: Extra;
 
   constructor(
-    id: number,
+    id: number | string,
     conversation: Conversation,
     sender: User | Conversation,
     content: string,
@@ -32,7 +32,9 @@ export class Message {
 }
 
 export abstract class Extra extends Object {
-  format?: string;
   input?: string;
   inputReply?: string;
+  format?: string;
+  preview?: boolean;
+  caption?: string;
 }

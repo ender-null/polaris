@@ -1,11 +1,11 @@
 export class User {
-  id: number;
+  id: number | string;
   firstName: string;
   lastName: string;
   username: string;
   isBot: boolean;
 
-  constructor(id: number, firstName?: string, lastName?: string, username?: string, isBot?: boolean) {
+  constructor(id: number | string, firstName?: string, lastName?: string, username?: string, isBot?: boolean) {
     this.id = id;
     this.firstName = firstName;
     this.lastName = lastName;

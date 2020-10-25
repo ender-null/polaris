@@ -15,13 +15,19 @@ export const logger = createLogger({
 });
 
 export const stop = (): void => {
-  bot.stop();
+  for (const bot of bots) {
+    bot.stop();
+  }
   process.exit(1);
 };
 
-const config = Config.loadFromFile('config.json');
-const bot = new Bot(config);
-bot.start();
+const configs = Config.loadInstancesFromFile('config.json');
+const bots = [];
+for (const config of configs) {
+  const bot = new Bot(config);
+  bot.start();
+  bots.push(bot);
+}
 
 process.once('SIGINT', stop);
 process.once('SIGTERM', stop);

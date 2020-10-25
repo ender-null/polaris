@@ -36,6 +36,7 @@
     "node": ">=12"
   },
   "dependencies": {
+    "discord.js": "^12.4.1",
     "tdl": "^6.1.0",
     "tdl-tdlib-ffi": "^2.0.0",
     "winston": "^3.3.3"
