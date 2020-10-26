@@ -37,4 +37,6 @@ export abstract class Extra extends Object {
   format?: string;
   preview?: boolean;
   caption?: string;
+  message?: number;
+  conversation?: number;
 }

@@ -3,6 +3,7 @@ import { TDLib } from 'tdl-tdlib-ffi';
 import { message, Update, user } from 'tdl/types/tdlib';
 import { BindingsBase, Bot, Conversation, Message, User } from '..';
 import { logger } from '../main';
+import { splitLargeMessage } from '../utils';
 
 export class TelegramTDlibBindings extends BindingsBase {
   client: Client;
@@ -154,17 +155,221 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async sendMessage(msg: Message): Promise<void> {
-    if (msg.content) {
-      await this.serverRequest('sendMessage', {
-        chat_id: msg.conversation.id,
-        input_message_content: {
-          _: 'inputMessageText',
-          text: {
-            _: 'formattedText',
-            text: msg.content,
+    this.sendChatAction(+msg.conversation.id, msg.type);
+    let data = null;
+    let inputMessageContent = null;
+
+    if (msg.type == 'text') {
+      if (!msg.content || (typeof msg.content == 'string' && msg.content.length == 0)) {
+        return;
+      }
+      let text = null;
+      if (msg.extra && 'format' in msg.extra) {
+        let parseMode = null;
+        let formatedText = null;
+
+        if (msg.extra.format == 'HTML') {
+          parseMode = 'textParseModeHTML';
+        } else {
+          parseMode = 'textParseModeMarkdown';
+        }
+
+        formatedText = await this.serverRequest('parseTextEntities', {
+          text: msg.content,
+          parse_mode: {
+            '@type': parseMode,
           },
-        },
-      });
+        });
+
+        if (formatedText) {
+          text = formatedText;
+        } else {
+          text = {
+            '@type': 'formattedText',
+            text: msg.content,
+            entities: [],
+          };
+        }
+      } else {
+        text = {
+          '@type': 'formattedText',
+          text: msg.content,
+          entities: [],
+        };
+      }
+
+      let preview = false;
+      if (msg.extra && 'preview' in msg.extra) {
+        preview = msg.extra.preview;
+      }
+      inputMessageContent = {
+        '@type': 'inputMessageText',
+        text: text,
+        disable_web_page_preview: !preview,
+      };
+    } else if (msg.type == 'photo') {
+      inputMessageContent = {
+        '@type': 'inputMessagePhoto',
+        photo: this.getInputFile(msg.content),
+      };
+
+      if (msg.extra && 'caption' in msg.extra) {
+        inputMessageContent['caption'] = {
+          '@type': 'formattedText',
+          text: msg.extra.caption,
+        };
+      }
+    } else if (msg.type == 'animation') {
+      inputMessageContent = {
+        '@type': 'inputMessageAnimation',
+        photo: this.getInputFile(msg.content),
+      };
+
+      if (msg.extra && 'caption' in msg.extra) {
+        inputMessageContent['caption'] = {
+          '@type': 'formattedText',
+          text: msg.extra.caption,
+        };
+      }
+    } else if (msg.type == 'audio') {
+      inputMessageContent = {
+        '@type': 'inputMessageAudio',
+        photo: this.getInputFile(msg.content),
+      };
+
+      if (msg.extra && 'caption' in msg.extra) {
+        inputMessageContent['caption'] = {
+          '@type': 'formattedText',
+          text: msg.extra.caption,
+        };
+      }
+    } else if (msg.type == 'document') {
+      inputMessageContent = {
+        '@type': 'inputMessageDocument',
+        photo: this.getInputFile(msg.content),
+      };
+
+      if (msg.extra && 'caption' in msg.extra) {
+        inputMessageContent['caption'] = {
+          '@type': 'formattedText',
+          text: msg.extra.caption,
+        };
+      }
+    } else if (msg.type == 'sticker') {
+      inputMessageContent = {
+        '@type': 'inputMessageSticker',
+        photo: this.getInputFile(msg.content),
+      };
+
+      if (msg.extra && 'caption' in msg.extra) {
+        inputMessageContent['caption'] = {
+          '@type': 'formattedText',
+          text: msg.extra.caption,
+        };
+      }
+    } else if (msg.type == 'video') {
+      inputMessageContent = {
+        '@type': 'inputMessageVideo',
+        photo: this.getInputFile(msg.content),
+      };
+
+      if (msg.extra && 'caption' in msg.extra) {
+        inputMessageContent['caption'] = {
+          '@type': 'formattedText',
+          text: msg.extra.caption,
+        };
+      }
+    } else if (msg.type == 'voice') {
+      inputMessageContent = {
+        '@type': 'inputMessageVoiceNote',
+        photo: this.getInputFile(msg.content),
+      };
+
+      if (msg.extra && 'caption' in msg.extra) {
+        inputMessageContent['caption'] = {
+          '@type': 'formattedText',
+          text: msg.extra.caption,
+        };
+      }
+    } else if (msg.type == 'forward') {
+      data = {
+        '@type': 'forwardMessages',
+        chat_id: msg.extra.conversation,
+        from_chat_id: msg.conversation.id,
+        message_ids: [msg.extra.message],
+      };
+    }
+
+    if (inputMessageContent) {
+      data = {
+        '@type': 'sendMessage',
+        chat_id: msg.conversation.id,
+        input_message_content: inputMessageContent,
+      };
+
+      if (msg.reply) {
+        data['reply_to_message_id'] = msg.reply;
+      }
+
+      if (data) {
+        if (msg.type == 'text' && data['input_message_content']['text']['text'].length > 4000) {
+          const texts = splitLargeMessage(data['input_message_content']['text']['text'], 4000);
+          for (const text of texts) {
+            data['input_message_content']['text']['text'] = text;
+            await this.serverRequest(data['@type'], data);
+          }
+        } else {
+          await this.serverRequest(data['@type'], data);
+        }
+        this.sendChatAction(+msg.conversation.id, 'cancel');
+      }
+    }
+  }
+
+  async sendChatAction(conversationId: number, type = 'text') {
+    let action = 'chatActionTyping';
+
+    if (type == 'photo') {
+      action = 'chatActionUploadingPhoto';
+    } else if (type == 'document') {
+      action = 'chatActionUploadingDocument';
+    } else if (type == 'video') {
+      action = 'chatActionUploadingVideo';
+    } else if (type == 'voice' || type == 'audio') {
+      action = 'chatActionRecordingVoiceNote';
+    } else if (type == 'location' || type == 'venue') {
+      action = 'chatActionChoosingLocation';
+    } else if (type == 'cancel') {
+      action = 'chatActionCancel';
+    }
+
+    return await this.serverRequest('sendChatAction', {
+      chat_id: conversationId,
+      action: { _: action },
+    });
+  }
+
+  getInputFile(content: string) {
+    if (content.startsWith('/')) {
+      return {
+        '@type': 'inputFileLocal',
+        path: content,
+      };
+    } else if (content.startsWith('http')) {
+      return {
+        '@type': 'inputFileRemote',
+        id: content,
+      };
+    } else if (content.startsWith(content)) {
+      return {
+        '@type': 'inputFileId',
+        id: content,
+      };
+    } else {
+      return {
+        '@type': 'inputFileRemote',
+        id: content,
+      };
     }
   }
 }
