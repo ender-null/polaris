@@ -97,10 +97,10 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
           script: |
-            docker pull ghcr.io/${{ github.repository_owner }}/polaris-js:latest
-            docker stop polaris-js
-            docker rm polaris-js
-            docker container create -t --rm --name polaris-js ghcr.io/${{ github.repository_owner }}/polaris-js
-            echo "${{ secrets.FIREBASE_CONFIG }}" > firebase.json
-            docker cp firebase.json polaris-js:/firebase.json
-            docker container start polaris-js
+            docker pull ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME:latest
+            docker stop $IMAGE_NAME
+            docker rm $IMAGE_NAME
+            docker container create -t --rm --name $IMAGE_NAME ghcr.io/${{ github.repository_owner }}/$IMAGE_NAME
+            echo '${{ secrets.FIREBASE_CONFIG }}' > firebase.json
+            docker cp firebase.json $IMAGE_NAME:/usr/src/app/firebase.json
+            docker container start $IMAGE_NAME
