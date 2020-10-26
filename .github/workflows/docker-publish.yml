@@ -100,7 +100,7 @@ jobs:
             docker pull ghcr.io/${{ github.repository_owner }}/polaris-js:latest
             docker stop polaris-js
             docker rm polaris-js
-            docker create -t --rm --name polaris-js ghcr.io/${{ github.repository_owner }}/polaris-js
+            docker container create -t --rm --name polaris-js ghcr.io/${{ github.repository_owner }}/polaris-js
             echo "${{ secrets.FIREBASE_CONFIG }}" > firebase.json
             docker cp firebase.json polaris-js:/firebase.json
-            docker start
+            docker container start polaris-js
