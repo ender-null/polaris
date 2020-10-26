@@ -1,5 +1,5 @@
 import { Bot, Message } from '.';
-import { logger } from './main';
+import { logger } from './utils';
 
 export abstract class PluginBase {
   bot: Bot;

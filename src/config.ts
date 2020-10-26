@@ -65,8 +65,7 @@ export class Config {
     return config;
   }
 
-  static loadInstancesFromFile(path: string): Config[] {
-    const config = this.loadFromFile(path);
+  static loadInstancesFromJSON(config: Config): Config[] {
     const configs = [];
     if (!config.instances) {
       configs.push(config);
@@ -80,6 +79,12 @@ export class Config {
         configs.push(iconfig);
       }
     }
+    return configs;
+  }
+
+  static loadInstancesFromFile(path: string): Config[] {
+    const config = this.loadFromFile(path);
+    const configs = this.loadInstancesFromJSON(config);
     return configs;
   }
 }

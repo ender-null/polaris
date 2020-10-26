@@ -1,10 +1,9 @@
 import { EventEmitter } from 'events';
 import * as bindings from './bindings/index';
 import { BindingsBase, Config, Extra, Message, PluginBase, User } from './index';
-import { logger } from './main';
 import { Parameter } from './plugin';
 import * as plugins from './plugins/index';
-import { hasTag, isTrusted, setInput } from './utils';
+import { hasTag, isTrusted, logger, setInput } from './utils';
 
 export class Bot {
   config: Config;

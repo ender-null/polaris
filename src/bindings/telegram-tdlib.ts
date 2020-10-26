@@ -1,9 +1,8 @@
 import { Client } from 'tdl';
 import { TDLib } from 'tdl-tdlib-ffi';
-import { message, Update, user } from 'tdl/types/tdlib';
+import { message, ok, Update, user } from 'tdl/types/tdlib';
 import { BindingsBase, Bot, Conversation, Message, User } from '..';
-import { logger } from '../main';
-import { splitLargeMessage } from '../utils';
+import { logger, sendRequest, splitLargeMessage } from '../utils';
 
 export class TelegramTDlibBindings extends BindingsBase {
   client: Client;
@@ -21,6 +20,11 @@ export class TelegramTDlibBindings extends BindingsBase {
         device_model: 'polaris.js',
       },
     });
+  }
+
+  async apiRequest(method: string, params: Record<string, unknown> = {}): Promise<any> {
+    const url = `https://api.telegram.org/bot${this.bot.config.apiKeys.telegramBotToken}/${method}`;
+    return sendRequest(url, params);
   }
 
   async serverRequest(method: string, params: Record<string, unknown> = {}): Promise<any> {
@@ -326,7 +330,7 @@ export class TelegramTDlibBindings extends BindingsBase {
     }
   }
 
-  async sendChatAction(conversationId: number, type = 'text') {
+  async sendChatAction(conversationId: number, type = 'text'): Promise<ok> {
     let action = 'chatActionTyping';
 
     if (type == 'photo') {
@@ -349,7 +353,7 @@ export class TelegramTDlibBindings extends BindingsBase {
     });
   }
 
-  getInputFile(content: string) {
+  getInputFile(content: string): Record<string, unknown> {
     if (content.startsWith('/')) {
       return {
         '@type': 'inputFileLocal',

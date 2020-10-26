@@ -1,7 +1,6 @@
-import { Client, Message as DiscordMessage, MessageEmbed } from 'discord.js';
+import { Client, DMChannel, Message as DiscordMessage, MessageEmbed, NewsChannel, TextChannel } from 'discord.js';
 import { BindingsBase, Bot, Conversation, Message, User } from '..';
-import { logger } from '../main';
-import { getExtension, htmlToDiscordMarkdown, splitLargeMessage } from '../utils';
+import { getExtension, htmlToDiscordMarkdown, logger, splitLargeMessage } from '../utils';
 
 export class DiscordBindings extends BindingsBase {
   client: Client;
@@ -179,7 +178,7 @@ export class DiscordBindings extends BindingsBase {
     }
   }
 
-  addDiscordMentions(chat, content: string): string {
+  addDiscordMentions(chat: DMChannel | TextChannel | NewsChannel, content: string): string {
     if (!content) {
       logger.info(chat);
     }

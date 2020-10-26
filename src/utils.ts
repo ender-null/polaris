@@ -1,5 +1,6 @@
+import fetch from 'node-fetch';
+import { createLogger, format, transports } from 'winston';
 import { Bot, Message } from '.';
-import { logger } from './main';
 import { PluginBase } from './plugin';
 
 export function isTrusted(bot: Bot, uid: number | string, msg: Message = null): boolean {
@@ -74,10 +75,16 @@ export function isCommand(plugin: PluginBase, number: number, text: string): boo
     } else if ('parameters' in plugin.commands[number - 1] && text.indexOf('/start') > -1) {
       trigger += ' ';
     }
+    if (new RegExp(trigger, 'gim').test(text)) {
+      return true;
+    }
   }
 
   if ('friendly' in plugin.commands[number - 1]) {
     trigger = plugin.commands[number - 1].friendly;
+    if (new RegExp(trigger, 'gim').test(text)) {
+      return true;
+    }
   }
   if ('shortcut' in plugin.commands[number - 1]) {
     trigger = plugin.commands[number - 1].shortcut.replace('/', plugin.bot.config.prefix).toLocaleLowerCase();
@@ -89,8 +96,11 @@ export function isCommand(plugin: PluginBase, number: number, text: string): boo
     } else if ('parameters' in plugin.commands[number - 1] && text.indexOf('/start') > -1) {
       trigger += ' ';
     }
+    if (new RegExp(trigger, 'gim').test(text)) {
+      return true;
+    }
   }
-  return new RegExp(trigger, 'gim').test(text);
+  return false;
 }
 
 export function getCommandIndex(plugin: PluginBase, text: string): number {
@@ -140,7 +150,19 @@ export function generateCommandHelp(plugin: PluginBase, text: string, showHidden
   return doc;
 }
 
-export function getExtension(filename) {
+export function sendRequest(url: string, params: any = {}) {
+  const init = {
+    body: params,
+  };
+  return fetch(url, init)
+    .then((data) => {
+      return data.json();
+    })
+    .then((res) => logger.info(res))
+    .catch((error) => logger.error(error));
+}
+
+export function getExtension(filename: string) {
   return '.' + filename.split('.')[1];
 }
 
@@ -193,3 +215,16 @@ export function splitLargeMessage(content: string, maxLength: number): string[] 
   }
   return texts;
 }
+
+// Configure logger
+export const logger = createLogger({
+  level: 'info',
+  format: format.combine(format.timestamp(), format.json()),
+  transports: [
+    new transports.Console({
+      format: format.combine(format.simple(), format.colorize()),
+    }),
+    new transports.File({ filename: 'error.log', level: 'error' }),
+    new transports.File({ filename: 'combined.log' }),
+  ],
+});
