@@ -2,10 +2,10 @@
 
 <a href="https://github.com/luksireiku/polaris.js/actions?query=workflow%3A%22Node.js+CI%22">
     <img alt="Build Status" src="https://github.com/luksireiku/polaris.js/workflows/Node.js%20CI/badge.svg"></a>
-<a href="https://github.com/luksireiku/polaris.js/actions?query=workflow%3A%22Docker%20Image%20CI%22">
-    <img alt="Build Status" src="https://github.com/luksireiku/polaris.js/workflows/Docker%20Image%20CI/badge.svg"></a>
-<a href="https://github.com/luksireiku/polaris.js/actions?query=workflow%3A%22Build+and+Deploy+to+Google+Compute+Engine%22">
-    <img alt="Build Status" src="https://github.com/luksireiku/polaris.js/workflows/Build%20and%20Deploy%20to%20Google%20Compute%20Engine/badge.svg"></a>
+<a href="https://github.com/luksireiku/polaris.js/actions?query=workflow%3ADocker">
+    <img alt="Build Status" src="https://github.com/luksireiku/polaris.js/workflows/Docker/badge.svg"></a>
+<a href="https://github.com/luksireiku/polaris.js/actions?query=workflow%3ADeploy">
+    <img alt="Build Status" src="https://github.com/luksireiku/polaris.js/workflows/Deploy/badge.svg"></a>
 
 A multiplatform Javascript bot using plugins!
 
