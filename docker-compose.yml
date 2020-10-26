@@ -6,3 +6,4 @@ services:
     volumes:
       - ./error.log:/error.log
       - ./combined.log:/combined.log
+      - ./firebase.json:/firebase.json
