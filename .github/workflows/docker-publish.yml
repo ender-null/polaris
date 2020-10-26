@@ -80,7 +80,16 @@ jobs:
           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
 
-      - name: Deploy Docker image to server
+  # Deploy image to server
+  deploy:
+    # Ensure push job passes before updating image.
+    needs: push
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Deploy image to server
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.HOST }}
