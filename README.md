@@ -4,8 +4,6 @@
     <img alt="Build Status" src="https://github.com/luksireiku/polaris.js/workflows/Node.js%20CI/badge.svg"></a>
 <a href="https://github.com/luksireiku/polaris.js/actions?query=workflow%3ADocker">
     <img alt="Build Status" src="https://github.com/luksireiku/polaris.js/workflows/Docker/badge.svg"></a>
-<a href="https://github.com/luksireiku/polaris.js/actions?query=workflow%3ADeploy">
-    <img alt="Build Status" src="https://github.com/luksireiku/polaris.js/workflows/Deploy/badge.svg"></a>
 
 A multiplatform Javascript bot using plugins!
 
