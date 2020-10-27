@@ -100,5 +100,4 @@ jobs:
             docker pull ghcr.io/${{ github.repository_owner }}/polaris-js:latest
             docker stop polaris-js
             docker rm polaris-js
-            docker container create -t --rm --name polaris-js ghcr.io/${{ github.repository_owner }}/polaris-js
-            docker container start polaris-js
+            docker run -v $PWD/error.log:/usr/src/app/error.log -v $PWD/combined.log:/usr/src/app/combined.log -v $PWD/firebase.json:/usr/src/app/firebase.json -v $PWD/.tdlib_files:/usr/src/app/.tdlib_files -ti -d --rm --name polaris ghcr.io/${{ github.repository_owner }}/polaris-js
