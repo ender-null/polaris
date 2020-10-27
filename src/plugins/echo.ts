@@ -24,6 +24,6 @@ export class EchoPlugin extends PluginBase {
     if (!input) {
       return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content), 'text', null, { format: 'HTML' });
     }
-    this.bot.replyMessage(msg, input);
+    this.bot.replyMessage(msg, msg.content.charAt(0).toUpperCase() + msg.content.slice(1));
   }
 }

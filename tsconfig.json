@@ -17,7 +17,7 @@
     "noImplicitAny": false,
     "noImplicitThis": false,
     "strictNullChecks": false,
-    "lib": ["ES6", "ES2019"],
+    "lib": ["ES6", "ES2019", "DOM"],
     "declaration": true,
     "declarationMap": true
   },

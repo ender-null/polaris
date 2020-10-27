@@ -1,16 +1,30 @@
 import fetch from 'node-fetch';
+import util from 'util';
 import { createLogger, format, transports } from 'winston';
-import { Bot, Message } from '.';
-import { PluginBase } from './plugin';
+import { Bot, Message, PluginBase } from '.';
+import { db } from './main';
 
 export function isTrusted(bot: Bot, uid: number | string, msg: Message = null): boolean {
-  logger.debug('hasTag', bot, uid, msg);
-  return true;
+  return hasTag(uid, 'trusted') || msg.sender.id == bot.config.owner;
 }
 
-export function hasTag(bot: Bot, target: number | string, tag: string): boolean {
-  logger.debug('hasTag', bot, target, tag);
-  return false;
+export function hasTag(target: number | string, tag: string): boolean {
+  if (typeof target != 'string') {
+    target = String(target);
+  }
+  const targetTags = db.tags.child(target).exists();
+  if (targetTags && tag.indexOf('?') > -1) {
+    for (const target_tag of db.tags.child(target).exists()) {
+      if (target_tag.startsWith(tag.split('?')[0])) {
+        return true;
+      }
+    }
+    return false;
+  } else if (targetTags && db.tags.child(target).val().indexOf(tag) > -1) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 export function setInput(message: Message, trigger: string): Message {
@@ -228,3 +242,10 @@ export const logger = createLogger({
     new transports.File({ filename: 'combined.log' }),
   ],
 });
+
+export const exec = util.promisify(require('child_process').exec);
+
+export async function execResult(command: string) {
+  const { stdout } = await exec(command);
+  return stdout;
+}

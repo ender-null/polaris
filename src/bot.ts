@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import * as bindings from './bindings/index';
-import { BindingsBase, Config, Extra, Message, PluginBase, User } from './index';
+import { BindingsBase, Config, Database, Extra, Message, PluginBase, User } from './index';
 import { Parameter } from './plugin';
 import * as plugins from './plugins/index';
 import { hasTag, isTrusted, logger, setInput } from './utils';
@@ -14,6 +14,7 @@ export class Bot {
   started: boolean;
   plugins: PluginBase[];
   user: User;
+  db: Database;
 
   constructor(config: Config) {
     this.inbox = new EventEmitter();
@@ -79,7 +80,7 @@ export class Bot {
     if (
       msg.sender.id != +this.config.owner &&
       !isTrusted(this, msg.sender.id, msg) &&
-      (hasTag(this, msg.conversation.id, 'muted') || hasTag(this, msg.sender.id, 'muted'))
+      (hasTag(msg.conversation.id, 'muted') || hasTag(msg.sender.id, 'muted'))
     ) {
       ignoreMessage = true;
     }
@@ -106,8 +107,8 @@ export class Bot {
 
           if (
             'friendly' in command &&
-            !hasTag(this, msg.sender.id, 'noreplies') &&
-            !hasTag(this, msg.conversation.id, 'noreplies') &&
+            !hasTag(msg.sender.id, 'noreplies') &&
+            !hasTag(msg.conversation.id, 'noreplies') &&
             msg.conversation.id != +this.config.alertsConversationId &&
             msg.conversation.id != +this.config.adminConversationId
           ) {
