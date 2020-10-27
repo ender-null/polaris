@@ -13,7 +13,7 @@ export class AboutPlugin extends PluginBase {
       },
       {
         command: '/donations',
-        description: 'Info about the bot',
+        description: 'Some help is always good',
         keepDefault: true,
       },
       {

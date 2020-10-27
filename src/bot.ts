@@ -141,7 +141,7 @@ export class Bot {
     friendly = false,
     keepDefault = false,
   ): boolean {
-    command = command.toLocaleLowerCase();
+    command = command.toLowerCase();
     if (
       typeof message.content == 'string' &&
       message.content.endsWith(`@${this.user.username}`) &&
@@ -150,13 +150,12 @@ export class Bot {
       message.content = message.content.replace('@' + this.user.username, '');
     }
 
-    // If the commands are not /start or /help, set the correct command start symbol.
+    // If the commands are not /start, /help or /config, set the correct command start symbol.
     let trigger = null;
     if (
-      typeof message.content == 'string' &&
-      ((command == '/start' && '/start'.indexOf(message.content) > -1) ||
-        (command == '/help' && '/help'.indexOf(message.content) > -1) ||
-        (command == '/config' && '/config'.indexOf(message.content) > -1))
+      (command == '/start' && message.content.indexOf('/start') > -1) ||
+      (command == '/help' && message.content.indexOf('/help') > -1) ||
+      (command == '/config' && message.content.indexOf('/config') > -1)
     ) {
       trigger = command.replace('/', '^/');
     } else {
@@ -167,7 +166,7 @@ export class Bot {
       }
 
       if (!friendly) {
-        trigger = trigger.replace(`@${this.user.username.toLocaleLowerCase()}`, '');
+        trigger = trigger.replace(`@${this.user.username.toLowerCase()}`, '');
         if (parameters == null && trigger.startsWith('^')) {
           trigger += '$';
         } else if (
@@ -186,13 +185,12 @@ export class Bot {
           trigger += ' ';
         }
       }
+    }
+    if (message.content && typeof message.content == 'string' && new RegExp(trigger, 'gim').test(message.content)) {
+      message = setInput(message, trigger);
+      plugin.run(message);
 
-      if (message.content && typeof message.content == 'string' && new RegExp(trigger, 'gim').test(message.content)) {
-        message = setInput(message, trigger);
-        plugin.run(message);
-
-        return true;
-      }
+      return true;
     }
     return false;
   }

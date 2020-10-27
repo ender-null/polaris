@@ -1,5 +1,6 @@
 import { exec } from 'child_process';
 import fetch from 'node-fetch';
+import util from 'util';
 import { createLogger, format, transports } from 'winston';
 import { Bot, Message, PluginBase } from '.';
 import { db } from './main';
@@ -244,6 +245,6 @@ export const logger = createLogger({
 });
 
 export async function execResult(command: string) {
-  const { stdout } = await exec(command);
+  const { stdout } = await util.promisify(exec)(command);
   return stdout;
 }
