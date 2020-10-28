@@ -42,7 +42,7 @@ export class DiscordBindings extends BindingsBase {
   }
 
   async stop(): Promise<void> {
-    logger.info('stop');
+    this.bot.status.emit('stopped');
   }
 
   async getMe(): Promise<User> {

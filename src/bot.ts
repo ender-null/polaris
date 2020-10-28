@@ -38,6 +38,10 @@ export class Bot {
       this.user = await this.bindings.getMe();
       logger.info(`Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}]`);
     });
+    this.status.on('stopped', async () => {
+      this.started = false;
+      logger.info(`Stopped ${this.user.firstName} (@${this.user.username}) [${this.user.id}]`);
+    });
     try {
       await this.bindings.start();
     } catch (e) {

@@ -1,13 +1,22 @@
 import { Bot, Config, Database } from '.';
+import { logger } from './utils';
 
-const bots = [];
+const bots: Bot[] = [];
 
-export const stop = (): void => {
+export async function stop(): Promise<void> {
+  let pending = bots.length;
   for (const bot of bots) {
-    bot.stop();
+    this.status.on('stopped', async () => {
+      pending -= 1;
+      if (pending == 0) {
+        process.exit(1);
+      } else {
+        logger.info(`Pending ${pending} bots...`);
+      }
+    });
+    await bot.stop();
   }
-  process.exit(1);
-};
+}
 
 export const db = new Database();
 db.events.once('update:configs', () => {
@@ -23,5 +32,5 @@ db.events.once('update:configs', () => {
 });
 db.init();
 
-process.once('SIGINT', stop);
-process.once('SIGTERM', stop);
+process.on('SIGINT', () => stop());
+process.on('SIGTERM', () => stop());
