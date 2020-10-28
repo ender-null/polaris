@@ -70,10 +70,10 @@ export class Config {
     if (!config.instances) {
       configs.push(config);
     } else {
-      for (const instance of config.instances) {
+      for (const instance of Object.keys(config.instances)) {
         const iconfig = {
           ...config,
-          ...instance,
+          ...config.instances[instance],
         };
         delete iconfig['instances'];
         configs.push(iconfig);

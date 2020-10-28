@@ -5,27 +5,181 @@ import { createLogger, format, transports } from 'winston';
 import { Bot, Message, PluginBase } from '.';
 import { db } from './main';
 
-export function isTrusted(bot: Bot, uid: number | string, msg: Message = null): boolean {
-  return hasTag(uid, 'trusted') || msg.sender.id == bot.config.owner;
+export function isOwner(bot: Bot, uid: number | string, msg: Message = null): boolean {
+  return hasTag(bot, uid, 'owner') || msg.sender.id == bot.config.owner;
 }
 
-export function hasTag(target: number | string, tag: string): boolean {
+export function isTrusted(bot: Bot, uid: number | string, msg: Message = null): boolean {
+  return hasTag(bot, uid, 'trusted') || isOwner(bot, uid, msg);
+}
+
+export function getTags(bot: Bot, target: number | string): string[] {
   if (typeof target != 'string') {
     target = String(target);
   }
-  const targetTags = db.tags.child(target).exists();
-  if (targetTags && tag.indexOf('?') > -1) {
-    for (const target_tag of db.tags.child(target).exists()) {
-      if (target_tag.startsWith(tag.split('?')[0])) {
+  if (db.tags[target] !== undefined) {
+    const tags = [];
+    for (const i in db.tags[target]) {
+      const tag = db.tags[target][i];
+      const regex = new RegExp('(@w+:)', 'gim');
+      if (regex.test(tag)) {
+        const inputMatch = regex.exec(tag);
+        if (inputMatch[1] === bot.config.name) {
+          tags.push(tag.replace(regex, ''));
+        }
+      } else {
+        tags.push(tag);
+      }
+    }
+    return tags;
+  } else {
+    return [];
+  }
+}
+
+export function hasTag(bot: Bot, target: number | string, tag: string): boolean {
+  if (typeof target != 'string') {
+    target = String(target);
+  }
+  const tags = getTags(bot, target);
+  if (tags && tag.indexOf('?') > -1) {
+    for (const targetTag of tags) {
+      if (targetTag.startsWith(tag.split('?')[0])) {
         return true;
       }
     }
     return false;
-  } else if (targetTags && db.tags.child(target).val().indexOf(tag) > -1) {
+  } else if (tags && tags.indexOf(tag) > -1) {
     return true;
   } else {
     return false;
   }
+}
+
+export function setTag(bot: Bot, target: number | string, tag: string): void {
+  if (typeof target != 'string') {
+    target = String(target);
+  }
+  const tags = getTags(bot, target);
+  if (tags && tags.indexOf(tag) == -1) {
+    db.tagsSnap.child(target).child(String(tags.length)).ref.set(tag);
+  }
+}
+
+export function delTag(bot: Bot, target: number | string, tag: string): void {
+  if (typeof target != 'string') {
+    target = String(target);
+  }
+  const tags = getTags(bot, target);
+  if (tags && tags.indexOf(tag) > -1) {
+    db.tagsSnap
+      .child(target)
+      .child(String(tags.indexOf(tag)))
+      .ref.set(null);
+  }
+}
+
+export function isInt(number: number | string): boolean {
+  if (typeof number == 'number') {
+    return true;
+  } else if (typeof number != 'string') {
+    return false;
+  }
+  return !isNaN(parseFloat(number));
+}
+
+export function getTarget(bot: Bot, m: Message, input: string): string {
+  if (input) {
+    const target = firstWord(input);
+    if (isInt(target)) {
+      return String(target);
+    } else if (target.startsWith('@')) {
+      if (bot.user.username.toLowerCase() == target.substr(1).toLowerCase()) {
+        return String(bot.user.id);
+      }
+      for (const uid in db.users) {
+        if (
+          db.users[uid]['username'] !== undefined &&
+          db.users[uid]['username'].toLowerCase() == target.substr(1).toLowerCase()
+        ) {
+          return uid;
+        }
+      }
+      for (const gid in db.groups) {
+        if (
+          db.groups[gid]['username'] !== undefined &&
+          db.groups[gid]['username'].toLowerCase() == target.substr(1).toLowerCase()
+        ) {
+          return gid;
+        }
+      }
+    } else if (target.startsWith('<@')) {
+      target.replace(new RegExp('<@!?([d]+)>', 'gim'), '$1');
+    } else if (target == '-g') {
+      return String(m.conversation.id);
+    } else {
+      for (const uid in db.users) {
+        let name = '';
+        if (db.users[uid].first_name !== undefined) {
+          name += db.users[uid].first_name;
+        }
+        if (db.users[uid].last_name !== undefined) {
+          name += ' ' + db.users[uid].last_name;
+        }
+        if (new RegExp(target, 'gim').test(name)) {
+          return uid;
+        }
+      }
+      for (const gid in db.groups) {
+        if (new RegExp(target, 'gim').test(db.groups[gid].title)) {
+          return gid;
+        }
+      }
+    }
+    return target;
+  } else if (m.reply) {
+    return String(m.reply.sender.id);
+  } else {
+    return String(m.sender.id);
+  }
+}
+
+export function firstWord(text: string, i = 1): string {
+  return text.split(' ')[i - 1];
+}
+
+export function allButFirstWord(text: string): string {
+  if (!text || text.indexOf(' ') == -1) {
+    return null;
+  }
+
+  return text.substr(text.indexOf(' ') + 1);
+}
+
+export function getUsername(uid: number | string): string {
+  if (typeof uid != 'string') {
+    uid = String(uid);
+  }
+  let name = '';
+  if (db.users[uid] !== undefined) {
+    if (db.users[uid]['first_name'] !== undefined) {
+      name += ' ' + db.users[uid].first_name;
+    }
+    if (db.users[uid]['last_name'] !== undefined) {
+      name += ' ' + db.users[uid].last_name;
+    }
+    if (db.users[uid]['username'] !== undefined) {
+      name = `@${db.users[uid].username}`;
+    }
+  } else if (db.groups[uid] !== undefined) {
+    name = db.groups[uid].title;
+    if (db.groups[uid]['username'] !== undefined) {
+      name = `@${db.groups[uid].username}`;
+    }
+  } else {
+    name = '[UNKNOWN]';
+  }
+  return name;
 }
 
 export function setInput(message: Message, trigger: string): Message {
@@ -83,11 +237,11 @@ export function isCommand(plugin: PluginBase, number: number, text: string): boo
       }
     }
 
-    if (!('parameters' in plugin.commands[number - 1]) && trigger.startsWith('^')) {
+    if (plugin.commands[number - 1].parameters == undefined && trigger.startsWith('^')) {
       trigger += '$';
-    } else if ('parameters' in plugin.commands[number - 1] && text.indexOf('/start') == -1) {
+    } else if (plugin.commands[number - 1].parameters !== undefined && text.indexOf(' ') == -1) {
       trigger += '$';
-    } else if ('parameters' in plugin.commands[number - 1] && text.indexOf('/start') > -1) {
+    } else if (plugin.commands[number - 1].parameters !== undefined && text.indexOf(' ') > -1) {
       trigger += ' ';
     }
     if (new RegExp(trigger, 'gim').test(text)) {
@@ -104,11 +258,11 @@ export function isCommand(plugin: PluginBase, number: number, text: string): boo
   if ('shortcut' in plugin.commands[number - 1]) {
     trigger = plugin.commands[number - 1].shortcut.replace('/', plugin.bot.config.prefix).toLocaleLowerCase();
 
-    if (!('parameters' in plugin.commands[number - 1]) && trigger.startsWith('^')) {
+    if (plugin.commands[number - 1].parameters == undefined && trigger.startsWith('^')) {
       trigger += '$';
-    } else if ('parameters' in plugin.commands[number - 1] && text.indexOf('/start') == -1) {
+    } else if (plugin.commands[number - 1].parameters !== undefined && text.indexOf(' ') == -1) {
       trigger += '$';
-    } else if ('parameters' in plugin.commands[number - 1] && text.indexOf('/start') > -1) {
+    } else if (plugin.commands[number - 1].parameters !== undefined && text.indexOf(' ') > -1) {
       trigger += ' ';
     }
     if (new RegExp(trigger, 'gim').test(text)) {
@@ -177,7 +331,7 @@ export function sendRequest(url: string, params: any = {}) {
     .catch((error) => logger.error(error));
 }
 
-export function getExtension(filename: string) {
+export function getExtension(filename: string): string {
   return '.' + filename.split('.')[1];
 }
 
@@ -231,6 +385,14 @@ export function splitLargeMessage(content: string, maxLength: number): string[] 
   return texts;
 }
 
+export function catchException(exception: Error, bot: Bot = null): void {
+  logger.info(`Catched exception: ${exception.message}`);
+  logger.error(`${exception.stack}`);
+  if (bot) {
+    bot.sendAlert(`${exception.stack}`);
+  }
+}
+
 // Configure logger
 export const logger = createLogger({
   level: 'info',
@@ -244,7 +406,12 @@ export const logger = createLogger({
   ],
 });
 
-export async function execResult(command: string) {
-  const { stdout } = await util.promisify(exec)(command);
-  return stdout;
+export async function execResult(command: string): Promise<string> {
+  try {
+    const { stdout } = await util.promisify(exec)(command);
+    return stdout;
+  } catch (e) {
+    catchException(e);
+    return null;
+  }
 }

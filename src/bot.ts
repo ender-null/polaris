@@ -1,9 +1,9 @@
 import { EventEmitter } from 'events';
 import * as bindings from './bindings/index';
-import { BindingsBase, Config, Database, Extra, Message, PluginBase, User } from './index';
+import { BindingsBase, Config, Conversation, Database, Extra, Message, PluginBase, User } from './index';
 import { Parameter } from './plugin';
 import * as plugins from './plugins/index';
-import { hasTag, isTrusted, logger, setInput } from './utils';
+import { catchException, hasTag, isTrusted, logger, setInput } from './utils';
 
 export class Bot {
   config: Config;
@@ -41,7 +41,7 @@ export class Bot {
     try {
       await this.bindings.start();
     } catch (e) {
-      logger.error(e);
+      catchException(e, this);
     }
   }
 
@@ -66,70 +66,78 @@ export class Bot {
   initPlugins(): PluginBase[] {
     const _plugins = [];
     for (const plugin in plugins) {
-      _plugins.push(new plugins[plugin](this));
+      try {
+        _plugins.push(new plugins[plugin](this));
+      } catch (e) {
+        catchException(e, this);
+      }
     }
     return _plugins;
   }
 
   onMessageReceive(msg: Message): void {
-    let ignoreMessage = false;
-    if (msg.content == null || (msg.type != 'inline_query' && msg.date < new Date().getTime() / 1000 - 60 * 5)) {
-      return;
-    }
-
-    if (
-      msg.sender.id != +this.config.owner &&
-      !isTrusted(this, msg.sender.id, msg) &&
-      (hasTag(msg.conversation.id, 'muted') || hasTag(msg.sender.id, 'muted'))
-    ) {
-      ignoreMessage = true;
-    }
-
-    for (const i in this.plugins) {
-      const plugin = this.plugins[i];
-      if ('always' in plugin) {
-        plugin.always(msg);
+    try {
+      let ignoreMessage = false;
+      if (msg.content == null || (msg.type != 'inline_query' && msg.date < new Date().getTime() / 1000 - 60 * 5)) {
+        return;
       }
-      if ('commands' in plugin && !ignoreMessage) {
-        for (const i in plugin.commands) {
-          const command = plugin.commands[i];
-          if ('command' in command) {
-            if (this.checkTrigger(command.command, command.parameters, msg, plugin)) {
-              break;
+
+      if (
+        msg.sender.id != +this.config.owner &&
+        !isTrusted(this, msg.sender.id, msg) &&
+        (hasTag(this, msg.conversation.id, 'muted') || hasTag(this, msg.sender.id, 'muted'))
+      ) {
+        ignoreMessage = true;
+      }
+
+      for (const i in this.plugins) {
+        const plugin = this.plugins[i];
+        if ('always' in plugin) {
+          plugin.always(msg);
+        }
+        if ('commands' in plugin && !ignoreMessage) {
+          for (const i in plugin.commands) {
+            const command = plugin.commands[i];
+            if ('command' in command) {
+              if (this.checkTrigger(command.command, command.parameters, msg, plugin)) {
+                break;
+              }
+
+              if ('keepDefault' in command && command.keepDefault) {
+                if (this.checkTrigger(command.command, command.parameters, msg, plugin, false, true)) {
+                  break;
+                }
+              }
             }
 
-            if ('keepDefault' in command && command.keepDefault) {
-              if (this.checkTrigger(command.command, command.parameters, msg, plugin, false, true)) {
+            if (
+              'friendly' in command &&
+              !hasTag(this, msg.sender.id, 'noreplies') &&
+              !hasTag(this, msg.conversation.id, 'noreplies') &&
+              msg.conversation.id != +this.config.alertsConversationId &&
+              msg.conversation.id != +this.config.adminConversationId
+            ) {
+              if (this.checkTrigger(command.friendly, command.parameters, msg, plugin, true)) {
                 break;
               }
             }
-          }
 
-          if (
-            'friendly' in command &&
-            !hasTag(msg.sender.id, 'noreplies') &&
-            !hasTag(msg.conversation.id, 'noreplies') &&
-            msg.conversation.id != +this.config.alertsConversationId &&
-            msg.conversation.id != +this.config.adminConversationId
-          ) {
-            if (this.checkTrigger(command.friendly, command.parameters, msg, plugin, true)) {
-              break;
-            }
-          }
-
-          if ('shortcut' in command) {
-            if (this.checkTrigger(command.shortcut, command.parameters, msg, plugin)) {
-              break;
-            }
-
-            if ('keepDefault' in command && command.keepDefault) {
-              if (this.checkTrigger(command.shortcut, command.parameters, msg, plugin, false, true)) {
+            if ('shortcut' in command) {
+              if (this.checkTrigger(command.shortcut, command.parameters, msg, plugin)) {
                 break;
+              }
+
+              if ('keepDefault' in command && command.keepDefault) {
+                if (this.checkTrigger(command.shortcut, command.parameters, msg, plugin, false, true)) {
+                  break;
+                }
               }
             }
           }
         }
       }
+    } catch (e) {
+      catchException(e, this);
     }
   }
 
@@ -197,6 +205,34 @@ export class Bot {
 
   replyMessage(msg: Message, content: string, type = 'text', reply?: Message, extra?: Extra): void {
     const message = new Message(null, msg.conversation, this.user, content, type, null, reply, extra);
+    this.outbox.emit('message', message);
+  }
+
+  sendAlert(text: string, language = 'javascript'): void {
+    const message = new Message(
+      null,
+      new Conversation(this.config.alertsConversationId, 'Alerts'),
+      this.user,
+      `<code class="language-${language}">${text}</code>'`,
+      'text',
+      null,
+      null,
+      { format: 'HTML', preview: false },
+    );
+    this.outbox.emit('message', message);
+  }
+
+  sendAdminAlert(text: string): void {
+    const message = new Message(
+      null,
+      new Conversation(this.config.adminConversationId, 'Admin'),
+      this.user,
+      text,
+      'text',
+      null,
+      null,
+      { format: 'HTML', preview: false },
+    );
     this.outbox.emit('message', message);
   }
 }

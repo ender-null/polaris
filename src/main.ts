@@ -12,8 +12,8 @@ export const stop = (): void => {
 export const db = new Database();
 db.events.once('update:configs', () => {
   const bots = [];
-  for (const key in db.configs.val()) {
-    const configs = Config.loadInstancesFromJSON(db.configs.child(key).val());
+  for (const key of Object.keys(db.configs)) {
+    const configs = Config.loadInstancesFromJSON(db.configs[key]);
     for (const config of configs) {
       const bot = new Bot(config);
       bot.start();

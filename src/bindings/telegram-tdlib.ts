@@ -16,7 +16,7 @@ export class TelegramTDlibBindings extends BindingsBase {
       filesDirectory: `${process.cwd()}/.tdlib_files/${this.bot.config.name}/files`,
       verbosityLevel: 1,
       tdlibParameters: {
-        application_version: '1.0',
+        application_version: 'latest',
         device_model: 'polaris.js',
       },
     });

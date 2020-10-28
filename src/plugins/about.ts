@@ -1,7 +1,7 @@
 import { Bot, Message } from '..';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
-import { execResult, isCommand } from '../utils';
+import { catchException, execResult, isCommand } from '../utils';
 
 export class AboutPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -26,7 +26,12 @@ export class AboutPlugin extends PluginBase {
   async run(msg: Message): Promise<void> {
     let text;
     if (isCommand(this, 1, msg.content) || isCommand(this, 3, msg.content)) {
-      const tag = await execResult('git rev-parse --short HEAD');
+      let tag = 'latest';
+      try {
+        tag = await execResult('git rev-parse --short HEAD');
+      } catch (e) {
+        catchException(e, this.bot);
+      }
       const greeting = `Hi! I'm <b>${this.bot.user.firstName}</b>!\nNice to meet you.`;
       const version = `Running <a href="https://git.io/polaris.js">polaris.js</a> <code>${tag}</code> by @endernull.`;
       const license = `<b>Polaris.js</b> (including all plugins and documentation) is <b>free software</b>; you are free to redistribute it and/or modify it under the terms of the <b>GNU AGPLv3</b>.`;
@@ -34,7 +39,7 @@ export class AboutPlugin extends PluginBase {
       const about = `Use ${this.bot.config.prefix}about to know more about me`;
       const notice = `You can try my other bots: <a href="https://t.me/sakubo">@Sakubo</a> and <a href="https://t.me/PetoBot">@PetoBot</a>`;
       const donations = `You can make donations at https://paypal.me/luksireiku`;
-      const stats = `👤 ${db.users.numChildren()} users\n👥 ${db.groups.numChildren()} groups`;
+      const stats = `👤 ${Object.keys(db.users).length} users\n👥 ${Object.keys(db.groups).length} groups`;
 
       if (isCommand(this, 1, msg.content)) {
         text = `${greeting}\n\n${notice}\n\n${help}\n${about}\n\n${version}\n${donations}\n\n${license}\n\n${stats}`;
@@ -58,12 +63,12 @@ export class AboutPlugin extends PluginBase {
     // Update group data
     const gid = String(msg.conversation.id);
     if (+msg.conversation.id < 0) {
-      if (db.groups.child(gid).exists()) {
-        db.groups.child(gid).ref.update({
+      if (gid in Object.keys(db.groups)) {
+        db.groupsSnap.child(gid).ref.update({
           title: msg.conversation.title,
         });
       } else {
-        db.groups.child(gid).ref.set({
+        db.groupsSnap.child(gid).ref.set({
           title: msg.conversation.title,
         });
       }
@@ -74,15 +79,15 @@ export class AboutPlugin extends PluginBase {
       return;
     }
 
-    if (db.users.child(uid).exists()) {
-      db.users.child(uid).ref.update({
+    if (uid in Object.keys(db.users)) {
+      db.usersSnap.child(uid).ref.update({
         first_name: msg.sender['firstName'],
         last_name: msg.sender['lastName'],
         username: msg.sender['username'],
         is_bot: msg.sender['isBot'],
       });
     } else {
-      db.users.child(uid).ref.set({
+      db.usersSnap.child(uid).ref.set({
         first_name: msg.sender['firstName'],
         last_name: msg.sender['lastName'],
         username: msg.sender['username'],

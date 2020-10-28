@@ -70,12 +70,12 @@ export class DiscordBindings extends BindingsBase {
       msg.author.bot,
     );
     const conversation = new Conversation('-' + msg.channel.id);
-    const channel = (await this.client.channels.fetch(msg.channel.id)) as any;
+    const channel = await this.client.channels.fetch(msg.channel.id);
     if (channel.constructor.name == 'DMChannel') {
-      conversation.id = channel.recipient.id;
-      conversation.title = channel.recipient.username;
+      conversation.id = channel['recipient']['id'];
+      conversation.title = channel['recipient']['username'];
     } else {
-      conversation.title = channel.name;
+      conversation.title = channel['name'];
     }
     return new Message(id, conversation, sender, content, type, date, reply, extra);
   }
