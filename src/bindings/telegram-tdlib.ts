@@ -2,7 +2,7 @@ import { Client } from 'tdl';
 import { TDLib } from 'tdl-tdlib-ffi';
 import { message, ok, Update, user } from 'tdl/types/tdlib';
 import { BindingsBase, Bot, Conversation, Message, User } from '..';
-import { logger, sendRequest, splitLargeMessage } from '../utils';
+import { catchException, logger, sendRequest, splitLargeMessage } from '../utils';
 
 export class TelegramTDlibBindings extends BindingsBase {
   client: Client;
@@ -32,7 +32,7 @@ export class TelegramTDlibBindings extends BindingsBase {
       _: method,
       ...params,
     };
-    return await this.client.invoke(query);
+    return await this.client.invoke(query).catch((e) => catchException(e, this.bot));
   }
 
   async start(): Promise<void> {
@@ -226,7 +226,7 @@ export class TelegramTDlibBindings extends BindingsBase {
     } else if (msg.type == 'animation') {
       inputMessageContent = {
         '@type': 'inputMessageAnimation',
-        photo: this.getInputFile(msg.content),
+        animation: this.getInputFile(msg.content),
       };
 
       if (msg.extra && 'caption' in msg.extra) {
@@ -238,7 +238,7 @@ export class TelegramTDlibBindings extends BindingsBase {
     } else if (msg.type == 'audio') {
       inputMessageContent = {
         '@type': 'inputMessageAudio',
-        photo: this.getInputFile(msg.content),
+        audio: this.getInputFile(msg.content),
       };
 
       if (msg.extra && 'caption' in msg.extra) {
@@ -250,7 +250,7 @@ export class TelegramTDlibBindings extends BindingsBase {
     } else if (msg.type == 'document') {
       inputMessageContent = {
         '@type': 'inputMessageDocument',
-        photo: this.getInputFile(msg.content),
+        document: this.getInputFile(msg.content),
       };
 
       if (msg.extra && 'caption' in msg.extra) {
@@ -262,7 +262,7 @@ export class TelegramTDlibBindings extends BindingsBase {
     } else if (msg.type == 'sticker') {
       inputMessageContent = {
         '@type': 'inputMessageSticker',
-        photo: this.getInputFile(msg.content),
+        sticker: this.getInputFile(msg.content),
       };
 
       if (msg.extra && 'caption' in msg.extra) {
@@ -274,7 +274,7 @@ export class TelegramTDlibBindings extends BindingsBase {
     } else if (msg.type == 'video') {
       inputMessageContent = {
         '@type': 'inputMessageVideo',
-        photo: this.getInputFile(msg.content),
+        video: this.getInputFile(msg.content),
       };
 
       if (msg.extra && 'caption' in msg.extra) {
@@ -286,7 +286,7 @@ export class TelegramTDlibBindings extends BindingsBase {
     } else if (msg.type == 'voice') {
       inputMessageContent = {
         '@type': 'inputMessageVoiceNote',
-        photo: this.getInputFile(msg.content),
+        voice_note: this.getInputFile(msg.content),
       };
 
       if (msg.extra && 'caption' in msg.extra) {
@@ -354,7 +354,7 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   getInputFile(content: string): Record<string, unknown> {
-    if (content.startsWith('/')) {
+    if (content.startsWith('/') || content.startsWith('C:\\')) {
       return {
         '@type': 'inputFileLocal',
         path: content,

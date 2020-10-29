@@ -3,7 +3,8 @@ import { logger } from './utils';
 
 export abstract class PluginBase {
   bot: Bot;
-  commands: Command[];
+  commands?: Command[];
+  cronExpression?: string;
 
   constructor(bot: Bot) {
     this.bot = bot;

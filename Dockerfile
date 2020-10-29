@@ -6,7 +6,7 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN apk add python make gcc g++
+RUN apk add python make gcc g++ ffmpeg opus
 RUN npm install
 
 COPY . .

@@ -1,4 +1,12 @@
-import { Client, DMChannel, Message as DiscordMessage, MessageEmbed, NewsChannel, TextChannel } from 'discord.js';
+import {
+  Client,
+  DMChannel,
+  Message as DiscordMessage,
+  MessageAttachment,
+  MessageEmbed,
+  NewsChannel,
+  TextChannel,
+} from 'discord.js';
 import { BindingsBase, Bot, Conversation, Message, User } from '..';
 import { getExtension, htmlToDiscordMarkdown, logger, splitLargeMessage } from '../utils';
 
@@ -138,29 +146,15 @@ export class DiscordBindings extends BindingsBase {
           }
 
           if (sendContent) {
-            if (msg.content.startsWith('/')) {
-              await chat.send({
-                files: [
-                  {
-                    attachment: msg.content,
-                    name: msg.type + getExtension(msg.content),
-                  },
-                ],
-              });
+            if (msg.content.startsWith('/') || msg.content.startsWith('C:\\')) {
+              await chat.send(new MessageAttachment(msg.content, msg.type + getExtension(msg.content)));
             } else {
               await chat.send(msg.content);
             }
           } else {
-            if (msg.content.startsWith('/')) {
-              await chat.send({
-                ...embed,
-                files: [
-                  {
-                    attachment: msg.content,
-                    name: msg.type + getExtension(msg.content),
-                  },
-                ],
-              });
+            if (msg.content.startsWith('/') || msg.content.startsWith('C:\\')) {
+              embed.attachFiles([new MessageAttachment(msg.content, msg.type + getExtension(msg.content))]);
+              await chat.send(embed);
             } else if (msg.content.startsWith('http')) {
               if (msg.type == 'photo') {
                 embed.setImage(msg.content);
@@ -168,7 +162,7 @@ export class DiscordBindings extends BindingsBase {
             } else if (msg.type == 'video') {
               embed.setURL(msg.content);
             } else {
-              embed.url = msg.content;
+              embed.setURL(msg.content);
               await chat.send(embed);
             }
           }

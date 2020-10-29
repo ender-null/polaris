@@ -1,5 +1,9 @@
 import { exec } from 'child_process';
+import fs from 'fs';
+import mime from 'mime-types';
 import fetch from 'node-fetch';
+import { pipeline } from 'stream';
+import tmp from 'tmp';
 import util from 'util';
 import { createLogger, format, transports } from 'winston';
 import { Bot, Message, PluginBase } from '.';
@@ -144,8 +148,12 @@ export function getTarget(bot: Bot, m: Message, input: string): string {
   }
 }
 
-export function firstWord(text: string, i = 1): string {
+export function getWord(text: string, i: number) {
   return text.split(' ')[i - 1];
+}
+
+export function firstWord(text: string): string {
+  return getWord(text, 1);
 }
 
 export function allButFirstWord(text: string): string {
@@ -319,20 +327,77 @@ export function generateCommandHelp(plugin: PluginBase, text: string, showHidden
   return doc;
 }
 
-export function sendRequest(url: string, params: any = {}) {
-  const init = {
-    body: params,
+export async function sendRequest(
+  url: string,
+  params: any = {},
+  headers?: any,
+  data?: any,
+  post?: boolean,
+  bot?: Bot,
+): Promise<any> {
+  const queryString = Object.keys(params)
+    .map((key) => `${key}=${params[key]}`)
+    .join('&');
+  const options = {
+    method: post ? 'POST' : 'GET',
+    body: data,
+    headers: headers,
   };
-  return fetch(url, init)
-    .then((data) => {
-      return data.json();
-    })
-    .then((res) => logger.info(res))
-    .catch((error) => logger.error(error));
+  try {
+    const fullUrl = `${url}?${queryString}`;
+    const response = await fetch(fullUrl, options);
+    if (response.status != 200) {
+      logger.error(JSON.stringify(response.json()));
+      if (bot) {
+        bot.sendAlert(JSON.stringify(response.json()));
+      }
+
+      if (response.status == 429) {
+        setTimeout(async () => {
+          await sendRequest(url, params, headers, data, post, bot);
+        }, 5000);
+      }
+    }
+    return response;
+  } catch (e) {
+    catchException(e);
+  }
 }
 
-export function getExtension(filename: string): string {
-  return '.' + filename.split('.')[1];
+export async function responseUrlFromRequest(url: string, params: any = {}, headers?: HeadersInit): Promise<string> {
+  const response = await sendRequest(url, params, headers);
+  return response.url;
+}
+
+export async function download(url: string, params: any = {}, headers?: HeadersInit, post?: boolean): Promise<any> {
+  const response = await sendRequest(url, params, headers, null, post);
+  const tempfile = tmp.fileSync({ mode: 0o644, postfix: `.${mime.extension(response.headers.get('Content-Type'))}` });
+  if (!response.ok) throw new Error(`unexpected response ${response.statusText}`);
+  const streamPipeline = util.promisify(pipeline);
+  await streamPipeline(response.body, fs.createWriteStream(tempfile.name));
+  logger.info(`Downloaded file: ${tempfile.name}`);
+  return tempfile.name;
+}
+
+export function getExtension(url: string): string {
+  const filename = url.split('#').shift().split('?').shift().split('/').pop();
+  if (filename.indexOf('.') > -1) {
+    return `.${filename.split('.').pop()}`;
+  } else {
+    return '';
+  }
+}
+
+export async function mp3ToOgg(input) {
+  try {
+    const output = tmp.fileSync({ mode: 0o644, postfix: `.ogg` });
+    const command = `ffmpeg -i ${input} -ac 1 -c:a libopus -b:a 16k -y ${output.name}`;
+    await execResult(command);
+    return output.name;
+  } catch (e) {
+    catchException(e);
+    return input;
+  }
 }
 
 export function removeHtml(text: string): string {
@@ -340,8 +405,8 @@ export function removeHtml(text: string): string {
 }
 
 export function replaceHtml(text: string): string {
-  text = text.replace('&lt;', '<');
-  text = text.replace('&gt;', '>');
+  text = text.replace(new RegExp('&lt;', 'gim'), '<');
+  text = text.replace(new RegExp('&gt;', 'gim'), '>');
   return text;
 }
 
@@ -387,9 +452,13 @@ export function splitLargeMessage(content: string, maxLength: number): string[] 
 
 export function catchException(exception: Error, bot: Bot = null): void {
   logger.info(`Catched exception: ${exception.message}`);
-  logger.error(`${exception.stack}`);
+  logger.error(`${exception.message}`);
   if (bot) {
-    bot.sendAlert(`${exception.stack}`);
+    if (exception.stack) {
+      bot.sendAlert(`${exception.stack}`);
+    } else {
+      bot.sendAlert(`${exception.message}`);
+    }
   }
 }
 

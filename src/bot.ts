@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+import cron from 'node-cron';
 import * as bindings from './bindings/index';
 import { BindingsBase, Config, Conversation, Database, Extra, Message, PluginBase, User } from './index';
 import { Parameter } from './plugin';
@@ -13,6 +14,7 @@ export class Bot {
   status: EventEmitter;
   started: boolean;
   plugins: PluginBase[];
+  tasks: any[];
   user: User;
   db: Database;
 
@@ -23,6 +25,7 @@ export class Bot {
     this.config = config;
     this.bindings = new bindings[this.config.bindings](this);
     this.plugins = [];
+    this.tasks = [];
   }
 
   async start(): Promise<void> {
@@ -32,14 +35,18 @@ export class Bot {
         ` [${this.user.id}] ${this.user.firstName}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
       );
     });
-    this.plugins = this.initPlugins();
+    this.initPlugins();
     this.status.on('started', async () => {
       this.started = true;
       this.user = await this.bindings.getMe();
       logger.info(`Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}]`);
+      this.scheduleCronJobs();
     });
     this.status.on('stopped', async () => {
       this.started = false;
+      for (const task of this.tasks) {
+        task.stop();
+      }
       logger.info(`Stopped ${this.user.firstName} (@${this.user.username}) [${this.user.id}]`);
     });
     try {
@@ -67,16 +74,28 @@ export class Bot {
     this.onMessageReceive(msg);
   }
 
-  initPlugins(): PluginBase[] {
-    const _plugins = [];
+  initPlugins(): void {
+    this.plugins = [];
     for (const plugin in plugins) {
       try {
-        _plugins.push(new plugins[plugin](this));
+        this.plugins.push(new plugins[plugin](this));
       } catch (e) {
         catchException(e, this);
       }
     }
-    return _plugins;
+  }
+
+  scheduleCronJobs(): void {
+    for (const plugin of this.plugins) {
+      if ('cronExpression' in plugin && 'cron' in plugin) {
+        this.tasks.push(
+          cron.schedule(plugin.cronExpression, () => {
+            logger.debug(`Running ${plugin.constructor.name} cron job of @${this.user.username}`);
+            plugin.cron();
+          }),
+        );
+      }
+    }
   }
 
   onMessageReceive(msg: Message): void {
@@ -217,7 +236,7 @@ export class Bot {
       null,
       new Conversation(this.config.alertsConversationId, 'Alerts'),
       this.user,
-      `<code class="language-${language}">${text}</code>'`,
+      `<code class="language-${language}">${text}</code>`,
       'text',
       null,
       null,
