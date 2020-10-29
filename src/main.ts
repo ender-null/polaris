@@ -1,26 +1,34 @@
 import { Bot, Config, Database } from '.';
 import { logger } from './utils';
 
-const bots: Bot[] = [];
+let bots: Bot[] = [];
 
 export async function stop(): Promise<void> {
   let pending = bots.length;
+  logger.info(`Stopping ${pending} bots...`);
   for (const bot of bots) {
-    this.status.on('stopped', async () => {
-      pending -= 1;
-      if (pending == 0) {
-        process.exit(1);
-      } else {
-        logger.info(`Pending ${pending} bots...`);
-      }
-    });
-    await bot.stop();
+    try {
+      await bot.stop();
+    } catch (e) {
+      logger.error(e.message);
+    }
+
+    pending -= 1;
+    if (pending == 0) {
+      logger.info(`Closed all bots, exiting process. PID: ${process.pid}`);
+      process.exit();
+    } else {
+      logger.info(`Pending ${pending} bots...`);
+    }
   }
 }
 
+process.once('SIGINT', () => stop());
+process.once('SIGTERM', () => stop());
+
 export const db = new Database();
 db.events.once('update:configs', () => {
-  const bots = [];
+  bots = [];
   for (const key of Object.keys(db.configs)) {
     const configs = Config.loadInstancesFromJSON(db.configs[key]);
     for (const config of configs) {
@@ -31,6 +39,3 @@ db.events.once('update:configs', () => {
   }
 });
 db.init();
-
-process.on('SIGINT', () => stop());
-process.on('SIGTERM', () => stop());

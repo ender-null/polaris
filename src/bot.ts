@@ -50,7 +50,7 @@ export class Bot {
   }
 
   async stop(): Promise<void> {
-    logger.info('stop');
+    await this.bindings.stop();
   }
 
   messagesHandler(msg: Message): void {
