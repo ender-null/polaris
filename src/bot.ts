@@ -40,6 +40,7 @@ export class Bot {
       this.started = true;
       this.user = await this.bindings.getMe();
       logger.info(`Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}]`);
+      this.sendAdminAlert(`Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}]`);
       this.scheduleCronJobs();
     });
     this.status.on('stopped', async () => {

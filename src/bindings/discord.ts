@@ -1,12 +1,4 @@
-import {
-  Client,
-  DMChannel,
-  Message as DiscordMessage,
-  MessageAttachment,
-  MessageEmbed,
-  NewsChannel,
-  TextChannel,
-} from 'discord.js';
+import { Client, Message as DiscordMessage, MessageAttachment, MessageEmbed } from 'discord.js';
 import { BindingsBase, Bot, Conversation, Message, User } from '..';
 import { getExtension, htmlToDiscordMarkdown, logger, splitLargeMessage } from '../utils';
 
@@ -50,6 +42,7 @@ export class DiscordBindings extends BindingsBase {
   }
 
   async stop(): Promise<void> {
+    this.client.destroy();
     this.bot.status.emit('stopped');
   }
 
@@ -112,7 +105,7 @@ export class DiscordBindings extends BindingsBase {
       if (chat) {
         chat.startTyping();
         if (msg.type == 'text') {
-          let content = this.addDiscordMentions(chat, msg.content);
+          let content = this.addDiscordMentions(msg.content);
           if (msg.extra) {
             if ('format' in msg.extra && msg.extra['format'] == 'HTML') {
               content = htmlToDiscordMarkdown(content);
@@ -172,10 +165,17 @@ export class DiscordBindings extends BindingsBase {
     }
   }
 
-  addDiscordMentions(chat: DMChannel | TextChannel | NewsChannel, content: string): string {
-    if (!content) {
-      logger.info(chat);
-    }
+  addDiscordMentions(content: string): string {
+    // TODO
+    // const matches = new RegExp('(@.[^@]+#\\d+)', 'gim').exec(content);
+    // if (matches) {
+    //   for (const match of matches) {
+    //     const userId = null;
+    //     if (userId) {
+    //       content = content.replace(new RegExp(match, 'gim'), `<@${userId}>`);
+    //     }
+    //   }
+    // }
     return content;
   }
 }
