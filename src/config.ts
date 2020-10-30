@@ -30,6 +30,7 @@ export class Config {
   prefix?: string;
   locale?: string;
   owner?: string;
+  enabled?: boolean;
   plugins?: string | string[];
   excludedPlugins?: string[];
   translation?: string;

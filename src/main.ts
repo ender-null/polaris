@@ -32,9 +32,11 @@ db.events.once('update:configs', () => {
   for (const key of Object.keys(db.configs)) {
     const configs = Config.loadInstancesFromJSON(db.configs[key]);
     for (const config of configs) {
-      const bot = new Bot(config);
-      bot.start();
-      bots.push(bot);
+      if (config.enabled) {
+        const bot = new Bot(config);
+        bot.start();
+        bots.push(bot);
+      }
     }
   }
 });
