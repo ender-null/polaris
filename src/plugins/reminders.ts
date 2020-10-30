@@ -57,14 +57,16 @@ export class RemindersPlugin extends PluginBase {
     try {
       db.remindersSnap.child(String(alarm).split('.')[0]).ref.set(reminder);
       let delayText = delay;
-      if (unit == 's' || unit == 'sec' || unit == 'second' || unit == 'seconds') {
+      if (unit == 's' || unit == 'sec' || unit == 'secs' || unit == 'second' || unit == 'seconds') {
         delayText = `${delay} seconds`;
-      } else if (unit == 'm' || unit == 'min' || unit == 'minute' || unit == 'minutes') {
+      } else if (unit == 'm' || unit == 'min' || unit == 'mins' || unit == 'minute' || unit == 'minutes') {
         delayText = `${delay} minutes`;
       } else if (unit == 'h' || unit == 'hour' || unit == 'hours') {
         delayText = `${delay} hours`;
       } else if (unit == 'd' || unit == 'day' || unit == 'days') {
         delayText = `${delay} days`;
+      } else {
+        return this.bot.replyMessage(msg, Errors.invalidArgument, 'text', null, { format: 'HTML' });
       }
 
       const message = `<b>${msg.sender['firstName']}</b>, I'll remint you in <b>${delayText}</b> to <i>${text}</i>.`;
@@ -75,38 +77,39 @@ export class RemindersPlugin extends PluginBase {
     }
   }
 
-  async cron() {
+  async cron(): Promise<void> {
     if (db.reminders) {
-      for (const time of Object.keys(db.reminders)) {
-        const reminder = db.reminders[time];
-        if (String(reminder.bot) == String(this.bot.user.id) && parseFloat(time) < now()) {
-          let chat;
-          if (+reminder.chatId > 0) {
-            chat = new Conversation(reminder.chatId, db.users[reminder.chatId].first_name);
-          } else {
-            chat = new Conversation(reminder.chatId, db.groups[reminder.chatId].title);
-          }
-          let name = reminder.firstName;
-          if (reminder.username && reminder.username.length > 0) {
-            name = `@${reminder.username}`;
-          }
-          const text = `<i>${reminder.text}</i>\n - ${name}`;
-          this.bot.sendMessage(chat, text, 'text', null, { format: 'HTML' });
-          db.remindersSnap.child(time).ref.set(null);
+      // Reminders are indexed by alarm time so there os no need to check more than one
+      const index = Object.keys(db.reminders)[0];
+      const reminder = db.reminders[index];
+
+      if (String(reminder.bot) == String(this.bot.user.id) && reminder.alarm < now()) {
+        let chat;
+        if (+reminder.chatId > 0) {
+          chat = new Conversation(reminder.chatId, db.users[reminder.chatId].first_name);
+        } else {
+          chat = new Conversation(reminder.chatId, db.groups[reminder.chatId].title);
         }
+
+        let text = `<i>${reminder.text}</i>\n - ${reminder.firstName}`;
+        if (reminder.username && reminder.username.length > 0) {
+          text += ` (@${reminder.username})`;
+        }
+        this.bot.sendMessage(chat, text, 'text', null, { format: 'HTML' });
+        db.remindersSnap.child(index).ref.set(null);
       }
     }
   }
 
-  generateAlarm(delay: string, unit: string) {
+  generateAlarm(delay: string, unit: string): number {
     const alarm = now();
-    if (unit == 's') {
+    if (unit == 's' || unit == 'sec' || unit == 'secs' || unit == 'second' || unit == 'seconds') {
       return now() + parseFloat(delay);
-    } else if (unit == 'm') {
+    } else if (unit == 'm' || unit == 'min' || unit == 'mins' || unit == 'minute' || unit == 'minutes') {
       return now() + parseFloat(delay) * 60;
-    } else if (unit == 'h') {
+    } else if (unit == 'h' || unit == 'hour' || unit == 'hours') {
       return now() + parseFloat(delay) * 60 * 60;
-    } else if (unit == 'd') {
+    } else if (unit == 'd' || unit == 'day' || unit == 'days') {
       return now() + parseFloat(delay) * 60 * 60 * 24;
     }
     return alarm;

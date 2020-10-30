@@ -1,3 +1,4 @@
+import { Response } from 'node-fetch';
 import { Client } from 'tdl';
 import { TDLib } from 'tdl-tdlib-ffi';
 import { message, ok, Update, user } from 'tdl/types/tdlib';
@@ -22,7 +23,7 @@ export class TelegramTDlibBindings extends BindingsBase {
     });
   }
 
-  async apiRequest(method: string, params: Record<string, unknown> = {}): Promise<any> {
+  async apiRequest(method: string, params: Record<string, unknown> = {}): Promise<Response> {
     const url = `https://api.telegram.org/bot${this.bot.config.apiKeys.telegramBotToken}/${method}`;
     return sendRequest(url, params);
   }

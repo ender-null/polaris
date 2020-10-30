@@ -1,7 +1,7 @@
 import { exec } from 'child_process';
 import fs from 'fs';
 import mime from 'mime-types';
-import fetch from 'node-fetch';
+import fetch, { BodyInit, HeadersInit, RequestInit, Response } from 'node-fetch';
 import { pipeline } from 'stream';
 import tmp from 'tmp';
 import util from 'util';
@@ -148,7 +148,7 @@ export function getTarget(bot: Bot, m: Message, input: string): string {
   }
 }
 
-export function getWord(text: string, i: number) {
+export function getWord(text: string, i: number): string {
   return text.split(' ')[i - 1];
 }
 
@@ -332,16 +332,16 @@ export function generateCommandHelp(plugin: PluginBase, text: string, showHidden
 
 export async function sendRequest(
   url: string,
-  params: any = {},
-  headers?: any,
-  data?: any,
+  params: Record<string, unknown> = {},
+  headers?: HeadersInit,
+  data?: BodyInit,
   post?: boolean,
   bot?: Bot,
-): Promise<any> {
+): Promise<Response> {
   const queryString = Object.keys(params)
     .map((key) => `${key}=${params[key]}`)
     .join('&');
-  const options = {
+  const options: RequestInit = {
     method: post ? 'POST' : 'GET',
     body: data,
     headers: headers,
@@ -364,15 +364,25 @@ export async function sendRequest(
     return response;
   } catch (e) {
     catchException(e);
+    return null;
   }
 }
 
-export async function responseUrlFromRequest(url: string, params: any = {}, headers?: HeadersInit): Promise<string> {
+export async function responseUrlFromRequest(
+  url: string,
+  params: Record<string, unknown> = {},
+  headers?: HeadersInit,
+): Promise<string> {
   const response = await sendRequest(url, params, headers);
   return response.url;
 }
 
-export async function download(url: string, params: any = {}, headers?: HeadersInit, post?: boolean): Promise<any> {
+export async function download(
+  url: string,
+  params: Record<string, unknown> = {},
+  headers?: HeadersInit,
+  post?: boolean,
+): Promise<string> {
   const response = await sendRequest(url, params, headers, null, post);
   const tempfile = tmp.fileSync({ mode: 0o644, postfix: `.${mime.extension(response.headers.get('Content-Type'))}` });
   if (!response.ok) throw new Error(`unexpected response ${response.statusText}`);
@@ -391,7 +401,7 @@ export function getExtension(url: string): string {
   }
 }
 
-export async function mp3ToOgg(input) {
+export async function mp3ToOgg(input: string): Promise<string> {
   try {
     const output = tmp.fileSync({ mode: 0o644, postfix: `.ogg` });
     const command = `ffmpeg -i ${input} -ac 1 -c:a libopus -b:a 16k -y ${output.name}`;

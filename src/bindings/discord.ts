@@ -1,5 +1,6 @@
 import { Client, Message as DiscordMessage, MessageAttachment, MessageEmbed } from 'discord.js';
 import { BindingsBase, Bot, Conversation, Message, User } from '..';
+import { db } from '../main';
 import { getExtension, htmlToDiscordMarkdown, logger, splitLargeMessage } from '../utils';
 
 export class DiscordBindings extends BindingsBase {
@@ -165,17 +166,25 @@ export class DiscordBindings extends BindingsBase {
     }
   }
 
+  findDiscordUserInDatabase(username: string): string {
+    for (const uid of Object.keys(db.users)) {
+      if (db.users[uid].username == username.substring(1)) {
+        return uid;
+      }
+    }
+    return null;
+  }
+
   addDiscordMentions(content: string): string {
-    // TODO
-    // const matches = new RegExp('(@.[^@]+#\\d+)', 'gim').exec(content);
-    // if (matches) {
-    //   for (const match of matches) {
-    //     const userId = null;
-    //     if (userId) {
-    //       content = content.replace(new RegExp(match, 'gim'), `<@${userId}>`);
-    //     }
-    //   }
-    // }
+    const matches = new RegExp('(@.[^@]+#\\d+)', 'gim').exec(content);
+    if (matches) {
+      for (const match of matches) {
+        const userId = this.findDiscordUserInDatabase(match);
+        if (userId) {
+          content = content.replace(new RegExp(match, 'gim'), `<@${userId}>`);
+        }
+      }
+    }
     return content;
   }
 }

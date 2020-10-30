@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import cron from 'node-cron';
+import * as cron from 'node-cron';
 import os from 'os';
 import * as bindings from './bindings/index';
 import { Errors } from './errors';
@@ -16,7 +16,7 @@ export class Bot {
   status: EventEmitter;
   started: boolean;
   plugins: PluginBase[];
-  tasks: any[];
+  tasks: cron.Task[];
   user: User;
   db: Database;
 
