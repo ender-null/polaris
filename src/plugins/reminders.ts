@@ -90,7 +90,7 @@ export class RemindersPlugin extends PluginBase {
           if (reminder.username && reminder.username.length > 0) {
             name = `@${reminder.username}`;
           }
-          let text = `<i>${reminder.text}</i>\n - ${name}`;
+          const text = `<i>${reminder.text}</i>\n - ${name}`;
           this.bot.sendMessage(chat, text, 'text', null, { format: 'HTML' });
           db.remindersSnap.child(time).ref.set(null);
         }
