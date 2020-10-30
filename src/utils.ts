@@ -349,9 +349,10 @@ export async function sendRequest(
     const fullUrl = `${url}?${queryString}`;
     const response = await fetch(fullUrl, options);
     if (response.status != 200) {
-      logger.error(JSON.stringify(response.json()));
+      const json = response.json().catch((e) => catchException(e));
+      logger.error(JSON.stringify(json));
       if (bot) {
-        bot.sendAlert(JSON.stringify(response.json()));
+        bot.sendAlert(JSON.stringify(json));
       }
 
       if (response.status == 429) {
@@ -384,7 +385,10 @@ export async function download(
 ): Promise<string> {
   const response = await sendRequest(url, params, headers, null, post);
   const tempfile = tmp.fileSync({ mode: 0o644, postfix: `.${mime.extension(response.headers.get('Content-Type'))}` });
-  if (!response.ok) throw new Error(`unexpected response ${response.statusText}`);
+  if (!response.ok) {
+    logger.error(`unexpected response ${response.statusText}`);
+    return null;
+  }
   const streamPipeline = util.promisify(pipeline);
   await streamPipeline(response.body, fs.createWriteStream(tempfile.name));
   logger.info(`Downloaded file: ${tempfile.name}`);
@@ -404,12 +408,15 @@ export async function mp3ToOgg(input: string): Promise<string> {
   try {
     const output = tmp.fileSync({ mode: 0o644, postfix: `.ogg` });
     const command = `ffmpeg -i ${input} -ac 1 -c:a libopus -b:a 16k -y ${output.name}`;
-    await execResult(command);
-    logger.info(`Converted mp3 file to ogg: ${output.name}`);
-    return output.name;
+    const result = await execResult(command);
+    if (result != null) {
+      logger.info(`Converted mp3 file to ogg: ${output.name}`);
+      return output.name;
+    }
+    return null;
   } catch (e) {
     catchException(e);
-    return input;
+    return null;
   }
 }
 
