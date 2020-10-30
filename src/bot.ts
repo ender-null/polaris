@@ -1,10 +1,12 @@
 import { EventEmitter } from 'events';
 import cron from 'node-cron';
+import os from 'os';
 import * as bindings from './bindings/index';
+import { Errors } from './errors';
 import { BindingsBase, Config, Conversation, Database, Extra, Message, PluginBase, User } from './index';
 import { Parameter } from './plugin';
 import * as plugins from './plugins/index';
-import { catchException, hasTag, isTrusted, logger, setInput } from './utils';
+import { catchException, hasTag, isTrusted, logger, now, setInput } from './utils';
 
 export class Bot {
   config: Config;
@@ -39,8 +41,10 @@ export class Bot {
     this.status.on('started', async () => {
       this.started = true;
       this.user = await this.bindings.getMe();
-      logger.info(`Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}]`);
-      this.sendAdminAlert(`Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}]`);
+      logger.info(`Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`);
+      this.sendAdminAlert(
+        `Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`,
+      );
       this.scheduleCronJobs();
     });
     this.status.on('stopped', async () => {
@@ -48,7 +52,7 @@ export class Bot {
       for (const task of this.tasks) {
         task.stop();
       }
-      logger.info(`Stopped ${this.user.firstName} (@${this.user.username}) [${this.user.id}]`);
+      logger.info(`Stopped ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`);
     });
     try {
       await this.bindings.start();
@@ -102,7 +106,7 @@ export class Bot {
   onMessageReceive(msg: Message): void {
     try {
       let ignoreMessage = false;
-      if (msg.content == null || (msg.type != 'inline_query' && msg.date < new Date().getTime() / 1000 - 60 * 5)) {
+      if (msg.content == null || (msg.type != 'inline_query' && msg.date < now() - 60 * 5)) {
         return;
       }
 
@@ -220,11 +224,21 @@ export class Bot {
     }
     if (message.content && typeof message.content == 'string' && new RegExp(trigger, 'gim').test(message.content)) {
       message = setInput(message, trigger);
-      plugin.run(message);
+      try {
+        plugin.run(message);
+      } catch (e) {
+        catchException(e, this);
+        this.replyMessage(message, Errors.exceptionFound);
+      }
 
       return true;
     }
     return false;
+  }
+
+  sendMessage(chat: Conversation, content: string, type = 'text', reply?: Message, extra?: Extra): void {
+    const message = new Message(null, chat, this.user, content, type, null, reply, extra);
+    this.outbox.emit('message', message);
   }
 
   replyMessage(msg: Message, content: string, type = 'text', reply?: Message, extra?: Extra): void {

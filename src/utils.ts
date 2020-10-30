@@ -156,12 +156,15 @@ export function firstWord(text: string): string {
   return getWord(text, 1);
 }
 
-export function allButFirstWord(text: string): string {
+export function allButNWord(text: string, word = 1): string {
   if (!text || text.indexOf(' ') == -1) {
     return null;
   }
+  return text.substr(text.indexOf(text.split(' ')[word]));
+}
 
-  return text.substr(text.indexOf(' ') + 1);
+export function allButFirstWord(text: string): string {
+  return allButNWord(text, 1);
 }
 
 export function getUsername(uid: number | string): string {
@@ -448,6 +451,10 @@ export function splitLargeMessage(content: string, maxLength: number): string[] 
     }
   }
   return texts;
+}
+
+export function now(): number {
+  return new Date().getTime() / 1000;
 }
 
 export function catchException(exception: Error, bot: Bot = null): void {

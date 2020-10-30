@@ -16,6 +16,15 @@ export interface DatabaseConversation {
   username: string;
 }
 
+export interface DatabaseReminder {
+  alarm: number;
+  chatId: number | string;
+  text: string;
+  firstName: string;
+  username: string;
+  bot: number | string;
+}
+
 export interface iString {
   [id: string]: string;
 }
@@ -41,7 +50,7 @@ export interface iPole {
 }
 
 export interface iReminder {
-  [id: string]: Record<string, unknown>;
+  [id: string]: DatabaseReminder;
 }
 
 export interface iTag {

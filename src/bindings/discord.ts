@@ -42,7 +42,7 @@ export class DiscordBindings extends BindingsBase {
   }
 
   async stop(): Promise<void> {
-    this.client.destroy();
+    // this.client.destroy();
     this.bot.status.emit('stopped');
   }
 
