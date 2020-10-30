@@ -1,5 +1,4 @@
 import { Bot, Message } from '..';
-import { Errors } from '../errors';
 import { PluginBase } from '../plugin';
 import {
   allButFirstWord,
@@ -55,11 +54,11 @@ export class TagsPlugin extends PluginBase {
     let input = getInput(msg, false);
 
     if (!isTrusted(this.bot, msg.sender.id, msg)) {
-      return this.bot.replyMessage(msg, Errors.permissionRequired, 'text', null, { format: 'HTML' });
+      return this.bot.replyMessage(msg, this.bot.errors.permissionRequired);
     }
 
     if (!input) {
-      return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content), 'text', null, { format: 'HTML' });
+      return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
     }
 
     if (!msg.reply) {
@@ -81,7 +80,7 @@ export class TagsPlugin extends PluginBase {
     const tags = input.split(' ');
 
     if (!target) {
-      return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content), 'text', null, { format: 'HTML' });
+      return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
     }
 
     // Adds a tag to user or group.
@@ -91,14 +90,14 @@ export class TagsPlugin extends PluginBase {
           setTag(this.bot, target, tag);
         }
       }
-      this.bot.replyMessage(msg, `<b>👤 ${name}</b>\n🏷 +${tags}`, 'text', null, { format: 'HTML' });
+      this.bot.replyMessage(msg, `<b>👤 ${name}</b>\n🏷 +${tags}`);
     } else if (isCommand(this, 2, msg.content)) {
       for (const tag of tags) {
         if (hasTag(this.bot, target, tag)) {
           delTag(this.bot, target, tag);
         }
       }
-      this.bot.replyMessage(msg, `<b>👤 ${name}</b>\n🏷 -${tags}`, 'text', null, { format: 'HTML' });
+      this.bot.replyMessage(msg, `<b>👤 ${name}</b>\n🏷 -${tags}`);
     }
   }
 }

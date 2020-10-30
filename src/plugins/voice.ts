@@ -1,5 +1,4 @@
 import { Bot, Message } from '..';
-import { Errors } from '../errors';
 import { PluginBase } from '../plugin';
 import { download, generateCommandHelp, getInput, mp3ToOgg } from '../utils';
 
@@ -23,10 +22,10 @@ export class VoicePlugin extends PluginBase {
   async run(msg: Message): Promise<void> {
     const input = getInput(msg, false);
     if (!input) {
-      return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content), 'text', null, { format: 'HTML' });
+      return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
     }
 
-    const language = 'en-us';
+    const language = this.bot.config.locale;
     const url = 'http://translate.google.com/translate_tts';
     const params = {
       tl: language,
@@ -46,9 +45,11 @@ export class VoicePlugin extends PluginBase {
     const file = await download(url, params, headers);
     const voice = await mp3ToOgg(file);
     if (voice) {
+      this.bot.replyMessage(msg, voice, 'voice');
+    } else if (file) {
       this.bot.replyMessage(msg, file, 'voice');
     } else {
-      this.bot.replyMessage(msg, Errors.downloadFailed);
+      this.bot.replyMessage(msg, this.bot.errors.downloadFailed);
     }
   }
 }

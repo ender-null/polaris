@@ -2,8 +2,10 @@ import { EventEmitter } from 'events';
 import * as cron from 'node-cron';
 import os from 'os';
 import * as bindings from './bindings/index';
-import { Errors } from './errors';
-import { BindingsBase, Config, Conversation, Database, Extra, Message, PluginBase, User } from './index';
+import { Translation } from './database';
+import { ErrorMessages } from './errors';
+import { BindingsBase, Config, Conversation, Extra, Message, PluginBase, User } from './index';
+import { db } from './main';
 import { Parameter } from './plugin';
 import * as plugins from './plugins/index';
 import { catchException, hasTag, isTrusted, logger, now, setInput } from './utils';
@@ -18,7 +20,7 @@ export class Bot {
   plugins: PluginBase[];
   tasks: cron.Task[];
   user: User;
-  db: Database;
+  errors: ErrorMessages;
 
   constructor(config: Config) {
     this.inbox = new EventEmitter();
@@ -38,6 +40,8 @@ export class Bot {
       );
     });
     this.initPlugins();
+    this.initTranslations();
+    db.events.on('update:translations', () => this.initTranslations());
     this.status.on('started', async () => {
       this.started = true;
       this.user = await this.bindings.getMe();
@@ -86,6 +90,46 @@ export class Bot {
         this.plugins.push(new plugins[plugin](this));
       } catch (e) {
         catchException(e, this);
+      }
+    }
+  }
+
+  initTranslations(): void {
+    if (db.translations && this.config.translation in db.translations) {
+      const trans: Translation = db.translations[this.config.translation];
+      this.errors = trans.errors;
+      for (const plugin of this.plugins) {
+        if (plugin.constructor.name in trans.plugins) {
+          for (const commandIndex in plugin.commands) {
+            if ('commands' in trans.plugins[plugin.constructor.name]) {
+              const com = trans.plugins[plugin.constructor.name].commands[commandIndex];
+              if ('command' in com) {
+                plugin.commands[commandIndex].command = com.command;
+              }
+              if ('shortcut' in com) {
+                plugin.commands[commandIndex].shortcut = com.shortcut;
+              }
+              if ('friendly' in com) {
+                plugin.commands[commandIndex].friendly = com.friendly;
+              }
+              if ('description' in com) {
+                plugin.commands[commandIndex].description = com.description;
+              }
+              if ('keepDefault' in com) {
+                plugin.commands[commandIndex].keepDefault = com.keepDefault;
+              }
+              if ('hidden' in com) {
+                plugin.commands[commandIndex].hidden = com.hidden;
+              }
+              if ('parameters' in com) {
+                plugin.commands[commandIndex].parameters = [];
+                for (const paramIndex in com.parameters) {
+                  plugin.commands[commandIndex].parameters[paramIndex] = com.parameters[paramIndex];
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -228,7 +272,7 @@ export class Bot {
         plugin.run(message);
       } catch (e) {
         catchException(e, this);
-        this.replyMessage(message, Errors.exceptionFound);
+        this.replyMessage(message, this.errors.exceptionFound);
       }
 
       return true;
@@ -237,13 +281,18 @@ export class Bot {
   }
 
   sendMessage(chat: Conversation, content: string, type = 'text', reply?: Message, extra?: Extra): void {
+    if (!extra) {
+      extra = {};
+    }
+    if (!('format' in extra)) {
+      extra.format = 'HTML';
+    }
     const message = new Message(null, chat, this.user, content, type, null, reply, extra);
     this.outbox.emit('message', message);
   }
 
   replyMessage(msg: Message, content: string, type = 'text', reply?: Message, extra?: Extra): void {
-    const message = new Message(null, msg.conversation, this.user, content, type, null, reply, extra);
-    this.outbox.emit('message', message);
+    this.sendMessage(msg.conversation, content, type, reply, extra);
   }
 
   sendAlert(text: string, language = 'javascript'): void {

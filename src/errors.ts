@@ -1,4 +1,26 @@
-export class Errors {
+export class ErrorMessages {
+  adminEequired?: string;
+  apiLimitExceeded?: string;
+  connectionError?: string;
+  downloadFailed?: string;
+  exceptionFound?: string;
+  failed?: string;
+  groupOnly?: string;
+  idiotKicked?: string;
+  invalidArgument?: string;
+  invalidSyntax?: string;
+  missingId?: string;
+  missingParameter?: string;
+  needsReply?: string;
+  noResults?: string;
+  notImplemented?: string;
+  permissionRequired?: string;
+  privateOnly?: string;
+  spammerDetected?: string;
+  unknown?: string;
+}
+
+export class Errors extends ErrorMessages {
   static adminEequired = 'Only works with <b>admin privileges</b>';
   static apiLimitExceeded = 'The API limits have been exceeded';
   static connectionError = 'Connection error';

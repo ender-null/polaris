@@ -1,9 +1,11 @@
 import { Bot, Message } from '.';
+import { iString } from './database';
 import { logger } from './utils';
 
 export abstract class PluginBase {
   bot: Bot;
   commands?: Command[];
+  strings?: iString;
   cronExpression?: string;
 
   constructor(bot: Bot) {

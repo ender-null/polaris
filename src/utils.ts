@@ -212,7 +212,6 @@ export function setInput(message: Message, trigger: string): Message {
     } else if ('input' in message.extra) {
       message.extra.inputReply = message.extra['input'];
     }
-    return message;
   }
   return message;
 }
@@ -406,6 +405,7 @@ export async function mp3ToOgg(input: string): Promise<string> {
     const output = tmp.fileSync({ mode: 0o644, postfix: `.ogg` });
     const command = `ffmpeg -i ${input} -ac 1 -c:a libopus -b:a 16k -y ${output.name}`;
     await execResult(command);
+    logger.info(`Converted mp3 file to ogg: ${output.name}`);
     return output.name;
   } catch (e) {
     catchException(e);

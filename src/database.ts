@@ -3,6 +3,8 @@ import firebase from 'firebase';
 import 'firebase/database';
 import { readFileSync } from 'fs';
 import { Config } from '.';
+import { ErrorMessages } from './errors';
+import { Command } from './plugin';
 
 export interface DatabaseUser {
   first_name: string;
@@ -57,8 +59,22 @@ export interface iTag {
   [id: string]: iString;
 }
 
+export interface PluginTranslation {
+  commands: Command[];
+  strings: iString;
+}
+
+export interface iPluginTranslation {
+  [id: string]: PluginTranslation;
+}
+
+export interface Translation {
+  errors: ErrorMessages;
+  plugins: iPluginTranslation;
+}
+
 export interface iTranslation {
-  [id: string]: Record<string, unknown>;
+  [id: string]: Translation;
 }
 
 export class Database {

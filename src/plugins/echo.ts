@@ -12,7 +12,7 @@ export class EchoPlugin extends PluginBase {
         parameters: [
           {
             name: 'text',
-            required: true,
+            required: false,
           },
         ],
         description: 'Repeat the input',
@@ -22,8 +22,8 @@ export class EchoPlugin extends PluginBase {
   async run(msg: Message): Promise<void> {
     const input = getInput(msg, false);
     if (!input) {
-      return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content), 'text', null, { format: 'HTML' });
+      return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
     }
-    this.bot.replyMessage(msg, msg.content.charAt(0).toUpperCase() + msg.content.slice(1));
+    this.bot.replyMessage(msg, input.charAt(0).toUpperCase() + input.slice(1));
   }
 }

@@ -94,6 +94,6 @@ export class HelpPlugin extends PluginBase {
       }
     }
 
-    this.bot.replyMessage(msg, text, 'text', null, { format: 'HTML' });
+    this.bot.replyMessage(msg, text);
   }
 }

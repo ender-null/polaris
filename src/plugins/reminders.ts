@@ -1,10 +1,9 @@
 import { Bot, Message } from '..';
 import { Conversation } from '../conversation';
 import { DatabaseReminder } from '../database';
-import { Errors } from '../errors';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
-import { allButNWord, catchException, generateCommandHelp, getInput, getWord, now } from '../utils';
+import { allButNWord, catchException, generateCommandHelp, getInput, getWord, isInt, now } from '../utils';
 
 export class RemindersPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -46,6 +45,10 @@ export class RemindersPlugin extends PluginBase {
     const text = allButNWord(input, 2);
     const alarm = this.generateAlarm(delay, unit);
 
+    if (!isInt(delay)) {
+      return this.bot.replyMessage(msg, this.bot.errors.invalidArgument);
+    }
+
     const reminder: DatabaseReminder = {
       bot: this.bot.user.id,
       alarm: alarm,
@@ -55,7 +58,6 @@ export class RemindersPlugin extends PluginBase {
       text: text,
     };
     try {
-      db.remindersSnap.child(String(alarm).split('.')[0]).ref.set(reminder);
       let delayText = delay;
       if (unit == 's' || unit == 'sec' || unit == 'secs' || unit == 'second' || unit == 'seconds') {
         delayText = `${delay} seconds`;
@@ -66,14 +68,15 @@ export class RemindersPlugin extends PluginBase {
       } else if (unit == 'd' || unit == 'day' || unit == 'days') {
         delayText = `${delay} days`;
       } else {
-        return this.bot.replyMessage(msg, Errors.invalidArgument, 'text', null, { format: 'HTML' });
+        return this.bot.replyMessage(msg, this.bot.errors.invalidArgument);
       }
+      db.remindersSnap.child(String(alarm).split('.')[0]).ref.set(reminder);
 
       const message = `<b>${msg.sender['firstName']}</b>, I'll remint you in <b>${delayText}</b> to <i>${text}</i>.`;
-      this.bot.replyMessage(msg, message, 'text', null, { format: 'HTML' });
+      this.bot.replyMessage(msg, message);
     } catch (e) {
       catchException(e, this.bot);
-      this.bot.replyMessage(msg, Errors.exceptionFound, 'text', null, { format: 'HTML' });
+      this.bot.replyMessage(msg, this.bot.errors.exceptionFound);
     }
   }
 
@@ -95,7 +98,7 @@ export class RemindersPlugin extends PluginBase {
         if (reminder.username && reminder.username.length > 0) {
           text += ` (@${reminder.username})`;
         }
-        this.bot.sendMessage(chat, text, 'text', null, { format: 'HTML' });
+        this.bot.sendMessage(chat, text);
         db.remindersSnap.child(index).ref.set(null);
       }
     }
