@@ -27,12 +27,12 @@ export class AboutPlugin extends PluginBase {
       greeting: "Hi! I'm <b>{0}</b>!\nNice to meet you.",
       version: 'Running <a href="https://git.io/polaris.js">polaris.js</a> <code>{0}</code> by @endernull.',
       license:
-        '<b>Polaris.js</b> (including all plugins and documentation) is <b>free software</b>; you are free to redistribute it and/or modify it under the terms of the <b>GNU AGPLv3</b>.',
+        '<b>Polaris.js</b> (including all plugins and documentation) is <b>free software</b>; you are free to redistribute it and/or modify it under the terms of the <b>MIT</b>.',
       help: 'Write {0}help to know what I can do!',
       about: 'Use {0}about to know more about me',
       notice:
         'You can try my other bots: <a href="https://t.me/sakubo">@Sakubo</a> and <a href="https://t.me/PetoBot">@PetoBot</a>',
-      donations: 'You can make donations at https://paypal.me/luksireiku',
+      donations: 'You can make {0}donations at https://paypal.me/luksireiku',
       stats: '👤 {0} users\n👥 {1} groups',
       donationsExplanation: 'You can make donations at https://paypal.me/luksireiku',
       supportersTitle: '<b>Supporters:</b>',
@@ -53,7 +53,7 @@ export class AboutPlugin extends PluginBase {
       const help = format(this.strings['help'], this.bot.config.prefix);
       const about = format(this.strings['about'], this.bot.config.prefix);
       const notice = this.strings['notice'];
-      const donations = this.strings['donations'];
+      const donations = format(this.strings['donations'], this.bot.config.prefix);
       const stats = format(this.strings['stats'], Object.keys(db.users).length, Object.keys(db.groups).length);
 
       if (isCommand(this, 1, msg.content)) {

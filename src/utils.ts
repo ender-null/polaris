@@ -247,11 +247,11 @@ export function isCommand(plugin: PluginBase, number: number, text: string): boo
       }
     }
 
-    if (plugin.commands[number - 1].parameters == undefined && trigger.startsWith('^')) {
+    if (plugin.commands[number - 1].parameters == null && trigger.startsWith('^')) {
       trigger += '$';
-    } else if (plugin.commands[number - 1].parameters !== undefined && text.indexOf(' ') == -1) {
+    } else if (plugin.commands[number - 1].parameters !== null && text.indexOf(' ') == -1) {
       trigger += '$';
-    } else if (plugin.commands[number - 1].parameters !== undefined && text.indexOf(' ') > -1) {
+    } else if (plugin.commands[number - 1].parameters !== null && text.indexOf(' ') > -1) {
       trigger += ' ';
     }
     if (new RegExp(trigger, 'gim').test(text)) {
@@ -268,11 +268,11 @@ export function isCommand(plugin: PluginBase, number: number, text: string): boo
   if ('shortcut' in plugin.commands[number - 1]) {
     trigger = plugin.commands[number - 1].shortcut.replace('/', plugin.bot.config.prefix).toLocaleLowerCase();
 
-    if (plugin.commands[number - 1].parameters == undefined && trigger.startsWith('^')) {
+    if (plugin.commands[number - 1].parameters == null && trigger.startsWith('^')) {
       trigger += '$';
-    } else if (plugin.commands[number - 1].parameters !== undefined && text.indexOf(' ') == -1) {
+    } else if (plugin.commands[number - 1].parameters !== null && text.indexOf(' ') == -1) {
       trigger += '$';
-    } else if (plugin.commands[number - 1].parameters !== undefined && text.indexOf(' ') > -1) {
+    } else if (plugin.commands[number - 1].parameters !== null && text.indexOf(' ') > -1) {
       trigger += ' ';
     }
     if (new RegExp(trigger, 'gim').test(text)) {

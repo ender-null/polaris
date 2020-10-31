@@ -104,14 +104,17 @@ export class Bot {
             let maxlength = plugin.commands.length;
             if (
               'commands' in trans.plugins[plugin.constructor.name] &&
-              trans.plugins[plugin.constructor.name].commands.length > maxlength
+              Object.keys(trans.plugins[plugin.constructor.name].commands).length > maxlength
             ) {
-              maxlength = trans.plugins[plugin.constructor.name].commands.length;
+              maxlength = Object.keys(trans.plugins[plugin.constructor.name].commands).length;
             }
             for (let commandIndex = 0; commandIndex < maxlength; commandIndex++) {
               if ('commands' in trans.plugins[plugin.constructor.name]) {
                 if (commandIndex in trans.plugins[plugin.constructor.name].commands) {
                   const com = trans.plugins[plugin.constructor.name].commands[commandIndex];
+                  if (plugin.commands[commandIndex] == undefined) {
+                    plugin.commands[commandIndex] = { ...com };
+                  }
                   if ('command' in com) {
                     plugin.commands[commandIndex].command = com.command;
                   }
