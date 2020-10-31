@@ -1,3 +1,4 @@
+import format from 'string-format';
 import { Bot, Message } from '..';
 import { Conversation } from '../conversation';
 import { DatabaseReminder } from '../database';
@@ -28,6 +29,13 @@ export class RemindersPlugin extends PluginBase {
         description: 'Remind you things after a delay.',
       },
     ];
+    this.strings = {
+      seconds: 'seconds',
+      minutes: 'minutes',
+      hours: 'hours',
+      days: 'days',
+      message: "<b>{0}</b>, I'll remint you in <b>{1}</b> to <i>{2}</i>.",
+    };
     this.cronExpression = '*/10 * * * * *';
   }
   async run(msg: Message): Promise<void> {
@@ -59,20 +67,34 @@ export class RemindersPlugin extends PluginBase {
     };
     try {
       let delayText = delay;
-      if (unit == 's' || unit == 'sec' || unit == 'secs' || unit == 'second' || unit == 'seconds') {
-        delayText = `${delay} seconds`;
-      } else if (unit == 'm' || unit == 'min' || unit == 'mins' || unit == 'minute' || unit == 'minutes') {
-        delayText = `${delay} minutes`;
-      } else if (unit == 'h' || unit == 'hour' || unit == 'hours') {
-        delayText = `${delay} hours`;
-      } else if (unit == 'd' || unit == 'day' || unit == 'days') {
-        delayText = `${delay} days`;
+      if (
+        unit == this.strings['seconds'] ||
+        unit == 's' ||
+        unit == 'sec' ||
+        unit == 'secs' ||
+        unit == 'second' ||
+        unit == 'seconds'
+      ) {
+        delayText = `${delay} ${this.strings['seconds']}`;
+      } else if (
+        unit == this.strings['minutes'] ||
+        unit == 'm' ||
+        unit == 'min' ||
+        unit == 'mins' ||
+        unit == 'minute' ||
+        unit == 'minutes'
+      ) {
+        delayText = `${delay} ${this.strings['minutes']}`;
+      } else if (unit == this.strings['hours'] || unit == 'h' || unit == 'hour' || unit == 'hours') {
+        delayText = `${delay} ${this.strings['hours']}`;
+      } else if (unit == this.strings['days'] || unit == 'd' || unit == 'day' || unit == 'days') {
+        delayText = `${delay} ${this.strings['days']}`;
       } else {
         return this.bot.replyMessage(msg, this.bot.errors.invalidArgument);
       }
       db.remindersSnap.child(String(alarm).split('.')[0]).ref.set(reminder);
 
-      const message = `<b>${msg.sender['firstName']}</b>, I'll remint you in <b>${delayText}</b> to <i>${text}</i>.`;
+      const message = format(this.strings['message'], msg.sender['firstName'], delayText, text);
       this.bot.replyMessage(msg, message);
     } catch (e) {
       catchException(e, this.bot);

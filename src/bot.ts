@@ -100,36 +100,48 @@ export class Bot {
       this.errors = trans.errors;
       for (const plugin of this.plugins) {
         if (plugin.constructor.name in trans.plugins) {
-          for (const commandIndex in plugin.commands) {
-            if ('commands' in trans.plugins[plugin.constructor.name]) {
-              if (commandIndex in trans.plugins[plugin.constructor.name].commands) {
-                const com = trans.plugins[plugin.constructor.name].commands[commandIndex];
-                if ('command' in com) {
-                  plugin.commands[commandIndex].command = com.command;
-                }
-                if ('shortcut' in com) {
-                  plugin.commands[commandIndex].shortcut = com.shortcut;
-                }
-                if ('friendly' in com) {
-                  plugin.commands[commandIndex].friendly = com.friendly;
-                }
-                if ('description' in com) {
-                  plugin.commands[commandIndex].description = com.description;
-                }
-                if ('keepDefault' in com) {
-                  plugin.commands[commandIndex].keepDefault = com.keepDefault;
-                }
-                if ('hidden' in com) {
-                  plugin.commands[commandIndex].hidden = com.hidden;
-                }
-                if ('parameters' in com) {
-                  plugin.commands[commandIndex].parameters = [];
-                  for (const paramIndex in com.parameters) {
-                    plugin.commands[commandIndex].parameters[paramIndex] = com.parameters[paramIndex];
+          if ('commands' in plugin) {
+            let maxlength = plugin.commands.length;
+            if (
+              'commands' in trans.plugins[plugin.constructor.name] &&
+              trans.plugins[plugin.constructor.name].commands.length > maxlength
+            ) {
+              maxlength = trans.plugins[plugin.constructor.name].commands.length;
+            }
+            for (let commandIndex = 0; commandIndex < maxlength; commandIndex++) {
+              if ('commands' in trans.plugins[plugin.constructor.name]) {
+                if (commandIndex in trans.plugins[plugin.constructor.name].commands) {
+                  const com = trans.plugins[plugin.constructor.name].commands[commandIndex];
+                  if ('command' in com) {
+                    plugin.commands[commandIndex].command = com.command;
+                  }
+                  if ('shortcut' in com) {
+                    plugin.commands[commandIndex].shortcut = com.shortcut;
+                  }
+                  if ('friendly' in com) {
+                    plugin.commands[commandIndex].friendly = com.friendly;
+                  }
+                  if ('description' in com) {
+                    plugin.commands[commandIndex].description = com.description;
+                  }
+                  if ('keepDefault' in com) {
+                    plugin.commands[commandIndex].keepDefault = com.keepDefault;
+                  }
+                  if ('hidden' in com) {
+                    plugin.commands[commandIndex].hidden = com.hidden;
+                  }
+                  if ('parameters' in com) {
+                    plugin.commands[commandIndex].parameters = [];
+                    for (const paramIndex in com.parameters) {
+                      plugin.commands[commandIndex].parameters[paramIndex] = com.parameters[paramIndex];
+                    }
                   }
                 }
               }
             }
+          }
+          if ('strings' in plugin) {
+            plugin.strings = { ...plugin.strings, ...trans.plugins[plugin.constructor.name].strings };
           }
         }
       }

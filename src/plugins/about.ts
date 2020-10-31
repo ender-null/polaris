@@ -1,3 +1,4 @@
+import format from 'string-format';
 import { Bot, Message } from '..';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
@@ -22,6 +23,20 @@ export class AboutPlugin extends PluginBase {
         hidden: true,
       },
     ];
+    this.strings = {
+      greeting: "Hi! I'm <b>{0}</b>!\nNice to meet you.",
+      version: 'Running <a href="https://git.io/polaris.js">polaris.js</a> <code>{0}</code> by @endernull.',
+      license:
+        '<b>Polaris.js</b> (including all plugins and documentation) is <b>free software</b>; you are free to redistribute it and/or modify it under the terms of the <b>GNU AGPLv3</b>.',
+      help: 'Write {0}help to know what I can do!',
+      about: 'Use {0}about to know more about me',
+      notice:
+        'You can try my other bots: <a href="https://t.me/sakubo">@Sakubo</a> and <a href="https://t.me/PetoBot">@PetoBot</a>',
+      donations: 'You can make donations at https://paypal.me/luksireiku',
+      stats: '👤 {0} users\n👥 {1} groups',
+      donationsExplanation: 'You can make donations at https://paypal.me/luksireiku',
+      supportersTitle: '<b>Supporters:</b>',
+    };
   }
   async run(msg: Message): Promise<void> {
     let text;
@@ -32,14 +47,14 @@ export class AboutPlugin extends PluginBase {
       } catch (e) {
         catchException(e, this.bot);
       }
-      const greeting = `Hi! I'm <b>${this.bot.user.firstName}</b>!\nNice to meet you.`;
-      const version = `Running <a href="https://git.io/polaris.js">polaris.js</a> <code>${tag}</code> by @endernull.`;
-      const license = `<b>Polaris.js</b> (including all plugins and documentation) is <b>free software</b>; you are free to redistribute it and/or modify it under the terms of the <b>GNU AGPLv3</b>.`;
-      const help = `Write ${this.bot.config.prefix}help to know what I can do!`;
-      const about = `Use ${this.bot.config.prefix}about to know more about me`;
-      const notice = `You can try my other bots: <a href="https://t.me/sakubo">@Sakubo</a> and <a href="https://t.me/PetoBot">@PetoBot</a>`;
-      const donations = `You can make donations at https://paypal.me/luksireiku`;
-      const stats = `👤 ${Object.keys(db.users).length} users\n👥 ${Object.keys(db.groups).length} groups`;
+      const greeting = format(this.strings['greeting'], this.bot.user.firstName);
+      const version = format(this.strings['version'], tag);
+      const license = this.strings['license'];
+      const help = format(this.strings['help'], this.bot.config.prefix);
+      const about = format(this.strings['about'], this.bot.config.prefix);
+      const notice = this.strings['notice'];
+      const donations = this.strings['donations'];
+      const stats = format(this.strings['stats'], Object.keys(db.users).length, Object.keys(db.groups).length);
 
       if (isCommand(this, 1, msg.content)) {
         text = `${greeting}\n\n${notice}\n\n${help}\n${about}\n\n${version}\n${donations}\n\n${license}\n\n${stats}`;
@@ -47,8 +62,8 @@ export class AboutPlugin extends PluginBase {
         text = `${greeting}\n\n${notice}\n\n${help}\n${about}\n\n${donations}`;
       }
     } else if (isCommand(this, 2, msg.content)) {
-      const donationsExplanation = `You can make donations at https://paypal.me/luksireiku`;
-      const supportersTitle = `<b>Supporters:</b>`;
+      const donationsExplanation = this.strings['donationsExplanation'];
+      const supportersTitle = this.strings['supportersTitle'];
       const supporters = '';
       if (supporters.length > 0) {
         text = `${donationsExplanation}\n\n${supportersTitle}${supporters}`;

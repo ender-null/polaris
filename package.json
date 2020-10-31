@@ -39,6 +39,7 @@
     "discord.js": "^12.4.1",
     "mime-types": "^2.1.27",
     "node-cron": "^2.0.3",
+    "string-format": "^2.0.0",
     "tdl": "^6.1.0",
     "tdl-tdlib-ffi": "^2.0.0",
     "tmp": "^0.2.1",

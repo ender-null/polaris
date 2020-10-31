@@ -18,6 +18,10 @@ export class HelpPlugin extends PluginBase {
         hidden: true,
       },
     ];
+    this.strings = {
+      commands: '<b>Commands</b>:',
+      noDescription: 'No description',
+    };
   }
   async run(msg: Message): Promise<void> {
     const commands = [];
@@ -26,7 +30,7 @@ export class HelpPlugin extends PluginBase {
     if (isCommand(this, 2, msg.content)) {
       text = '';
     } else {
-      text = `<b>Commands</b>:`;
+      text = this.strings['commands'];
     }
 
     // Iterates the initialized plugin
@@ -69,7 +73,7 @@ export class HelpPlugin extends PluginBase {
                 text += ' - No description';
                 commands.push({
                   command: command.command.substring(1),
-                  description: 'No description',
+                  description: this.strings['noDescription'],
                 });
               }
             }
@@ -85,7 +89,7 @@ export class HelpPlugin extends PluginBase {
                 if (lines.length > 1) {
                   text += `\n   ${lines[1]}`;
                 } else {
-                  text += `\n   <i>No description</i>`;
+                  text += `\n   <i>${this.strings['noDescription']}</i>`;
                 }
               }
             }
