@@ -13,6 +13,10 @@ export function isOwner(bot: Bot, uid: number | string, msg: Message = null): bo
   return hasTag(bot, uid, 'owner') || msg.sender.id == bot.config.owner;
 }
 
+export function isAdmin(bot: Bot, uid: number | string, msg: Message = null): boolean {
+  return hasTag(bot, uid, 'admin');
+}
+
 export function isTrusted(bot: Bot, uid: number | string, msg: Message = null): boolean {
   return hasTag(bot, uid, 'trusted') || isOwner(bot, uid, msg);
 }
