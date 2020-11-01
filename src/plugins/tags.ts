@@ -51,7 +51,7 @@ export class TagsPlugin extends PluginBase {
     ];
   }
   async run(msg: Message): Promise<void> {
-    let input = getInput(msg, false);
+    let input = getInput(msg);
 
     if (!isTrusted(this.bot, msg.sender.id, msg)) {
       return this.bot.replyMessage(msg, this.bot.errors.permissionRequired);

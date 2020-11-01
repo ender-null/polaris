@@ -187,4 +187,25 @@ export class DiscordBindings extends BindingsBase {
     }
     return content;
   }
+
+  async getChatAdministrators(conversationId: string | number): Promise<User[]> {
+    const channel = await this.client.channels.fetch(String(conversationId).slice(1));
+    console.log(JSON.stringify(channel));
+    const admins = [];
+    // for (const member of channel.members) {
+    //   const perms = channel.permissionsFor(member);
+    //   if (perms.administrator) {
+    //     admins.push(
+    //       new User(
+    //         member.id,
+    //         member.name,
+    //         '#' + member.discriminator,
+    //         member.name + '#' + member.discriminator,
+    //         member.bot,
+    //       ),
+    //     );
+    //   }
+    // }
+    return admins;
+  }
 }

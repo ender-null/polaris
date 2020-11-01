@@ -1,7 +1,7 @@
 import format from 'string-format';
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
-import { delTag, firstWord, getInput, hasTag, isAdmin, isTrusted, setTag } from '../utils';
+import { delTag, getInput, hasTag, isAdmin, isTrusted, setTag } from '../utils';
 
 export class ConfigPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -19,14 +19,25 @@ export class ConfigPlugin extends PluginBase {
         description: 'Configure parameters',
       },
     ];
-    this.strings = { explanation: '' };
+    this.strings = {
+      reactions: 'Reactions',
+      roulette: 'Russian roulette',
+      replies: 'Replies',
+      pole: 'Pole',
+      fiesta: 'Fiesta',
+      nsfw: 'NSFW',
+      antispam: 'Anti SPAM',
+      antiarab: 'Anti arab',
+      antirussian: 'Anti russian',
+      polereset: 'PoleReset',
+      explanation: "Toggles group features. The syntax is <i>'{0}config parameter'</i>, the parameters are: '{1}'",
+    };
   }
   async run(msg: Message): Promise<void> {
     if (+msg.conversation.id > 0) {
       return this.bot.replyMessage(msg, this.bot.errors.groupOnly);
     }
-    const input = getInput(msg, false);
-    const parameter = firstWord(input);
+    const input = getInput(msg);
     const enabled = ['reactions', 'roulette', 'replies', 'pole', 'fiesta', 'nsfw'];
     const disabled = ['antispam', 'antiarab', 'antirussian', 'polereset'];
     const config = {};
@@ -40,30 +51,30 @@ export class ConfigPlugin extends PluginBase {
 
     let text = '';
     if (!input) {
-      text = format(this.strings.explanation, Object.keys(config).join("', '"));
+      text = format(this.strings.explanation, this.bot.config.prefix, Object.keys(config).join("', '"));
       for (const param of Object.keys(config)) {
         text += `\n${config[param] ? '✔️' : '❌'} ${this.strings[param]}`;
       }
-    } else if (parameter in enabled || parameter in disabled) {
-      if (!isAdmin(this.bot, msg.sender.id, msg) && !isTrusted(this.bot, msg.sender.id, msg)) {
+    } else if (enabled.indexOf(input) > -1 || disabled.indexOf(input) > -1) {
+      if ((await !isAdmin(this.bot, msg.sender.id, msg)) && !isTrusted(this.bot, msg.sender.id, msg)) {
         return this.bot.replyMessage(msg, this.bot.errors.permissionRequired);
       }
 
-      if (config[parameter]) {
-        if (parameter in enabled) {
-          setTag(this.bot, msg.conversation.id, 'no' + parameter);
-        } else if (parameter in disabled) {
-          delTag(this.bot, msg.conversation.id, parameter);
+      if (config[input]) {
+        if (enabled.indexOf(input) > -1) {
+          setTag(this.bot, msg.conversation.id, 'no' + input);
+        } else if (disabled.indexOf(input) > -1) {
+          delTag(this.bot, msg.conversation.id, input);
         }
       } else {
-        if (parameter in enabled) {
-          delTag(this.bot, msg.conversation.id, 'no' + parameter);
-        } else if (parameter in disabled) {
-          setTag(this.bot, msg.conversation.id, parameter);
+        if (enabled.indexOf(input) > -1) {
+          delTag(this.bot, msg.conversation.id, 'no' + input);
+        } else if (disabled.indexOf(input) > -1) {
+          setTag(this.bot, msg.conversation.id, input);
         }
       }
 
-      text += `${config[parameter] ? '❌' : '✔️'} ${this.strings[parameter]}`;
+      text += `${config[input] ? '❌' : '✔️'} ${this.strings[input]}`;
     }
 
     this.bot.replyMessage(msg, text);

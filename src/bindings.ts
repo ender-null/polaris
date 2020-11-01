@@ -12,4 +12,6 @@ export abstract class BindingsBase {
   abstract async stop(): Promise<void>;
 
   abstract async getMe(): Promise<User>;
+
+  abstract async getChatAdministrators(conversationId: string | number): Promise<User[]>;
 }

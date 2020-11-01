@@ -297,6 +297,10 @@ export class Bot {
     return false;
   }
 
+  getChatAdmins(conversationId: string | number) {
+    return this.bindings.getChatAdministrators(conversationId);
+  }
+
   sendMessage(chat: Conversation, content: string, type = 'text', reply?: Message, extra?: Extra): void {
     if (!extra) {
       extra = {};

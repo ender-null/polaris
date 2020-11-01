@@ -13,8 +13,22 @@ export function isOwner(bot: Bot, uid: number | string, msg: Message = null): bo
   return hasTag(bot, uid, 'owner') || msg.sender.id == bot.config.owner;
 }
 
-export function isAdmin(bot: Bot, uid: number | string, msg: Message = null): boolean {
-  return hasTag(bot, uid, 'admin');
+export async function isAdmin(bot: Bot, uid: number | string, msg: Message = null): Promise<boolean> {
+  return hasTag(bot, uid, 'admin') || (await isGroupAdmin(bot, uid, msg));
+}
+
+export async function isGroupAdmin(bot: Bot, uid: number | string, msg: Message = null): Promise<boolean> {
+  if (typeof uid != 'string') {
+    uid = String(uid);
+  }
+  if (msg && +msg.conversation.id < 0) {
+    const chatAdmins = await bot.getChatAdmins(msg.conversation.id);
+    for (const admin of chatAdmins) {
+      if (uid == String(admin.id)) return true;
+    }
+  }
+
+  return false;
 }
 
 export function isTrusted(bot: Bot, uid: number | string, msg: Message = null): boolean {
@@ -153,7 +167,13 @@ export function getTarget(bot: Bot, m: Message, input: string): string {
 }
 
 export function getWord(text: string, i: number): string {
-  return text.split(' ')[i - 1];
+  if (text && text.indexOf(' ') > -1) {
+    return text.split(' ')[i - 1];
+  } else if (text && text.indexOf(' ') == -1 && i == 1) {
+    return text;
+  } else {
+    return null;
+  }
 }
 
 export function firstWord(text: string): string {
@@ -200,14 +220,14 @@ export function getUsername(uid: number | string): string {
 export function setInput(message: Message, trigger: string): Message {
   if (message.type == 'text') {
     // Get the text that is next to the pattern
-    const inputMatch = new RegExp(`${trigger}(.+)$`, 'gim').exec(message.content);
+    const inputMatch = new RegExp(`${trigger} (.+)$`, 'gim').exec(message.content);
     if (inputMatch && inputMatch.length > 0) {
       message.extra.input = inputMatch[1];
     }
 
     // Get the text that is next to the pattern
     if (message.reply && message.reply.content) {
-      const inputMatch = new RegExp(`${trigger}(.+)$`, 'gim').exec(
+      const inputMatch = new RegExp(`${trigger} (.+)$`, 'gim').exec(
         String(message.content) + ' ' + String(message.reply.content),
       );
       if (inputMatch && inputMatch.length > 0) {

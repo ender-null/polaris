@@ -45,7 +45,7 @@ export class RemindersPlugin extends PluginBase {
     this.cronExpression = '*/10 * * * * *';
   }
   async run(msg: Message): Promise<void> {
-    const input = getInput(msg, false);
+    const input = getInput(msg);
     if (!input) {
       return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content), 'text', null, { format: 'HTML' });
     }

@@ -20,7 +20,7 @@ export class VoicePlugin extends PluginBase {
     ];
   }
   async run(msg: Message): Promise<void> {
-    const input = getInput(msg, false);
+    const input = getInput(msg);
     if (!input) {
       return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
     }

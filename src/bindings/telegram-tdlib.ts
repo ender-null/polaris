@@ -377,4 +377,37 @@ export class TelegramTDlibBindings extends BindingsBase {
       };
     }
   }
+
+  async getChatAdministrators(conversationId: string | number): Promise<User[]> {
+    const result = await this.serverRequest('getChatAdministrators', {
+      chat_id: conversationId,
+    });
+
+    const admins = [];
+    if (result && 'administrators' in result) {
+      for (const member of result['administrators']) {
+        const user = new User(member['user_id']);
+
+        const request = this.serverRequest('getUser', {
+          user_id: user.id,
+        });
+        const rawUser = request;
+
+        if (rawUser) {
+          user.isBot = rawUser['type']['@type'] == 'userTypeBot';
+          if ('first_name' in rawUser) {
+            user.firstName = String(rawUser['first_name']);
+          }
+          if ('last_name' in rawUser) {
+            user.lastName = String(rawUser['last_name']);
+          }
+          if ('username' in rawUser) {
+            user.username = String(rawUser['username']);
+          }
+        }
+        admins.push(user);
+      }
+    }
+    return admins;
+  }
 }
