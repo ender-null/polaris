@@ -122,6 +122,10 @@ export function isInt(number: number | string): boolean {
   return !isNaN(parseFloat(number));
 }
 
+export function escapeRegExp(str: string): string {
+  return str.replace(/[-\\^$*+?.()|[\]{}]/g, '\\$&');
+}
+
 export function getTarget(bot: Bot, m: Message, input: string): string {
   if (input) {
     const target = firstWord(input);
@@ -294,7 +298,9 @@ export function isCommand(plugin: PluginBase, number: number, text: string): boo
       if (text[0] == '/' && 'keepDefault' in plugin.commands[number - 1] && plugin.commands[number - 1].keepDefault) {
         trigger = plugin.commands[number - 1].command.replace('/', '^/');
       } else {
-        trigger = plugin.commands[number - 1].command.replace('/', plugin.bot.config.prefix).toLocaleLowerCase();
+        trigger = plugin.commands[number - 1].command
+          .replace('/', escapeRegExp(plugin.bot.config.prefix))
+          .toLocaleLowerCase();
       }
     }
 
@@ -317,7 +323,9 @@ export function isCommand(plugin: PluginBase, number: number, text: string): boo
     }
   }
   if ('shortcut' in plugin.commands[number - 1]) {
-    trigger = plugin.commands[number - 1].shortcut.replace('/', plugin.bot.config.prefix).toLocaleLowerCase();
+    trigger = plugin.commands[number - 1].shortcut
+      .replace('/', escapeRegExp(plugin.bot.config.prefix))
+      .toLocaleLowerCase();
 
     if (plugin.commands[number - 1].parameters == null && trigger.startsWith('^')) {
       trigger += '$';
@@ -338,7 +346,7 @@ export function getCommandIndex(plugin: PluginBase, text: string): number {
     text = text.replace(`@${plugin.bot.user.username}`, '');
   }
 
-  text = text.replace('/', plugin.bot.config['prefix']);
+  text = text.replace('/', escapeRegExp(plugin.bot.config['prefix']));
 
   for (const i in plugin.commands) {
     if (isCommand(plugin, parseInt(i) + 1, text)) {
@@ -360,7 +368,7 @@ export function generateCommandHelp(plugin: PluginBase, text: string, showHidden
     return null;
   }
 
-  let doc = command['command'].replace('/', plugin.bot.config.prefix);
+  let doc = command['command'].replace('/', escapeRegExp(plugin.bot.config.prefix));
 
   if ('parameters' in command && command.parameters) {
     for (const i in command.parameters) {

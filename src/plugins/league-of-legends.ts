@@ -146,7 +146,7 @@ export class LeagueOfLegendsPlugin extends PluginBase {
           const summonerInfo = tags[0].split(':')[1];
           if (summonerInfo.indexOf('/') > -1) {
             this.region = this.regions[summonerInfo.split('/')[0]];
-            summonerName = summonerInfo.split('/')[1].replace('_', ' ');
+            summonerName = summonerInfo.split('/')[1].replace(new RegExp('_', 'gim'), ' ');
           }
         }
         if (!summonerName) {
@@ -178,7 +178,7 @@ export class LeagueOfLegendsPlugin extends PluginBase {
       }
       text = format('{0} ({1}: {2})\n', summoner['name'], this.strings['lv'], summoner['summonerLevel']);
       if (account && 'gameName' in account) {
-        text += `${account['gameName'] + '#' + account['tagLine']}\n`;
+        text += `${account['gameName']}#${account['tagLine']}\n`;
       }
       if (masteries) {
         text += `\n${this.strings['masteries']}:`;
@@ -228,16 +228,15 @@ export class LeagueOfLegendsPlugin extends PluginBase {
       if (hasTag(this.bot, uid, 'lol:?')) {
         delTag(this.bot, uid, 'lol:?');
       }
-      console.log(input, getWord(input, 1), allButNWord(input, 1));
       const region = getWord(input, 1).toLowerCase();
       if (!(region in this.regions)) {
         return this.bot.replyMessage(msg, this.strings['invalidRegion']);
       }
-      const summonerName = allButNWord(input, 1).replace(' ', '_');
+      const summonerName = allButNWord(input, 1).replace(new RegExp(' ', 'gim'), '_');
       setTag(this.bot, uid, `lol:${region}/${summonerName}`);
       text = format(
         this.strings['summonerSet'],
-        summonerName.replace('_', ' '),
+        summonerName.replace(new RegExp('_', 'gim'), ' '),
         region.toUpperCase(),
         this.bot.config.prefix,
       );

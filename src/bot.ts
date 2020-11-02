@@ -8,7 +8,7 @@ import { BindingsBase, Config, Conversation, Extra, Message, PluginBase, User } 
 import { db } from './main';
 import { Parameter } from './plugin';
 import * as plugins from './plugins/index';
-import { catchException, hasTag, isTrusted, logger, now, setInput } from './utils';
+import { catchException, escapeRegExp, hasTag, isTrusted, logger, now, setInput } from './utils';
 
 export class Bot {
   config: Config;
@@ -259,7 +259,7 @@ export class Bot {
       if (keepDefault) {
         trigger = command.replace('/', '^/');
       } else {
-        trigger = command.replace('/', `^${this.config.prefix}`);
+        trigger = command.replace('/', `^${escapeRegExp(this.config.prefix)}`);
       }
 
       if (!friendly) {
