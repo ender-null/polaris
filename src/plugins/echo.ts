@@ -1,6 +1,6 @@
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
-import { generateCommandHelp, getInput } from '../utils';
+import { capitalize, generateCommandHelp, getInput } from '../utils';
 
 export class EchoPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -24,6 +24,6 @@ export class EchoPlugin extends PluginBase {
     if (!input) {
       return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
     }
-    this.bot.replyMessage(msg, input.charAt(0).toUpperCase() + input.slice(1));
+    this.bot.replyMessage(msg, capitalize(input));
   }
 }

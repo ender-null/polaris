@@ -35,7 +35,7 @@ export function isTrusted(bot: Bot, uid: number | string, msg: Message = null): 
   return hasTag(bot, uid, 'trusted') || isOwner(bot, uid, msg);
 }
 
-export function getTags(bot: Bot, target: number | string): string[] {
+export function getTags(bot: Bot, target: number | string, tagFilter?: string): string[] {
   if (typeof target != 'string') {
     target = String(target);
   }
@@ -44,6 +44,9 @@ export function getTags(bot: Bot, target: number | string): string[] {
     for (const i in db.tags[target]) {
       const tag = db.tags[target][i];
       const regex = new RegExp('(@w+:)', 'gim');
+      if (tagFilter && tagFilter.indexOf('?') > -1 && !tag.startsWith(tagFilter.split('?')[0])) {
+        continue;
+      }
       if (regex.test(tag)) {
         const inputMatch = regex.exec(tag);
         if (inputMatch[1] === bot.config.name) {
@@ -93,7 +96,16 @@ export function delTag(bot: Bot, target: number | string, tag: string): void {
     target = String(target);
   }
   const tags = getTags(bot, target);
-  if (tags && tags.indexOf(tag) > -1) {
+  if (tags && tag.indexOf('?') > -1) {
+    for (const targetTag of tags) {
+      if (targetTag.startsWith(tag.split('?')[0])) {
+        db.tagsSnap
+          .child(target)
+          .child(String(tags.indexOf(targetTag)))
+          .ref.set(null);
+      }
+    }
+  } else if (tags && tags.indexOf(tag) > -1) {
     db.tagsSnap
       .child(target)
       .child(String(tags.indexOf(tag)))
@@ -166,6 +178,13 @@ export function getTarget(bot: Bot, m: Message, input: string): string {
   }
 }
 
+export function capitalize(text: string): string {
+  if (text) {
+    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+  }
+  return null;
+}
+
 export function getWord(text: string, i: number): string {
   if (text && text.indexOf(' ') > -1) {
     return text.split(' ')[i - 1];
@@ -220,21 +239,29 @@ export function getUsername(uid: number | string): string {
 export function setInput(message: Message, trigger: string): Message {
   if (message.type == 'text') {
     // Get the text that is next to the pattern
-    const inputMatch = new RegExp(`${trigger} (.+)$`, 'gim').exec(message.content);
+    const inputMatch = new RegExp(`${trigger}(.+)$`, 'gim').exec(message.content);
     if (inputMatch && inputMatch.length > 0) {
-      message.extra.input = inputMatch[1];
+      if (inputMatch[1].startsWith(' ')) {
+        message.extra.input = inputMatch[1].slice(1);
+      } else {
+        message.extra.input = inputMatch[1];
+      }
     }
 
     // Get the text that is next to the pattern
     if (message.reply && message.reply.content) {
-      const inputMatch = new RegExp(`${trigger} (.+)$`, 'gim').exec(
+      const inputMatch = new RegExp(`${trigger}(.+)$`, 'gim').exec(
         String(message.content) + ' ' + String(message.reply.content),
       );
       if (inputMatch && inputMatch.length > 0) {
-        message.extra.inputReply = inputMatch[1];
+        if (inputMatch[1].startsWith(' ')) {
+          message.extra.inputReply = inputMatch[1].slice(1);
+        } else {
+          message.extra.inputReply = inputMatch[1];
+        }
       }
     } else if ('input' in message.extra) {
-      message.extra.inputReply = message.extra['input'];
+      message.extra.inputReply = message.extra.input;
     }
   }
   return message;
@@ -373,13 +400,14 @@ export async function sendRequest(
     const fullUrl = `${url}?${queryString}`;
     const response = await fetch(fullUrl, options);
     if (response.status != 200) {
-      const json = response.json().catch((e) => catchException(e));
+      const error = response.clone();
+      const json = error.json().catch((e) => catchException(e));
       logger.error(JSON.stringify(json));
       if (bot) {
         bot.sendAlert(JSON.stringify(json));
       }
 
-      if (response.status == 429) {
+      if (error.status == 429) {
         setTimeout(async () => {
           await sendRequest(url, params, headers, data, post, bot);
         }, 5000);

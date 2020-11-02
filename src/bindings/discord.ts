@@ -157,8 +157,8 @@ export class DiscordBindings extends BindingsBase {
               embed.setURL(msg.content);
             } else {
               embed.setURL(msg.content);
-              await chat.send(embed);
             }
+            await chat.send(embed);
           }
         }
         chat.stopTyping();

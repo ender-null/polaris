@@ -31,6 +31,10 @@ export interface iString {
   [id: string]: string;
 }
 
+export interface iStringNested {
+  [id: string]: iString;
+}
+
 export interface iConfig {
   [id: string]: Config;
 }
