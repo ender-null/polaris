@@ -346,7 +346,7 @@ export function getCommandIndex(plugin: PluginBase, text: string): number {
     text = text.replace(`@${plugin.bot.user.username}`, '');
   }
 
-  text = text.replace('/', escapeRegExp(plugin.bot.config['prefix']));
+  text = text.replace('/', plugin.bot.config['prefix']);
 
   for (const i in plugin.commands) {
     if (isCommand(plugin, parseInt(i) + 1, text)) {
@@ -368,7 +368,7 @@ export function generateCommandHelp(plugin: PluginBase, text: string, showHidden
     return null;
   }
 
-  let doc = command['command'].replace('/', escapeRegExp(plugin.bot.config.prefix));
+  let doc = command['command'].replace('/', plugin.bot.config.prefix);
 
   if ('parameters' in command && command.parameters) {
     for (const i in command.parameters) {
@@ -492,7 +492,7 @@ export function replaceHtml(text: string): string {
 
 export function htmlToDiscordMarkdown(text: string): string {
   const replacements = [
-    { pattern: '<code class="language-([w]+)">([Ss]+)</code>', sub: '```$1\n$2```' },
+    { pattern: '<code class="language-([\\w]+)">([\\S\\s]+)</code>', sub: '```$1\n$2```' },
     // {pattern: '<a href=\"(.[^\<]+)\">(.[^\<]+)</a>', sub: '[$2]($1)'},
     { pattern: '<a href="(.[^<]+)">(.[^<]+)</a>', sub: '$1' },
     { pattern: '<[/]?i>', sub: '_' },

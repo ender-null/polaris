@@ -1,5 +1,5 @@
 import { Bot, Config, Database } from '.';
-import { logger } from './utils';
+import { catchException, logger } from './utils';
 
 let bots: Bot[] = [];
 
@@ -32,11 +32,14 @@ db.events.once('update:configs', () => {
   for (const key of Object.keys(db.configs)) {
     const configs = Config.loadInstancesFromJSON(db.configs[key]);
     for (const config of configs) {
+      const bot = new Bot(config);
+      process.on('unhandledRejection', (exception: Error) => {
+        catchException(exception, bot);
+      });
       if (config.enabled) {
-        const bot = new Bot(config);
         bot.start();
-        bots.push(bot);
       }
+      bots.push(bot);
     }
   }
 });
