@@ -23,6 +23,7 @@ export interface Instance {
   adminConversationId?: string;
   alertsConversationId?: string;
   plugins?: string | string[];
+  apiKeys?: ApiKeys;
 }
 
 export class Config {

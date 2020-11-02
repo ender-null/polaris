@@ -27,19 +27,32 @@ process.once('SIGINT', () => stop());
 process.once('SIGTERM', () => stop());
 
 export const db = new Database();
-db.events.once('update:configs', () => {
-  bots = [];
+bots = [];
+db.events.on('update:configs', () => {
   for (const key of Object.keys(db.configs)) {
     const configs = Config.loadInstancesFromJSON(db.configs[key]);
     for (const config of configs) {
-      const bot = new Bot(config);
-      process.on('unhandledRejection', (exception: Error) => {
-        catchException(exception, bot);
-      });
-      if (config.enabled) {
-        bot.start();
+      let found = false;
+      for (const bot of bots) {
+        if (bot.config.name == config.name && bot.config.bindings == config.bindings) {
+          bot.config = config;
+          if (!config.enabled) {
+            bot.stop();
+          }
+          found = true;
+          break;
+        }
       }
-      bots.push(bot);
+      if (!found) {
+        const bot = new Bot(config);
+        if (config.enabled) {
+          process.on('unhandledRejection', (exception: Error) => {
+            catchException(exception, bot);
+          });
+          bot.start();
+        }
+        bots.push(bot);
+      }
     }
   }
 });
