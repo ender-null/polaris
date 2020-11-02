@@ -538,10 +538,12 @@ export function catchException(exception: Error, bot: Bot = null): void {
   logger.info(`Catched exception: ${exception.message}`);
   logger.error(`${exception.message}`);
   if (bot) {
-    if (exception.stack) {
-      bot.sendAlert(`${exception.stack}`);
-    } else {
-      bot.sendAlert(`${exception.message}`);
+    if (exception.message != 'Chat not found') {
+      if (exception.stack) {
+        bot.sendAlert(`${exception.stack}`);
+      } else {
+        bot.sendAlert(`${exception.message}`);
+      }
     }
   }
 }
