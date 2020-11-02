@@ -80,11 +80,11 @@ export class AboutPlugin extends PluginBase {
     if (+msg.conversation.id < 0) {
       if (gid in Object.keys(db.groups)) {
         db.groupsSnap.child(gid).ref.update({
-          title: msg.conversation.title,
+          title: msg.conversation.title || '',
         });
       } else {
         db.groupsSnap.child(gid).ref.set({
-          title: msg.conversation.title,
+          title: msg.conversation.title || '',
         });
       }
     }
@@ -96,17 +96,17 @@ export class AboutPlugin extends PluginBase {
 
     if (uid in Object.keys(db.users)) {
       db.usersSnap.child(uid).ref.update({
-        first_name: msg.sender['firstName'],
-        last_name: msg.sender['lastName'],
-        username: msg.sender['username'],
-        is_bot: msg.sender['isBot'],
+        first_name: msg.sender['firstName'] || '',
+        last_name: msg.sender['lastName'] || '',
+        username: msg.sender['username'] || '',
+        is_bot: msg.sender['isBot'] || false,
       });
     } else {
       db.usersSnap.child(uid).ref.set({
-        first_name: msg.sender['firstName'],
-        last_name: msg.sender['lastName'],
-        username: msg.sender['username'],
-        is_bot: msg.sender['isBot'],
+        first_name: msg.sender['firstName'] || '',
+        last_name: msg.sender['lastName'] || '',
+        username: msg.sender['username'] || '',
+        is_bot: msg.sender['isBot'] || '',
       });
     }
   }
