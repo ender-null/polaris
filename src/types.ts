@@ -50,6 +50,7 @@ export interface ApiKeys {
   telegramAppId?: number;
   databaseEncryptionKey?: string;
   discordBotToken?: string;
+  discordClientId?: number;
   battleNet?: string;
   catApi?: string;
   giphy?: string;

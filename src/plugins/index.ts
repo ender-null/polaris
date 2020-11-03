@@ -1,4 +1,5 @@
 export { AboutPlugin } from './about';
+export { AddToDiscordPlugin } from './add-to-discord';
 export { AnimalsPlugin } from './animals';
 export { ConfigPlugin } from './config';
 export { EchoPlugin } from './echo';
