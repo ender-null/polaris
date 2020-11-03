@@ -28,31 +28,26 @@ process.once('SIGTERM', () => stop());
 
 export const db = new Database();
 bots = [];
-db.events.on('update:configs', () => {
+db.events.on('update:configs', async () => {
+  logger.info('Configs updated');
   for (const key of Object.keys(db.configs)) {
     const configs = Config.loadInstancesFromJSON(db.configs[key]);
-    for (const config of configs) {
-      let found = false;
+    if (Array.isArray(bots) && bots.length > 0) {
       for (const bot of bots) {
-        if (bot.config.name == config.name && bot.config.bindings == config.bindings) {
-          bot.config = config;
-          if (!config.enabled) {
-            bot.stop();
-          }
-          found = true;
-          break;
-        }
+        await bot.stop();
+        delete bots[bots.indexOf(bot)];
       }
-      if (!found) {
-        const bot = new Bot(config);
-        if (config.enabled) {
-          process.on('unhandledRejection', (exception: Error) => {
-            catchException(exception, bot);
-          });
-          bot.start();
-        }
-        bots.push(bot);
+    }
+    bots = [];
+    for (const config of configs) {
+      const bot = new Bot(config);
+      if (config.enabled) {
+        process.on('unhandledRejection', (exception: Error) => {
+          catchException(exception, bot);
+        });
+        await bot.start();
       }
+      bots.push(bot);
     }
   }
 });
