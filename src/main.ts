@@ -1,7 +1,7 @@
 import { Bot, Config, Database } from '.';
 import { catchException, logger } from './utils';
 
-let bots: Bot[] = [];
+const bots: Bot[] = [];
 
 export async function stop(): Promise<void> {
   let pending = bots.length;

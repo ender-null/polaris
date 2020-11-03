@@ -47,7 +47,7 @@ export class Bot {
     }
   }
 
-  async onStarted() {
+  async onStarted(): Promise<void> {
     this.started = true;
     this.user = await this.bindings.getMe();
     logger.info(`Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`);
@@ -57,7 +57,7 @@ export class Bot {
     this.scheduleCronJobs();
   }
 
-  async onStopped() {
+  async onStopped(): Promise<void> {
     this.started = false;
     for (const task of this.tasks) {
       task.stop();
@@ -77,7 +77,7 @@ export class Bot {
     }
   }
 
-  messageSender(msg: Message) {
+  messageSender(msg: Message): void {
     logger.info(
       ` [${this.user.id}] ${this.user.firstName}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
     );
