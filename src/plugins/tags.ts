@@ -1,13 +1,13 @@
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
 import {
-  allButFirstWord,
+  allButNWord,
   delTag,
-  firstWord,
   generateCommandHelp,
   getInput,
   getTarget,
   getUsername,
+  getWord,
   hasTag,
   isCommand,
   isTrusted,
@@ -62,14 +62,14 @@ export class TagsPlugin extends PluginBase {
     }
 
     if (!msg.reply) {
-      input = allButFirstWord(input);
+      input = allButNWord(input, 1);
     }
 
     let target = getTarget(this.bot, msg, getInput(msg, false));
     let name = null;
     if (target) {
       name = getUsername(target);
-    } else if (firstWord(input) == '-g') {
+    } else if (getWord(input, 1) == '-g') {
       target = String(msg.conversation.id);
       name = getUsername(target);
     } else {

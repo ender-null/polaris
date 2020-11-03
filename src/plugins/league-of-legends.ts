@@ -276,10 +276,6 @@ export class LeagueOfLegendsPlugin extends PluginBase {
     return await this.apiRequest(`/lol/league/v4/entries/by-summoner/${encryptedSummonerId}`);
   }
 
-  async status(): Promise<Response> {
-    return await this.apiRequest(`/lol/status/v3/shard-data`);
-  }
-
   async ddragonVersions(): Promise<string> {
     const data = await sendRequest(`https://ddragon.leagueoflegends.com/api/versions.json`);
     if (data) {

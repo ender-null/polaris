@@ -128,7 +128,7 @@ export function escapeRegExp(str: string): string {
 
 export function getTarget(bot: Bot, m: Message, input: string): string {
   if (input) {
-    const target = firstWord(input);
+    const target = getWord(input, 1);
     if (isInt(target)) {
       return String(target);
     } else if (target.startsWith('@')) {
@@ -199,19 +199,11 @@ export function getWord(text: string, i: number): string {
   }
 }
 
-export function firstWord(text: string): string {
-  return getWord(text, 1);
-}
-
 export function allButNWord(text: string, word = 1): string {
   if (!text || text.indexOf(' ') == -1) {
     return null;
   }
   return text.substr(text.indexOf(text.split(' ')[word]));
-}
-
-export function allButFirstWord(text: string): string {
-  return allButNWord(text, 1);
 }
 
 export function getUsername(uid: number | string): string {
