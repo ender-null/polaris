@@ -50,6 +50,8 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async stop(): Promise<void> {
+    await this.serverRequest('close');
+    this.bot.outbox.removeAllListeners('message');
     this.bot.status.emit('stopped');
   }
 

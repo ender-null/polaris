@@ -34,30 +34,12 @@ export class Bot {
 
   async start(): Promise<void> {
     this.inbox.on('message', (msg: Message) => this.messagesHandler(msg));
-    this.outbox.on('message', (msg: Message) => {
-      logger.info(
-        ` [${this.user.id}] ${this.user.firstName}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
-      );
-    });
+    this.outbox.on('message', (msg: Message) => this.messageSender(msg));
     this.initPlugins();
     this.initTranslations();
     db.events.on('update:translations', () => this.initTranslations());
-    this.status.on('started', async () => {
-      this.started = true;
-      this.user = await this.bindings.getMe();
-      logger.info(`Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`);
-      this.sendAdminAlert(
-        `Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`,
-      );
-      this.scheduleCronJobs();
-    });
-    this.status.on('stopped', async () => {
-      this.started = false;
-      for (const task of this.tasks) {
-        task.stop();
-      }
-      logger.info(`Stopped ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`);
-    });
+    this.status.on('started', () => this.onStarted());
+    this.status.on('stopped', () => this.onStopped());
     try {
       await this.bindings.start();
     } catch (e) {
@@ -65,8 +47,40 @@ export class Bot {
     }
   }
 
+  async onStarted() {
+    this.started = true;
+    this.user = await this.bindings.getMe();
+    logger.info(`Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`);
+    this.sendAdminAlert(
+      `Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`,
+    );
+    this.scheduleCronJobs();
+  }
+
+  async onStopped() {
+    this.started = false;
+    for (const task of this.tasks) {
+      task.stop();
+    }
+    this.inbox.removeAllListeners('message');
+    this.outbox.removeAllListeners('message');
+    this.status.removeAllListeners('started');
+    this.status.removeAllListeners('stopped');
+    logger.info(`Stopped ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`);
+  }
+
   async stop(): Promise<void> {
-    await this.bindings.stop();
+    try {
+      await this.bindings.stop();
+    } catch (e) {
+      catchException(e, this);
+    }
+  }
+
+  messageSender(msg: Message) {
+    logger.info(
+      ` [${this.user.id}] ${this.user.firstName}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
+    );
   }
 
   messagesHandler(msg: Message): void {

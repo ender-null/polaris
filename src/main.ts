@@ -27,18 +27,15 @@ process.once('SIGINT', () => stop());
 process.once('SIGTERM', () => stop());
 
 export const db = new Database();
-bots = [];
 db.events.on('update:configs', async () => {
   logger.info('Configs updated');
+  if (Array.isArray(bots) && bots.length > 0) {
+    for (const bot of bots) {
+      await bot.stop();
+    }
+  }
   for (const key of Object.keys(db.configs)) {
     const configs = Config.loadInstancesFromJSON(db.configs[key]);
-    if (Array.isArray(bots) && bots.length > 0) {
-      for (const bot of bots) {
-        await bot.stop();
-        delete bots[bots.indexOf(bot)];
-      }
-    }
-    bots = [];
     for (const config of configs) {
       const bot = new Bot(config);
       if (config.enabled) {
