@@ -1,8 +1,28 @@
 export { BindingsBase } from './bindings';
 export { Bot } from './bot';
-export { ApiKeys, Config } from './config';
-export { Conversation } from './conversation';
+export { Config } from './config';
 export { Database } from './database';
-export { Extra, Message } from './message';
-export { Command, Parameter, PluginBase } from './plugin';
-export { User } from './user';
+export { PluginBase } from './plugin';
+export {
+  ApiKeys,
+  Command,
+  Conversation,
+  DatabaseReminder,
+  ErrorMessages,
+  Errors,
+  Extra,
+  iConfig,
+  iConversation,
+  iPin,
+  iPole,
+  iReminder,
+  iString,
+  iStringNested,
+  iTag,
+  iTranslation,
+  iUser,
+  Message,
+  Parameter,
+  Translation,
+  User,
+} from './types';

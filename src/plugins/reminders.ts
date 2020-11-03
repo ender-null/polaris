@@ -1,7 +1,5 @@
 import format from 'string-format';
-import { Bot, Message } from '..';
-import { Conversation } from '../conversation';
-import { DatabaseReminder } from '../database';
+import { Bot, Conversation, DatabaseReminder, Message } from '..';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
 import { allButNWord, catchException, generateCommandHelp, getInput, getWord, isInt, now } from '../utils';

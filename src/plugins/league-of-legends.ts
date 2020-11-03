@@ -1,7 +1,6 @@
 import { Response } from 'node-fetch';
 import format from 'string-format';
-import { Bot, Message } from '..';
-import { iString, iStringNested } from '../database';
+import { Bot, iString, iStringNested, Message } from '..';
 import { PluginBase } from '../plugin';
 import {
   allButNWord,

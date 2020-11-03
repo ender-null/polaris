@@ -1,30 +1,6 @@
 import { readFileSync } from 'fs';
-
-export interface ApiKeys {
-  telegramBotToken?: string;
-  telegramApiHash?: string;
-  telegramAppId?: number;
-  databaseEncryptionKey?: string;
-  discordBotToken?: string;
-  battleNet?: string;
-  catApi?: string;
-  giphy?: string;
-  googleDeveloperConsole?: string;
-  lastfm?: string;
-  openWeather?: string;
-  riotApi?: string;
-  wolframAlpha?: string;
-}
-
-export interface Instance {
-  translation?: string;
-  bindings?: string;
-  owner?: string;
-  adminConversationId?: string;
-  alertsConversationId?: string;
-  plugins?: string | string[];
-  apiKeys?: ApiKeys;
-}
+import { ApiKeys } from '.';
+import { Instance } from './types';
 
 export class Config {
   name?: string;

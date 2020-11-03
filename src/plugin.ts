@@ -1,5 +1,4 @@
-import { Bot, Message } from '.';
-import { iString } from './database';
+import { Bot, Command, iString, Message } from '.';
 import { logger } from './utils';
 
 export abstract class PluginBase {
@@ -21,28 +20,4 @@ export abstract class PluginBase {
   async cron(): Promise<void> {
     logger.debug(`Ignoring because plugin "${this.constructor.name}" missing cron()`);
   }
-}
-
-export abstract class Command {
-  command: string;
-  friendly?: string;
-  shortcut?: string;
-  parameters?: Parameter[];
-  hidden?: boolean;
-  description?: string;
-  keepDefault?: boolean;
-
-  constructor() {
-    this.friendly = null;
-    this.shortcut = null;
-    this.parameters = null;
-    this.hidden = false;
-    this.description = null;
-    this.keepDefault = false;
-  }
-}
-
-export abstract class Parameter {
-  name: string;
-  required: boolean;
 }

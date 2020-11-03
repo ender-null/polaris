@@ -1,5 +1,4 @@
-import { Bot, Message } from '..';
-import { Errors } from '../errors';
+import { Bot, Errors, Message } from '..';
 import { PluginBase } from '../plugin';
 import { hasTag, isCommand, responseUrlFromRequest } from '../utils';
 

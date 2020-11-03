@@ -1,12 +1,20 @@
 import { EventEmitter } from 'events';
 import * as cron from 'node-cron';
 import os from 'os';
+import {
+  BindingsBase,
+  Config,
+  Conversation,
+  ErrorMessages,
+  Extra,
+  Message,
+  Parameter,
+  PluginBase,
+  Translation,
+  User,
+} from '.';
 import * as bindings from './bindings/index';
-import { Translation } from './database';
-import { ErrorMessages } from './errors';
-import { BindingsBase, Config, Conversation, Extra, Message, PluginBase, User } from './index';
 import { db } from './main';
-import { Parameter } from './plugin';
 import * as plugins from './plugins/index';
 import { catchException, escapeRegExp, hasTag, isTrusted, logger, now, setInput } from './utils';
 
