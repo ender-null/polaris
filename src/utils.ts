@@ -17,6 +17,18 @@ export async function isAdmin(bot: Bot, uid: number | string, msg: Message = nul
   return hasTag(bot, uid, 'admin') || (await isGroupAdmin(bot, uid, msg));
 }
 
+export async function isMod(bot: Bot, uid: number | string, gid: number | string): Promise<boolean> {
+  if (typeof uid != 'string') {
+    uid = String(uid);
+  }
+
+  if (hasTag(bot, uid, 'globalmod') || hasTag(bot, uid, `mod:${gid}`)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 export async function isGroupAdmin(bot: Bot, uid: number | string, msg: Message = null): Promise<boolean> {
   if (typeof uid != 'string') {
     uid = String(uid);

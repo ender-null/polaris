@@ -7,4 +7,5 @@ export { HelpPlugin } from './help';
 export { LeagueOfLegendsPlugin } from './league-of-legends';
 export { RemindersPlugin } from './reminders';
 export { TagsPlugin } from './tags';
+export { TelegramPlugin } from './telegram';
 export { VoicePlugin } from './voice';

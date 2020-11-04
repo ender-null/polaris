@@ -4,6 +4,7 @@ import { logger } from './utils';
 export abstract class PluginBase {
   bot: Bot;
   commands?: Command[];
+  bindings?: string[];
   strings?: iString;
   cronExpression?: string;
 

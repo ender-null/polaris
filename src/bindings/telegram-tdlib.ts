@@ -2,8 +2,8 @@ import { Response } from 'node-fetch';
 import { Client } from 'tdl';
 import { TDLib } from 'tdl-tdlib-ffi';
 import { message, ok, Update, user } from 'tdl/types/tdlib';
-import { BindingsBase, Bot, Conversation, Message, User } from '..';
-import { catchException, logger, sendRequest, splitLargeMessage } from '../utils';
+import { BindingsBase, Bot, Conversation, ConversationInfo, Message, User } from '..';
+import { catchException, download, logger, sendRequest, splitLargeMessage } from '../utils';
 
 export class TelegramTDlibBindings extends BindingsBase {
   client: Client;
@@ -25,7 +25,7 @@ export class TelegramTDlibBindings extends BindingsBase {
 
   async apiRequest(method: string, params: Record<string, unknown> = {}): Promise<Response> {
     const url = `https://api.telegram.org/bot${this.bot.config.apiKeys.telegramBotToken}/${method}`;
-    return sendRequest(url, params);
+    return await sendRequest(url, params);
   }
 
   async serverRequest(method: string, params: Record<string, unknown> = {}): Promise<any> {
@@ -378,6 +378,145 @@ export class TelegramTDlibBindings extends BindingsBase {
         id: content,
       };
     }
+  }
+
+  async getMessage(chatId: string | number, messageId: string | number): Promise<Message> {
+    const result = await this.serverRequest('getMessage', {
+      chat_id: chatId,
+      message_id: messageId,
+    });
+    if (result) {
+      return this.convertMessage(result);
+    }
+
+    return null;
+  }
+
+  async deleteMessage(chatId: string | number, messageId: string | number): Promise<boolean> {
+    return await this.serverRequest('deleteMessages', {
+      chat_id: chatId,
+      message_ids: [messageId],
+      revoke: true,
+    });
+  }
+
+  async getFile(fileId: string | number, link?: boolean): Promise<string> {
+    if (this.bot.user.isBot) {
+      const params = {
+        file_id: fileId,
+      };
+      const resp = await this.apiRequest('getFile', params);
+      const result = await resp.json();
+      if ('result' in result) {
+        if (link) {
+          return `https://api.telegram.org/file/bot${this.bot.config.apiKeys.telegramBotToken}/${result.result.file_path}`;
+        } else {
+          return download(
+            `https://api.telegram.org/file/bot${this.bot.config.apiKeys.telegramBotToken}/${result.result.file_path}`,
+          );
+        }
+      }
+    }
+    return null;
+  }
+
+  async checkInviteLink(inviteLink: string | number): Promise<boolean> {
+    if (this.bot.user.isBot) {
+      return null;
+    }
+    return await this.serverRequest('checkChatInviteLink', {
+      invite_link: inviteLink,
+    });
+  }
+
+  async joinByInviteLink(inviteLink: string | number): Promise<boolean> {
+    if (this.bot.user.isBot) {
+      return null;
+    }
+    return await this.serverRequest('joinChatByInviteLink', {
+      invite_link: inviteLink,
+    });
+  }
+
+  async inviteConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
+    if (this.bot.user.isBot) {
+      return null;
+    }
+    return await this.serverRequest('addChatMember', {
+      chat_id: conversationId,
+      user_id: userId,
+    });
+  }
+
+  async promoteConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
+    if (this.bot.user.isBot) {
+      return null;
+    }
+    return await this.serverRequest('setChatMemberStatus', {
+      chat_id: conversationId,
+      user_id: userId,
+      status: { _: 'chatMemberStatusAdministrator' },
+    });
+  }
+
+  async kickConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
+    if (this.bot.user.isBot) {
+      return null;
+    }
+    return await this.serverRequest('setChatMemberStatus', {
+      chat_id: conversationId,
+      user_id: userId,
+      status: { _: 'chatMemberStatusLeft' },
+    });
+  }
+
+  async banConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
+    if (this.bot.user.isBot) {
+      return null;
+    }
+    return await this.serverRequest('setChatMemberStatus', {
+      chat_id: conversationId,
+      user_id: userId,
+      status: { _: 'chatMemberStatusBanned' },
+    });
+  }
+
+  async unbanConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
+    if (this.bot.user.isBot) {
+      return null;
+    }
+    return await this.serverRequest('setChatMemberStatus', {
+      chat_id: conversationId,
+      user_id: userId,
+      status: { _: 'chatMemberStatusMember' },
+    });
+  }
+
+  async renameConversation(conversationId: string | number, title: string): Promise<boolean> {
+    return await this.serverRequest('setChatTitle', {
+      chat_id: conversationId,
+      title: title,
+    });
+  }
+
+  async changeConversationDescription(conversationId: string | number, description: string): Promise<boolean> {
+    return await this.serverRequest('setChatDescription', {
+      chat_id: conversationId,
+      description: description,
+    });
+  }
+
+  async changeConversationPhoto(conversationId: string | number, photo: string): Promise<boolean> {
+    return await this.serverRequest('setChatPhoto', {
+      chat_id: conversationId,
+      photo: photo,
+    });
+  }
+
+  async conversationInfo(conversationId: string | number): Promise<ConversationInfo> {
+    return await this.serverRequest('getChat', {
+      chat_id: conversationId,
+    });
   }
 
   async getChatAdministrators(conversationId: string | number): Promise<User[]> {

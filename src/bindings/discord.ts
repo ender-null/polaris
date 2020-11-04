@@ -1,5 +1,5 @@
 import { Client, Message as DiscordMessage, MessageAttachment, MessageEmbed } from 'discord.js';
-import { BindingsBase, Bot, Conversation, Message, User } from '..';
+import { BindingsBase, Bot, Conversation, ConversationInfo, Message, User } from '..';
 import { db } from '../main';
 import { getExtension, htmlToDiscordMarkdown, logger, splitLargeMessage } from '../utils';
 
@@ -94,7 +94,6 @@ export class DiscordBindings extends BindingsBase {
     // if (message.content.startsWith('/') || message.content.startsWith(this.bot.config.prefix)) {
     //   message.channel.startTyping();
     // }
-
     this.bot.inbox.emit('message', await this.convertMessage(message));
   }
 
@@ -189,6 +188,49 @@ export class DiscordBindings extends BindingsBase {
       }
     }
     return content;
+  }
+
+  async getMessage(chatId: string | number, messageId: string | number): Promise<Message> {
+    throw new Error('Method not implemented.');
+  }
+  async deleteMessage(chatId: string | number, messageId: string | number): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  async getFile(fileId: string | number, link?: boolean): Promise<string> {
+    throw new Error('Method not implemented.');
+  }
+  async checkInviteLink(inviteLink: string | number): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  async joinByInviteLink(inviteLink: string | number): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  async inviteConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  async promoteConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  async kickConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  async banConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  async unbanConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  async renameConversation(conversationId: string | number, title: string): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  async changeConversationDescription(conversationId: string | number, description: string): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  async changeConversationPhoto(conversationId: string | number, photo: string): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  async conversationInfo(conversationId: string | number): Promise<ConversationInfo> {
+    throw new Error('Method not implemented.');
   }
 
   async getChatAdministrators(conversationId: string | number): Promise<User[]> {

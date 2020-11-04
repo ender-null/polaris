@@ -1,7 +1,7 @@
 import { Config } from '.';
 
 export class ErrorMessages {
-  adminEequired?: string;
+  adminRequired?: string;
   apiLimitExceeded?: string;
   connectionError?: string;
   downloadFailed?: string;
@@ -23,7 +23,7 @@ export class ErrorMessages {
 }
 
 export class Errors extends ErrorMessages {
-  static adminEequired = 'Only works with <b>admin privileges</b>';
+  static adminRequired = 'Only works with <b>admin privileges</b>';
   static apiLimitExceeded = 'The API limits have been exceeded';
   static connectionError = 'Connection error';
   static downloadFailed = 'Download failed';
@@ -120,6 +120,8 @@ export class Conversation {
     this.title = title;
   }
 }
+
+export class ConversationInfo extends Conversation {}
 
 export class Message {
   id: number | string;

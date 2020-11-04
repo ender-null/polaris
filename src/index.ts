@@ -7,6 +7,7 @@ export {
   ApiKeys,
   Command,
   Conversation,
+  ConversationInfo,
   DatabaseReminder,
   ErrorMessages,
   Errors,

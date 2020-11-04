@@ -107,11 +107,11 @@ export class Bot {
 
   initPlugins(): void {
     this.plugins = [];
-    for (const plugin in plugins) {
-      try {
-        this.plugins.push(new plugins[plugin](this));
-      } catch (e) {
-        catchException(e, this);
+    for (const i in plugins) {
+      const plugin = new plugins[i](this);
+      // Check if plugin works only with certain bindings
+      if (plugin.bindings == undefined || plugin.bindings.indexOf(this.config.bindings) > -1) {
+        this.plugins.push(plugin);
       }
     }
   }
