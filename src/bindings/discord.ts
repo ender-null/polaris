@@ -244,7 +244,7 @@ export class DiscordBindings extends BindingsBase {
       chat = await this.client.channels.fetch(String(conversationId).slice(1));
     }
     if (chat) {
-      await chat.members.kick();
+      await chat.members[userId].kick();
       return true;
     }
     return false;
@@ -257,7 +257,7 @@ export class DiscordBindings extends BindingsBase {
       chat = await this.client.channels.fetch(String(conversationId).slice(1));
     }
     if (chat) {
-      await chat.members.ban();
+      await chat.members[userId].ban();
       return true;
     }
     return false;
