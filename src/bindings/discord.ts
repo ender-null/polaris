@@ -191,45 +191,59 @@ export class DiscordBindings extends BindingsBase {
   }
 
   async getMessage(chatId: string | number, messageId: string | number): Promise<Message> {
+    console.debug(chatId, messageId);
     throw new Error('Method not implemented.');
   }
   async deleteMessage(chatId: string | number, messageId: string | number): Promise<boolean> {
+    console.debug(chatId, messageId);
     throw new Error('Method not implemented.');
   }
   async getFile(fileId: string | number, link?: boolean): Promise<string> {
+    console.debug(fileId, link);
     throw new Error('Method not implemented.');
   }
   async checkInviteLink(inviteLink: string | number): Promise<boolean> {
+    console.debug(inviteLink);
     throw new Error('Method not implemented.');
   }
   async joinByInviteLink(inviteLink: string | number): Promise<boolean> {
+    console.debug(inviteLink);
     throw new Error('Method not implemented.');
   }
   async inviteConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
+    console.debug(conversationId, userId);
     throw new Error('Method not implemented.');
   }
   async promoteConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
+    console.debug(conversationId, userId);
     throw new Error('Method not implemented.');
   }
   async kickConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
+    console.debug(conversationId, userId);
     throw new Error('Method not implemented.');
   }
   async banConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
+    console.debug(conversationId, userId);
     throw new Error('Method not implemented.');
   }
   async unbanConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
+    console.debug(conversationId, userId);
     throw new Error('Method not implemented.');
   }
   async renameConversation(conversationId: string | number, title: string): Promise<boolean> {
+    console.debug(conversationId, title);
     throw new Error('Method not implemented.');
   }
   async changeConversationDescription(conversationId: string | number, description: string): Promise<boolean> {
+    console.debug(conversationId, description);
     throw new Error('Method not implemented.');
   }
   async changeConversationPhoto(conversationId: string | number, photo: string): Promise<boolean> {
+    console.debug(conversationId, photo);
     throw new Error('Method not implemented.');
   }
   async conversationInfo(conversationId: string | number): Promise<ConversationInfo> {
+    console.debug(conversationId);
     throw new Error('Method not implemented.');
   }
 
