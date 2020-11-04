@@ -98,6 +98,12 @@ export class HelpPlugin extends PluginBase {
       }
     }
 
+    if (isCommand(this, 2, msg.content) && this.bot.config.bindings == 'TelegramTDlibBindings') {
+      this.bot.replyMessage(msg, 'setMyCommands', 'api', null, {
+        commands: JSON.stringify(commands),
+      });
+    }
+
     this.bot.replyMessage(msg, text);
   }
 }

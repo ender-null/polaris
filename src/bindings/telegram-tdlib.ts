@@ -526,24 +526,23 @@ export class TelegramTDlibBindings extends BindingsBase {
 
     const admins = [];
     if (result && 'administrators' in result) {
-      for (const member of result['administrators']) {
-        const user = new User(member['user_id']);
+      for (const member of result.administrators) {
+        const user = new User(member.user_id);
 
-        const request = this.serverRequest('getUser', {
+        const rawUser = await this.serverRequest('getUser', {
           user_id: user.id,
         });
-        const rawUser = request;
 
         if (rawUser) {
-          user.isBot = rawUser['type']['@type'] == 'userTypeBot';
+          user.isBot = rawUser.type._ == 'userTypeBot';
           if ('first_name' in rawUser) {
-            user.firstName = String(rawUser['first_name']);
+            user.firstName = rawUser.first_name;
           }
           if ('last_name' in rawUser) {
-            user.lastName = String(rawUser['last_name']);
+            user.lastName = rawUser.last_name;
           }
           if ('username' in rawUser) {
-            user.username = String(rawUser['username']);
+            user.username = rawUser.username;
           }
         }
         admins.push(user);

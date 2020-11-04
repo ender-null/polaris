@@ -190,81 +190,136 @@ export class DiscordBindings extends BindingsBase {
     return content;
   }
 
-  async getMessage(chatId: string | number, messageId: string | number): Promise<Message> {
-    console.debug(chatId, messageId);
-    throw new Error('Method not implemented.');
+  async getMessage(conversationId: string | number, messageId: string | number): Promise<Message> {
+    let chat;
+    if (+conversationId > 0) {
+      chat = await (await this.client.users.fetch(String(conversationId))).dmChannel;
+    } else {
+      chat = await this.client.channels.fetch(String(conversationId).slice(1));
+    }
+    if (chat) {
+      const message = await chat.messages.fetch(messageId);
+      return this.convertMessage(message);
+    }
+    return null;
   }
-  async deleteMessage(chatId: string | number, messageId: string | number): Promise<boolean> {
-    console.debug(chatId, messageId);
-    throw new Error('Method not implemented.');
+  async deleteMessage(conversationId: string | number, messageId: string | number): Promise<boolean> {
+    let chat;
+    if (+conversationId > 0) {
+      chat = await (await this.client.users.fetch(String(conversationId))).dmChannel;
+    } else {
+      chat = await this.client.channels.fetch(String(conversationId).slice(1));
+    }
+    if (chat) {
+      await chat.messages.delete(messageId);
+      return true;
+    }
+    return false;
   }
   async getFile(fileId: string | number, link?: boolean): Promise<string> {
     console.debug(fileId, link);
-    throw new Error('Method not implemented.');
+    return null;
   }
   async checkInviteLink(inviteLink: string | number): Promise<boolean> {
     console.debug(inviteLink);
-    throw new Error('Method not implemented.');
+    return null;
   }
   async joinByInviteLink(inviteLink: string | number): Promise<boolean> {
     console.debug(inviteLink);
-    throw new Error('Method not implemented.');
+    return null;
   }
   async inviteConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
     console.debug(conversationId, userId);
-    throw new Error('Method not implemented.');
+    return null;
   }
   async promoteConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
     console.debug(conversationId, userId);
-    throw new Error('Method not implemented.');
+    return null;
   }
   async kickConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    console.debug(conversationId, userId);
-    throw new Error('Method not implemented.');
+    let chat;
+    if (+conversationId > 0) {
+      chat = await (await this.client.users.fetch(String(conversationId))).dmChannel;
+    } else {
+      chat = await this.client.channels.fetch(String(conversationId).slice(1));
+    }
+    if (chat) {
+      await chat.members.kick();
+      return true;
+    }
+    return false;
   }
   async banConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    console.debug(conversationId, userId);
-    throw new Error('Method not implemented.');
+    let chat;
+    if (+conversationId > 0) {
+      chat = await (await this.client.users.fetch(String(conversationId))).dmChannel;
+    } else {
+      chat = await this.client.channels.fetch(String(conversationId).slice(1));
+    }
+    if (chat) {
+      await chat.members.ban();
+      return true;
+    }
+    return false;
   }
   async unbanConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
     console.debug(conversationId, userId);
-    throw new Error('Method not implemented.');
+    return null;
   }
   async renameConversation(conversationId: string | number, title: string): Promise<boolean> {
-    console.debug(conversationId, title);
-    throw new Error('Method not implemented.');
+    let chat;
+    if (+conversationId > 0) {
+      chat = await (await this.client.users.fetch(String(conversationId))).dmChannel;
+    } else {
+      chat = await this.client.channels.fetch(String(conversationId).slice(1));
+    }
+    if (chat) {
+      await chat.edit({ name: title });
+      return true;
+    }
+    return false;
   }
   async changeConversationDescription(conversationId: string | number, description: string): Promise<boolean> {
-    console.debug(conversationId, description);
-    throw new Error('Method not implemented.');
+    let chat;
+    if (+conversationId > 0) {
+      chat = await (await this.client.users.fetch(String(conversationId))).dmChannel;
+    } else {
+      chat = await this.client.channels.fetch(String(conversationId).slice(1));
+    }
+    if (chat) {
+      await chat.edit({ topic: description });
+      return true;
+    }
+    return false;
   }
   async changeConversationPhoto(conversationId: string | number, photo: string): Promise<boolean> {
     console.debug(conversationId, photo);
-    throw new Error('Method not implemented.');
+    return false;
   }
   async conversationInfo(conversationId: string | number): Promise<ConversationInfo> {
     console.debug(conversationId);
-    throw new Error('Method not implemented.');
+    return null;
   }
 
   async getChatAdministrators(conversationId: string | number): Promise<User[]> {
     const channel = await this.client.channels.fetch(String(conversationId).slice(1));
     console.log(JSON.stringify(channel));
     const admins = [];
-    // for (const member of channel.members) {
-    //   const perms = channel.permissionsFor(member);
-    //   if (perms.administrator) {
-    //     admins.push(
-    //       new User(
-    //         member.id,
-    //         member.name,
-    //         '#' + member.discriminator,
-    //         member.name + '#' + member.discriminator,
-    //         member.bot,
-    //       ),
-    //     );
-    //   }
-    // }
+    for (const member of channel['members']) {
+      console.log(member);
+      //   const perms = channel.permissionsFor(member);
+      //   if (perms.administrator) {
+      //     admins.push(
+      //       new User(
+      //         member.id,
+      //         member.name,
+      //         '#' + member.discriminator,
+      //         member.name + '#' + member.discriminator,
+      //         member.bot,
+      //       ),
+      //     );
+      //   }
+    }
     return admins;
   }
 }

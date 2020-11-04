@@ -162,6 +162,7 @@ export abstract class Extra extends Object {
   caption?: string;
   message?: number;
   conversation?: number;
+  commands?: string;
 }
 
 export interface DatabaseUser {
