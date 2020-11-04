@@ -6,6 +6,9 @@
     <img alt="Build Status" src="https://github.com/luksireiku/polaris.js/workflows/Docker/badge.svg"></a>
 <a href="https://github.com/luksireiku/polaris.js/commits/main">
     <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/luksireiku/polaris.js"></a>
+<a href="https://github.com/luksireiku/polaris.js/issues">
+    <img alt="GitHub issues" src="https://img.shields.io/github/issues/luksireiku/polaris.js"></a>
+<img alt="GitHub top language" src="https://img.shields.io/github/languages/top/luksireiku/polaris.js">
 <a href="https://discord.gg/sSE7gDA3v6">
     <img alt="Discord" src="https://img.shields.io/discord/133155648891256832"></a>
 
