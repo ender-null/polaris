@@ -347,27 +347,27 @@ export class TelegramTDlibBindings extends BindingsBase {
       };
 
       if (msg.extra && 'userId' in msg.extra) {
-        data['user_id'] = msg.extra['userId'];
+        params['user_id'] = msg.extra['userId'];
       }
 
       if (msg.extra && 'customTitle' in msg.extra) {
-        data['custom_title'] = msg.extra['customTitle'];
+        params['custom_title'] = msg.extra['customTitle'];
       }
 
       if (msg.extra && 'photo' in msg.extra) {
-        data['photo'] = msg.extra['photo'];
+        params['photo'] = msg.extra['photo'];
       }
 
       if (msg.extra && 'messageId' in msg.extra) {
-        data['message_id'] = msg.extra['messageId'];
+        params['message_id'] = msg.extra['messageId'];
       }
 
       if (msg.extra && 'stickerSetName' in msg.extra) {
-        data['sticker_set_name'] = msg.extra['stickerSetName'];
+        params['sticker_set_name'] = msg.extra['stickerSetName'];
       }
 
       if (msg.extra && 'commands' in msg.extra) {
-        data['commands'] = msg.extra['commands'];
+        params['commands'] = msg.extra['commands'];
       }
 
       await this.apiRequest(msg.content, params);
