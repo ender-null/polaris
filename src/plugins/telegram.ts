@@ -1,6 +1,6 @@
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
-import { generateCommandHelp, getInput, isAdmin, isCommand, isGroupAdmin, isMod } from '../utils';
+import { generateCommandHelp, getInput, getTarget, isAdmin, isCommand, isGroupAdmin, isMod } from '../utils';
 
 export class TelegramPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -19,6 +19,86 @@ export class TelegramPlugin extends PluginBase {
           },
         ],
         description: 'Sets group title',
+        hidden: true,
+      },
+      {
+        command: '/desc',
+        parameters: [
+          {
+            name: 'text',
+            required: true,
+          },
+        ],
+        description: 'Sets group description',
+        hidden: true,
+      },
+      {
+        command: '/gphoto',
+        description: 'Sets group photo',
+        hidden: true,
+      },
+      {
+        command: '/promote',
+        parameters: [
+          {
+            name: 'user id | @username',
+            required: true,
+          },
+        ],
+        description: 'Promote a user to admin',
+        hidden: true,
+      },
+      {
+        command: '/kick',
+        parameters: [
+          {
+            name: 'user id | @username',
+            required: true,
+          },
+        ],
+        description: 'Kicks a user from group',
+        hidden: true,
+      },
+      {
+        command: '/ban',
+        parameters: [
+          {
+            name: 'user id | @username',
+            required: true,
+          },
+        ],
+        description: 'Kicks a user from group',
+        hidden: true,
+      },
+      {
+        command: '/unban',
+        parameters: [
+          {
+            name: 'user id | @username',
+            required: true,
+          },
+        ],
+        description: 'Unban a user from group',
+        hidden: true,
+      },
+      {
+        command: '/delete',
+        description: 'Deletes a message',
+        hidden: true,
+      },
+      {
+        command: '/setpin',
+        description: 'Pins a message',
+        hidden: true,
+      },
+      {
+        command: '/rmpin',
+        description: 'Removes the pinned message',
+        hidden: true,
+      },
+      {
+        command: '/suicide',
+        description: 'Kicks the bot from the group',
         hidden: true,
       },
     ];
@@ -58,6 +138,58 @@ export class TelegramPlugin extends PluginBase {
     } else if (isCommand(this, 2, msg.content)) {
       if (this.checkPermissions(msg)) {
         ok = await this.bot.bindings.renameConversation(msg.conversation.id, input);
+      }
+    } else if (isCommand(this, 3, msg.content)) {
+      if (this.checkPermissions(msg)) {
+        ok = await this.bot.bindings.changeConversationDescription(msg.conversation.id, input);
+      }
+    } else if (isCommand(this, 4, msg.content)) {
+      if (this.checkPermissions(msg)) {
+        if (msg.reply && msg.reply.type == 'photo') {
+          const photo = await this.bot.bindings.getFile(msg.reply.content);
+          if (photo) {
+            ok = await this.bot.bindings.changeConversationPhoto(msg.conversation.id, photo);
+          } else {
+            ok = await this.bot.bindings.changeConversationPhoto(msg.conversation.id, msg.reply.content);
+          }
+        }
+      }
+    } else if (isCommand(this, 5, msg.content)) {
+      if (this.checkPermissions(msg)) {
+        const target = getTarget(this.bot, msg, input);
+        ok = await this.bot.bindings.promoteConversationMember(msg.conversation.id, target);
+      }
+    } else if (isCommand(this, 6, msg.content)) {
+      if (this.checkPermissions(msg)) {
+        const target = getTarget(this.bot, msg, input);
+        ok = await this.bot.bindings.kickConversationMember(msg.conversation.id, target);
+      }
+    } else if (isCommand(this, 7, msg.content)) {
+      if (this.checkPermissions(msg)) {
+        const target = getTarget(this.bot, msg, input);
+        ok = await this.bot.bindings.banConversationMember(msg.conversation.id, target);
+      }
+    } else if (isCommand(this, 8, msg.content)) {
+      if (this.checkPermissions(msg)) {
+        const target = getTarget(this.bot, msg, input);
+        ok = await this.bot.bindings.unbanConversationMember(msg.conversation.id, target);
+      }
+    } else if (isCommand(this, 9, msg.content)) {
+      if (this.checkPermissions(msg)) {
+        await this.bot.bindings.deleteMessage(msg.conversation.id, msg.id);
+        if (msg.reply) {
+          ok = await this.bot.bindings.deleteMessage(msg.conversation.id, msg.reply.id);
+        }
+      }
+    } else if (isCommand(this, 10, msg.content)) {
+      if (this.checkPermissions(msg)) {
+        await this.bot.bindings.deleteMessage(msg.conversation.id, msg.id);
+        if (msg.reply) {
+          ok = true;
+          this.bot.replyMessage(msg, 'pinChatMessage', 'api', null, {
+            messageId: msg.reply.id,
+          });
+        }
       }
     }
 

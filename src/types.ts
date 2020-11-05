@@ -161,8 +161,13 @@ export abstract class Extra extends Object {
   preview?: boolean;
   caption?: string;
   message?: number;
+  photo?: string;
   conversation?: number;
   commands?: string;
+  stickerSetName?: string;
+  messageId?: number | string;
+  userId?: number | string;
+  customTitle?: string;
 }
 
 export interface DatabaseUser {

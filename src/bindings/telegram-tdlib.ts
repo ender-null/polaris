@@ -162,7 +162,7 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async sendMessage(msg: Message): Promise<void> {
-    this.sendChatAction(+msg.conversation.id, msg.type);
+    await this.sendChatAction(+msg.conversation.id, msg.type);
     let data = null;
     let inputMessageContent = null;
 
@@ -305,6 +305,74 @@ export class TelegramTDlibBindings extends BindingsBase {
         from_chat_id: msg.conversation.id,
         message_ids: [msg.extra.message],
       };
+    } else if (msg.type == 'native') {
+      data = {
+        '@type': msg.content,
+        chat_id: msg.conversation.id,
+      };
+
+      if (msg.extra && 'title' in msg.extra) {
+        data['title'] = msg.extra['title'];
+      }
+      if (msg.extra && 'userId' in msg.extra) {
+        data['user_id'] = msg.extra['userId'];
+      }
+
+      if (msg.extra && 'customTitle' in msg.extra) {
+        data['custom_title'] = msg.extra['customTitle'];
+      }
+
+      if (msg.extra && 'photo' in msg.extra) {
+        data['photo'] = this.getInputFile(msg.extra['photo']);
+      }
+
+      if (msg.extra && 'description' in msg.extra) {
+        data['description'] = msg.extra['description'];
+      }
+
+      if (msg.extra && 'messageId' in msg.extra) {
+        data['message_id'] = msg.extra['messageId'];
+      }
+
+      if (msg.extra && 'stickerSetName' in msg.extra) {
+        data['sticker_set_name'] = msg.extra['stickerSetName'];
+      }
+
+      if (msg.extra && 'commands' in msg.extra) {
+        data['commands'] = msg.extra['commands'];
+      }
+    } else if (msg.type == 'api') {
+      const params = {
+        chat_id: msg.conversation.id,
+      };
+
+      if (msg.extra && 'userId' in msg.extra) {
+        data['user_id'] = msg.extra['userId'];
+      }
+
+      if (msg.extra && 'customTitle' in msg.extra) {
+        data['custom_title'] = msg.extra['customTitle'];
+      }
+
+      if (msg.extra && 'photo' in msg.extra) {
+        data['photo'] = msg.extra['photo'];
+      }
+
+      if (msg.extra && 'messageId' in msg.extra) {
+        data['message_id'] = msg.extra['messageId'];
+      }
+
+      if (msg.extra && 'stickerSetName' in msg.extra) {
+        data['sticker_set_name'] = msg.extra['stickerSetName'];
+      }
+
+      if (msg.extra && 'commands' in msg.extra) {
+        data['commands'] = msg.extra['commands'];
+      }
+
+      await this.apiRequest(msg.content, params);
+      await this.sendChatAction(msg.conversation.id, 'cancel');
+      return;
     }
 
     if (inputMessageContent) {
@@ -328,12 +396,12 @@ export class TelegramTDlibBindings extends BindingsBase {
         } else {
           await this.serverRequest(data['@type'], data);
         }
-        this.sendChatAction(+msg.conversation.id, 'cancel');
+        await this.sendChatAction(+msg.conversation.id, 'cancel');
       }
     }
   }
 
-  async sendChatAction(conversationId: number, type = 'text'): Promise<ok> {
+  async sendChatAction(conversationId: number | string, type = 'text'): Promise<ok> {
     let action = 'chatActionTyping';
 
     if (type == 'photo') {
