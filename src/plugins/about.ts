@@ -32,9 +32,9 @@ export class AboutPlugin extends PluginBase {
       about: 'Use {0}about to know more about me',
       notice:
         'You can try my other bots: <a href="https://t.me/sakubo">@Sakubo</a> and <a href="https://t.me/PetoBot">@PetoBot</a>',
-      donations: 'You can make {0}donations at https://paypal.me/luksireiku',
+      donations: 'You can make {0}donations at https://github.com/sponsors/luksireiku',
       stats: '👤 {0} users\n👥 {1} groups',
-      donationsExplanation: 'You can make donations at https://paypal.me/luksireiku',
+      donationsExplanation: 'You can make donations at https://github.com/sponsors/luksireiku',
       supportersTitle: '<b>Supporters:</b>',
     };
   }
