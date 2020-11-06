@@ -36,6 +36,7 @@
     "node": ">=12"
   },
   "dependencies": {
+    "cheerio": "^1.0.0-rc.3",
     "discord.js": "^12.4.1",
     "mime-types": "^2.1.27",
     "node-cron": "^2.0.3",

@@ -2,6 +2,7 @@ export { AboutPlugin } from './about';
 export { AddToDiscordPlugin } from './add-to-discord';
 export { AnimalsPlugin } from './animals';
 export { AntiSpamPlugin } from './anti-spam';
+export { AscoDeVidaPlugin } from './asco-de-vida';
 export { ConfigPlugin } from './config';
 export { EchoPlugin } from './echo';
 export { HelpPlugin } from './help';
