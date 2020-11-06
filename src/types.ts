@@ -168,27 +168,29 @@ export abstract class Extra extends Object {
   messageId?: number | string;
   userId?: number | string;
   customTitle?: string;
+  urls?: string[];
+  mentions?: string[];
 }
 
 export interface DatabaseUser {
-  first_name: string;
-  last_name: string;
-  username: string;
-  is_bot: string;
+  first_name?: string;
+  last_name?: string;
+  username?: string;
+  is_bot?: string;
 }
 
 export interface DatabaseConversation {
-  title: string;
-  username: string;
+  title?: string;
+  username?: string;
 }
 
 export interface DatabaseReminder {
-  alarm: number;
-  chatId: number | string;
-  text: string;
-  firstName: string;
-  username: string;
-  bot: number | string;
+  alarm?: number;
+  chatId?: number | string;
+  text?: string;
+  firstName?: string;
+  username?: string;
+  bot?: number | string;
 }
 
 export interface iString {
@@ -228,17 +230,29 @@ export interface iTag {
 }
 
 export interface PluginTranslation {
-  commands: Command[];
-  strings: iString;
+  commands?: Command[];
+  strings?: iString;
 }
 
 export interface iPluginTranslation {
   [id: string]: PluginTranslation;
 }
 
+export interface GroupAdministration {
+  alias?: string;
+  link?: string;
+  motd?: string;
+  public?: boolean;
+  rules?: iString;
+}
+
+export interface iGroupAdministration {
+  [id: string]: GroupAdministration;
+}
+
 export interface Translation {
-  errors: ErrorMessages;
-  plugins: iPluginTranslation;
+  errors?: ErrorMessages;
+  plugins?: iPluginTranslation;
 }
 
 export interface iTranslation {

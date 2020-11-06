@@ -3,9 +3,10 @@ import fs from 'fs';
 import mime from 'mime-types';
 import fetch, { BodyInit, HeadersInit, RequestInit, Response } from 'node-fetch';
 import { pipeline } from 'stream';
+import format from 'string-format';
 import tmp from 'tmp';
 import util from 'util';
-import { createLogger, format, transports } from 'winston';
+import { createLogger, format as winstonFormat, transports } from 'winston';
 import { Bot, Message, PluginBase } from '.';
 import { db } from './main';
 
@@ -242,6 +243,42 @@ export function getUsername(uid: number | string): string {
     name = '[UNKNOWN]';
   }
   return name;
+}
+
+export function getFullName(uid: number | string, includeUsername = true): string {
+  if (typeof uid != 'string') {
+    uid = String(uid);
+  }
+  let name = '';
+  if (db.users[uid] !== undefined) {
+    if (db.users[uid]['first_name'] !== undefined) {
+      name += ' ' + db.users[uid].first_name;
+    }
+    if (db.users[uid]['last_name'] !== undefined) {
+      name += ' ' + db.users[uid].last_name;
+    }
+    if (includeUsername && db.users[uid]['username'] !== undefined) {
+      name += ` (@${db.users[uid].username})`;
+    }
+  } else if (db.groups[uid] !== undefined) {
+    name = db.groups[uid].title;
+    if (db.groups[uid]['username'] !== undefined) {
+      name += ` (@${db.groups[uid].username})`;
+    }
+  } else {
+    name = '[UNKNOWN]';
+  }
+  return name;
+}
+
+export function fixTelegramLink(link: string): string {
+  const inputMatch = new RegExp('(?:t|telegram|tlgrm).(?:me|dog)/joinchat/([a-zA-Z0-9-]+)', 'gim').exec(link);
+  if (inputMatch && inputMatch.length > 0) {
+    const fixedLink = format('https://t.me/joinchat/{0}', inputMatch[1]);
+    logger.info(format('Fixed telegram link: {0}', fixedLink));
+    return fixedLink;
+  }
+  return link;
 }
 
 export function setInput(message: Message, trigger: string): Message {
@@ -497,7 +534,6 @@ export function replaceHtml(text: string): string {
 export function htmlToDiscordMarkdown(text: string): string {
   const replacements = [
     { pattern: '<code class="language-([\\w]+)">([\\S\\s]+)</code>', sub: '```$1\n$2```' },
-    // {pattern: '<a href=\"(.[^\<]+)\">(.[^\<]+)</a>', sub: '[$2]($1)'},
     { pattern: '<a href="(.[^<]+)">(.[^<]+)</a>', sub: '$1' },
     { pattern: '<[/]?i>', sub: '_' },
     { pattern: '<[/]?b>', sub: '**' },
@@ -544,7 +580,7 @@ export function catchException(exception: Error, bot: Bot = null): void {
   if (bot) {
     if (exception.message != 'Chat not found') {
       if (exception.stack) {
-        bot.sendAlert(`${exception.stack}`);
+        bot.sendAlert(`${replaceHtml(exception.stack)}`);
       } else {
         bot.sendAlert(`${exception.message}`);
       }
@@ -555,10 +591,10 @@ export function catchException(exception: Error, bot: Bot = null): void {
 // Configure logger
 export const logger = createLogger({
   level: 'info',
-  format: format.combine(format.timestamp(), format.json()),
+  format: winstonFormat.combine(winstonFormat.timestamp(), winstonFormat.json()),
   transports: [
     new transports.Console({
-      format: format.combine(format.simple(), format.colorize()),
+      format: winstonFormat.combine(winstonFormat.simple(), winstonFormat.colorize()),
     }),
     new transports.File({ filename: 'error.log', level: 'error' }),
     new transports.File({ filename: 'combined.log' }),

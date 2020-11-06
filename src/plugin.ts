@@ -12,7 +12,9 @@ export abstract class PluginBase {
     this.bot = bot;
   }
 
-  abstract async run(msg: Message): Promise<void>;
+  async run(msg: Message): Promise<void> {
+    logger.debug(`Ignoring message [${msg.id}] because plugin "${this.constructor.name}" missing run(msg)`);
+  }
 
   async always(msg: Message): Promise<void> {
     logger.debug(`Ignoring message [${msg.id}] because plugin "${this.constructor.name}" missing always(msg)`);

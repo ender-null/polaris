@@ -3,6 +3,7 @@ import firebase from 'firebase';
 import 'firebase/database';
 import { readFileSync } from 'fs';
 import { iConfig, iConversation, iPin, iPole, iReminder, iTag, iTranslation, iUser } from '.';
+import { iGroupAdministration } from './types';
 
 export class Database {
   fb: firebase.database.Database;
@@ -21,6 +22,8 @@ export class Database {
   reminders: iReminder;
   tagsSnap: firebase.database.DataSnapshot;
   tags: iTag;
+  administrationSnap: firebase.database.DataSnapshot;
+  administration: iGroupAdministration;
   translationsSnap: firebase.database.DataSnapshot;
   translations: iTranslation;
   constructor() {
@@ -31,7 +34,17 @@ export class Database {
     const firebaseConfig = JSON.parse(readFileSync('firebase.json', 'utf-8'));
     firebase.initializeApp(firebaseConfig);
     this.fb = firebase.database();
-    const tables = ['configs', 'users', 'groups', 'pins', 'poles', 'reminders', 'tags', 'translations'];
+    const tables = [
+      'configs',
+      'users',
+      'groups',
+      'pins',
+      'poles',
+      'reminders',
+      'tags',
+      'administration',
+      'translations',
+    ];
     for (const table of tables) {
       this.fb.ref(`db/${table}`).on('value', (snapshot: firebase.database.DataSnapshot) => {
         this[table + 'Snap'] = snapshot;
