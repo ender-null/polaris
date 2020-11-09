@@ -163,7 +163,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
     return content.access_token;
   }
 
-  async getCharacter(region: string, realm: string, characterName: string) {
+  async getCharacter(region: string, realm: string, characterName: string): Promise<Record<string, unknown>> {
     console.log(region, realm, characterName);
     const url = `https://${region}.api.blizzard.com/profile/wow/character/${realm}/${characterName}`;
     const params = {
@@ -175,7 +175,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
     return await resp.json();
   }
 
-  async getCharacterMedia(region: string, realm: string, characterName: string) {
+  async getCharacterMedia(region: string, realm: string, characterName: string): Promise<Record<string, unknown>> {
     const url = `https://${region}.api.blizzard.com/profile/wow/character/${realm}/${characterName}/character-media`;
     const params = {
       namespace: `profile-${region}`,
