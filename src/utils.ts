@@ -590,6 +590,10 @@ export function now(): number {
   return new Date().getTime() / 1000;
 }
 
+export function btoa(text: string): string {
+  return Buffer.from(text).toString('base64');
+}
+
 export function catchException(exception: Error, bot: Bot = null): void {
   logger.info(`Catched exception: ${exception.message}`);
   logger.error(`${exception.message}`);
