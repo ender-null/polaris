@@ -55,8 +55,9 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       lv: 'Lv',
       ilvl: 'item level',
       achievementPoints: 'achievement points',
+      honorLevel: 'honor level',
+      honorableKills: 'honorable kills',
       name: '<b>{0}-{1}</b> (Nivel: {2})',
-      stats: '{0} item level\n{1} achievement points',
       characterSet: 'Your character is set as <b>{0}</b> from realm <b>{1}</b>, you can now just use {2}wow',
       tokenTitle: 'WoW token price',
     };
@@ -103,27 +104,32 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       const character = await this.getCharacter(region, realm, characterName);
       const media = await this.getCharacterMedia(region, realm, characterName);
       const raids = await this.getCharacterRaids(region, realm, characterName);
+      const pvp = await this.getCharacterPVP(region, realm, characterName);
 
       if (character.code == 404) {
         return this.bot.replyMessage(msg, this.bot.errors.noResults);
       }
       const name = format(
-        `{0}-{1} (${this.strings['lv']}: {2})`,
-        character.name,
+        `{0} [{1}] (${this.strings['lv']}: {2})`,
+        character.active_title
+          ? character.active_title.display_string.replace('{name}', character.name)
+          : character.name,
         character.realm.name,
         character.level,
       );
       let guild = null;
       if ('guild' in character) {
-        guild = `<${character.guild.name}-${character.guild.realm.name}>`;
+        guild = `<${character.guild.name}>`;
       }
-      const race = `${character.race.name} ${character.character_class.name} ${
+      const race = `${character.race.name} ${character.character_class.name} ${character.active_spec.name} ${
         character.gender.type == 'FEMALE' ? '♀️' : '♂️'
       }`;
       const stats = format(
-        `{0} ${this.strings['ilvl']}\n{1} ${this.strings['achievementPoints']}`,
+        `{0} ${this.strings['ilvl']}\n{1} ${this.strings['achievementPoints']}\n{2} ${this.strings['honorLevel']}\n{3} ${this.strings['honorableKills']}`,
         character.average_item_level,
         character.achievement_points,
+        pvp.honor_level,
+        pvp.honorable_kills,
       );
       if (guild) {
         text = `${name}\n${guild}\n${race}\n\n${stats}`;
@@ -200,5 +206,9 @@ export class WorldOfWarcraftPlugin extends PluginBase {
 
   async getCharacterDungeons(region: string, realm: string, characterName: string): Promise<any> {
     return await this.getCharacter(region, realm, characterName, '/encounters/dungeons');
+  }
+
+  async getCharacterPVP(region: string, realm: string, characterName: string): Promise<any> {
+    return await this.getCharacter(region, realm, characterName, '/pvp-summary');
   }
 }
