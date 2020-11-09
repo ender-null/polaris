@@ -3,6 +3,7 @@ import format from 'string-format';
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
 import {
+  btoa,
   capitalize,
   capitalizeEachWord,
   delTag,
