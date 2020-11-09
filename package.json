@@ -1,7 +1,7 @@
 {
   "name": "polaris.js",
   "version": "0.1.0",
-  "description": "A multiplatform Javascript bot using plugins!",
+  "description": "A multiplatform Typescript bot using plugins!",
   "license": "MIT",
   "author": {
     "name": "luksireiku",
@@ -38,6 +38,7 @@
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
     "discord.js": "^12.4.1",
+    "form-data": "^3.0.0",
     "mime-types": "^2.1.27",
     "node-cron": "^2.0.3",
     "string-format": "^2.0.0",

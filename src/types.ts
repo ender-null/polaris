@@ -51,7 +51,8 @@ export interface ApiKeys {
   databaseEncryptionKey?: string;
   discordBotToken?: string;
   discordClientId?: number;
-  battleNet?: string;
+  blizzardClientId?: string;
+  blizzardClientSecret?: string;
   catApi?: string;
   giphy?: string;
   googleDeveloperConsole?: string;

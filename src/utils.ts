@@ -202,6 +202,22 @@ export function capitalize(text: string): string {
   return null;
 }
 
+export function capitalizeEachWord(text: string): string {
+  if (text) {
+    if (text.indexOf(' ') > -1) {
+      const words = text.split(' ');
+      const capitalized = [];
+      for (const word of words) {
+        capitalized.push(capitalize(word));
+      }
+      return capitalized.join(' ');
+    } else {
+      return capitalize(text);
+    }
+  }
+  return null;
+}
+
 export function getWord(text: string, i: number): string {
   if (text && text.indexOf(' ') > -1) {
     return text.split(' ')[i - 1];
@@ -526,8 +542,8 @@ export function removeHtml(text: string): string {
 }
 
 export function replaceHtml(text: string): string {
-  text = text.replace(new RegExp('&lt;', 'gim'), '<');
-  text = text.replace(new RegExp('&gt;', 'gim'), '>');
+  text = text.replace(new RegExp('<', 'gim'), '&lt;');
+  text = text.replace(new RegExp('>', 'gim'), '&gt;');
   return text;
 }
 
@@ -546,7 +562,7 @@ export function htmlToDiscordMarkdown(text: string): string {
     text = text.replace(new RegExp(rep['pattern'], 'gim'), rep['sub']);
   }
 
-  text = replaceHtml(text);
+  // text = replaceHtml(text);
   return text;
 }
 
