@@ -10,6 +10,7 @@ import util from 'util';
 import { createLogger, format as winstonFormat, transports } from 'winston';
 import { Bot, Message, PluginBase } from '.';
 import { db } from './main';
+import { iString } from './types';
 
 export function isOwner(bot: Bot, uid: number | string, msg: Message = null): boolean {
   return hasTag(bot, uid, 'owner') || msg.sender.id == bot.config.owner;
@@ -101,7 +102,14 @@ export function setTag(bot: Bot, target: number | string, tag: string): void {
   }
   const tags = getTags(bot, target);
   if (tags && tags.indexOf(tag) == -1) {
-    db.tagsSnap.child(target).child(String(tags.length)).ref.set(tag);
+    if (db.tags[target]) {
+      db.tags[target][Object.keys(db.tags[target]).length] = tag;
+    } else {
+      db.tags[target] = {
+        0: tag,
+      };
+    }
+    db.tagsSnap.child(target).ref.set(db.tags[target]);
   }
 }
 
@@ -111,19 +119,21 @@ export function delTag(bot: Bot, target: number | string, tag: string): void {
   }
   const tags = getTags(bot, target);
   if (tags && tag.indexOf('?') > -1) {
-    for (const targetTag of tags) {
+    for (const i of Object.keys(db.tags[target])) {
+      const targetTag = db.tags[target][i];
       if (targetTag.startsWith(tag.split('?')[0])) {
-        db.tagsSnap
-          .child(target)
-          .child(String(tags.indexOf(targetTag)))
-          .ref.set(null);
+        delete db.tags[target][i];
       }
     }
+    db.tagsSnap.child(target).ref.set(db.tags[target]);
   } else if (tags && tags.indexOf(tag) > -1) {
-    db.tagsSnap
-      .child(target)
-      .child(String(tags.indexOf(tag)))
-      .ref.set(null);
+    for (const i of Object.keys(db.tags[target])) {
+      const targetTag = db.tags[target][i];
+      if (targetTag == tag) {
+        delete db.tags[target][i];
+      }
+    }
+    db.tagsSnap.child(target).ref.set(db.tags[target]);
   }
 }
 
@@ -583,16 +593,20 @@ export function splitLargeMessage(content: string, maxLength: number): string[] 
   return texts;
 }
 
+export function sortList(list: iString): iString {
+  const sorted: iString = {};
+  for (let i = 0; i < Object.keys(list).length; i++) {
+    sorted[i] = list[Object.keys(list)[i]];
+  }
+  return sorted;
+}
+
 export function now(): number {
   return new Date().getTime() / 1000;
 }
 
 export function btoa(text: string): string {
   return Buffer.from(text).toString('base64');
-}
-
-export function utf8(text: string): string {
-  return Buffer.from(text).toString('utf8');
 }
 
 export function catchException(exception: Error, bot: Bot = null): void {
