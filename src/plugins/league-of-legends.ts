@@ -224,21 +224,25 @@ export class LeagueOfLegendsPlugin extends PluginBase {
         return this.bot.replyMessage(msg, iconUrl, 'photo', null, { caption: text, format: 'HTML', preview: true });
       }
     } else if (isCommand(this, 2, msg.content)) {
-      if (hasTag(this.bot, uid, 'lol:?')) {
-        delTag(this.bot, uid, 'lol:?');
+      if (!input) {
+        return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
+      } else {
+        if (hasTag(this.bot, uid, 'lol:?')) {
+          delTag(this.bot, uid, 'lol:?');
+        }
+        const region = getWord(input, 1).toLowerCase();
+        if (!(region in this.regions)) {
+          return this.bot.replyMessage(msg, this.strings['invalidRegion']);
+        }
+        const summonerName = allButNWord(input, 1).replace(new RegExp(' ', 'gim'), '_');
+        setTag(this.bot, uid, `lol:${region}/${summonerName}`);
+        text = format(
+          this.strings['summonerSet'],
+          summonerName.replace(new RegExp('_', 'gim'), ' '),
+          region.toUpperCase(),
+          this.bot.config.prefix,
+        );
       }
-      const region = getWord(input, 1).toLowerCase();
-      if (!(region in this.regions)) {
-        return this.bot.replyMessage(msg, this.strings['invalidRegion']);
-      }
-      const summonerName = allButNWord(input, 1).replace(new RegExp(' ', 'gim'), '_');
-      setTag(this.bot, uid, `lol:${region}/${summonerName}`);
-      text = format(
-        this.strings['summonerSet'],
-        summonerName.replace(new RegExp('_', 'gim'), ' '),
-        region.toUpperCase(),
-        this.bot.config.prefix,
-      );
     }
 
     this.bot.replyMessage(msg, text);

@@ -1,6 +1,6 @@
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
-import { generateCommandHelp, isCommand } from '../utils';
+import { generateCommandHelp, getWord, isCommand, removeHtml } from '../utils';
 
 export class HelpPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -37,60 +37,26 @@ export class HelpPlugin extends PluginBase {
     for (const plugin of this.bot.plugins) {
       if ('commands' in plugin) {
         for (const command of plugin.commands) {
-          // Adds the command and parameters
-          if (isCommand(this, 2, msg.content)) {
-            let show = false;
-            if ('parameters' in command && command.parameters) {
-              let allOptional = true;
-              for (const parameter of command.parameters) {
-                if (parameter.required) {
-                  allOptional = false;
-                }
-              }
-              show = allOptional;
-            } else {
-              show = true;
-            }
+          // If the command is hidden, ignore it
+          if (!('hidden' in command) || !command.hidden) {
+            const doc = generateCommandHelp(plugin, command.command, false);
+            if (doc) {
+              const lines = doc.split('\n');
 
-            if (this.bot.config.prefix != '/' && (!('keepDefault' in command) || !command.keepDefault)) {
-              show = false;
-            }
+              text += `\n • ${lines[0]}`;
 
-            if (command.command.startsWith('/')) {
-              show = false;
-            }
-
-            if (show) {
-              text += `\n${command.command.substring(1)}`;
-
-              if ('description' in command) {
-                text += ` - ${command.description}`;
+              if (lines.length > 1) {
+                text += `\n   ${lines[1]}`;
                 commands.push({
-                  command: command.command.substring(1),
-                  description: command.description,
+                  command: getWord(lines[0], 1).substr(1),
+                  description: removeHtml(lines[1]),
                 });
               } else {
-                text += ' - No description';
+                text += `\n   <i>${this.strings['noDescription']}</i>`;
                 commands.push({
-                  command: command.command.substring(1),
+                  command: getWord(lines[0], 1).substr(1),
                   description: this.strings['noDescription'],
                 });
-              }
-            }
-          } else {
-            // If the command is hidden, ignore it
-            if (!('hidden' in command) || !command.hidden) {
-              const doc = generateCommandHelp(plugin, command.command, false);
-              if (doc) {
-                const lines = doc.split('\n');
-
-                text += `\n • ${lines[0]}`;
-
-                if (lines.length > 1) {
-                  text += `\n   ${lines[1]}`;
-                } else {
-                  text += `\n   <i>${this.strings['noDescription']}</i>`;
-                }
               }
             }
           }

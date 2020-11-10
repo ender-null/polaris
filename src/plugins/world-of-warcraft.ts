@@ -50,14 +50,17 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         ],
         description: 'Set character name and realm',
       },
+      {
+        command: '/wowtoken',
+        description: 'Get WoW Token prices',
+      },
     ];
     this.strings = {
       lv: 'Lv',
-      ilvl: 'item level',
-      achievementPoints: 'achievement points',
-      honorLevel: 'honor level',
-      honorableKills: 'honorable kills',
-      name: '<b>{0}-{1}</b> (Nivel: {2})',
+      ilvl: 'Item level',
+      achievementPoints: 'Achievement points',
+      honorLevel: 'Honor level',
+      honorableKills: 'Honorable kills',
       characterSet: 'Your character is set as <b>{0}</b> from realm <b>{1}</b>, you can now just use {2}wow',
       tokenTitle: 'WoW token price',
     };
@@ -67,7 +70,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       this.accessToken = await this.retrievingAccessToken();
     }
     const input = getInput(msg, false);
-    let text;
+    let text = '';
     let uid;
     if (msg.reply) {
       uid = String(msg.reply.sender.id);
@@ -109,39 +112,38 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       if (character.code == 404) {
         return this.bot.replyMessage(msg, this.bot.errors.noResults);
       }
-      const name = format(
-        `{0} [{1}] (${this.strings['lv']}: {2})`,
-        character.active_title
-          ? character.active_title.display_string.replace('{name}', character.name)
-          : character.name,
-        character.realm.name,
-        character.level,
-      );
+      let title = null;
+      if (character.active_title) {
+        title = character.active_title.display_string.replace('{name}', character.name);
+      }
+      const name = `${character.name}-${character.realm.name} (${this.strings['lv']}: ${character.level})`;
       let guild = null;
       if ('guild' in character) {
-        guild = `<${character.guild.name}>`;
+        guild = `<${character.guild.name}-${character.guild.realm.name}>`;
       }
-      const race = `${character.race.name} ${character.character_class.name} ${character.active_spec.name} ${
-        character.gender.type == 'FEMALE' ? '♀️' : '♂️'
-      }`;
+      const characterClass = `${character.character_class.name} ${character.active_spec.name}`;
+      const race = `${character.race.name} ${character.gender.type == 'FEMALE' ? '♀️' : '♂️'}`;
       const stats = format(
-        `{0} ${this.strings['ilvl']}\n{1} ${this.strings['achievementPoints']}\n{2} ${this.strings['honorLevel']}\n{3} ${this.strings['honorableKills']}`,
-        character.average_item_level,
+        `${this.strings['achievementPoints']}: {0} \n${this.strings['ilvl']}: {1}\n${this.strings['honorLevel']}: {2}\n${this.strings['honorableKills']}: {3}`,
         character.achievement_points,
+        character.average_item_level,
         pvp.honor_level,
         pvp.honorable_kills,
       );
+      if (title) {
+        text += `${title}\n\t`;
+      }
       if (guild) {
-        text = `${name}\n${guild}\n${race}\n\n${stats}`;
+        text += `${name}\n${guild}\n\t${characterClass}\n\t${race}\n\n${stats}`;
       } else {
-        text = `${name}\n${race}\n\n${stats}`;
+        text += `${name}\n${characterClass}\n${race}\n\n${stats}`;
       }
 
       const lastExp = raids.expansions[raids.expansions.length - 1];
       const lastRaid = lastExp.instances[lastExp.instances.length - 1];
       let raidProgression = `${lastRaid.instance.name}:`;
       for (const mode of lastRaid.modes) {
-        raidProgression += `\n • ${mode.difficulty.name}: ${mode.progress.completed_count}/${mode.progress.total_count}`;
+        raidProgression += `\n\t${mode.difficulty.name}: ${mode.progress.completed_count}/${mode.progress.total_count}`;
       }
       let photo = null;
       for (const asset of media.assets) {
@@ -155,19 +157,41 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         return this.bot.replyMessage(msg, photo, 'photo', null, { caption: text });
       }
     } else if (isCommand(this, 2, msg.content)) {
-      if (hasTag(this.bot, uid, 'wow:?')) {
-        delTag(this.bot, uid, 'wow:?');
+      if (!input) {
+        return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
+      } else {
+        if (hasTag(this.bot, uid, 'wow:?')) {
+          delTag(this.bot, uid, 'wow:?');
+        }
+        const words = input.split(' ');
+        const characterName = words.pop().toLowerCase();
+        const realm = words.join('-').toLowerCase();
+        setTag(this.bot, uid, `wow:${realm}/${characterName}`);
+        text = format(
+          this.strings['characterSet'],
+          capitalize(characterName),
+          capitalizeEachWord(realm.replace(new RegExp('-', 'gim'), ' ')),
+          this.bot.config.prefix,
+        );
       }
-      const words = input.split(' ');
-      const characterName = words.pop().toLowerCase();
-      const realm = words.join('-').toLowerCase();
-      setTag(this.bot, uid, `wow:${realm}/${characterName}`);
-      text = format(
-        this.strings['characterSet'],
-        capitalize(characterName),
-        capitalizeEachWord(realm.replace(new RegExp('-', 'gim'), ' ')),
-        this.bot.config.prefix,
-      );
+    } else if (isCommand(this, 3, msg.content)) {
+      const url = 'https://wowtokenprices.com/current_prices.json';
+      const resp = await sendRequest(url);
+      const content = await resp.json();
+      if (content) {
+        text = `<b>${this.strings['tokenTitle']}</b>:`;
+        for (const region in content) {
+          text += format(
+            '\n\t<b>{0}</b>: {1}k💰 {2}k📈{2}k',
+            region.toUpperCase(),
+            Math.trunc(content[region].current_price / 1000),
+            Math.trunc(content[region]['1_day_low'] / 1000),
+            Math.trunc(content[region]['1_day_high'] / 1000),
+          );
+        }
+      } else {
+        this.bot.replyMessage(msg, this.bot.errors.connectionError);
+      }
     }
     this.bot.replyMessage(msg, text);
   }
@@ -180,7 +204,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
     };
     const body = new FormData();
     body.append('grant_type', 'client_credentials');
-    const resp = await sendRequest('https://eu.battle.net/oauth/token', {}, headers, body as any, true);
+    const resp = await sendRequest('https://eu.battle.net/oauth/token', {}, headers, body, true);
     const content = await resp.json();
     return content.access_token;
   }

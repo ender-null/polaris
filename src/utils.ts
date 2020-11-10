@@ -2,6 +2,7 @@ import { exec } from 'child_process';
 import fs from 'fs';
 import mime from 'mime-types';
 import fetch, { BodyInit, HeadersInit, RequestInit, Response } from 'node-fetch';
+import querystring, { ParsedUrlQueryInput } from 'querystring';
 import { pipeline } from 'stream';
 import format from 'string-format';
 import tmp from 'tmp';
@@ -447,26 +448,22 @@ export function generateCommandHelp(plugin: PluginBase, text: string, showHidden
 
 export async function sendRequest(
   url: string,
-  params: Record<string, unknown> = {},
+  params?: ParsedUrlQueryInput,
   headers?: HeadersInit,
   data?: BodyInit,
   post?: boolean,
   bot?: Bot,
 ): Promise<Response> {
-  const queryString = Object.keys(params)
-    .map((key) => `${key}=${params[key]}`)
-    .join('&');
   const options: RequestInit = {
     method: post ? 'POST' : 'GET',
     body: data,
     headers: headers,
   };
   try {
-    const fullUrl = `${url}?${queryString}`;
-    const response = await fetch(fullUrl, options);
+    const response = await fetch(`${url}?${querystring.stringify(params)}`, options);
     if (response.status != 200) {
       const error = response.clone();
-      const json = error.json().catch((e) => catchException(e));
+      const json = await error.json().catch((e) => catchException(e));
       logger.error(JSON.stringify(json));
       if (bot) {
         bot.sendAlert(JSON.stringify(json));
@@ -487,7 +484,7 @@ export async function sendRequest(
 
 export async function responseUrlFromRequest(
   url: string,
-  params: Record<string, unknown> = {},
+  params?: ParsedUrlQueryInput,
   headers?: HeadersInit,
 ): Promise<string> {
   const response = await sendRequest(url, params, headers);
@@ -496,7 +493,7 @@ export async function responseUrlFromRequest(
 
 export async function download(
   url: string,
-  params: Record<string, unknown> = {},
+  params?: ParsedUrlQueryInput,
   headers?: HeadersInit,
   post?: boolean,
 ): Promise<string> {
@@ -592,6 +589,10 @@ export function now(): number {
 
 export function btoa(text: string): string {
   return Buffer.from(text).toString('base64');
+}
+
+export function utf8(text: string): string {
+  return Buffer.from(text).toString('utf8');
 }
 
 export function catchException(exception: Error, bot: Bot = null): void {
