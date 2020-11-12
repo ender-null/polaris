@@ -229,6 +229,17 @@ export function capitalizeEachWord(text: string): string {
   return null;
 }
 
+export function camelCase(text: string): string {
+  if (text) {
+    return text
+      .replace(/(?:^\w|[A-Z]|\b\w)/g, function (word, index) {
+        return index === 0 ? word.toLowerCase() : word.toUpperCase();
+      })
+      .replace(/\s+/g, '');
+  }
+  return null;
+}
+
 export function getWord(text: string, i: number): string {
   if (text && text.indexOf(' ') > -1) {
     return text.split(' ')[i - 1];
@@ -591,6 +602,13 @@ export function splitLargeMessage(content: string, maxLength: number): string[] 
     }
   }
   return texts;
+}
+
+export function formatNumber(number: string | number): string {
+  if (typeof number == 'string') {
+    number = parseInt(number);
+  }
+  return number.toLocaleString(undefined);
 }
 
 export function sortList(list: iString): iString {

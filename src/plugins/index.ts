@@ -5,6 +5,7 @@ export { AntiSpamPlugin } from './anti-spam';
 export { AscoDeVidaPlugin } from './asco-de-vida';
 export { ConfigPlugin } from './config';
 export { CorePlugin } from './core';
+export { Covid19Plugin } from './covid-19';
 export { EchoPlugin } from './echo';
 export { HelpPlugin } from './help';
 export { LeagueOfLegendsPlugin } from './league-of-legends';
