@@ -1,4 +1,5 @@
 import * as cheerio from 'cheerio';
+import format from 'string-format';
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
 import { iStringNested } from '../types';
@@ -30,16 +31,15 @@ export class Covid19Plugin extends PluginBase {
     this.strings = {
       countryList: 'Most affected countries codes',
       moreCountries: 'Showing only the most affected countries, but you can try other codes and names',
-      dataSource: 'Data source',
+      countrySituation: 'COVID-19 situation in {0}',
+      dataSource: 'Source',
       deaths: 'Deaths',
-      cumulativeDeaths: 'Cumulative deaths',
-      deathsLast7Days: 'Newly reported deaths',
-      deathsLast7DaysChange: 'Deaths last 7 days change',
+      deathsLast24Hours: 'Newly reported deaths',
+      deathsLast7Days: 'Deaths in last 7 days',
       deathsPerMillion: 'Deaths per million',
-      confirmed: 'Cases',
-      cumulativeConfirmed: 'Cumulative cases',
-      casesLast7Days: 'Newly reported cases',
-      casesLast7DaysChange: 'Cases last 7 days change',
+      cases: 'Cases',
+      casesLast24Hours: 'Newly reported cases',
+      casesLast7Days: 'Cases in last 7 days',
       casesPerMillion: 'Cases per million',
     };
     this.cronExpression = '0 * * * *';
@@ -60,10 +60,22 @@ export class Covid19Plugin extends PluginBase {
         if (!countryCode || (countryCode && this.data[countryCode] == undefined)) {
           return this.bot.replyMessage(msg, this.bot.errors.noResults);
         } else {
-          text = `<b>${this.countryCodes[countryCode].name} COVID-19 situation</b>:`;
-          const values = ['confirmed', 'deaths'];
+          text = `<b>${format(this.strings['countrySituation'], this.countryCodes[countryCode].name)}</b>:`;
+          const values = [
+            'cases',
+            'casesLast7Days',
+            'casesLast24Hours',
+            'deaths',
+            'deathsLast7Days',
+            'deathsLast24Hours',
+          ];
+          const separator = 3;
           for (const value of values) {
-            text += `\n${this.strings[value]}: ${formatNumber(this.data[countryCode][value])}`;
+            const tab = values.indexOf(value) != 0 && values.indexOf(value) != separator;
+            if (values.indexOf(value) == separator) {
+              text += '\n';
+            }
+            text += `\n${tab ? '\t' : ''}${this.strings[value]}: <b>${formatNumber(this.data[countryCode][value])}</b>`;
           }
           text += `\n\n<a href="${this.dataSource}">${this.strings['dataSource']}</a>`;
         }
@@ -97,10 +109,24 @@ export class Covid19Plugin extends PluginBase {
     this.data = {};
     for (const country of countryGroups) {
       const code = country.value.toLowerCase();
+      const lastEntry = country.data.rows[country.data.rows.length - 1];
       this.data[code] = {};
       for (let i = 0; i < country.data.metrics.length; i++) {
         this.data[code][camelCase(country.data.metrics[i].name)] = country.data.totals[i];
       }
+      this.data[code] = {
+        ...this.data[code],
+        ...{
+          cases: lastEntry[8],
+          casesPerMillion: lastEntry[11],
+          casesLast7Days: lastEntry[9],
+          casesLast24Hours: lastEntry[7],
+          deaths: lastEntry[3],
+          deathsPerMillion: lastEntry[6],
+          deathsLast7Days: lastEntry[4],
+          deathsLast24Hours: lastEntry[2],
+        },
+      };
     }
     logger.info('Updated COVID-19 data');
   }
