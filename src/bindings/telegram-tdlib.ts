@@ -3,8 +3,8 @@ import { ParsedUrlQueryInput } from 'querystring';
 import { Client } from 'tdl';
 import { TDLib } from 'tdl-tdlib-ffi';
 import { message, ok, Update, user } from 'tdl/types/tdlib';
-import { BindingsBase, Bot, Conversation, ConversationInfo, Message, User } from '..';
-import { catchException, download, logger, sendRequest, splitLargeMessage } from '../utils';
+import { BindingsBase, Bot, Conversation, ConversationInfo, Extra, Message, User } from '..';
+import { catchException, download, isInt, logger, sendRequest, splitLargeMessage } from '../utils';
 
 export class TelegramTDlibBindings extends BindingsBase {
   client: Client;
@@ -63,7 +63,7 @@ export class TelegramTDlibBindings extends BindingsBase {
 
   async convertMessage(msg: message): Promise<Message> {
     const id = msg['id'];
-    const extra = {};
+    const extra: Extra = {};
 
     const rawChat = await this.serverRequest('getChat', { chat_id: msg.chat_id });
     const conversation = new Conversation(msg['chat_id']);
@@ -93,41 +93,69 @@ export class TelegramTDlibBindings extends BindingsBase {
     if (msg.content._ == 'messageText') {
       content = msg.content.text.text;
       type = 'text';
+      if (Array.isArray(msg.content.text['entities'])) {
+        for (const entity of msg.content.text.entities) {
+          if (entity.type['@type'] == 'textEntityTypeUrl') {
+            if (!Array.isArray(extra.urls)) {
+              extra.urls = [];
+            }
+            extra.urls.push(content.slice(entity.offset, entity.offset + entity.length));
+          }
+          if (entity.type['@type'] == 'textEntityTypeMention') {
+            if (!Array.isArray(extra.mentions)) {
+              extra.mentions = [];
+            }
+            extra.mentions.push(content.slice(entity.offset, entity.offset + entity.length));
+          }
+          if (entity.type['@type'] == 'textEntityTypeMentionText') {
+            if (!Array.isArray(extra.mentions)) {
+              extra.mentions = [];
+            }
+            extra.mentions.push(entity['user']['id']);
+          }
+          if (entity.type['@type'] == 'textEntityTypeHashtag') {
+            if (!Array.isArray(extra.hashtags)) {
+              extra.hashtags = [];
+            }
+            extra.hashtags.push(content.slice(entity.offset, entity.offset + entity.length));
+          }
+        }
+      }
     } else if (msg.content._ == 'messagePhoto') {
       content = msg.content.photo.sizes[0].photo.remote.id;
       type = 'photo';
       if (msg.content.caption) {
-        extra['caption'] = msg.content.caption;
+        extra.caption = msg.content.caption.text;
       }
     } else if (msg.content._ == 'messageAnimation') {
       content = msg.content.animation.animation.remote.id;
       type = 'animation';
       if (msg.content.caption) {
-        extra['caption'] = msg.content.caption;
+        extra.caption = msg.content.caption.text;
       }
     } else if (msg.content._ == 'messageDocument') {
       content = msg.content.document.document.remote.id;
       type = 'document';
       if (msg.content.caption) {
-        extra['caption'] = msg.content.caption;
+        extra.caption = msg.content.caption.text;
       }
     } else if (msg.content._ == 'messageAudio') {
       content = msg.content.audio.audio.remote.id;
       type = 'audio';
       if (msg.content.caption) {
-        extra['caption'] = msg.content.caption;
+        extra.caption = msg.content.caption.text;
       }
     } else if (msg.content._ == 'messageVideo') {
       content = msg.content.video.video.remote.id;
       type = 'video';
       if (msg.content.caption) {
-        extra['caption'] = msg.content.caption;
+        extra.caption = msg.content.caption.text;
       }
     } else if (msg.content._ == 'messageVoiceNote') {
       content = msg.content.voice_note.voice.remote.id;
       type = 'voice';
       if (msg.content.caption) {
-        extra['caption'] = msg.content.caption;
+        extra.caption = msg.content.caption.text;
       }
     } else if (msg.content._ == 'messageSticker') {
       content = msg.content.sticker.sticker.remote.id;
@@ -140,8 +168,20 @@ export class TelegramTDlibBindings extends BindingsBase {
       type = 'unsupported';
     }
 
+    let reply = null;
+    if (msg['reply_to_message_id'] != undefined && msg['reply_to_message_id'] > 0) {
+      reply = await this.getMessage(msg['chat_id'], msg['reply_to_message_id']);
+    }
+    if (msg['via_bot_user_id'] != undefined && msg['via_bot_user_id'] > 0) {
+      extra.viaBotUserId = msg['via_bot_user_id'];
+    }
+    if (msg['restriction_reason'] != undefined) {
+      extra.restrictionReason = msg['restriction_reason'];
+    }
+    if (msg['reply_markup'] != undefined) {
+      extra.replyMarkup = msg['reply_markup'];
+    }
     const date = msg['date'];
-    const reply = null;
     return new Message(id, conversation, sender, content, type, date, reply, extra);
   }
 
@@ -384,7 +424,7 @@ export class TelegramTDlibBindings extends BindingsBase {
       };
 
       if (msg.reply) {
-        data['reply_to_message_id'] = msg.reply;
+        data['reply_to_message_id'] = msg.reply.id;
       }
 
       if (data) {
@@ -436,7 +476,7 @@ export class TelegramTDlibBindings extends BindingsBase {
         '@type': 'inputFileRemote',
         id: content,
       };
-    } else if (content.startsWith(content)) {
+    } else if (isInt(content)) {
       return {
         '@type': 'inputFileId',
         id: content,

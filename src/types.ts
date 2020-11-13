@@ -171,6 +171,10 @@ export abstract class Extra extends Object {
   customTitle?: string;
   urls?: string[];
   mentions?: string[];
+  hashtags?: string[];
+  viaBotUserId?: number | string;
+  restrictionReason?: string;
+  replyMarkup?: any;
 }
 
 export interface DatabaseUser {
@@ -194,6 +198,12 @@ export interface DatabaseReminder {
   bot?: number | string;
 }
 
+export interface DatabasePin {
+  content?: string;
+  creator?: number | string;
+  type?: string;
+}
+
 export interface iString {
   [id: string]: string;
 }
@@ -215,7 +225,7 @@ export interface iConversation {
 }
 
 export interface iPin {
-  [id: string]: Record<string, unknown>;
+  [id: string]: DatabasePin;
 }
 
 export interface iPole {

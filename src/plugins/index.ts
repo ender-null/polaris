@@ -9,6 +9,7 @@ export { Covid19Plugin } from './covid-19';
 export { EchoPlugin } from './echo';
 export { HelpPlugin } from './help';
 export { LeagueOfLegendsPlugin } from './league-of-legends';
+export { PinsPlugin } from './pins';
 export { RemindersPlugin } from './reminders';
 export { TagsPlugin } from './tags';
 export { TelegramPlugin } from './telegram';
