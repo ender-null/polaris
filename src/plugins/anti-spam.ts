@@ -113,7 +113,7 @@ export class AntiSpamPlugin extends PluginBase {
         db.groupsSnap
           .child(gid)
           .child(spamType)
-          .ref.update(db.groups[gid][spamType] + 1);
+          .ref.set(db.groups[gid][spamType] + 1);
       } else {
         db.groupsSnap.child(gid).child(spamType).ref.set(1);
       }
