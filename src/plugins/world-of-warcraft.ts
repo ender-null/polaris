@@ -58,6 +58,10 @@ export class WorldOfWarcraftPlugin extends PluginBase {
     this.strings = {
       lv: 'Lv',
       ilvl: 'Item level',
+      health: 'Health',
+      strength: 'Strength',
+      agility: 'Agility',
+      intellect: 'Intellect',
       achievementPoints: 'Achievement points',
       honorLevel: 'Honor level',
       honorableKills: 'Honorable kills',
@@ -108,6 +112,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       const media = await this.getCharacterMedia(region, realm, characterName);
       const raids = await this.getCharacterRaids(region, realm, characterName);
       const pvp = await this.getCharacterPVP(region, realm, characterName);
+      const statistics = await this.getCharacterStatistics(region, realm, characterName);
 
       if (character.code == 404) {
         return this.bot.replyMessage(msg, this.bot.errors.noResults);
@@ -124,6 +129,12 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       const characterClass = `${character.character_class.name} ${character.active_spec.name}`;
       const race = `${character.race.name} ${character.gender.type == 'FEMALE' ? '♀️' : '♂️'}`;
       const stats = format(
+        `${this.strings['health']}: {0} \n{1}: {2}`,
+        statistics.health,
+        statistics.power_type.name,
+        statistics.power,
+      );
+      const info = format(
         `${this.strings['achievementPoints']}: {0} \n${this.strings['ilvl']}: {1}\n${this.strings['honorLevel']}: {2}\n${this.strings['honorableKills']}: {3}`,
         character.achievement_points,
         character.average_item_level,
@@ -134,9 +145,9 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         text += `${title}\n\t`;
       }
       if (guild) {
-        text += `${name}\n${guild}\n\t${characterClass}\n\t${race}\n\n${stats}`;
+        text += `${name}\n${guild}\n\t${characterClass}\n\t${race}\n\n${stats}\n\n${info}`;
       } else {
-        text += `${name}\n${characterClass}\n${race}\n\n${stats}`;
+        text += `${name}\n${characterClass}\n${race}\n\n${stats}\n\n${info}`;
       }
 
       const lastExp = raids.expansions[raids.expansions.length - 1];
@@ -234,5 +245,9 @@ export class WorldOfWarcraftPlugin extends PluginBase {
 
   async getCharacterPVP(region: string, realm: string, characterName: string): Promise<any> {
     return await this.getCharacter(region, realm, characterName, '/pvp-summary');
+  }
+
+  async getCharacterStatistics(region: string, realm: string, characterName: string): Promise<any> {
+    return await this.getCharacter(region, realm, characterName, '/statistics');
   }
 }
