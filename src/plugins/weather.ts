@@ -39,7 +39,7 @@ export class WeatherPlugin extends PluginBase {
 
     const url = 'https://api.openweathermap.org/data/2.5/weather';
     const params = {
-      APPID: this.bot.config.apiKeys.openWeather,
+      appid: this.bot.config.apiKeys.openWeather,
       lon: coords.lng,
       lat: coords.lat,
       units: 'metric',
@@ -50,16 +50,13 @@ export class WeatherPlugin extends PluginBase {
     if (!content || content.cod != 200) {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);
     }
-    const title = `<b>${format(this.strings['title'], coords.locality, coords.country)} %s (%s)</b>:`;
-    const weatherString = content.weather[0].main;
-    const weatherIcon = this.getWeatherIcon(content.weather[0].icon);
+    const title = `<b>${format(this.strings['title'], coords.locality, coords.country)}</b>:`;
+    const weather = content.weather[0].description;
+    const icon = this.getWeatherIcon(content.weather[0].icon);
     const temp = content.main.temp;
     const humidity = content.main.humidity;
     const wind = content.wind.speed;
-    const feelslike = '';
-    const text = `'${removeHtml(
-      title,
-    )}\n${weatherIcon} ${weatherString}${feelslike}\n🌡${temp}ºC 💧${humidity}% 🌬${wind} m/s'`;
+    const text = `${removeHtml(title)}\n${icon} ${weather}\n🌡${temp}ºC 💧${humidity}% 🌬${wind} m/s`;
     this.bot.replyMessage(msg, text);
   }
 

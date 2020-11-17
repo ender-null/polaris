@@ -581,7 +581,7 @@ export async function getCoords(input: string, bot?: Bot): Promise<CoordinatesRe
     const locality = content.results[0].address_components[0].long_name;
     let country;
     for (const address of content.results[0].address_components) {
-      if (address.types.country) {
+      if (address.types.indexOf('country') > -1) {
         country = address.long_name;
       }
     }
