@@ -177,8 +177,8 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         }
       }
       text = `${title ? title + '\n\t' : ''}${name}\n${
-        guild ? guild + '\n\t' : ''
-      }${characterClass}\n\t${race}\n\n${info}\n\n${raidProgression ? raidProgression + '\n\t' : ''}${stats}`;
+        guild ? guild + '\n\n' : ''
+      }${characterClass}\n\t${race}\n\n${info}\n\n${raidProgression ? raidProgression + '\n\n' : ''}${stats}`;
       if (photo) {
         return this.bot.replyMessage(msg, photo, 'photo', null, { caption: text });
       }
