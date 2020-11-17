@@ -31,7 +31,7 @@ export class TelegramTDlibBindings extends BindingsBase {
 
   async serverRequest(method: string, params: Record<string, unknown> = {}): Promise<any> {
     const query: any = {
-      _: method,
+      '@type': method,
       ...params,
     };
     return await this.client.invoke(query).catch((e) => {

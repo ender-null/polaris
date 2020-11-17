@@ -69,6 +69,10 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       achievementPoints: 'Achievement points',
       honorLevel: 'Honor level',
       honorableKills: 'Honorable kills',
+      mythicPlusScores: 'Raider.io Mythic+ scores',
+      dps: 'DPS',
+      healer: 'Healer',
+      tank: 'Tank',
       characterSet: 'Your character is set as <b>{0}</b> from realm <b>{1}</b>, you can now just use {2}wow',
       tokenTitle: 'WoW token price',
     };
@@ -116,7 +120,8 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       const media = await this.getCharacterMedia(region, realm, characterName);
       const raids = await this.getCharacterRaids(region, realm, characterName);
       const pvp = await this.getCharacterPVP(region, realm, characterName);
-      const statistics = await this.getCharacterStatistics(region, realm, characterName);
+      // const statistics = await this.getCharacterStatistics(region, realm, characterName);
+      const raiderIO = await this.getRaiderIO(region, realm, characterName);
 
       if (!character) {
         return this.bot.replyMessage(msg, this.bot.errors.connectionError);
@@ -133,27 +138,27 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       if ('guild' in character) {
         guild = `<${character.guild.name}-${character.guild.realm.name}>`;
       }
-      let mainStat = 'strength';
-      let mainStatAmount = statistics.strength.effective;
-      if (statistics.agility.effective > mainStatAmount) {
-        mainStat = 'agility';
-        mainStatAmount = statistics.agility.effective;
-      }
-      if (statistics.intellect.effective > mainStatAmount) {
-        mainStat = 'intellect';
-        mainStatAmount = statistics.intellect.effective;
-      }
+      // let mainStat = 'strength';
+      // let mainStatAmount = statistics.strength.effective;
+      // if (statistics.agility.effective > mainStatAmount) {
+      //   mainStat = 'agility';
+      //   mainStatAmount = statistics.agility.effective;
+      // }
+      // if (statistics.intellect.effective > mainStatAmount) {
+      //   mainStat = 'intellect';
+      //   mainStatAmount = statistics.intellect.effective;
+      // }
+      // const stats = format(
+      //   `${this.strings['statistics']}:\n\t${this.strings['health']}: {0} \n\t{1}: {2}\n\t${this.strings[mainStat]}: {3}\n\t${this.strings['stamina']}: {4}\n\t${this.strings['armor']}: {5}`,
+      //   formatNumber(statistics.health),
+      //   statistics.power_type.name,
+      //   formatNumber(statistics.power),
+      //   formatNumber(mainStatAmount),
+      //   formatNumber(statistics.stamina.effective),
+      //   formatNumber(statistics.armor.effective),
+      // );
       const characterClass = `${character.character_class.name} ${character.active_spec.name}`;
       const race = `${character.race.name} ${character.gender.type == 'FEMALE' ? '♀️' : '♂️'}`;
-      const stats = format(
-        `${this.strings['statistics']}:\n\t${this.strings['health']}: {0} \n\t{1}: {2}\n\t${this.strings[mainStat]}: {3}\n\t${this.strings['stamina']}: {4}\n\t${this.strings['armor']}: {5}`,
-        formatNumber(statistics.health),
-        statistics.power_type.name,
-        formatNumber(statistics.power),
-        formatNumber(mainStatAmount),
-        formatNumber(statistics.stamina.effective),
-        formatNumber(statistics.armor.effective),
-      );
       const info = format(
         `${this.strings['achievementPoints']}: {0} \n${this.strings['ilvl']}: {1}\n${this.strings['honorLevel']}: {2}\n${this.strings['honorableKills']}: {3}`,
         formatNumber(character.achievement_points),
@@ -170,6 +175,22 @@ export class WorldOfWarcraftPlugin extends PluginBase {
           raidProgression += `\n\t${mode.difficulty.name}: ${mode.progress.completed_count}/${mode.progress.total_count}`;
         }
       }
+      let mythicScore = '';
+      if (raiderIO.mythic_plus_scores_by_season.length > 0) {
+        const lastSeason = raiderIO.mythic_plus_scores_by_season[0];
+        mythicScore = `${this.strings['mythicPlusScores']}:`;
+        let empty = true;
+        const scores = ['dps', 'healer', 'tank'];
+        for (const score of scores) {
+          mythicScore += `\n\t${this.strings[score]}: ${lastSeason.scores[score]}`;
+          if (lastSeason.scores[score] > 0) {
+            empty = false;
+          }
+        }
+        if (empty) {
+          mythicScore = '';
+        }
+      }
       let photo = null;
       for (const asset of media.assets) {
         if (asset.key == 'main') {
@@ -179,7 +200,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       }
       text = `${title ? title + '\n\t' : ''}${name}\n${
         guild ? guild + '\n\n' : ''
-      }${characterClass}\n\t${race}\n\n${info}\n\n${raidProgression ? raidProgression + '\n\n' : ''}${stats}`;
+      }${characterClass}\n\t${race}\n\n${info}\n\n${raidProgression ? raidProgression + '\n\n' : ''}${mythicScore}`;
       if (photo) {
         return this.bot.replyMessage(msg, photo, 'photo', null, { caption: text });
       }
@@ -270,5 +291,17 @@ export class WorldOfWarcraftPlugin extends PluginBase {
 
   async getCharacterStatistics(region: string, realm: string, characterName: string): Promise<any> {
     return await this.getCharacter(region, realm, characterName, '/statistics');
+  }
+
+  async getRaiderIO(region: string, realm: string, characterName: string): Promise<any> {
+    const url = 'https://raider.io/api/v1/characters/profile';
+    const params = {
+      region: region,
+      realm: realm,
+      name: characterName,
+      fields: 'mythic_plus_scores_by_season:current,mythic_plus_scores_by_season:previous',
+    };
+    const resp = await sendRequest(url, params);
+    return await resp.json();
   }
 }
