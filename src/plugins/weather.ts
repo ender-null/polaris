@@ -1,7 +1,7 @@
 import format from 'string-format';
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
-import { generateCommandHelp, getCoords, getInput, removeHtml, sendRequest } from '../utils';
+import { capitalize, generateCommandHelp, getCoords, getInput, removeHtml, sendRequest } from '../utils';
 
 export class WeatherPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -51,7 +51,7 @@ export class WeatherPlugin extends PluginBase {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);
     }
     const title = `<b>${format(this.strings['title'], coords.locality, coords.country)}</b>:`;
-    const weather = content.weather[0].description;
+    const weather = capitalize(content.weather[0].description);
     const icon = this.getWeatherIcon(content.weather[0].icon);
     const temp = content.main.temp;
     const humidity = content.main.humidity;
