@@ -7,6 +7,7 @@ import {
   capitalize,
   capitalizeEachWord,
   delTag,
+  formatNumber,
   generateCommandHelp,
   getInput,
   getTags,
@@ -146,19 +147,19 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       const race = `${character.race.name} ${character.gender.type == 'FEMALE' ? '♀️' : '♂️'}`;
       const stats = format(
         `${this.strings['statistics']}:\n\t${this.strings['health']}: {0} \n\t{1}: {2}\n\t${this.strings[mainStat]}: {3}\n\t${this.strings['stamina']}: {4}\n\t${this.strings['armor']}: {5}`,
-        statistics.health,
+        formatNumber(statistics.health),
         statistics.power_type.name,
-        statistics.power,
-        mainStatAmount,
-        statistics.stamina.effective,
-        statistics.armor.effective,
+        formatNumber(statistics.power),
+        formatNumber(mainStatAmount),
+        formatNumber(statistics.stamina.effective),
+        formatNumber(statistics.armor.effective),
       );
       const info = format(
         `${this.strings['achievementPoints']}: {0} \n${this.strings['ilvl']}: {1}\n${this.strings['honorLevel']}: {2}\n${this.strings['honorableKills']}: {3}`,
-        character.achievement_points,
+        formatNumber(character.achievement_points),
         character.average_item_level,
         pvp.honor_level,
-        pvp.honorable_kills,
+        formatNumber(pvp.honorable_kills),
       );
       let raidProgression = null;
       if (raids.expansions) {
