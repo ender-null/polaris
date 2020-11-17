@@ -35,7 +35,7 @@ export class TelegramTDlibBindings extends BindingsBase {
       ...params,
     };
     return await this.client.invoke(query).catch((e) => {
-      this.bot.sendAlert(query);
+      this.bot.sendAlert(JSON.stringify(query));
       catchException(e, this.bot);
     });
   }
