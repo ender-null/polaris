@@ -14,5 +14,6 @@ export { RemindersPlugin } from './reminders';
 export { TagsPlugin } from './tags';
 export { TelegramPlugin } from './telegram';
 export { VoicePlugin } from './voice';
+export { WeatherPlugin } from './weather';
 export { WorldOfWarcraftPlugin } from './world-of-warcraft';
 export { YouTubePlugin } from './youtube';

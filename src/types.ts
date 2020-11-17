@@ -177,6 +177,14 @@ export abstract class Extra extends Object {
   replyMarkup?: any;
 }
 
+export interface CoordinatesResult {
+  status: string;
+  lat: number;
+  lng: number;
+  locality: string;
+  country: string;
+}
+
 export interface DatabaseUser {
   first_name?: string;
   last_name?: string;
