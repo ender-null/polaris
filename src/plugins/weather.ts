@@ -60,7 +60,7 @@ export class WeatherPlugin extends PluginBase {
     this.bot.replyMessage(msg, text);
   }
 
-  getWeatherIcon(icon: string) {
+  getWeatherIcon(icon: string): string {
     const weatherEmoji = {};
     if (icon[2] == 'n') {
       weatherEmoji['01'] = '🌙';
