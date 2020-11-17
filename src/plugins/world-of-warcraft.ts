@@ -58,6 +58,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
     this.strings = {
       lv: 'Lv',
       ilvl: 'Item level',
+      statistics: 'Statistics',
       health: 'Health',
       strength: 'Strength',
       agility: 'Agility',
@@ -116,6 +117,9 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       const pvp = await this.getCharacterPVP(region, realm, characterName);
       const statistics = await this.getCharacterStatistics(region, realm, characterName);
 
+      if (!character) {
+        return this.bot.replyMessage(msg, this.bot.errors.connectionError);
+      }
       if (character.code == 404) {
         return this.bot.replyMessage(msg, this.bot.errors.noResults);
       }
@@ -141,7 +145,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       const characterClass = `${character.character_class.name} ${character.active_spec.name}`;
       const race = `${character.race.name} ${character.gender.type == 'FEMALE' ? '♀️' : '♂️'}`;
       const stats = format(
-        `${this.strings['health']}: {0} \n{1}: {2}\n\t${this.strings[mainStat]}: {3}\n\t${this.strings['stamina']}: {4}\n\t${this.strings['armor']}: {5}`,
+        `${this.strings['statistics']}:\n\t${this.strings['health']}: {0} \n\t{1}: {2}\n\t${this.strings[mainStat]}: {3}\n\t${this.strings['stamina']}: {4}\n\t${this.strings['armor']}: {5}`,
         statistics.health,
         statistics.power_type.name,
         statistics.power,
@@ -156,20 +160,14 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         pvp.honor_level,
         pvp.honorable_kills,
       );
-      if (title) {
-        text += `${title}\n\t`;
-      }
-      if (guild) {
-        text += `${name}\n${guild}\n\t${characterClass}\n\t${race}\n\n${stats}\n\n${info}`;
-      } else {
-        text += `${name}\n${characterClass}\n${race}\n\n${stats}\n\n${info}`;
-      }
-
-      const lastExp = raids.expansions[raids.expansions.length - 1];
-      const lastRaid = lastExp.instances[lastExp.instances.length - 1];
-      let raidProgression = `${lastRaid.instance.name}:`;
-      for (const mode of lastRaid.modes) {
-        raidProgression += `\n\t${mode.difficulty.name}: ${mode.progress.completed_count}/${mode.progress.total_count}`;
+      let raidProgression = null;
+      if (raids.expansions) {
+        const lastExp = raids.expansions[raids.expansions.length - 1];
+        const lastRaid = lastExp.instances[lastExp.instances.length - 1];
+        raidProgression = `${lastRaid.instance.name}:`;
+        for (const mode of lastRaid.modes) {
+          raidProgression += `\n\t${mode.difficulty.name}: ${mode.progress.completed_count}/${mode.progress.total_count}`;
+        }
       }
       let photo = null;
       for (const asset of media.assets) {
@@ -178,7 +176,9 @@ export class WorldOfWarcraftPlugin extends PluginBase {
           break;
         }
       }
-      text += `\n\n${raidProgression}`;
+      text = `${title ? title + '\n\t' : ''}${name}\n${
+        guild ? guild + '\n\t' : ''
+      }${characterClass}\n\t${race}\n\n${info}\n\n${raidProgression ? raidProgression + '\n\t' : ''}${stats}`;
       if (photo) {
         return this.bot.replyMessage(msg, photo, 'photo', null, { caption: text });
       }
@@ -242,8 +242,13 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       locale: this.bot.config.locale,
       access_token: this.accessToken,
     };
-    const resp = await sendRequest(url, params);
-    return await resp.json();
+    try {
+      const resp = await sendRequest(url, params);
+      return await resp.json();
+    } catch (e) {
+      this.retrievingAccessToken();
+      return null;
+    }
   }
 
   async getCharacterMedia(region: string, realm: string, characterName: string): Promise<any> {
