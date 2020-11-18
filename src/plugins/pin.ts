@@ -4,7 +4,7 @@ import { db } from '../main';
 import { PluginBase } from '../plugin';
 import { generateCommandHelp, getInput, isCommand } from '../utils';
 
-export class PinsPlugin extends PluginBase {
+export class PinPlugin extends PluginBase {
   constructor(bot: Bot) {
     super(bot);
     this.commands = [

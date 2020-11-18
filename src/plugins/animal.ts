@@ -2,7 +2,7 @@ import { Bot, Errors, Message } from '..';
 import { PluginBase } from '../plugin';
 import { hasTag, isCommand, responseUrlFromRequest } from '../utils';
 
-export class AnimalsPlugin extends PluginBase {
+export class AnimalPlugin extends PluginBase {
   constructor(bot: Bot) {
     super(bot);
     this.commands = [

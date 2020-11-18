@@ -671,6 +671,18 @@ export function now(): number {
   return new Date().getTime() / 1000;
 }
 
+export function time(hour: number, minute?: number, second?: number): number {
+  const today = new Date();
+  return new Date(today.getFullYear(), today.getMonth(), today.getDate(), hour, minute, second).getTime();
+}
+
+export function timeInRange(start: number, end: number, time: number): boolean {
+  if (time >= start && time < end) {
+    return true;
+  }
+  return false;
+}
+
 export function btoa(text: string): string {
   return Buffer.from(text).toString('base64');
 }

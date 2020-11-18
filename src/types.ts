@@ -212,6 +212,24 @@ export interface DatabasePin {
   type?: string;
 }
 
+export interface DatabasePoleList {
+  [id: string]: DatabasePole;
+}
+
+export interface DatabasePole {
+  pole?: number | string;
+  subpole?: number | string;
+  fail?: number | string;
+  iron?: number | string;
+  canaria?: number | string;
+  andaluza?: number | string;
+}
+
+export interface OrderedPole extends DatabasePole {
+  uid?: number | string;
+  points?: number;
+}
+
 export interface iString {
   [id: string]: string;
 }
@@ -237,7 +255,7 @@ export interface iPin {
 }
 
 export interface iPole {
-  [id: string]: Record<string, unknown>;
+  [id: string]: DatabasePoleList;
 }
 
 export interface iReminder {

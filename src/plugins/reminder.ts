@@ -4,7 +4,7 @@ import { db } from '../main';
 import { PluginBase } from '../plugin';
 import { allButNWord, catchException, generateCommandHelp, getInput, getWord, isInt, now } from '../utils';
 
-export class RemindersPlugin extends PluginBase {
+export class ReminderPlugin extends PluginBase {
   constructor(bot: Bot) {
     super(bot);
     this.commands = [

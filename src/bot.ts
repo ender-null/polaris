@@ -266,7 +266,7 @@ export class Bot {
       message.content.endsWith(`@${this.user.username}`) &&
       message.content.indexOf(' ') > -1
     ) {
-      message.content = message.content.replace('@' + this.user.username, '');
+      message.content = message.content.replace(`@${this.user.username}`, '');
     }
 
     // If the commands are not /start, /help or /config, set the correct command start symbol.

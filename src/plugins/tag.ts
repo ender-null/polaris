@@ -14,7 +14,7 @@ import {
   setTag,
 } from '../utils';
 
-export class TagsPlugin extends PluginBase {
+export class TagPlugin extends PluginBase {
   constructor(bot: Bot) {
     super(bot);
     this.commands = [
