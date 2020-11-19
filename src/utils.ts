@@ -634,6 +634,8 @@ export function htmlToDiscordMarkdown(text: string): string {
   for (const rep of replacements) {
     text = text.replace(new RegExp(rep['pattern'], 'gim'), rep['sub']);
   }
+  text = text.replace(new RegExp('&lt;', 'gim'), '<');
+  text = text.replace(new RegExp('&gt;', 'gim'), '>');
   return text;
 }
 
@@ -697,11 +699,11 @@ export function catchException(exception: Error | error, bot: Bot = null): Error
   logger.error(`${exception.message}`);
   if (bot) {
     if (exception['stack']) {
-      bot.sendAlert(`${escapeHtml(exception['stack'])}`);
+      bot.sendAlert(replaceHtml(exception['stack']));
     } else if (exception['_'] == 'error') {
-      bot.sendAlert(`${exception}`);
+      bot.sendAlert(JSON.stringify(exception));
     } else {
-      bot.sendAlert(`${exception.message}`);
+      bot.sendAlert(exception.message);
     }
   }
   return exception;

@@ -56,7 +56,7 @@ export class WeatherPlugin extends PluginBase {
     const temp = content.main.temp;
     const humidity = content.main.humidity;
     const wind = content.wind.speed;
-    const text = `<b>${title}:</b>\n${icon} ${weather}\n🌡${temp}ºC 💧${humidity}% 🌬${wind} m/s`;
+    const text = `${title}\n${icon} ${weather}\n🌡${temp}ºC 💧${humidity}% 🌬${wind} m/s`;
     this.bot.replyMessage(msg, text);
   }
 
