@@ -74,9 +74,15 @@ export class TelegramTDlibBindings extends BindingsBase {
     if (rawChat && 'title' in rawChat) {
       conversation.title = rawChat.title;
     }
-    if (msg['sender_user_id'] > 0) {
-      const rawSender = await this.serverRequest('getUser', { user_id: msg.sender_user_id });
-      sender = new User(msg.sender_user_id);
+    let userId;
+    if (msg['sender'] && msg['sender']['user_id']) {
+      userId = msg['sender']['user_id'];
+    } else if (msg.sender_user_id && msg.sender_user_id > 0) {
+      userId = msg.sender_user_id;
+    }
+    if (userId) {
+      const rawSender = await this.serverRequest('getUser', { user_id: userId });
+      sender = new User(userId);
       if ('first_name' in rawSender) {
         sender.firstName = String(rawSender.first_name);
       }
@@ -171,11 +177,11 @@ export class TelegramTDlibBindings extends BindingsBase {
       type = 'unsupported';
     }
 
-    let reply = null;
+    let reply: Message = null;
     if (msg['reply_to_message_id'] != undefined && msg['reply_to_message_id'] > 0) {
       logger.info('reply_to_message_id: ' + msg['reply_to_message_id']);
       reply = await this.getMessage(msg['chat_id'], msg['reply_to_message_id']);
-      logger.info('reply: ' + String(reply));
+      logger.info(`reply ${reply.id}: ${reply.content}`);
     }
     if (msg['via_bot_user_id'] != undefined && msg['via_bot_user_id'] > 0) {
       extra.viaBotUserId = msg['via_bot_user_id'];
