@@ -18,7 +18,7 @@ export class Covid19Plugin extends PluginBase {
         parameters: [
           {
             name: 'country',
-            required: false,
+            required: true,
           },
         ],
         description: 'Get current COVID-19 situation by country',
