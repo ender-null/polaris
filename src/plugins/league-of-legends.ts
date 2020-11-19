@@ -118,12 +118,8 @@ export class LeagueOfLegendsPlugin extends PluginBase {
   async run(msg: Message): Promise<void> {
     const input = getInput(msg);
     let text;
-    let uid;
-    if (msg.reply) {
-      uid = String(msg.reply.sender.id);
-    } else {
-      uid = String(msg.sender.id);
-    }
+    const uid = String(msg.sender.id);
+
     // Get character data
     if (isCommand(this, 1, msg.content)) {
       if (!this.latestVersion) {

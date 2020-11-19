@@ -173,7 +173,9 @@ export class TelegramTDlibBindings extends BindingsBase {
 
     let reply = null;
     if (msg['reply_to_message_id'] != undefined && msg['reply_to_message_id'] > 0) {
+      logger.info('reply_to_message_id: ' + msg['reply_to_message_id']);
       reply = await this.getMessage(msg['chat_id'], msg['reply_to_message_id']);
+      logger.info('reply: ' + String(reply));
     }
     if (msg['via_bot_user_id'] != undefined && msg['via_bot_user_id'] > 0) {
       extra.viaBotUserId = msg['via_bot_user_id'];

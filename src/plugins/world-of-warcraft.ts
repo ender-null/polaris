@@ -83,12 +83,8 @@ export class WorldOfWarcraftPlugin extends PluginBase {
     }
     const input = getInput(msg, false);
     let text = '';
-    let uid;
-    if (msg.reply) {
-      uid = String(msg.reply.sender.id);
-    } else {
-      uid = String(msg.sender.id);
-    }
+    const uid = String(msg.sender.id);
+
     // Get character data
     if (isCommand(this, 1, msg.content)) {
       let region = 'eu';
