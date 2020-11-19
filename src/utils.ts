@@ -5,6 +5,7 @@ import fetch, { BodyInit, HeadersInit, RequestInit, Response } from 'node-fetch'
 import querystring, { ParsedUrlQueryInput } from 'querystring';
 import { pipeline } from 'stream';
 import format from 'string-format';
+import { error } from 'tdl/types/tdlib';
 import tmp from 'tmp';
 import util from 'util';
 import { createLogger, format as winstonFormat, transports } from 'winston';
@@ -567,6 +568,7 @@ export async function getCoords(input: string, bot?: Bot): Promise<CoordinatesRe
   const params = {
     address: input,
     language: lang,
+    region: lang,
     key: key,
   };
   const res = await sendRequest(url, params);
@@ -613,6 +615,12 @@ export function replaceHtml(text: string): string {
   return text;
 }
 
+export function escapeHtml(text: string): string {
+  text = text.replace(new RegExp('<', 'gim'), '\\<');
+  text = text.replace(new RegExp('>', 'gim'), '\\>');
+  return text;
+}
+
 export function htmlToDiscordMarkdown(text: string): string {
   const replacements = [
     { pattern: '<code class="language-([\\w]+)">([\\S\\s]+)</code>', sub: '```$1\n$2```' },
@@ -623,12 +631,9 @@ export function htmlToDiscordMarkdown(text: string): string {
     { pattern: '<[/]?code>', sub: '`' },
     { pattern: '<[/]?pre>', sub: '```' },
   ];
-
   for (const rep of replacements) {
     text = text.replace(new RegExp(rep['pattern'], 'gim'), rep['sub']);
   }
-
-  // text = replaceHtml(text);
   return text;
 }
 
@@ -687,18 +692,19 @@ export function btoa(text: string): string {
   return Buffer.from(text).toString('base64');
 }
 
-export function catchException(exception: Error, bot: Bot = null): void {
+export function catchException(exception: Error | error, bot: Bot = null): Error | error {
   logger.info(`Catched exception: ${exception.message}`);
   logger.error(`${exception.message}`);
   if (bot) {
-    if (exception.message != 'Chat not found') {
-      if (exception.stack) {
-        bot.sendAlert(`${replaceHtml(exception.stack)}`);
-      } else {
-        bot.sendAlert(`${exception.message}`);
-      }
+    if (exception['stack']) {
+      bot.sendAlert(`${escapeHtml(exception['stack'])}`);
+    } else if (exception['_'] == 'error') {
+      bot.sendAlert(`${exception}`);
+    } else {
+      bot.sendAlert(`${exception.message}`);
     }
   }
+  return exception;
 }
 
 // Configure logger

@@ -90,10 +90,6 @@ export class DiscordBindings extends BindingsBase {
     if (+message.author.id == this.bot.user.id) {
       return;
     }
-
-    // if (message.content.startsWith('/') || message.content.startsWith(this.bot.config.prefix)) {
-    //   message.channel.startTyping();
-    // }
     this.bot.inbox.emit('message', await this.convertMessage(message));
   }
 
