@@ -323,7 +323,7 @@ export function setInput(message: Message, trigger: string): Message {
   if (message.type == 'text') {
     // Get the text that is next to the pattern
     const inputMatch = new RegExp(`${trigger}(.+)$`, 'gim').exec(message.content);
-    if (inputMatch && inputMatch.length > 0) {
+    if (inputMatch && inputMatch.length > 0 && inputMatch[1]) {
       if (inputMatch[1].startsWith(' ')) {
         message.extra.input = inputMatch[1].slice(1);
       } else {
@@ -336,7 +336,7 @@ export function setInput(message: Message, trigger: string): Message {
       const inputMatch = new RegExp(`${trigger}(.+)$`, 'gim').exec(
         String(message.content) + ' ' + String(message.reply.content),
       );
-      if (inputMatch && inputMatch.length > 0) {
+      if (inputMatch && inputMatch.length > 0 && inputMatch[1]) {
         if (inputMatch[1].startsWith(' ')) {
           message.extra.inputReply = inputMatch[1].slice(1);
         } else {

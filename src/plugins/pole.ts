@@ -19,34 +19,36 @@ export class PolePlugin extends PluginBase {
       },
       {
         command: '/pole',
-        friendly: 'pole',
+        friendly: '^pole$|oro',
         description: 'Get the pole',
       },
       {
         command: '/subpole',
-        friendly: 'subpole',
+        friendly: '^subpole|plata',
         description: 'Get the subpole',
         hidden: true,
       },
       {
         command: '/fail',
-        friendly: 'fail',
+        friendly: '^fail|bronce',
         description: 'Get the fail',
         hidden: true,
       },
       {
         command: '/iron',
-        friendly: 'iron',
+        friendly: '(^| )hierro($| )',
         description: 'Get the iron',
         hidden: true,
       },
       {
         command: '/polecanaria',
+        friendly: '(^| )pole canaria($| )',
         description: 'Get the pole canaria',
         hidden: true,
       },
       {
         command: '/poleandaluza',
+        friendly: '(^| )pole andaluza($| )',
         description: 'Get the pole andaluza',
         hidden: true,
       },
@@ -146,7 +148,7 @@ export class PolePlugin extends PluginBase {
       isCommand(this, 6, msg.content)
     ) {
       if (this.hasPole(gid, uid, date, type)) {
-        return;
+        return this.bot.replyMessage(msg, format('{0} has already claimed a pole', getUsername(uid)));
       }
       let value = 'pole';
       if (isCommand(this, 4, msg.content)) {
@@ -165,7 +167,7 @@ export class PolePlugin extends PluginBase {
         return this.bot.replyMessage(msg, format(this.strings['tooSoon'], getUsername(uid)));
       }
       if (db.poles && db.poles[gid] && db.poles[gid][date] && db.poles[gid][date][value] != undefined) {
-        return;
+        return this.bot.replyMessage(msg, `${capitalize(value)} already claimed`);
       }
 
       if (!db.poles || db.poles[gid] == undefined || db.poles[gid][date] == undefined) {
