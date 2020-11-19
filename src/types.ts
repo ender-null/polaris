@@ -225,7 +225,7 @@ export interface DatabasePole {
   andaluza?: number | string;
 }
 
-export interface OrderedPole extends DatabasePole {
+export interface SortedPole extends DatabasePole {
   uid?: number | string;
   points?: number;
 }

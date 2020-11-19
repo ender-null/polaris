@@ -2,8 +2,8 @@ import format from 'string-format';
 import { Bot, Message } from '..';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
-import { DatabasePoleList, OrderedPole } from '../types';
-import { capitalize, getFullName, getUsername, hasTag, isCommand, now, time, timeInRange } from '../utils';
+import { DatabasePoleList, SortedPole } from '../types';
+import { capitalize, getCommandIndex, getFullName, getUsername, hasTag, now, time, timeInRange } from '../utils';
 
 export class PolePlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -85,51 +85,50 @@ export class PolePlugin extends PluginBase {
     }
 
     const gid = String(msg.conversation.id);
-    const uid = msg.sender.id;
+    const uid = String(msg.sender.id);
     const date = new Date().toISOString().split('T')[0];
     let text;
-    let type = 0;
-    if (timeInRange(time(1), time(2), now())) {
-      type = 1;
-    } else if (timeInRange(time(12), time(13), now())) {
-      type = 2;
-    }
-    if (isCommand(this, 1, msg.content)) {
+    const commandIndex = getCommandIndex(this, msg.content);
+    const types = ['pole', 'subpole', 'fail', 'iron', 'canaria', 'andaluza'];
+
+    if (commandIndex == 0) {
       if (db.poles && db.poles[gid] != undefined) {
-        let included = ['pole', 'subpole', 'fail', 'iron'];
-        if (type == 1) {
-          included = ['canaria'];
-        } else if (type == 2) {
-          included = ['andaluza'];
+        let rankingTypes;
+        if (timeInRange(time(1), time(2), now())) {
+          rankingTypes = [types[4]];
+        } else if (timeInRange(time(12), time(13), now())) {
+          rankingTypes = [types[5]];
+        } else {
+          rankingTypes = types.slice(0, 4);
         }
         const ranking: DatabasePoleList = {};
         for (const day in db.poles[gid]) {
-          for (const value of included) {
-            if (db.poles[gid][day][value] != undefined) {
-              if (ranking[db.poles[gid][day][value]] == undefined) {
-                ranking[db.poles[gid][day][value]] = {};
-                for (const v of included) {
-                  ranking[db.poles[gid][day][value]][v] = 0;
+          for (const type of rankingTypes) {
+            if (db.poles[gid][day][type] != undefined) {
+              if (ranking[db.poles[gid][day][type]] == undefined) {
+                ranking[db.poles[gid][day][type]] = {};
+                for (const t of rankingTypes) {
+                  ranking[db.poles[gid][day][type]][t] = 0;
                 }
               }
-              ranking[db.poles[gid][day][value]][value] += 1;
+              ranking[db.poles[gid][day][type]][type] += 1;
             }
           }
         }
         text = `<b>${this.strings['ranking']}:</b>`;
-        const ord = this.orderBy(ranking, 'points');
-        for (const i in ord) {
-          text += `\n • ${getFullName(ord[i].uid, false)}: <b>${ord[i].points}</b> ${this.strings['points']}`;
+        const rank = this.sortRanking(ranking, 'points');
+        for (const i in rank) {
+          text += `\n • ${getFullName(rank[i].uid, false)}: <b>${rank[i].points}</b> ${this.strings['points']}`;
         }
 
-        for (const value of included) {
-          let section = `\n\n<b>${capitalize(this.strings[value + 's'])}:</b>`;
+        for (const type of types) {
+          let section = `\n\n<b>${capitalize(this.strings[type + 's'])}:</b>`;
           let empty = true;
-          const ord = this.orderBy(ranking, value);
-          for (const i in ord) {
-            if (ord[i][value]) {
+          const rank = this.sortRanking(ranking, type);
+          for (const i in rank) {
+            if (rank[i][type]) {
               empty = false;
-              section += `\n • ${getFullName(ord[i].uid, false)}: <b>${ord[i][value]}</b> ${this.strings[value + 's']}`;
+              section += `\n • ${getFullName(rank[i].uid, false)}: <b>${rank[i][type]}</b> ${this.strings[type + 's']}`;
             }
           }
           if (!empty) {
@@ -139,35 +138,27 @@ export class PolePlugin extends PluginBase {
       } else {
         this.bot.replyMessage(msg, this.bot.errors.noResults);
       }
-    } else if (isCommand(this, 2, msg.content)) {
+    } else if (commandIndex == 1) {
       return this.bot.replyMessage(msg, this.bot.errors.notImplemented);
-    } else if (
-      isCommand(this, 3, msg.content) ||
-      isCommand(this, 4, msg.content) ||
-      isCommand(this, 5, msg.content) ||
-      isCommand(this, 6, msg.content)
-    ) {
-      if (this.hasPole(gid, uid, date, type)) {
-        return this.bot.replyMessage(msg, format('{0} has already claimed a pole', getUsername(uid)));
-      }
-      let value = 'pole';
-      if (isCommand(this, 4, msg.content)) {
-        value = 'subpole';
-      } else if (isCommand(this, 5, msg.content)) {
-        value = 'fail';
-      } else if (isCommand(this, 6, msg.content)) {
-        value = 'iron';
-      }
-
+    } else if (commandIndex >= 2 && commandIndex <= 7) {
+      const type = types[commandIndex - 2];
       if (
-        ((value == 'subpole' || value == 'fail' || value == 'iron') && db.poles[gid][date].pole == undefined) ||
-        ((value == 'fail' || value == 'iron') && db.poles[gid][date].subpole == undefined) ||
-        (value == 'iron' && db.poles[gid][date].fail == undefined)
+        ((type == 'subpole' || type == 'fail' || type == 'iron') && db.poles[gid][date].pole == undefined) ||
+        ((type == 'fail' || type == 'iron') && db.poles[gid][date].subpole == undefined) ||
+        (type == 'iron' && db.poles[gid][date].fail == undefined)
       ) {
         return this.bot.replyMessage(msg, format(this.strings['tooSoon'], getUsername(uid)));
       }
-      if (db.poles && db.poles[gid] && db.poles[gid][date] && db.poles[gid][date][value] != undefined) {
-        return this.bot.replyMessage(msg, `${capitalize(value)} already claimed`);
+      if (type == 'canaria' && !timeInRange(time(1), time(2), now())) {
+        return this.bot.replyMessage(msg, `${capitalize(type)} not available`);
+      } else if (type == 'andaluza' && !timeInRange(time(12), time(13), now())) {
+        return this.bot.replyMessage(msg, format(this.strings['tooSoonAndaluza'], getUsername(uid)));
+      }
+      if (this.hasPole(gid, uid, date) && type != 'canaria' && type != 'andaluza') {
+        return this.bot.replyMessage(msg, format('{0} has already claimed a pole', getUsername(uid)));
+      }
+      if (db.poles && db.poles[gid] && db.poles[gid][date] && db.poles[gid][date][type] != undefined) {
+        return this.bot.replyMessage(msg, `${capitalize(type)} already claimed`);
       }
 
       if (!db.poles || db.poles[gid] == undefined || db.poles[gid][date] == undefined) {
@@ -175,31 +166,26 @@ export class PolePlugin extends PluginBase {
           .child(gid)
           .child(date)
           .ref.set({
-            [value]: uid,
+            [type]: uid,
           });
       } else {
         db.polesSnap
           .child(gid)
           .child(date)
           .ref.update({
-            [value]: uid,
+            [type]: uid,
           });
       }
-      text = format(this.strings['got' + capitalize(value)], getUsername(uid));
+      text = format(this.strings['got' + capitalize(type)], getUsername(uid));
     }
     this.bot.replyMessage(msg, text);
   }
 
-  hasPole(gid: number | string, uid: number | string, date: string, type?: number): boolean {
+  hasPole(gid: number | string, uid: number | string, date: string): boolean {
     if (db.poles && db.poles[gid] != undefined && db.poles[gid][date] != undefined) {
-      let included = ['pole', 'subpole', 'fail', 'iron'];
-      if (type == 1) {
-        included = ['canaria'];
-      } else if (type == 2) {
-        included = ['andaluza'];
-      }
-      for (const value of included) {
-        if (db.poles[gid][date][value] != undefined && db.poles[gid][date][value] == uid) {
+      const types = ['pole', 'subpole', 'fail', 'iron'];
+      for (const type of types) {
+        if (db.poles[gid][date][type] != undefined && db.poles[gid][date][type] == uid) {
           return true;
         }
       }
@@ -207,8 +193,8 @@ export class PolePlugin extends PluginBase {
     return false;
   }
 
-  orderBy(ranking: DatabasePoleList, value: string): OrderedPole[] {
-    const items: OrderedPole[] = Object.keys(ranking).map((key) => {
+  sortRanking(ranking: DatabasePoleList, type: string): SortedPole[] {
+    const items: SortedPole[] = Object.keys(ranking).map((key) => {
       return {
         ...ranking[key],
         uid: key,
@@ -217,10 +203,10 @@ export class PolePlugin extends PluginBase {
       };
     });
     items.sort((first, second) => {
-      if (value == 'points') {
+      if (type == 'points') {
         return second.points - first.points;
       } else {
-        return second[value] - first[value];
+        return second[type] - first[type];
       }
     });
     return items;
