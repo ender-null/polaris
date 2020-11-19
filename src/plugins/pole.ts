@@ -143,12 +143,12 @@ export class PolePlugin extends PluginBase {
     } else if (commandIndex >= 2 && commandIndex <= 7) {
       const type = types[commandIndex - 2];
       if (
-        db.poles &&
-        db.poles[gid] &&
-        db.poles[gid][date] &&
-        (((type == 'subpole' || type == 'fail' || type == 'iron') && db.poles[gid][date].pole == undefined) ||
-          ((type == 'fail' || type == 'iron') && db.poles[gid][date].subpole == undefined) ||
-          (type == 'iron' && db.poles[gid][date].fail == undefined))
+        !db.poles ||
+        !db.poles[gid] ||
+        !db.poles[gid][date] ||
+        ((type == 'subpole' || type == 'fail' || type == 'iron') && db.poles[gid][date].pole == undefined) ||
+        ((type == 'fail' || type == 'iron') && db.poles[gid][date].subpole == undefined) ||
+        (type == 'iron' && db.poles[gid][date].fail == undefined)
       ) {
         return this.bot.replyMessage(msg, format(this.strings['tooSoon'], getUsername(uid)));
       }
