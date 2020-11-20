@@ -188,7 +188,7 @@ export class TelegramTDlibBindings extends BindingsBase {
     if (msg['via_bot_user_id'] != undefined && msg['via_bot_user_id'] > 0) {
       extra.viaBotUserId = msg['via_bot_user_id'];
     }
-    if (msg['restriction_reason'] != undefined) {
+    if (msg['restriction_reason'] != undefined && msg['restriction_reason'] != '') {
       extra.restrictionReason = msg['restriction_reason'];
     }
     if (msg['reply_markup'] != undefined) {
