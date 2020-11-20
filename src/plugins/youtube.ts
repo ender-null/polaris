@@ -60,7 +60,6 @@ export class YouTubePlugin extends PluginBase {
       text = `https://youtu.be/${content['items'][0].id.videoId}`;
       this.bot.replyMessage(msg, text, 'text', null, { preview: true });
     } else if (isCommand(this, 2, msg.content)) {
-      text = `https://youtu.be/${content['items'][0].id.videoId}`;
       text = format(`<b>${this.strings['results']}</b> <i>{0}</i>:`, input);
       for (const item of content['items']) {
         if (item.snippet.title.length > 26) {
