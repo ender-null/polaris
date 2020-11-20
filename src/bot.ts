@@ -44,7 +44,6 @@ export class Bot {
     this.inbox.on('message', (msg: Message) => this.messagesHandler(msg));
     this.outbox.on('message', (msg: Message) => this.messageSender(msg));
     this.initPlugins();
-    this.initTranslations();
     db.events.on('update:translations', () => this.initTranslations());
     this.status.on('started', () => this.onStarted());
     this.status.on('stopped', () => this.onStopped());
@@ -58,6 +57,7 @@ export class Bot {
   async onStarted(): Promise<void> {
     this.started = true;
     this.user = await this.bindings.getMe();
+    this.initTranslations();
     logger.info(`Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`);
     this.sendAdminAlert(
       `Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`,

@@ -65,9 +65,11 @@ export class Covid19Plugin extends PluginBase {
             'cases',
             'casesLast7Days',
             'casesLast24Hours',
+            'casesPerMillion',
             'deaths',
             'deathsLast7Days',
             'deathsLast24Hours',
+            'deathsPerMillion',
           ];
           const separator = 3;
           for (const value of values) {

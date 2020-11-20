@@ -24,7 +24,8 @@ export class ReactionPlugin extends PluginBase {
     }
     for (const reaction in this.data) {
       for (const triggerIndex in this.data[reaction]) {
-        if (new RegExp(this.data[reaction][triggerIndex], 'gim').test(msg.content)) {
+        const trigger = this.formatText(this.data[reaction][triggerIndex], msg);
+        if (new RegExp(trigger, 'gim').test(msg.content)) {
           const text = this.formatText(reaction, msg);
           const types = ['photo', 'audio', 'document', 'voice', 'sticker', 'video'];
           for (const type in types) {
@@ -53,8 +54,8 @@ export class ReactionPlugin extends PluginBase {
   formatText(text: string, message?: Message): string {
     if (this.bot.user) {
       text = text.replace(
-        new RegExp('BOT', 'gm'),
-        escapeMarkdown(this.bot.user.username.toLowerCase().replace('bot', '')),
+        new RegExp('BOT', 'gim'),
+        this.bot.user.username.toLowerCase().replace('bot', '').split('#')[0],
       );
     }
     if (message) {
