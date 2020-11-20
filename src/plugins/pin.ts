@@ -43,10 +43,12 @@ export class PinPlugin extends PluginBase {
       unpinned: '<b>#{0}</b> was deleted.',
     };
     this.updateTriggers();
-    db.events.on('update:pins', async () => {
-      this.updateTriggers();
-    });
   }
+
+  afterTranslation(): void {
+    this.updateTriggers();
+  }
+
   async run(msg: Message): Promise<void> {
     const input = getInput(msg);
     if (isCommand(this, 1, msg.content)) {

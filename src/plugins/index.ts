@@ -11,6 +11,7 @@ export { HelpPlugin } from './help';
 export { LeagueOfLegendsPlugin } from './league-of-legends';
 export { PinPlugin } from './pin';
 export { PolePlugin } from './pole';
+export { ReactionPlugin } from './reaction';
 export { ReminderPlugin } from './reminder';
 export { TagPlugin } from './tag';
 export { TelegramPlugin } from './telegram';

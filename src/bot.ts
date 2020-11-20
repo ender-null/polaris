@@ -168,6 +168,10 @@ export class Bot {
           if ('strings' in plugin) {
             plugin.strings = { ...plugin.strings, ...trans.plugins[plugin.constructor.name].strings };
           }
+          if ('data' in plugin) {
+            plugin.data = trans.plugins[plugin.constructor.name].data;
+          }
+          plugin.afterTranslation();
         }
       }
     }

@@ -147,10 +147,6 @@ export function isInt(number: number | string): boolean {
   return !isNaN(parseFloat(number));
 }
 
-export function escapeRegExp(str: string): string {
-  return str.replace(/[-\\^$*+?.()|[\]{}]/g, '\\$&');
-}
-
 export function getTarget(bot: Bot, m: Message, input: string): string {
   if (input) {
     const target = getWord(input, 1);
@@ -619,6 +615,14 @@ export function escapeHtml(text: string): string {
   text = text.replace(new RegExp('<', 'gim'), '\\<');
   text = text.replace(new RegExp('>', 'gim'), '\\>');
   return text;
+}
+
+export function escapeMarkdown(text: string): string {
+  return text.replace(new RegExp('[`*_{}[]()#+-.!]', 'gim'), '\\$&');
+}
+
+export function escapeRegExp(text: string): string {
+  return text.replace(new RegExp('[-\\^$*+?.()|[]{}]', 'gim'), '\\$&');
 }
 
 export function htmlToDiscordMarkdown(text: string): string {

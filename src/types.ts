@@ -269,6 +269,7 @@ export interface iTag {
 export interface PluginTranslation {
   commands?: Command[];
   strings?: iString;
+  data?: any;
 }
 
 export interface iPluginTranslation {
