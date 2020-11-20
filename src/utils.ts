@@ -459,6 +459,9 @@ export function generateCommandHelp(plugin: PluginBase, text: string, showHidden
   if ('description' in command) {
     doc += `\n<i>${command.description}</i>`;
   }
+  if ('shortcut' in command) {
+    doc += `\n\nAlias: <code>${command.shortcut.replace('/', plugin.bot.config.prefix)}</code>`;
+  }
 
   return doc;
 }

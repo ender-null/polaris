@@ -46,13 +46,13 @@ export class HelpPlugin extends PluginBase {
               text += `\n • ${lines[0]}`;
 
               if (lines.length > 1) {
-                text += `\n   ${lines[1]}`;
+                // text += `\n   ${lines[1]}`;
                 commands.push({
                   command: getWord(lines[0], 1).substr(1),
                   description: removeHtml(lines[1]),
                 });
               } else {
-                text += `\n   <i>${this.strings['noDescription']}</i>`;
+                // text += `\n   <i>${this.strings['noDescription']}</i>`;
                 commands.push({
                   command: getWord(lines[0], 1).substr(1),
                   description: this.strings['noDescription'],
