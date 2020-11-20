@@ -25,13 +25,7 @@ export class HelpPlugin extends PluginBase {
   }
   async run(msg: Message): Promise<void> {
     const commands = [];
-    let text;
-
-    if (isCommand(this, 2, msg.content)) {
-      text = '';
-    } else {
-      text = this.strings['commands'];
-    }
+    let text = this.strings['commands'];
 
     // Iterates the initialized plugin
     for (const plugin of this.bot.plugins) {
