@@ -1,6 +1,6 @@
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
-import { generateCommandHelp, getInput, hasTag, sendRequest } from '../utils';
+import { generateCommandHelp, getInput, hasTag, random, sendRequest } from '../utils';
 
 export class ImagePlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -74,8 +74,7 @@ export class ImagePlugin extends PluginBase {
     if (content.results.length == 0) {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);
     }
-    const i = Math.floor(Math.random() * content.results.length);
-    const photo = content.results[i].image;
+    const photo = content.results[random(0, content.results.length)].image;
     return this.bot.replyMessage(msg, photo, 'photo');
   }
 }

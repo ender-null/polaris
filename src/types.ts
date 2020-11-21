@@ -161,13 +161,14 @@ export abstract class Extra extends Object {
   format?: string;
   preview?: boolean;
   caption?: string;
-  message?: number;
+  message?: number | string;
   photo?: string;
-  conversation?: number;
+  conversation?: number | string;
   commands?: string;
   stickerSetName?: string;
   messageId?: number | string;
   userId?: number | string;
+  fromChatId?: number | string;
   customTitle?: string;
   urls?: string[];
   mentions?: string[];

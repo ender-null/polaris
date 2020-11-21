@@ -64,7 +64,7 @@ export class TelegramTDlibBindings extends BindingsBase {
     return new User(me.id, me.first_name, me.last_name, me.username);
   }
 
-  async convertMessage(msg: message): Promise<Message> {
+  async convertMessage(msg: message, ignoreReply?: boolean): Promise<Message> {
     const id = msg['id'];
     const extra: Extra = {};
 
@@ -178,12 +178,8 @@ export class TelegramTDlibBindings extends BindingsBase {
     }
 
     let reply: Message = null;
-    if (msg['reply_to_message_id'] != undefined && msg['reply_to_message_id'] > 0) {
-      logger.info('reply_to_message_id: ' + msg['reply_to_message_id']);
-      reply = await this.getMessage(msg['chat_id'], msg['reply_to_message_id']);
-      if (reply) {
-        logger.info(`reply ${reply.id}: ${reply.content}`);
-      }
+    if (msg['reply_to_message_id'] != undefined && msg['reply_to_message_id'] > 0 && !ignoreReply) {
+      reply = await this.getMessage(msg['chat_id'], msg['reply_to_message_id'], true);
     }
     if (msg['via_bot_user_id'] != undefined && msg['via_bot_user_id'] > 0) {
       extra.viaBotUserId = msg['via_bot_user_id'];
@@ -502,13 +498,13 @@ export class TelegramTDlibBindings extends BindingsBase {
     }
   }
 
-  async getMessage(chatId: string | number, messageId: string | number): Promise<Message> {
+  async getMessage(chatId: string | number, messageId: string | number, ignoreReply?: boolean): Promise<Message> {
     const result = await this.serverRequest('getMessage', {
       chat_id: chatId,
       message_id: messageId,
     });
     if (result) {
-      return this.convertMessage(result);
+      return this.convertMessage(result, ignoreReply);
     }
 
     return null;

@@ -13,7 +13,11 @@ export abstract class BindingsBase {
 
   abstract async getMe(): Promise<User>;
 
-  abstract async getMessage(chatId: string | number, messageId: string | number): Promise<Message>;
+  abstract async getMessage(
+    chatId: string | number,
+    messageId: string | number,
+    ignoreReply?: boolean,
+  ): Promise<Message>;
 
   abstract async deleteMessage(chatId: string | number, messageId: string | number): Promise<boolean>;
 

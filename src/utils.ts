@@ -307,7 +307,7 @@ export function getFullName(uid: number | string, includeUsername = true): strin
 }
 
 export function fixTelegramLink(link: string): string {
-  const inputMatch = new RegExp('(?:t|telegram|tlgrm).(?:me|dog)/joinchat/([a-zA-Z0-9-]+)', 'gim').exec(link);
+  const inputMatch = telegramLinkRegExp.exec(link);
   if (inputMatch && inputMatch.length > 0) {
     const fixedLink = format('https://t.me/joinchat/{0}', inputMatch[1]);
     logger.info(format('Fixed telegram link: {0}', fixedLink));
@@ -700,6 +700,10 @@ export function btoa(text: string): string {
   return Buffer.from(text).toString('base64');
 }
 
+export function random(min: number, max: number) {
+  return Math.random() * (max - min) + min;
+}
+
 export function catchException(exception: Error | error, bot: Bot = null): Error | error {
   logger.info(`Catched exception: ${exception.message}`);
   logger.error(`${exception.message}`);
@@ -714,6 +718,8 @@ export function catchException(exception: Error | error, bot: Bot = null): Error
   }
   return exception;
 }
+
+export const telegramLinkRegExp = new RegExp('(?:t|telegram|tlgrm).(?:me|dog)/joinchat/([a-zA-Z0-9-]+)', 'gim');
 
 // Configure logger
 export const logger = createLogger({

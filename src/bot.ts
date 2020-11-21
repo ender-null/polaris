@@ -334,7 +334,15 @@ export class Bot {
     if (!('format' in extra)) {
       extra.format = 'HTML';
     }
-    const message = new Message(null, chat, this.user, content, type, null, reply, extra);
+    const message = new Message(null, chat, this.user, content, type, now(), reply, extra);
+    this.outbox.emit('message', message);
+  }
+
+  forwardMessage(msg: Message, chatId: number | string) {
+    const message = new Message(null, msg.conversation, this.user, msg.content, 'forward', now(), null, {
+      message: msg.id,
+      conversation: chatId,
+    });
     this.outbox.emit('message', message);
   }
 
