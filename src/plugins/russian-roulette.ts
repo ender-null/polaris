@@ -31,7 +31,7 @@ export class RussianRoulettePlugin extends PluginBase {
     let text;
     let bullets = null;
     const roulette = getTags(this.bot, gid, 'roulette:?');
-    if (roulette) {
+    if (roulette.length > 0) {
       bullets = +roulette[0].split(':')[1];
     }
     if (!bullets) {
