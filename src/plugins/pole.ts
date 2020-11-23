@@ -142,15 +142,14 @@ export class PolePlugin extends PluginBase {
       return this.bot.replyMessage(msg, this.bot.errors.notImplemented);
     } else if (commandIndex >= 2 && commandIndex <= 7) {
       const type = types[commandIndex - 2];
-      if (
-        !db.poles ||
-        !db.poles[gid] ||
-        !db.poles[gid][date] ||
-        ((type == 'subpole' || type == 'fail' || type == 'iron') && db.poles[gid][date].pole == undefined) ||
-        ((type == 'fail' || type == 'iron') && db.poles[gid][date].subpole == undefined) ||
-        (type == 'iron' && db.poles[gid][date].fail == undefined)
-      ) {
-        return this.bot.replyMessage(msg, format(this.strings['tooSoon'], getUsername(uid)));
+      if (db.poles && db.poles[gid] && db.poles[gid][date]) {
+        if (
+          ((type == 'subpole' || type == 'fail' || type == 'iron') && db.poles[gid][date].pole == undefined) ||
+          ((type == 'fail' || type == 'iron') && db.poles[gid][date].subpole == undefined) ||
+          (type == 'iron' && db.poles[gid][date].fail == undefined)
+        ) {
+          return this.bot.replyMessage(msg, format(this.strings['tooSoon'], getUsername(uid)));
+        }
       }
       if (type == 'canaria' && !timeInRange(time(1), time(2), now())) {
         return this.bot.replyMessage(msg, `${capitalize(type)} not available`);
@@ -164,7 +163,7 @@ export class PolePlugin extends PluginBase {
         return this.bot.replyMessage(msg, `${capitalize(type)} already claimed`);
       }
 
-      if (!db.poles || db.poles[gid] == undefined || db.poles[gid][date] == undefined) {
+      if (!db.poles || !db.poles[gid] || !db.poles[gid][date]) {
         db.polesSnap
           .child(gid)
           .child(date)
