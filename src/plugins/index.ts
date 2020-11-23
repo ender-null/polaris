@@ -9,6 +9,7 @@ export { Covid19Plugin } from './covid-19';
 export { EchoPlugin } from './echo';
 export { HelpPlugin } from './help';
 export { ImagePlugin } from './image';
+export { LastFMPlugin } from './lastfm';
 export { LeagueOfLegendsPlugin } from './league-of-legends';
 export { MediaForwarderPlugin } from './media-forwarder';
 export { PinPlugin } from './pin';
