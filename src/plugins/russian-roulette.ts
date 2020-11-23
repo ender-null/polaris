@@ -39,8 +39,7 @@ export class RussianRoulettePlugin extends PluginBase {
       bullets = 6;
     }
 
-    if (random(1, bullets) === 1) {
-      delTag(this.bot, gid, 'roulette:?');
+    if (random(1, bullets) == 1) {
       setTag(this.bot, gid, 'roulette:6');
 
       if (isGroupAdmin(this.bot, uid, msg)) {
@@ -54,12 +53,10 @@ export class RussianRoulettePlugin extends PluginBase {
         text = format(this.strings['saved'], getUsername(uid));
       }
     } else {
-      delTag(this.bot, gid, `roulette:${bullets}`);
       bullets -= 1;
       setTag(this.bot, gid, `roulette:${bullets}`);
       text = format(this.strings['miss'], getUsername(uid), bullets);
     }
-    delTag(this.bot, gid, `lastroulette:?`);
     setTag(this.bot, gid, `lastroulette:${now()}`);
 
     this.bot.replyMessage(msg, text);

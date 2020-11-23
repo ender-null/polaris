@@ -5,12 +5,10 @@ import { PluginBase } from '../plugin';
 import {
   allButNWord,
   capitalize,
-  delTag,
   generateCommandHelp,
   getInput,
   getTags,
   getWord,
-  hasTag,
   isCommand,
   sendRequest,
   setTag,
@@ -223,9 +221,6 @@ export class LeagueOfLegendsPlugin extends PluginBase {
       if (!input) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       } else {
-        if (hasTag(this.bot, uid, 'lol:?')) {
-          delTag(this.bot, uid, 'lol:?');
-        }
         const region = getWord(input, 1).toLowerCase();
         if (!(region in this.regions)) {
           return this.bot.replyMessage(msg, this.strings['invalidRegion']);

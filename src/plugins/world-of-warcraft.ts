@@ -6,12 +6,10 @@ import {
   btoa,
   capitalize,
   capitalizeEachWord,
-  delTag,
   formatNumber,
   generateCommandHelp,
   getInput,
   getTags,
-  hasTag,
   isCommand,
   now,
   sendRequest,
@@ -204,9 +202,6 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       if (!input) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       } else {
-        if (hasTag(this.bot, uid, 'wow:?')) {
-          delTag(this.bot, uid, 'wow:?');
-        }
         const words = input.split(' ');
         const characterName = words.pop().toLowerCase();
         const realm = words.join('-').toLowerCase();

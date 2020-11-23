@@ -103,14 +103,27 @@ export function setTag(bot: Bot, target: number | string, tag: string): void {
   }
   const tags = getTags(bot, target);
   if (tags && tags.indexOf(tag) == -1) {
-    if (db.tags[target]) {
-      db.tags[target][Object.keys(db.tags[target]).length] = tag;
-    } else {
-      db.tags[target] = {
-        0: tag,
-      };
+    let found = false;
+    if (tag.indexOf(':') > -1) {
+      for (const i of Object.keys(db.tags[target])) {
+        const targetTag = db.tags[target][i];
+        if (targetTag.startsWith(tag.split(':')[0] + ':')) {
+          db.tags[target][i] = tag;
+          found = true;
+          break;
+        }
+      }
     }
-    db.tagsSnap.child(target).ref.set(db.tags[target]);
+    if (found == false) {
+      if (db.tags[target]) {
+        db.tags[target][Object.keys(db.tags[target]).length] = tag;
+      } else {
+        db.tags[target] = {
+          0: tag,
+        };
+      }
+    }
+    db.tagsSnap.child(target).ref.set(sortList(db.tags[target]));
   }
 }
 
@@ -134,7 +147,7 @@ export function delTag(bot: Bot, target: number | string, tag: string): void {
         delete db.tags[target][i];
       }
     }
-    db.tagsSnap.child(target).ref.set(db.tags[target]);
+    db.tagsSnap.child(target).ref.set(sortList(db.tags[target]));
   }
 }
 
@@ -701,7 +714,7 @@ export function btoa(text: string): string {
 }
 
 export function random(min: number, max: number) {
-  return Math.random() * (max - min) + min;
+  return Math.round(Math.random() * (max - min) + min);
 }
 
 export function catchException(exception: Error | error, bot: Bot = null): Error | error {
