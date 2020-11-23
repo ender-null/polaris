@@ -713,7 +713,7 @@ export function btoa(text: string): string {
   return Buffer.from(text).toString('base64');
 }
 
-export function random(min: number, max: number) {
+export function random(min: number, max: number): number {
   return Math.round(Math.random() * (max - min) + min);
 }
 

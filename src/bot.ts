@@ -338,7 +338,7 @@ export class Bot {
     this.outbox.emit('message', message);
   }
 
-  forwardMessage(msg: Message, chatId: number | string) {
+  forwardMessage(msg: Message, chatId: number | string): void {
     const message = new Message(null, msg.conversation, this.user, msg.content, 'forward', now(), null, {
       message: msg.id,
       conversation: chatId,
