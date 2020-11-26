@@ -255,11 +255,14 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       locale: this.bot.config.locale,
       access_token: this.accessToken,
     };
+    const resp = await sendRequest(url, params);
+    const content = await resp.text();
     try {
-      const resp = await sendRequest(url, params);
-      return await resp.json();
+      return JSON.parse(content);
     } catch (e) {
-      this.retrievingAccessToken();
+      this.bot.sendAlert(content);
+      this.accessToken = await this.retrievingAccessToken();
+      // return await this.getCharacter(region, realm, characterName, method);
       return null;
     }
   }
