@@ -248,7 +248,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
     return content.access_token;
   }
 
-  async getCharacter(region: string, realm: string, characterName: string, method = ''): Promise<any> {
+  async getCharacter(region: string, realm: string, characterName: string, method = '', retries = 3): Promise<any> {
     const url = `https://${region}.api.blizzard.com/profile/wow/character/${realm}/${characterName}${method}`;
     const params = {
       namespace: `profile-${region}`,
@@ -260,10 +260,13 @@ export class WorldOfWarcraftPlugin extends PluginBase {
     try {
       return JSON.parse(content);
     } catch (e) {
-      this.bot.sendAlert(content);
       this.accessToken = await this.retrievingAccessToken();
-      // return await this.getCharacter(region, realm, characterName, method);
-      return null;
+      retries -= 1;
+      if (retries > 0) {
+        return await this.getCharacter(region, realm, characterName, method, retries);
+      } else {
+        return null;
+      }
     }
   }
 
