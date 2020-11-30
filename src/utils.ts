@@ -104,7 +104,7 @@ export function setTag(bot: Bot, target: number | string, tag: string): void {
   const tags = getTags(bot, target);
   if (tags && tags.indexOf(tag) == -1) {
     let found = false;
-    if (tag.indexOf(':') > -1) {
+    if (db.tags[target] && tag.indexOf(':') > -1) {
       for (const i of Object.keys(db.tags[target])) {
         const targetTag = db.tags[target][i];
         if (targetTag.startsWith(tag.split(':')[0] + ':')) {

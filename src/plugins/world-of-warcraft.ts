@@ -67,6 +67,18 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       achievementPoints: 'Achievement points',
       honorLevel: 'Honor level',
       honorableKills: 'Honorable kills',
+      herbalism: 'Herbalism',
+      mining: 'Mining',
+      skinning: 'Skinning',
+      fishing: 'Fishing',
+      alchemy: 'Alchemy',
+      blacksmithing: 'Blacksmithing',
+      enchanting: 'Enchanting',
+      engineering: 'Engineering',
+      inscription: 'Inscription',
+      jewelcrafting: 'Jewelcrafting',
+      leatherworking: 'Leatherworking',
+      tailoring: 'Tailoring',
       mythicPlusScores: 'Raider.io Mythic+ scores',
       dps: 'DPS',
       healer: 'Healer',
@@ -114,6 +126,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       const media = await this.getCharacterMedia(region, realm, characterName);
       const raids = await this.getCharacterRaids(region, realm, characterName);
       const pvp = await this.getCharacterPVP(region, realm, characterName);
+      const professions = await this.getCharacterProfessions(region, realm, characterName);
       // const statistics = await this.getCharacterStatistics(region, realm, characterName);
       const raiderIO = await this.getRaiderIO(region, realm, characterName);
 
@@ -130,7 +143,11 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       const name = `${character.name}-${character.realm.name} (${this.strings['lv']}: ${character.level})`;
       let guild = null;
       if ('guild' in character) {
-        guild = `<${character.guild.name}-${character.guild.realm.name}>`;
+        if (character.realm.name == character.guild.realm.name) {
+          guild = `<${character.guild.name}>`;
+        } else {
+          guild = `<${character.guild.name}-${character.guild.realm.name}>`;
+        }
       }
       // let mainStat = 'strength';
       // let mainStatAmount = statistics.strength.effective;
@@ -160,6 +177,24 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         pvp.honor_level,
         formatNumber(pvp.honorable_kills),
       );
+      let professionLevels = null;
+      if (professions.primaries) {
+        professionLevels = '';
+        for (const profession of professions.primaries) {
+          let highest;
+          for (const tier of profession.tiers) {
+            if (!highest || tier.tier.id > highest.tier.id) {
+              highest = tier;
+            }
+          }
+          if (professions.primaries.indexOf(profession) > 0) {
+            professionLevels += '\n';
+          }
+          professionLevels += `${this.strings[profession.profession.name.toLowerCase()]}: ${highest.skill_points}/${
+            highest.max_skill_points
+          }`;
+        }
+      }
       let raidProgression = null;
       if (raids.expansions) {
         const lastExp = raids.expansions[raids.expansions.length - 1];
@@ -194,7 +229,9 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       }
       text = `${title ? title + '\n\t' : ''}${name}\n${
         guild ? guild + '\n\n' : ''
-      }${characterClass}\n\t${race}\n\n${info}\n\n${raidProgression ? raidProgression + '\n\n' : ''}${mythicScore}`;
+      }${characterClass}\n\t${race}\n\n${info}\n\n${professionLevels ? professionLevels + '\n\n' : ''}${
+        raidProgression ? raidProgression + '\n\n' : ''
+      }${mythicScore}`;
       if (photo) {
         return this.bot.replyMessage(msg, photo, 'photo', null, { caption: text });
       }
@@ -288,6 +325,10 @@ export class WorldOfWarcraftPlugin extends PluginBase {
 
   async getCharacterStatistics(region: string, realm: string, characterName: string): Promise<any> {
     return await this.getCharacter(region, realm, characterName, '/statistics');
+  }
+
+  async getCharacterProfessions(region: string, realm: string, characterName: string): Promise<any> {
+    return await this.getCharacter(region, realm, characterName, '/professions');
   }
 
   async getRaiderIO(region: string, realm: string, characterName: string): Promise<any> {
