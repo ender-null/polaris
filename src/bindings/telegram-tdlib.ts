@@ -4,7 +4,8 @@ import { Client } from 'tdl';
 import { TDLib } from 'tdl-tdlib-ffi';
 import { message, ok, Update, user } from 'tdl/types/tdlib';
 import { BindingsBase, Bot, Conversation, ConversationInfo, Extra, Message, User } from '..';
-import { catchException, download, isInt, logger, sendRequest, splitLargeMessage } from '../utils';
+import { db } from '../main';
+import { catchException, download, hasTag, isInt, logger, sendRequest, splitLargeMessage } from '../utils';
 
 export class TelegramTDlibBindings extends BindingsBase {
   client: Client;
@@ -29,14 +30,24 @@ export class TelegramTDlibBindings extends BindingsBase {
     return await sendRequest(url, params, null, null, false, this.bot);
   }
 
-  async serverRequest(method: string, params: Record<string, unknown> = {}): Promise<any> {
+  async serverRequest(
+    method: string,
+    params: Record<string, unknown> = {},
+    ignoreErrors?: boolean,
+    processRequest?: boolean,
+  ): Promise<any> {
     const query: any = {
       '@type': method,
       ...params,
     };
-    return await this.client.invoke(query).catch((e) => {
-      this.bot.sendAlert(JSON.stringify(query));
-      catchException(e, this.bot);
+    return await this.client.invoke(query).catch(async (e) => {
+      if (!ignoreErrors) {
+        this.bot.sendAlert(JSON.stringify(query));
+        catchException(e, this.bot);
+      }
+      if (processRequest) {
+        await this.requestProcessing(query, e);
+      }
     });
   }
 
@@ -468,10 +479,14 @@ export class TelegramTDlibBindings extends BindingsBase {
       action = 'chatActionCancel';
     }
 
-    return await this.serverRequest('sendChatAction', {
-      chat_id: conversationId,
-      action: { _: action },
-    });
+    return await this.serverRequest(
+      'sendChatAction',
+      {
+        chat_id: conversationId,
+        action: { _: action },
+      },
+      true,
+    );
   }
 
   getInputFile(content: string): Record<string, unknown> {
@@ -498,11 +513,48 @@ export class TelegramTDlibBindings extends BindingsBase {
     }
   }
 
+  async requestProcessing(request: any, response: any) {
+    const leaveList = [
+      'no rights',
+      'no write access',
+      'not enough rights to send',
+      'need administrator rights',
+      'channel_private',
+    ];
+    let otherError = true;
+    for (const term of leaveList) {
+      if (
+        term in response['message'].toLowerCase() &&
+        !hasTag(this.bot, request['chat_id'], 'resend:?') &&
+        !hasTag(this.bot, request['chat_id'], 'fwd:?')
+      ) {
+        this.bot.sendAdminAlert(`Leaving chat: ${db.groups[request['chat_id']].title} [{request['chat_id']}]`);
+        await this.bot.bindings.kickConversationMember(request['chat_id'], this.bot.user.id);
+        otherError = false;
+        break;
+      }
+    }
+
+    if (response['message'].lower() == 'chat not found') {
+      logger.info(`Chat not found: ${request['chat_id']}`);
+      otherError = false;
+    }
+
+    if (otherError) {
+      this.bot.sendAlert(request);
+      this.bot.sendAlert(response);
+    }
+  }
+
   async getMessage(chatId: string | number, messageId: string | number, ignoreReply?: boolean): Promise<Message> {
-    const result = await this.serverRequest('getMessage', {
-      chat_id: chatId,
-      message_id: messageId,
-    });
+    const result = await this.serverRequest(
+      'getMessage',
+      {
+        chat_id: chatId,
+        message_id: messageId,
+      },
+      true,
+    );
     if (result) {
       return this.convertMessage(result, ignoreReply);
     }
@@ -638,9 +690,13 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async getChatAdministrators(conversationId: string | number): Promise<User[]> {
-    const result = await this.serverRequest('getChatAdministrators', {
-      chat_id: conversationId,
-    });
+    const result = await this.serverRequest(
+      'getChatAdministrators',
+      {
+        chat_id: conversationId,
+      },
+      true,
+    );
 
     const admins = [];
     if (result && 'administrators' in result) {

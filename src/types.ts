@@ -196,6 +196,7 @@ export interface DatabaseUser {
 export interface DatabaseConversation {
   title?: string;
   username?: string;
+  invite_link?: string;
 }
 
 export interface DatabaseReminder {
