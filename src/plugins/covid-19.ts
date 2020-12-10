@@ -71,7 +71,7 @@ export class Covid19Plugin extends PluginBase {
             'deathsLast24Hours',
             'deathsPerMillion',
           ];
-          const separator = 3;
+          const separator = 4;
           for (const value of values) {
             const tab = values.indexOf(value) != 0 && values.indexOf(value) != separator;
             if (values.indexOf(value) == separator) {
