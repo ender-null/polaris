@@ -51,7 +51,31 @@ export class ZaragozaPlugin extends PluginBase {
     }
     let text;
     if (isCommand(this, 1, msg.content)) {
-      const url = 'http://api.drk.cat/zgzpls/tram/stations';
+      const url = 'https://api.drk.cat/zgzpls/bus/stations';
+      const params = {
+        number: input,
+      };
+      const res = await sendRequest(url, params);
+      const content = await res.json();
+      if (!content || content.errors) {
+        if (content && content.errors && content.errors.status == '404 Not Found') {
+          return this.bot.replyMessage(msg, this.bot.errors.noResults);
+        } else {
+          return this.bot.replyMessage(msg, this.bot.errors.connectionError);
+        }
+      }
+
+      if (content.street) {
+        text = `<b>${content.street}</b>\n   ${this.strings['station']}: <b>${content.number}</b>  [${content.lines}]\n\n`;
+      } else {
+        text = `<b>${this.strings['station']}: ${content.number}</b>\n\n`;
+      }
+
+      for (const bus of content.transports) {
+        text += ` • <b>${bus.time}</b>  ${bus.line} <i>${bus.destination}</i>\n`;
+      }
+    } else if (isCommand(this, 2, msg.content)) {
+      const url = 'https://api.drk.cat/zgzpls/tram/stations';
       const params = {};
       if (isInt(input)) {
         params['number'] = input;
