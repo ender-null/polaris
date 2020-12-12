@@ -717,6 +717,14 @@ export function random(min: number, max: number): number {
   return Math.round(Math.random() * (max - min) + min);
 }
 
+export function lstrip(str: string, strip: string): string {
+  return str;
+}
+
+export function rstrip(str: string, strip: string): string {
+  return str;
+}
+
 export function catchException(exception: Error | error, bot: Bot = null): Error | error {
   logger.info(`Catched exception: ${exception.message}`);
   logger.error(`${exception.message}`);
