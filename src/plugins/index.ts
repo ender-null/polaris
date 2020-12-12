@@ -24,3 +24,4 @@ export { VoicePlugin } from './voice';
 export { WeatherPlugin } from './weather';
 export { WorldOfWarcraftPlugin } from './world-of-warcraft';
 export { YouTubePlugin } from './youtube';
+export { ZaragozaPlugin } from './zaragoza';

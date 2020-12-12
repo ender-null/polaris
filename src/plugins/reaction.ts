@@ -52,17 +52,19 @@ export class ReactionPlugin extends PluginBase {
   }
 
   formatText(text: string, message?: Message): string {
-    if (this.bot.user) {
-      text = text.replace(
-        new RegExp('BOT', 'gim'),
-        this.bot.user.username.toLowerCase().replace('bot', '').split('#')[0],
-      );
-    }
-    if (message) {
-      if (+message.sender.id > 0) {
-        text = text.replace(new RegExp('USER', 'gm'), escapeMarkdown(message.sender['firstName']));
-      } else {
-        text = text.replace(new RegExp('USER', 'gm'), escapeMarkdown(message.sender['title']));
+    if (text) {
+      if (this.bot.user) {
+        text = text.replace(
+          new RegExp('BOT', 'gim'),
+          this.bot.user.username.toLowerCase().replace('bot', '').split('#')[0],
+        );
+      }
+      if (message) {
+        if (+message.sender.id > 0) {
+          text = text.replace(new RegExp('USER', 'gm'), escapeMarkdown(message.sender['firstName']));
+        } else {
+          text = text.replace(new RegExp('USER', 'gm'), escapeMarkdown(message.sender['title']));
+        }
       }
     }
     return text;
