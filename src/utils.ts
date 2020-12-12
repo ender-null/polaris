@@ -718,10 +718,16 @@ export function random(min: number, max: number): number {
 }
 
 export function lstrip(str: string, strip: string): string {
+  while (str[0] == strip) {
+    str = str.slice(1);
+  }
   return str;
 }
 
 export function rstrip(str: string, strip: string): string {
+  while (str[str.length - 1] == strip) {
+    str = str.slice(0, str.length - 2);
+  }
   return str;
 }
 
