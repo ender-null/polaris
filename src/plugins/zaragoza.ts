@@ -45,7 +45,6 @@ export class ZaragozaPlugin extends PluginBase {
     };
   }
   async run(msg: Message): Promise<void> {
-    const baseUrl = 'http://www.zaragoza.es/api';
     const input = getInput(msg);
     if (!input) {
       return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
