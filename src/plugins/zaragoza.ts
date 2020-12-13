@@ -92,8 +92,8 @@ export class ZaragozaPlugin extends PluginBase {
       const res = await sendRequest(url, params);
       const content = await res.json();
 
-      if (!content || content.errors) {
-        if (content && content.errors && content.errors.status == '404 Not Found') {
+      if (!content || content.error) {
+        if (content && content.error == 'Parametros incorrectos') {
           return this.bot.replyMessage(msg, this.bot.errors.noResults);
         } else {
           return this.bot.replyMessage(msg, this.bot.errors.connectionError);
