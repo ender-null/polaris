@@ -205,7 +205,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         }
       }
       let mythicScore = '';
-      if (raiderIO.mythic_plus_scores_by_season.length > 0) {
+      if (raiderIO.mythic_plus_scores_by_season && raiderIO.mythic_plus_scores_by_season.length > 0) {
         const lastSeason = raiderIO.mythic_plus_scores_by_season[0];
         mythicScore = `${this.strings['mythicPlusScores']}:`;
         let empty = true;
