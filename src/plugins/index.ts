@@ -20,6 +20,7 @@ export { RussianRoulettePlugin } from './russian-roulette';
 export { SearchPlugin } from './search';
 export { TagPlugin } from './tag';
 export { TelegramPlugin } from './telegram';
+export { ValenciaPlugin } from './valencia';
 export { VoicePlugin } from './voice';
 export { WeatherPlugin } from './weather';
 export { WorldOfWarcraftPlugin } from './world-of-warcraft';
