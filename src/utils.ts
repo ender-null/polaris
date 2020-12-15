@@ -617,62 +617,79 @@ export async function getCoords(input: string, bot?: Bot): Promise<CoordinatesRe
 }
 
 export function removeHtml(text: string): string {
-  return text.replace(new RegExp('<[^<]+?>', 'gim'), '');
+  if (text) {
+    text = text.replace(new RegExp('<[^<]+?>', 'gim'), '');
+  }
+  return text;
 }
 
 export function replaceHtml(text: string): string {
-  text = text.replace(new RegExp('<', 'gim'), '&lt;');
-  text = text.replace(new RegExp('>', 'gim'), '&gt;');
+  if (text) {
+    text = text.replace(new RegExp('<', 'gim'), '&lt;');
+    text = text.replace(new RegExp('>', 'gim'), '&gt;');
+  }
   return text;
 }
 
 export function escapeHtml(text: string): string {
-  text = text.replace(new RegExp('<', 'gim'), '\\<');
-  text = text.replace(new RegExp('>', 'gim'), '\\>');
+  if (text) {
+    text = text.replace(new RegExp('<', 'gim'), '\\<');
+    text = text.replace(new RegExp('>', 'gim'), '\\>');
+  }
   return text;
 }
 
 export function escapeMarkdown(text: string): string {
-  return text.replace(new RegExp('[`*_{}[]()#+-.!]', 'gim'), '\\$&');
+  if (text) {
+    text = text.replace(new RegExp('[`*_{}[]()#+-.!]', 'gim'), '\\$&');
+  }
+  return text;
 }
 
 export function escapeRegExp(text: string): string {
-  return text.replace(new RegExp('[-\\^$*+?.()|[]{}]', 'gim'), '\\$&');
+  if (text) {
+    text = text.replace(new RegExp('[-\\^$*+?.()|[]{}]', 'gim'), '\\$&');
+  }
+  return text;
 }
 
 export function htmlToDiscordMarkdown(text: string): string {
-  const replacements = [
-    { pattern: '<code class="language-([\\w]+)">([\\S\\s]+)</code>', sub: '```$1\n$2```' },
-    { pattern: '<a href="(.[^<]+)">(.[^<]+)</a>', sub: '$1' },
-    { pattern: '<[/]?i>', sub: '_' },
-    { pattern: '<[/]?b>', sub: '**' },
-    { pattern: '<[/]?u>', sub: '__' },
-    { pattern: '<[/]?code>', sub: '`' },
-    { pattern: '<[/]?pre>', sub: '```' },
-  ];
-  for (const rep of replacements) {
-    text = text.replace(new RegExp(rep['pattern'], 'gim'), rep['sub']);
+  if (text) {
+    const replacements = [
+      { pattern: '<code class="language-([\\w]+)">([\\S\\s]+)</code>', sub: '```$1\n$2```' },
+      { pattern: '<a href="(.[^<]+)">(.[^<]+)</a>', sub: '$1' },
+      { pattern: '<[/]?i>', sub: '_' },
+      { pattern: '<[/]?b>', sub: '**' },
+      { pattern: '<[/]?u>', sub: '__' },
+      { pattern: '<[/]?code>', sub: '`' },
+      { pattern: '<[/]?pre>', sub: '```' },
+    ];
+    for (const rep of replacements) {
+      text = text.replace(new RegExp(rep['pattern'], 'gim'), rep['sub']);
+    }
+    text = text.replace(new RegExp('&lt;', 'gim'), '<');
+    text = text.replace(new RegExp('&gt;', 'gim'), '>');
   }
-  text = text.replace(new RegExp('&lt;', 'gim'), '<');
-  text = text.replace(new RegExp('&gt;', 'gim'), '>');
   return text;
 }
 
 export function splitLargeMessage(content: string, maxLength: number): string[] {
   const lineBreak = '\n';
-  const lines = content.split(lineBreak);
   const texts = [];
-  let text = '';
-  let length = 0;
+  if (content) {
+    const lines = content.split(lineBreak);
+    let text = '';
+    let length = 0;
 
-  for (const line of lines) {
-    if (length + line.length + lineBreak.length < maxLength) {
-      text += line + lineBreak;
-      length += line.length + lineBreak.length;
-    } else {
-      texts.push(text);
-      text = line + lineBreak;
-      length += line.length + lineBreak.length;
+    for (const line of lines) {
+      if (length + line.length + lineBreak.length < maxLength) {
+        text += line + lineBreak;
+        length += line.length + lineBreak.length;
+      } else {
+        texts.push(text);
+        text = line + lineBreak;
+        length += line.length + lineBreak.length;
+      }
     }
   }
   return texts;
