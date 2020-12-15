@@ -100,4 +100,4 @@ jobs:
             docker pull ghcr.io/${{ github.repository_owner }}/polaris-js:latest
             docker stop polaris-js
             docker rm polaris-js
-            docker run -p 1984 -v $PWD/error.log:/usr/src/app/error.log -v $PWD/combined.log:/usr/src/app/combined.log -v $PWD/firebase.json:/usr/src/app/firebase.json -v $PWD/.tdlib_files:/usr/src/app/.tdlib_files -ti -d --restart unless-stopped --name polaris-js ghcr.io/${{ github.repository_owner }}/polaris-js
+            docker run --expose 1984 -v $PWD/error.log:/usr/src/app/error.log -v $PWD/combined.log:/usr/src/app/combined.log -v $PWD/firebase.json:/usr/src/app/firebase.json -v $PWD/.tdlib_files:/usr/src/app/.tdlib_files -ti -d --restart unless-stopped --name polaris-js ghcr.io/${{ github.repository_owner }}/polaris-js
