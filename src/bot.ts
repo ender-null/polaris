@@ -56,7 +56,7 @@ export class Bot {
         });
         res.end();
       })
-      .listen(1984);
+      .listen(8080);
     try {
       await this.bindings.start();
     } catch (e) {
