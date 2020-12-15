@@ -17,7 +17,7 @@ export class ValenciaPlugin extends PluginBase {
             required: true,
           },
         ],
-        description: 'Wait times of EMT Valencia',
+        description: 'Wait times of EMT Valencia bus',
       },
     ];
     this.strings = {
@@ -46,14 +46,16 @@ export class ValenciaPlugin extends PluginBase {
     const schedule = $('.llegadaHome');
 
     let line = '';
+    text = `<b>${this.strings['station']}: ${input}</b>\n\n`;
 
     schedule.each((i, elem) => {
       line = $('img').eq(i).attr('title');
-      const show = $(elem).text();
-      text += line + ': ' + show + '\n';
+      const show = $(elem).text().replace('.', '. ').trim();
+      const showSplit = show.split(' - ');
+      text += ` • <b>${showSplit[1]}</b>  ${line} <i>${showSplit[0]}</i>\n`;
     });
 
-    if (text == '' || text == 'undefined: faltaParametro' || text == 'undefined: LINEA NO ENCONTRADA\n') {
+    if (text == '') {
       text = this.bot.errors.noResults;
     }
 

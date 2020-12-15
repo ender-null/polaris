@@ -15,7 +15,7 @@ export class ZaragozaPlugin extends PluginBase {
             required: true,
           },
         ],
-        description: 'Wait times of zaragoza bus station',
+        description: 'Wait times of Zaragoza bus station',
       },
       {
         command: '/tram',
@@ -26,7 +26,7 @@ export class ZaragozaPlugin extends PluginBase {
             required: true,
           },
         ],
-        description: 'Wait times of zaragoza tram station',
+        description: 'Wait times of Zaragoza tram station',
       },
       {
         command: '/bizi',
