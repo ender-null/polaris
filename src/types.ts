@@ -291,6 +291,7 @@ export interface iGroupAdministration {
 }
 
 export interface Translation {
+  extends?: string;
   errors?: ErrorMessages;
   plugins?: iPluginTranslation;
 }

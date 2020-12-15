@@ -748,7 +748,23 @@ export function rstrip(str: string, strip: string): string {
   return str;
 }
 
-export function catchException(exception: Error | error, bot: Bot = null): Error | error {
+export function merge(base: any, extension: any): any {
+  const merged = { ...base };
+  for (const key of Object.keys(extension)) {
+    if (base[key]) {
+      if (Object.prototype.toString.call(base[key]) === '[object Object]') {
+        merged[key] = this.merge(base[key], extension[key]);
+      } else {
+        merged[key] = extension[key];
+      }
+    } else {
+      merged[key] = extension[key];
+    }
+  }
+  return merged;
+}
+
+export function catchException(exception: Error | error, bot: Bot = null, message: Message = null): Error | error {
   logger.info(`Catched exception: ${exception.message}`);
   logger.error(`${exception.message}`);
   if (bot) {
@@ -758,6 +774,9 @@ export function catchException(exception: Error | error, bot: Bot = null): Error
       bot.sendAlert(JSON.stringify(exception));
     } else {
       bot.sendAlert(exception.message);
+    }
+    if (message) {
+      bot.replyMessage(message, bot.errors.exceptionFound);
     }
   }
   return exception;

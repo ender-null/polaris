@@ -16,7 +16,7 @@ import {
 import * as bindings from './bindings/index';
 import { db } from './main';
 import * as plugins from './plugins/index';
-import { catchException, escapeRegExp, hasTag, isTrusted, logger, now, setInput } from './utils';
+import { catchException, escapeRegExp, hasTag, isTrusted, logger, merge, now, setInput } from './utils';
 
 export class Bot {
   config: Config;
@@ -118,7 +118,20 @@ export class Bot {
 
   initTranslations(): void {
     if (db.translations && this.config.translation in db.translations) {
-      const trans: Translation = db.translations[this.config.translation];
+      let trans: Translation = db.translations[this.config.translation];
+      if (trans.extends) {
+        let base = db.translations[trans.extends];
+        while (base.extends) {
+          const inherit = db.translations[base.extends];
+          base = merge(inherit, base);
+          if (inherit.extends) {
+            base.extends = inherit.extends;
+          } else {
+            delete base.extends;
+          }
+        }
+        trans = merge(base, trans);
+      }
       this.errors = trans.errors;
       for (const plugin of this.plugins) {
         if (plugin.constructor.name in trans.plugins) {
@@ -252,7 +265,7 @@ export class Bot {
         }
       }
     } catch (e) {
-      catchException(e, this);
+      catchException(e, this, msg);
     }
   }
 
@@ -314,8 +327,7 @@ export class Bot {
       try {
         plugin.run(message);
       } catch (e) {
-        catchException(e, this);
-        this.replyMessage(message, this.errors.exceptionFound);
+        catchException(e, this, message);
       }
 
       return true;
