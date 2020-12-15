@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events';
-import http from 'http';
 import * as cron from 'node-cron';
 import os from 'os';
 import {
@@ -48,15 +47,6 @@ export class Bot {
     db.events.on('update:translations', () => this.initTranslations());
     this.status.on('started', () => this.onStarted());
     this.status.on('stopped', () => this.onStopped());
-    http
-      .createServer((req, res) => {
-        logger.info(JSON.stringify(req));
-        req.on('data', (chunk) => {
-          logger.info(JSON.stringify(chunk));
-        });
-        res.end();
-      })
-      .listen(8080);
     try {
       await this.bindings.start();
     } catch (e) {
