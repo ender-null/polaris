@@ -1,3 +1,4 @@
+import http from 'http';
 import { Bot, Config, Database } from '.';
 import { catchException, logger } from './utils';
 
@@ -25,6 +26,16 @@ export async function stop(): Promise<void> {
 
 process.once('SIGINT', () => stop());
 process.once('SIGTERM', () => stop());
+
+http
+  .createServer((req, res) => {
+    logger.info(JSON.stringify(req));
+    req.on('data', (chunk) => {
+      logger.info(JSON.stringify(chunk));
+    });
+    res.end();
+  })
+  .listen(1984);
 
 export const db = new Database();
 db.events.on('update:configs', async () => {
