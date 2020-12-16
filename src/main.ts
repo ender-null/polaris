@@ -31,12 +31,18 @@ http
   .createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
     const path = req.url.split('/');
     req.on('data', (data) => {
+      let received = false;
       for (const bot of bots) {
         if (bot.config.name == path[1]) {
           bot.inbox.emit('webhook', data);
-          res.writeHead(200, { 'Content-Type': 'text/html' });
           res.write(`webhook@${bot.user.username}\n`);
+          received = true;
         }
+      }
+      if (received) {
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+      } else {
+        res.writeHead(404, { 'Content-Type': 'text/html' });
       }
     });
     res.end();
