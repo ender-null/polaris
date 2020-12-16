@@ -28,8 +28,8 @@ process.once('SIGINT', () => stop());
 process.once('SIGTERM', () => stop());
 
 http
-  .createServer((req, res) => {
-    logger.info(JSON.stringify(req));
+  .createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
+    logger.info(`request received at: ${req.url}`);
     req.on('data', (chunk) => {
       logger.info(JSON.stringify(chunk));
     });
