@@ -7,6 +7,7 @@ export { ConfigPlugin } from './config';
 export { CorePlugin } from './core';
 export { Covid19Plugin } from './covid-19';
 export { EchoPlugin } from './echo';
+export { GitHubPlugin } from './github';
 export { HelpPlugin } from './help';
 export { ImagePlugin } from './image';
 export { LastFMPlugin } from './lastfm';

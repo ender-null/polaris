@@ -29,12 +29,16 @@ process.once('SIGTERM', () => stop());
 
 http
   .createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
-    logger.info(`request received at: ${req.url}`);
-    req.on('data', (chunk) => {
-      logger.info(chunk);
+    const path = req.url.split('/');
+    req.on('data', (data) => {
+      for (const bot of bots) {
+        if (bot.config.name == path[0]) {
+          bot.inbox.emit('webhook', data);
+          res.writeHead(200, { 'Content-Type': 'text/html' });
+          res.write(`Received by @${bot.user.username}\n`);
+        }
+      }
     });
-    res.writeHead(200, { 'Content-Type': 'text/html' });
-    res.write('OK');
     res.end();
   })
   .listen(1984);
