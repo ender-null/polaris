@@ -1,6 +1,7 @@
 import { Bot } from '..';
 import { PluginBase } from '../plugin';
-import { logger } from '../utils';
+import { Conversation } from '../types';
+import { getTaggedWith, logger } from '../utils';
 
 export class GitHubPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -18,9 +19,10 @@ export class GitHubPlugin extends PluginBase {
     )}</a>: ${cb.head_commit.message} by ${cb.head_commit.committer.name}`;
 
     if (cb.head_commit) {
-      this.bot.sendAdminAlert(text);
-    } else {
-      logger.debug(`other`);
+      const subs = getTaggedWith(this.bot, `sub:${cb.repository.name}`);
+      for (const sub of subs) {
+        this.bot.sendMessage(new Conversation(sub), text);
+      }
     }
   }
 }

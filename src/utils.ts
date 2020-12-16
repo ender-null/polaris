@@ -78,6 +78,21 @@ export function getTags(bot: Bot, target: number | string, tagFilter?: string): 
   }
 }
 
+export function getTaggedWith(bot: Bot, tag: string): string[] {
+  const subs = [];
+  for (const gid in db.groups) {
+    if (hasTag(bot, gid, tag)) {
+      subs.push(gid);
+    }
+  }
+  for (const uid in db.users) {
+    if (hasTag(bot, uid, tag)) {
+      subs.push(uid);
+    }
+  }
+  return subs;
+}
+
 export function hasTag(bot: Bot, target: number | string, tag: string): boolean {
   if (typeof target != 'string') {
     target = String(target);
