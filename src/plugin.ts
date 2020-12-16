@@ -29,9 +29,9 @@ export abstract class PluginBase {
     logger.debug(`Ignoring because plugin "${this.constructor.name}" missing cron()`);
   }
 
-  async webhook(data: string): Promise<void> {
+  async webhook(url: string, data: string): Promise<void> {
     logger.debug(
-      `Ignoring data with ${data.length} length because plugin "${this.constructor.name}" missing webhook()`,
+      `Ignoring webhook ${url} with data (${data.length} length) because plugin "${this.constructor.name}" missing webhook()`,
     );
   }
 }

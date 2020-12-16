@@ -7,8 +7,8 @@ export class GitHubPlugin extends PluginBase {
     super(bot);
   }
 
-  async webhook(data): Promise<void> {
-    logger.info('github plugin');
+  async webhook(url: string, data: string): Promise<void> {
+    logger.info(`github plugin: ${url}`);
     if (data['head_commit']) {
       this.bot.sendAdminAlert(`new commit: ${data['head_commit']['message']}`);
     } else {

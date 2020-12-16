@@ -42,7 +42,7 @@ export class Bot {
 
   async start(): Promise<void> {
     this.inbox.on('message', (msg: Message) => this.messagesHandler(msg));
-    this.inbox.on('webhook', (data) => this.webhookHandler(data));
+    this.inbox.on('webhook', (url, data) => this.webhookHandler(url, data));
     this.outbox.on('message', (msg: Message) => this.messageSender(msg));
     this.initPlugins();
     db.events.on('update:translations', () => this.initTranslations());
@@ -106,12 +106,12 @@ export class Bot {
     this.onMessageReceive(msg);
   }
 
-  webhookHandler(data: any): void {
-    logger.info(`[webhook@${this.user.username}] ${data}`);
+  webhookHandler(url: string, data: any): void {
+    logger.info(`[webhook:${url}] (@${this.user.username}) ${data}`);
     for (const i in this.plugins) {
       const plugin = this.plugins[i];
       if ('webhook' in plugin) {
-        plugin.webhook(data);
+        plugin.webhook(url, data);
       }
     }
   }
