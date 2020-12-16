@@ -31,8 +31,10 @@ http
   .createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
     logger.info(`request received at: ${req.url}`);
     req.on('data', (chunk) => {
-      logger.info(JSON.stringify(chunk));
+      logger.info(chunk);
     });
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.write('OK');
     res.end();
   })
   .listen(1984);
