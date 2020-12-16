@@ -55,7 +55,7 @@ export class ValenciaPlugin extends PluginBase {
       text += ` • <b>${showSplit[1]}</b>  ${line} <i>${showSplit[0]}</i>\n`;
     });
 
-    if (text == '') {
+    if (line == '') {
       text = this.bot.errors.noResults;
     }
 
