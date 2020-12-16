@@ -32,10 +32,10 @@ http
     const path = req.url.split('/');
     req.on('data', (data) => {
       for (const bot of bots) {
-        if (bot.config.name == path[0]) {
+        if (bot.config.name == path[1]) {
           bot.inbox.emit('webhook', data);
           res.writeHead(200, { 'Content-Type': 'text/html' });
-          res.write(`Received by @${bot.user.username}\n`);
+          res.write(`webhook@${bot.user.username}\n`);
         }
       }
     });
