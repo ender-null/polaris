@@ -54,7 +54,7 @@ export class AboutPlugin extends PluginBase {
       const help = format(this.strings['help'], this.bot.config.prefix);
       const about = format(this.strings['about'], this.bot.config.prefix);
       const notice = this.strings['notice'];
-      const channel = this.strings['notice'];
+      const channel = this.strings['channel'];
       const donations = format(this.strings['donations'], this.bot.config.prefix);
       const stats = format(this.strings['stats'], Object.keys(db.users).length, Object.keys(db.groups).length);
 
