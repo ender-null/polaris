@@ -6,7 +6,67 @@ import { fixTelegramLink, logger, telegramLinkRegExp } from '../utils';
 export class CorePlugin extends PluginBase {
   constructor(bot: Bot) {
     super(bot);
+    this.commands = [
+      {
+        command: '/shutdown',
+        description: 'Shuts down the bot',
+        hidden: true,
+      },
+      {
+        command: '/reload',
+        description: 'Reload the bot',
+        hidden: true,
+      },
+      {
+        command: '/reloadplugins',
+        description: 'Reloads plugins',
+        hidden: true,
+      },
+      {
+        command: '/msg',
+        description: 'Send message to chat',
+        parameters: [
+          {
+            name: 'target',
+            required: true,
+          },
+          {
+            name: 'message',
+            required: true,
+          },
+        ],
+        hidden: true,
+      },
+      {
+        command: '/shell',
+        shortcut: '/sh',
+        description: 'Runs shell code',
+        parameters: [
+          {
+            name: 'code',
+            required: true,
+          },
+        ],
+      },
+      {
+        command: '/javascript',
+        shortcut: '/js',
+        description: 'Runs JavaScript code',
+        parameters: [
+          {
+            name: 'code',
+            required: true,
+          },
+        ],
+      },
+    ];
+    this.strings = {
+      reloadingPlugins: 'Reloading plugins...',
+      restarting: 'Restarting...',
+      shuttingDown: 'Shutting down...',
+    };
   }
+
   async run(msg: Message): Promise<void> {
     this.bot.replyMessage(msg, null);
   }

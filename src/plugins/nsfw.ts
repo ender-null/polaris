@@ -42,7 +42,7 @@ export class NSFWPlugin extends PluginBase {
     }
 
     if (!this.bot.user.isBot) {
-      const history = this.bot.bindings['serverRequest']('getChatHistory', {
+      const history = await this.bot.bindings['serverRequest']('getChatHistory', {
         chat_id: cid,
         from_message_id: 0,
         offset: 0,
@@ -53,12 +53,12 @@ export class NSFWPlugin extends PluginBase {
         let message = null;
         while (!message) {
           const index = random(0, history['messages'].length - 1);
-          message = this.bot.bindings.getMessage(cid, history['messages'][index]['id']);
+          message = await this.bot.bindings.getMessage(cid, history['messages'][index]['id']);
         }
-        this.bot.forwardMessage(message, msg.conversation.id);
+        await this.bot.forwardMessage(message, msg.conversation.id);
       }
     } else {
-      const info = this.bot.bindings.conversationInfo(cid);
+      const info = await this.bot.bindings.conversationInfo(cid);
 
       if (info) {
         let message = null;
@@ -69,17 +69,17 @@ export class NSFWPlugin extends PluginBase {
         while (!message) {
           let rid = random(start, last);
           while (rid in this.invalidIds) rid = random(start, last);
-          message = this.bot.bindings.getMessage(cid, rid);
+          message = await this.bot.bindings.getMessage(cid, rid);
           if (!message && this.invalidIds.indexOf(rid) == -1) {
             retries -= 1;
             this.invalidIds.push(rid);
           }
 
           if (retries <= 0) {
-            message = this.bot.bindings.getMessage(cid, last);
-            return this.bot.forwardMessage(message, msg.conversation.id);
+            message = await this.bot.bindings.getMessage(cid, last);
           }
         }
+        return await this.bot.forwardMessage(message, msg.conversation.id);
       }
     }
   }

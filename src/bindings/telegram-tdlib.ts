@@ -72,7 +72,7 @@ export class TelegramTDlibBindings extends BindingsBase {
 
   async getMe(): Promise<User> {
     const me: user = await this.serverRequest('getMe');
-    return new User(me.id, me.first_name, me.last_name, me.username);
+    return new User(me.id, me.first_name, me.last_name, me.username, me.type['_'] == 'userTypeBot');
   }
 
   async convertMessage(msg: message, ignoreReply?: boolean): Promise<Message> {
@@ -446,19 +446,19 @@ export class TelegramTDlibBindings extends BindingsBase {
       if (msg.reply) {
         data['reply_to_message_id'] = msg.reply.id;
       }
+    }
 
-      if (data) {
-        if (msg.type == 'text' && data['input_message_content']['text']['text'].length > 4000) {
-          const texts = splitLargeMessage(data['input_message_content']['text']['text'], 4000);
-          for (const text of texts) {
-            data['input_message_content']['text']['text'] = text;
-            await this.serverRequest(data['@type'], data);
-          }
-        } else {
+    if (data) {
+      if (msg.type == 'text' && data['input_message_content']['text']['text'].length > 4000) {
+        const texts = splitLargeMessage(data['input_message_content']['text']['text'], 4000);
+        for (const text of texts) {
+          data['input_message_content']['text']['text'] = text;
           await this.serverRequest(data['@type'], data);
         }
-        await this.sendChatAction(+msg.conversation.id, 'cancel');
+      } else {
+        await this.serverRequest(data['@type'], data);
       }
+      await this.sendChatAction(+msg.conversation.id, 'cancel');
     }
   }
 
