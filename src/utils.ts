@@ -13,6 +13,10 @@ import { Bot, Message, PluginBase } from '.';
 import { db } from './main';
 import { CoordinatesResult, iString } from './types';
 
+export function getPluginSlug(plugin: PluginBase) {
+  return plugin.constructor.name.replace('Plugin', '').toLowerCase();
+}
+
 export function isOwner(bot: Bot, uid: number | string, msg: Message = null): boolean {
   return hasTag(bot, uid, 'owner') || msg.sender.id == bot.config.owner;
 }

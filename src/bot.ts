@@ -16,7 +16,7 @@ import {
 import * as bindings from './bindings/index';
 import { db } from './main';
 import * as plugins from './plugins/index';
-import { catchException, escapeRegExp, hasTag, isTrusted, logger, merge, now, setInput } from './utils';
+import { catchException, escapeRegExp, getPluginSlug, hasTag, isTrusted, logger, merge, now, setInput } from './utils';
 
 export class Bot {
   config: Config;
@@ -108,9 +108,10 @@ export class Bot {
 
   webhookHandler(url: string, data: any): void {
     logger.info(`[webhook:${url}] (@${this.user.username}) ${data}`);
+    const path = url.split('/');
     for (const i in this.plugins) {
       const plugin = this.plugins[i];
-      if ('webhook' in plugin) {
+      if (getPluginSlug(plugin) == path[2] && 'webhook' in plugin) {
         plugin.webhook(url, data);
       }
     }

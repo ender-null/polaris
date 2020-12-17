@@ -19,7 +19,7 @@ export class GitHubPlugin extends PluginBase {
     )}</a>: ${cb.head_commit.message} by ${cb.head_commit.committer.name}`;
 
     if (cb.head_commit) {
-      const subs = getTaggedWith(this.bot, `sub:${cb.repository.name}`);
+      const subs = getTaggedWith(this.bot, `sub:github/${cb.repository.name}`);
       for (const sub of subs) {
         this.bot.sendMessage(new Conversation(sub), text);
       }
