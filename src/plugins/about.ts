@@ -30,11 +30,12 @@ export class AboutPlugin extends PluginBase {
         '<b>Polaris.js</b> (including all plugins and documentation) is <b>free software</b>; you are free to redistribute it and/or modify it under the terms of the <b>MIT</b>.',
       help: 'Write {0}help to know what I can do!',
       about: 'Use {0}about to know more about me',
+      channel: 'Support & suggestions at <a href="https://t.me/PolarisSupport">@PolarisSupport</a>',
       notice:
         'You can try my other bots: <a href="https://t.me/sakubo">@Sakubo</a> and <a href="https://t.me/PetoBot">@PetoBot</a>',
-      donations: 'You can make {0}donations at https://github.com/sponsors/luksireiku',
+      donations: 'You can make {0}donations at https://paypal.me/luksireiku',
       stats: '👤 {0} users\n👥 {1} groups',
-      donationsExplanation: 'You can make donations at https://github.com/sponsors/luksireiku',
+      donationsExplanation: 'You can make donations at https://paypal.me/luksireiku',
       supportersTitle: '<b>Supporters:</b>',
     };
   }
@@ -53,13 +54,14 @@ export class AboutPlugin extends PluginBase {
       const help = format(this.strings['help'], this.bot.config.prefix);
       const about = format(this.strings['about'], this.bot.config.prefix);
       const notice = this.strings['notice'];
+      const channel = this.strings['notice'];
       const donations = format(this.strings['donations'], this.bot.config.prefix);
       const stats = format(this.strings['stats'], Object.keys(db.users).length, Object.keys(db.groups).length);
 
       if (isCommand(this, 1, msg.content)) {
-        text = `${greeting}\n\n${notice}\n\n${help}\n${about}\n\n${version}\n${donations}\n\n${license}\n\n${stats}`;
+        text = `${greeting}\n\n${notice}\n${channel}\n\n${help}\n${about}\n\n${version}\n${donations}\n\n${license}\n\n${stats}`;
       } else {
-        text = `${greeting}\n\n${notice}\n\n${help}\n${about}\n\n${donations}`;
+        text = `${greeting}\n\n${notice}\n${channel}\n\n${help}\n${about}\n\n${donations}`;
       }
     } else if (isCommand(this, 2, msg.content)) {
       const donationsExplanation = this.strings['donationsExplanation'];
