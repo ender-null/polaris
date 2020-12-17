@@ -1,7 +1,17 @@
 import { Bot, Message } from '..';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
-import { fixTelegramLink, logger, telegramLinkRegExp } from '../utils';
+import {
+  execResult,
+  fixTelegramLink,
+  generateCommandHelp,
+  getInput,
+  isCommand,
+  isOwner,
+  isTrusted,
+  logger,
+  telegramLinkRegExp,
+} from '../utils';
 
 export class CorePlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -68,7 +78,44 @@ export class CorePlugin extends PluginBase {
   }
 
   async run(msg: Message): Promise<void> {
-    this.bot.replyMessage(msg, null);
+    if (!isOwner(this.bot, msg.sender.id) && !isTrusted(this.bot, msg.sender.id)) {
+      return this.bot.replyMessage(msg, this.bot.errors.permissionRequired);
+    }
+    const input = getInput(msg);
+    let text = this.bot.errors.noResults;
+
+    if (isCommand(this, 1, msg.content)) {
+      await this.bot.stop();
+      text = this.strings['shuttingDown'];
+    } else if (isCommand(this, 2, msg.content)) {
+      await this.bot.stop();
+      await this.bot.start();
+      text = this.strings['restarting'];
+    } else if (isCommand(this, 3, msg.content)) {
+      this.bot.initPlugins();
+      text = this.strings['reloadingPlugins'];
+    } else if (isCommand(this, 4, msg.content)) {
+      text = this.bot.errors.notImplemented;
+    } else if (isCommand(this, 5, msg.content)) {
+      if (!input) {
+        return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
+      }
+      const result = await execResult(input);
+      text = `<code class="language-shell">$ ${input}\n\n${result}</code>`;
+    } else if (isCommand(this, 6, msg.content)) {
+      if (!input) {
+        return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
+      }
+      let result;
+      try {
+        result = new Function(input)();
+      } catch (error) {
+        result = error.message;
+      }
+      text = `<code class="language-javascript">&gt; ${input}\n\n${result}</code>`;
+    }
+
+    this.bot.replyMessage(msg, text);
   }
 
   async always(msg: Message): Promise<void> {

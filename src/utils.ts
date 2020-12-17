@@ -822,6 +822,6 @@ export async function execResult(command: string): Promise<string> {
     return stdout;
   } catch (e) {
     catchException(e);
-    return null;
+    return e.message;
   }
 }
