@@ -4,6 +4,7 @@ import 'firebase/database';
 import { readFileSync } from 'fs';
 import { iConfig, iConversation, iPin, iPole, iReminder, iTag, iTranslation, iUser } from '.';
 import { iGroupAdministration } from './types';
+import { logger } from './utils';
 
 export class Database {
   fb: firebase.database.Database;
@@ -45,11 +46,19 @@ export class Database {
       'administration',
       'translations',
     ];
+    const ready = [];
     for (const table of tables) {
       this.fb.ref(`db/${table}`).on('value', (snapshot: firebase.database.DataSnapshot) => {
         this[table + 'Snap'] = snapshot;
         this[table] = snapshot.toJSON();
+        logger.info(`loaded ${table} [${this[table] ? Object.keys(this[table]).length : 0}]`);
         this.events.emit(`update:${table}`);
+        if (ready.indexOf(table) == -1) {
+          ready.push(table);
+        }
+        if (ready.length == tables.length) {
+          this.events.emit('loaded');
+        }
       });
     }
   }

@@ -106,3 +106,8 @@ dist
 .vscode
 firebase.json
 .tdlib_files
+
+# Migration
+import.json
+export/
+src/migrate.ts

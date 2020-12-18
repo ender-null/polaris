@@ -55,7 +55,7 @@ export class PinPlugin extends PluginBase {
       const pins = [];
       if (db.pins) {
         for (const pin in db.pins) {
-          if (db.pins[pin].creator == msg.sender.id) {
+          if (db.pins[pin].creator == msg.sender.id && db.pins[pin].bot == this.bot.user.id) {
             pins.push(pin);
           }
         }
@@ -95,6 +95,7 @@ export class PinPlugin extends PluginBase {
         content: msg.reply.content.replace('<', '&lt;').replace('>', '&gt;'),
         creator: msg.sender.id,
         type: pinType,
+        bot: this.bot.user.id,
       });
       this.bot.replyMessage(msg, format(this.strings['pinned'], tag));
     } else if (isCommand(this, 3, msg.content)) {
@@ -121,7 +122,11 @@ export class PinPlugin extends PluginBase {
       if (pins) {
         for (const pin of pins) {
           if (pin in db.pins) {
-            if (db.pins[pin]['content'] != undefined && db.pins[pin]['type'] != undefined) {
+            if (
+              db.pins[pin].content != undefined &&
+              db.pins[pin].type != undefined &&
+              db.pins[pin].bot == this.bot.user.id
+            ) {
               if (db.pins[pin].type == 'command') {
                 msg.content = db.pins[pin].content;
                 return this.bot.onMessageReceive(msg);

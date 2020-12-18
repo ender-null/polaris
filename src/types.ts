@@ -212,6 +212,7 @@ export interface DatabasePin {
   content?: string;
   creator?: number | string;
   type?: string;
+  bot?: number | string;
 }
 
 export interface DatabasePoleList {

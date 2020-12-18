@@ -24,25 +24,7 @@ export async function stop(): Promise<void> {
   }
 }
 
-process.once('SIGINT', () => stop());
-process.once('SIGTERM', () => stop());
-
-http
-  .createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
-    const path = req.url.split('/');
-    req.on('data', (data: string) => {
-      for (const bot of bots) {
-        if (bot.config.name == path[1]) {
-          bot.inbox.emit('webhook', req.url, data);
-        }
-      }
-    });
-    res.end();
-  })
-  .listen(1984);
-
-export const db = new Database();
-db.events.on('update:configs', async () => {
+export async function start(): Promise<void> {
   logger.info('Configs updated');
   if (Array.isArray(bots) && bots.length > 0) {
     for (const bot of bots) {
@@ -62,5 +44,30 @@ db.events.on('update:configs', async () => {
       bots.push(bot);
     }
   }
+}
+
+process.once('SIGINT', () => stop());
+process.once('SIGTERM', () => stop());
+
+http
+  .createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
+    const path = req.url.split('/');
+    req.on('data', (data: string) => {
+      for (const bot of bots) {
+        if (bot.config.name == path[1]) {
+          bot.inbox.emit('webhook', req.url, data);
+        }
+      }
+    });
+    res.end();
+  })
+  .listen(1984);
+
+export const db = new Database();
+db.events.once('loaded', async () => {
+  start();
+  db.events.on('update:configs', async () => {
+    start();
+  });
 });
 db.init();

@@ -59,7 +59,7 @@ export function getTags(bot: Bot, target: number | string, tagFilter?: string): 
   if (typeof target != 'string') {
     target = String(target);
   }
-  if (db.tags[target] !== undefined) {
+  if (db.tags && db.tags[target] !== undefined) {
     const tags = [];
     for (const i in db.tags[target]) {
       const tag = db.tags[target][i];
@@ -69,7 +69,7 @@ export function getTags(bot: Bot, target: number | string, tagFilter?: string): 
       }
       if (regex.test(tag)) {
         const inputMatch = regex.exec(tag);
-        if (inputMatch[1] === bot.config.name) {
+        if (inputMatch[1] === bot.config.name || inputMatch[1] === bot.user.username) {
           tags.push(tag.replace(regex, ''));
         }
       } else {

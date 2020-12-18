@@ -80,7 +80,7 @@ export class AboutPlugin extends PluginBase {
     // Update group data
     const gid = String(msg.conversation.id);
     if (+msg.conversation.id < 0) {
-      if (db.groups[gid] != undefined) {
+      if (db.groups && db.groups[gid] != undefined) {
         db.groupsSnap.child(gid).ref.update({
           title: msg.conversation.title || '',
         });
@@ -96,7 +96,7 @@ export class AboutPlugin extends PluginBase {
       return;
     }
 
-    if (db.users[uid] != undefined) {
+    if (db.users && db.users[uid] != undefined) {
       db.usersSnap.child(uid).ref.update({
         first_name: msg.sender['firstName'] || '',
         last_name: msg.sender['lastName'] || '',
