@@ -576,14 +576,16 @@ export class TelegramTDlibBindings extends BindingsBase {
         file_id: fileId,
       };
       const resp = await this.apiRequest('getFile', params);
-      const result = await resp.json();
-      if ('result' in result) {
-        if (link) {
-          return `https://api.telegram.org/file/bot${this.bot.config.apiKeys.telegramBotToken}/${result.result.file_path}`;
-        } else {
-          return download(
-            `https://api.telegram.org/file/bot${this.bot.config.apiKeys.telegramBotToken}/${result.result.file_path}`,
-          );
+      if (resp) {
+        const result = await resp.json();
+        if ('result' in result) {
+          if (link) {
+            return `https://api.telegram.org/file/bot${this.bot.config.apiKeys.telegramBotToken}/${result.result.file_path}`;
+          } else {
+            return download(
+              `https://api.telegram.org/file/bot${this.bot.config.apiKeys.telegramBotToken}/${result.result.file_path}`,
+            );
+          }
         }
       }
     }

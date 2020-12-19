@@ -59,7 +59,9 @@ export class Bot {
     this.started = true;
     this.user = await this.bindings.getMe();
     this.initTranslations();
-    logger.info(`Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`);
+    logger.info(
+      `🟢 Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`,
+    );
     this.sendAdminAlert(
       `Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`,
     );
@@ -75,7 +77,7 @@ export class Bot {
     this.outbox.removeAllListeners('message');
     this.status.removeAllListeners('started');
     this.status.removeAllListeners('stopped');
-    logger.info(`Stopped ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`);
+    logger.info(`🔴 Stopped ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`);
   }
 
   async stop(): Promise<void> {
@@ -88,18 +90,18 @@ export class Bot {
 
   messageSender(msg: Message): void {
     logger.info(
-      ` [${this.user.id}] ${this.user.firstName}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
+      `💬 [${this.user.id}] ${this.user.firstName}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
     );
   }
 
   messagesHandler(msg: Message): void {
     if (msg.sender instanceof User) {
       logger.info(
-        `[${msg.sender.id}] ${msg.sender.firstName}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
+        `✉️  [${msg.sender.id}] ${msg.sender.firstName}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
       );
     } else {
       logger.info(
-        `[${msg.sender.id}] ${msg.sender.title}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
+        `✉️  [${msg.sender.id}] ${msg.sender.title}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
       );
     }
 
@@ -107,7 +109,7 @@ export class Bot {
   }
 
   webhookHandler(url: string, data: any): void {
-    logger.info(`[webhook:${url}] (@${this.user.username}) ${data}`);
+    logger.info(`🌐 [webhook:${url}] (@${this.user.username}) ${data}`);
     const path = url.split('/');
     for (const i in this.plugins) {
       const plugin = this.plugins[i];

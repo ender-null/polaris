@@ -12,7 +12,7 @@ export class UrbanDictionaryPlugin extends PluginBase {
         parameters: [
           {
             name: 'term',
-            required: false,
+            required: true,
           },
         ],
         description: 'Search the Urban Dictionary',

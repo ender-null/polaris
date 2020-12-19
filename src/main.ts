@@ -6,7 +6,7 @@ const bots: Bot[] = [];
 
 export async function stop(): Promise<void> {
   let pending = bots.length;
-  logger.info(`Stopping ${pending} bots...`);
+  logger.info(`🟡 Stopping ${pending} bots...`);
   for (const bot of bots) {
     try {
       await bot.stop();
@@ -16,16 +16,16 @@ export async function stop(): Promise<void> {
 
     pending -= 1;
     if (pending == 0) {
-      logger.info(`Closed all bots, exiting process. PID: ${process.pid}`);
+      logger.info(`✅ Closed all bots, exiting process. PID: ${process.pid}`);
       process.exit();
     } else {
-      logger.info(`Pending ${pending} bots...`);
+      logger.info(`🕓 Pending ${pending} bots...`);
     }
   }
 }
 
 export async function start(): Promise<void> {
-  logger.info('Configs updated');
+  logger.info('✅ Configurations updated');
   if (Array.isArray(bots) && bots.length > 0) {
     for (const bot of bots) {
       await bot.stop();

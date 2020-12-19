@@ -53,7 +53,7 @@ export class Database {
         this[table + 'Snap'] = snapshot;
         if (!this[table] || table == 'configs' || table == 'translations') {
           this[table] = snapshot.toJSON();
-          logger.info(`loaded ${table} [${this[table] ? Object.keys(this[table]).length : 0}]`);
+          logger.info(`🆗 Loaded ${table} [${this[table] ? Object.keys(this[table]).length : 0}]`);
         }
         this.events.emit(`update:${table}`);
         if (!loaded) {
@@ -61,7 +61,7 @@ export class Database {
             ready.push(table);
           }
           if (ready.length == tables.length) {
-            logger.info('initial load complete');
+            logger.info('✅ Initial load complete');
             this.events.emit('loaded');
             loaded = true;
           }

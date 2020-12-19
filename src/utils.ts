@@ -301,12 +301,12 @@ export function getUsername(uid: number | string): string {
     if (db.users[uid]['last_name'] !== undefined) {
       name += ' ' + db.users[uid].last_name;
     }
-    if (db.users[uid]['username'] !== undefined) {
+    if (db.users[uid]['username'] !== undefined && db.users[uid]['username'] !== '') {
       name = `@${db.users[uid].username}`;
     }
   } else if (db.groups[uid] !== undefined) {
     name = db.groups[uid].title;
-    if (db.groups[uid]['username'] !== undefined) {
+    if (db.groups[uid]['username'] !== undefined && db.groups[uid]['username'] !== '') {
       name = `@${db.groups[uid].username}`;
     }
   } else {
@@ -556,6 +556,9 @@ export async function download(
   const tempfile = tmp.fileSync({ mode: 0o644, postfix: `.${mime.extension(response.headers.get('Content-Type'))}` });
   if (!response.ok) {
     logger.error(`unexpected response ${response.statusText}`);
+    return null;
+  }
+  if (response.headers.get('Content-Length') == '0') {
     return null;
   }
   const streamPipeline = util.promisify(pipeline);

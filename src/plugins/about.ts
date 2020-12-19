@@ -87,14 +87,15 @@ export class AboutPlugin extends PluginBase {
         db.groupsSnap.child(gid).ref.update({
           title: msg.conversation.title || '',
         });
+        db.groups[gid]['title'] = msg.conversation.title || '';
       } else {
         db.groupsSnap.child(gid).ref.set({
           title: msg.conversation.title || '',
         });
+        db.groups[gid] = {
+          title: msg.conversation.title || '',
+        };
       }
-      db.groups[gid] = {
-        title: msg.conversation.title || '',
-      };
     }
 
     const uid = String(msg.sender.id);
@@ -112,6 +113,10 @@ export class AboutPlugin extends PluginBase {
         username: msg.sender['username'] || '',
         is_bot: msg.sender['isBot'] || false,
       });
+      db.users[uid]['first_name'] = msg.sender['firstName'] || '';
+      db.users[uid]['last_name'] = msg.sender['lastName'] || '';
+      db.users[uid]['username'] = msg.sender['username'] || '';
+      db.users[uid]['is_bot'] = msg.sender['isBot'] || false;
     } else {
       db.usersSnap.child(uid).ref.set({
         first_name: msg.sender['firstName'] || '',
@@ -119,12 +124,12 @@ export class AboutPlugin extends PluginBase {
         username: msg.sender['username'] || '',
         is_bot: msg.sender['isBot'] || false,
       });
+      db.users[uid] = {
+        first_name: msg.sender['firstName'] || '',
+        last_name: msg.sender['lastName'] || '',
+        username: msg.sender['username'] || '',
+        is_bot: msg.sender['isBot'] || false,
+      };
     }
-    db.users[uid] = {
-      first_name: msg.sender['firstName'] || '',
-      last_name: msg.sender['lastName'] || '',
-      username: msg.sender['username'] || '',
-      is_bot: msg.sender['isBot'] || false,
-    };
   }
 }

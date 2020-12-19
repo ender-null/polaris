@@ -156,12 +156,12 @@ export class PolePlugin extends PluginBase {
       } else if (type == 'andaluza' && !timeInRange(time(12), time(13), now())) {
         return this.bot.replyMessage(msg, format(this.strings['tooSoonAndaluza'], getUsername(uid)));
       }
-      if (this.hasPole(gid, uid, date) && type != 'canaria' && type != 'andaluza') {
-        return this.bot.replyMessage(msg, format('{0} has already claimed a pole', getUsername(uid)));
-      }
-      if (db.poles && db.poles[gid] && db.poles[gid][date] && db.poles[gid][date][type] != undefined) {
-        return this.bot.replyMessage(msg, `${capitalize(type)} already claimed`);
-      }
+      // if (this.hasPole(gid, uid, date) && type != 'canaria' && type != 'andaluza') {
+      //   return this.bot.replyMessage(msg, format('{0} has already claimed a pole', getUsername(uid)));
+      // }
+      // if (db.poles && db.poles[gid] && db.poles[gid][date] && db.poles[gid][date][type] != undefined) {
+      //   return this.bot.replyMessage(msg, `${capitalize(type)} already claimed`);
+      // }
 
       if (!db.poles || !db.poles[gid] || !db.poles[gid][date]) {
         db.polesSnap
