@@ -180,9 +180,7 @@ export class PolePlugin extends PluginBase {
           .ref.update({
             [type]: uid,
           });
-        db.poles[gid][date] = {
-          [type]: uid,
-        };
+        db.poles[gid][date][type] = uid;
       }
       text = format(this.strings['got' + capitalize(type)], getUsername(uid));
     }
