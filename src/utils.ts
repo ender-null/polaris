@@ -142,6 +142,7 @@ export function setTag(bot: Bot, target: number | string, tag: string): void {
         };
       }
     }
+    db.tags[target] = sortList(db.tags[target]);
     db.tagsSnap.child(target).ref.set(sortList(db.tags[target]));
   }
 }
@@ -158,6 +159,7 @@ export function delTag(bot: Bot, target: number | string, tag: string): void {
         delete db.tags[target][i];
       }
     }
+    db.tags[target] = sortList(db.tags[target]);
     db.tagsSnap.child(target).ref.set(db.tags[target]);
   } else if (tags && tags.indexOf(tag) > -1) {
     for (const i of Object.keys(db.tags[target])) {
@@ -166,6 +168,7 @@ export function delTag(bot: Bot, target: number | string, tag: string): void {
         delete db.tags[target][i];
       }
     }
+    db.tags[target] = sortList(db.tags[target]);
     db.tagsSnap.child(target).ref.set(sortList(db.tags[target]));
   }
 }

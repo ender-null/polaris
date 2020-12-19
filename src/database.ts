@@ -47,17 +47,24 @@ export class Database {
       'translations',
     ];
     const ready = [];
+    let loaded = false;
     for (const table of tables) {
       this.fb.ref(`db/${table}`).on('value', (snapshot: firebase.database.DataSnapshot) => {
         this[table + 'Snap'] = snapshot;
-        this[table] = snapshot.toJSON();
-        logger.info(`loaded ${table} [${this[table] ? Object.keys(this[table]).length : 0}]`);
-        this.events.emit(`update:${table}`);
-        if (ready.indexOf(table) == -1) {
-          ready.push(table);
+        if (!this[table]) {
+          this[table] = snapshot.toJSON();
+          logger.info(`loaded ${table} [${this[table] ? Object.keys(this[table]).length : 0}]`);
         }
-        if (ready.length == tables.length) {
-          this.events.emit('loaded');
+        this.events.emit(`update:${table}`);
+        if (!loaded) {
+          if (ready.indexOf(table) == -1) {
+            ready.push(table);
+          }
+          if (ready.length == tables.length) {
+            logger.info('loaded database');
+            this.events.emit('loaded');
+            loaded = true;
+          }
         }
       });
     }
