@@ -170,6 +170,9 @@ export class PolePlugin extends PluginBase {
           .ref.set({
             [type]: uid,
           });
+        db.poles[gid][date] = {
+          [type]: uid,
+        };
       } else {
         db.polesSnap
           .child(gid)
@@ -177,6 +180,9 @@ export class PolePlugin extends PluginBase {
           .ref.update({
             [type]: uid,
           });
+        db.poles[gid][date] = {
+          [type]: uid,
+        };
       }
       text = format(this.strings['got' + capitalize(type)], getUsername(uid));
     }

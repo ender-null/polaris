@@ -97,6 +97,12 @@ export class PinPlugin extends PluginBase {
         type: pinType,
         bot: this.bot.user.id,
       });
+      db.pins[tag] = {
+        content: msg.reply.content.replace('<', '&lt;').replace('>', '&gt;'),
+        creator: msg.sender.id,
+        type: pinType,
+        bot: this.bot.user.id,
+      };
       this.bot.replyMessage(msg, format(this.strings['pinned'], tag));
     } else if (isCommand(this, 3, msg.content)) {
       if (!input) {
@@ -114,6 +120,7 @@ export class PinPlugin extends PluginBase {
         return this.bot.replyMessage(msg, format(this.strings['notCreator'], tag));
       }
       db.pinsSnap.child(tag).ref.set(null);
+      delete db.pins[tag];
       this.bot.replyMessage(msg, format(this.strings['unpinned'], tag));
     } else {
       // Finds the first 3 pins of the message and sends them.

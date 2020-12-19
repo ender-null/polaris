@@ -126,7 +126,8 @@ export class ReminderPlugin extends PluginBase {
       } else {
         return this.bot.replyMessage(msg, this.bot.errors.invalidArgument);
       }
-      db.remindersSnap.child(String(alarm).split('.')[0]).ref.set(reminder);
+      db.remindersSnap.child(String(Math.trunc(alarm))).ref.set(reminder);
+      db.reminders[String(Math.trunc(alarm))] = reminder;
 
       const message = format(this.strings['message'], msg.sender['firstName'], delayText, text);
       this.bot.replyMessage(msg, message);
@@ -156,6 +157,7 @@ export class ReminderPlugin extends PluginBase {
         }
         this.bot.sendMessage(chat, text);
         db.remindersSnap.child(index).ref.set(null);
+        delete db.reminders[index];
       }
     }
   }

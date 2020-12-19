@@ -83,9 +83,6 @@ export class AboutPlugin extends PluginBase {
       if (!db.groups) {
         db.groups = {};
       }
-      db.groups[gid] = {
-        title: msg.conversation.title || '',
-      };
       if (db.groups && db.groups[gid] != undefined) {
         db.groupsSnap.child(gid).ref.update({
           title: msg.conversation.title || '',
@@ -95,6 +92,9 @@ export class AboutPlugin extends PluginBase {
           title: msg.conversation.title || '',
         });
       }
+      db.groups[gid] = {
+        title: msg.conversation.title || '',
+      };
     }
 
     const uid = String(msg.sender.id);
@@ -105,13 +105,6 @@ export class AboutPlugin extends PluginBase {
     if (!db.users) {
       db.users = {};
     }
-    db.users[uid] = {
-      first_name: msg.sender['firstName'] || '',
-      last_name: msg.sender['lastName'] || '',
-      username: msg.sender['username'] || '',
-      is_bot: msg.sender['isBot'] || false,
-    };
-
     if (db.users[uid] != undefined) {
       db.usersSnap.child(uid).ref.update({
         first_name: msg.sender['firstName'] || '',
@@ -127,5 +120,11 @@ export class AboutPlugin extends PluginBase {
         is_bot: msg.sender['isBot'] || false,
       });
     }
+    db.users[uid] = {
+      first_name: msg.sender['firstName'] || '',
+      last_name: msg.sender['lastName'] || '',
+      username: msg.sender['username'] || '',
+      is_bot: msg.sender['isBot'] || false,
+    };
   }
 }

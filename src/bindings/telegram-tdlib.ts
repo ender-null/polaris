@@ -1,7 +1,7 @@
 import { Response } from 'node-fetch';
 import { ParsedUrlQueryInput } from 'querystring';
 import { Client } from 'tdl';
-import { TDLib } from 'tdl-tdlib-ffi';
+import { TDLib } from 'tdl-tdlib-addon';
 import { message, ok, Update, user } from 'tdl/types/tdlib';
 import { BindingsBase, Bot, Conversation, ConversationInfo, Extra, Message, User } from '..';
 import { db } from '../main';

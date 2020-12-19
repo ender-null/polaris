@@ -110,11 +110,13 @@ export class AntiSpamPlugin extends PluginBase {
       );
       setTag(this.bot, m.sender.id, spamType);
       if (spamType in db.groups[gid]) {
+        db.groups[gid][spamType] = db.groups[gid][spamType] + 1;
         db.groupsSnap
           .child(gid)
           .child(spamType)
           .ref.set(db.groups[gid][spamType] + 1);
       } else {
+        db.groups[gid][spamType] = 1;
         db.groupsSnap.child(gid).child(spamType).ref.set(1);
       }
 
