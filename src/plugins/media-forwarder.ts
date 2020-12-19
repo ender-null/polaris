@@ -135,7 +135,7 @@ export class MediaForwarderPlugin extends PluginBase {
                   webhookUrl,
                   { content: file },
                   {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Type': 'multipart/form-data',
                   },
                   null,
                   true,
