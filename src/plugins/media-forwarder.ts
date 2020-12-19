@@ -122,11 +122,27 @@ export class MediaForwarderPlugin extends PluginBase {
                   url = url.split('?')[0];
                 }
               }
-              await sendRequest(webhookUrl, { content: url }, null, null, true);
+              await sendRequest(
+                webhookUrl,
+                { content: url },
+                {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                null,
+                true,
+              );
             }
           } else {
             if (msg.content.startsWith('http')) {
-              await sendRequest(webhookUrl, { content: msg.content }, null, null, true);
+              await sendRequest(
+                webhookUrl,
+                { content: msg.content },
+                {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                null,
+                true,
+              );
             } else {
               const file = await this.bot.bindings.getFile(msg.content);
               // TODO
