@@ -131,7 +131,15 @@ export class MediaForwarderPlugin extends PluginBase {
               const file = await this.bot.bindings.getFile(msg.content);
               // TODO
               if (file) {
-                await sendRequest(webhookUrl, { content: file }, null, null, true);
+                await sendRequest(
+                  webhookUrl,
+                  { content: file },
+                  {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                  },
+                  null,
+                  true,
+                );
               }
             }
           }

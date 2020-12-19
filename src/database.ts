@@ -51,7 +51,7 @@ export class Database {
     for (const table of tables) {
       this.fb.ref(`db/${table}`).on('value', (snapshot: firebase.database.DataSnapshot) => {
         this[table + 'Snap'] = snapshot;
-        if (!this[table]) {
+        if (!this[table] || table == 'configs' || table == 'translations') {
           this[table] = snapshot.toJSON();
           logger.info(`loaded ${table} [${this[table] ? Object.keys(this[table]).length : 0}]`);
         }
