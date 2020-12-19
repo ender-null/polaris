@@ -295,7 +295,7 @@ export class Bot {
     if (
       typeof message.content == 'string' &&
       message.content.endsWith(`@${this.user.username}`) &&
-      message.content.indexOf(' ') > -1
+      message.content.indexOf(' ') == -1
     ) {
       message.content = message.content.replace(`@${this.user.username}`, '');
     }
@@ -316,7 +316,6 @@ export class Bot {
       }
 
       if (!friendly) {
-        trigger = trigger.toLowerCase().replace(`@${this.user.username.toLowerCase()}`, '');
         if (parameters == null && trigger.startsWith('^')) {
           trigger += '$';
         } else if (
