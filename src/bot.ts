@@ -316,7 +316,7 @@ export class Bot {
       }
 
       if (!friendly) {
-        trigger = trigger.replace(`@${this.user.username.toLowerCase()}`, '');
+        trigger = trigger.toLowerCase().replace(`@${this.user.username.toLowerCase()}`, '');
         if (parameters == null && trigger.startsWith('^')) {
           trigger += '$';
         } else if (
