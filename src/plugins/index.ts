@@ -22,6 +22,7 @@ export { RussianRoulettePlugin } from './russian-roulette';
 export { SearchPlugin } from './search';
 export { TagPlugin } from './tag';
 export { TelegramPlugin } from './telegram';
+export { UrbanDictionaryPlugin } from './urban-dictionary';
 export { ValenciaPlugin } from './valencia';
 export { VoicePlugin } from './voice';
 export { WeatherPlugin } from './weather';
