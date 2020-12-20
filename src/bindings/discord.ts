@@ -8,6 +8,7 @@ export class DiscordBindings extends BindingsBase {
   constructor(bot: Bot) {
     super(bot);
     this.client = new Client({
+      restRequestTimeout: 60000,
       presence: {
         activity: {
           name: `${this.bot.config.prefix}help`,
