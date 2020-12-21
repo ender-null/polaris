@@ -163,6 +163,13 @@ export class PolePlugin extends PluginBase {
         return;
       }
 
+      if (!db.poles) {
+        db.poles = {};
+      }
+      if (db.poles[gid] == undefined) {
+        db.poles[gid] = {};
+      }
+
       if (!db.poles || !db.poles[gid] || !db.poles[gid][date]) {
         db.polesSnap
           .child(gid)
