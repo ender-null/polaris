@@ -36,21 +36,19 @@ export class HelpPlugin extends PluginBase {
             const doc = generateCommandHelp(plugin, command.command, false);
             if (doc) {
               const lines = doc.split('\n');
-
               text += `\n • ${lines[0]}`;
-
-              if (lines.length > 1) {
-                // text += `\n   ${lines[1]}`;
-                commands.push({
-                  command: getWord(lines[0], 1).substr(1),
-                  description: removeHtml(lines[1]),
-                });
-              } else {
-                // text += `\n   <i>${this.strings['noDescription']}</i>`;
-                commands.push({
-                  command: getWord(lines[0], 1).substr(1),
-                  description: this.strings['noDescription'],
-                });
+              if (this.bot.config.prefix == '/' || command.keepDefault) {
+                if (lines.length > 1) {
+                  commands.push({
+                    command: getWord(lines[0], 1).substr(1),
+                    description: removeHtml(lines[1]),
+                  });
+                } else {
+                  commands.push({
+                    command: getWord(lines[0], 1).substr(1),
+                    description: this.strings['noDescription'],
+                  });
+                }
               }
             }
           }

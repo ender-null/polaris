@@ -548,7 +548,10 @@ export async function responseUrlFromRequest(
   headers?: HeadersInit,
 ): Promise<string> {
   const response = await sendRequest(url, params, headers);
-  return response.url;
+  if (response) {
+    return response.url;
+  }
+  return null;
 }
 
 export async function download(
