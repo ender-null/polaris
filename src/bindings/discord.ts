@@ -9,12 +9,6 @@ export class DiscordBindings extends BindingsBase {
     super(bot);
     this.client = new Client({
       restRequestTimeout: 60000,
-      presence: {
-        activity: {
-          name: `${this.bot.config.prefix}help`,
-          type: 'LISTENING',
-        },
-      },
     });
   }
 
@@ -27,6 +21,12 @@ export class DiscordBindings extends BindingsBase {
         this.client.user.tag,
         this.client.user.bot,
       );
+      this.client.user.setPresence({
+        activity: {
+          name: `${this.bot.config.prefix}help`,
+          type: 'LISTENING',
+        },
+      });
       this.bot.status.emit('started');
     });
 
