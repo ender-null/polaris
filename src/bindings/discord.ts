@@ -97,10 +97,15 @@ export class DiscordBindings extends BindingsBase {
   async sendMessage(msg: Message): Promise<void> {
     if (msg.content) {
       let chat;
-      if (+msg.conversation.id > 0) {
-        chat = await (await this.client.users.fetch(String(msg.conversation.id))).dmChannel;
-      } else {
-        chat = await this.client.channels.fetch(String(msg.conversation.id).slice(1));
+      try {
+        if (+msg.conversation.id > 0) {
+          chat = await (await this.client.users.fetch(String(msg.conversation.id))).dmChannel;
+        } else {
+          chat = await this.client.channels.fetch(String(msg.conversation.id).slice(1));
+        }
+      } catch (e) {
+        logger.error(e.message);
+        return;
       }
       if (chat) {
         chat.startTyping();
