@@ -8,7 +8,8 @@ import format from 'string-format';
 import { error } from 'tdl/types/tdlib';
 import tmp from 'tmp';
 import util from 'util';
-import { createLogger, format as winstonFormat, transports } from 'winston';
+import winston, { createLogger, format as winstonFormat, transports } from 'winston';
+import 'winston-daily-rotate-file';
 import { Bot, Message, PluginBase } from '.';
 import { db } from './main';
 import { CoordinatesResult, iString } from './types';
@@ -238,9 +239,13 @@ export function getTarget(bot: Bot, m: Message, input: string): string {
   }
 }
 
-export function capitalize(text: string): string {
+export function capitalize(text: string, setLowercase?: boolean): string {
   if (text) {
-    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+    if (setLowercase) {
+      return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+    } else {
+      return text.charAt(0).toUpperCase() + text.slice(1);
+    }
   }
   return null;
 }
@@ -809,6 +814,15 @@ export function catchException(exception: Error | error, bot: Bot = null, messag
 
 export const telegramLinkRegExp = new RegExp('(?:t|telegram|tlgrm).(?:me|dog)/joinchat/([a-zA-Z0-9-]+)', 'gim');
 
+export const transport = new winston.transports.DailyRotateFile({
+  dirname: 'logs',
+  filename: 'polaris-js-%DATE%.log',
+  datePattern: 'YYYY-MM-DD-HH',
+  zippedArchive: true,
+  maxSize: '20m',
+  maxFiles: '14d',
+});
+
 // Configure logger
 export const logger = createLogger({
   level: 'info',
@@ -817,8 +831,7 @@ export const logger = createLogger({
     new transports.Console({
       format: winstonFormat.combine(winstonFormat.simple(), winstonFormat.colorize()),
     }),
-    new transports.File({ filename: 'error.log', level: 'error' }),
-    new transports.File({ filename: 'combined.log' }),
+    transport,
   ],
 });
 

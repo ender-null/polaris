@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs';
 import { ApiKeys } from '.';
 import { Instance } from './types';
+import { merge } from './utils';
 
 export class Config {
   name?: string;
@@ -29,6 +30,7 @@ export class Config {
     this.alertsConversationId = null;
     this.apiKeys = {
       telegramBotToken: null,
+      telegramPhoneNumber: null,
       telegramApiHash: null,
       telegramAppId: null,
       databaseEncryptionKey: null,
@@ -49,10 +51,7 @@ export class Config {
       configs.push(config);
     } else {
       for (const instance of Object.keys(config.instances)) {
-        const iconfig = {
-          ...config,
-          ...config.instances[instance],
-        };
+        const iconfig = merge(config, config.instances[instance]);
         delete iconfig['instances'];
         configs.push(iconfig);
       }

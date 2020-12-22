@@ -45,6 +45,7 @@ export class Errors extends ErrorMessages {
 }
 
 export interface ApiKeys {
+  telegramPhoneNumber?: string;
   telegramBotToken?: string;
   telegramApiHash?: string;
   telegramAppId?: number;

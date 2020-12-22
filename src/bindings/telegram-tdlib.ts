@@ -52,11 +52,19 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async start(): Promise<void> {
-    await this.client.connectAndLogin(() => ({
-      type: 'bot',
-      getToken: (retry) =>
-        retry ? Promise.reject('Token is not valid') : Promise.resolve(this.bot.config.apiKeys.telegramBotToken), // Token from @BotFather
-    }));
+    if (this.bot.config.apiKeys.telegramBotToken) {
+      await this.client.connectAndLogin(() => ({
+        type: 'bot',
+        getToken: (retry) =>
+          retry ? Promise.reject('Token is not valid') : Promise.resolve(this.bot.config.apiKeys.telegramBotToken),
+      }));
+    } else if (this.bot.config.apiKeys.telegramPhoneNumber) {
+      await this.client.connectAndLogin(() => ({
+        type: 'user',
+        getPhoneNumber: (retry) =>
+          retry ? Promise.reject('Invalid phone number') : Promise.resolve(this.bot.config.apiKeys.telegramPhoneNumber),
+      }));
+    }
 
     this.client.on('update', (update: Update) => this.updateHandler(update));
     this.client.on('error', logger.error);
@@ -537,6 +545,11 @@ export class TelegramTDlibBindings extends BindingsBase {
 
     if (response['message'].lower() == 'chat not found') {
       logger.info(`Chat not found: ${request['chat_id']}`);
+      otherError = false;
+    }
+
+    if (response['message'].lower() == 'bad request: file is too big') {
+      logger.info(`File is too big`);
       otherError = false;
     }
 
