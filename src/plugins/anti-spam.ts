@@ -2,7 +2,18 @@ import format from 'string-format';
 import { Bot, Message } from '..';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
-import { delTag, fixTelegramLink, getFullName, hasTag, isAdmin, isGroupAdmin, setTag } from '../utils';
+import {
+  delTag,
+  fixTelegramLink,
+  getFullName,
+  hasTag,
+  isAdmin,
+  isGroupAdmin,
+  isTrusted,
+  logger,
+  setTag,
+  telegramLinkRegExp,
+} from '../utils';
 
 export class AntiSpamPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -13,6 +24,7 @@ export class AntiSpamPlugin extends PluginBase {
       unmarking: 'Unmarking {0}: {1} [{2}] from group {3} [{4}]',
       kicked: 'Kicked {0}: {1} [{2}] from group {3} [{4}] for {5}: {6}',
       kickedMyself: 'Kicked myself from: {0} [{1}]',
+      cantKickMyself: "Can't kick myself from: {0} [{1}]",
       unsafeTelegramLink: 'Sent unsafe telegram link: {0} [{1}] to group {2} [{3}] for text: {4}',
     };
   }
@@ -30,7 +42,7 @@ export class AntiSpamPlugin extends PluginBase {
       if (hasTag(this.bot, msg.sender.id, spamType)) {
         if (!isAdmin(this.bot, msg.sender.id, msg)) {
           await this.kickSpammer(msg, spamType, 'tag');
-        } else {
+        } else if (isTrusted(this.bot, msg.sender.id, msg)) {
           delTag(this.bot, msg.sender.id, spamType);
           const name = getFullName(msg.sender.id);
           const gid = String(msg.conversation.id);
@@ -146,13 +158,17 @@ export class AntiSpamPlugin extends PluginBase {
   }
 
   async kickMyself(msg: Message): Promise<void> {
-    await this.bot.bindings.kickConversationMember(msg.conversation.id, this.bot.user.id);
+    const res = await this.bot.bindings.kickConversationMember(msg.conversation.id, this.bot.user.id);
     const gid = String(msg.conversation.id);
-    this.bot.sendAdminAlert(format(this.strings['kickedMyself'], db.groups[gid].title, gid));
+    if (res) {
+      this.bot.sendAdminAlert(format(this.strings['kickedMyself'], db.groups[gid].title, gid));
+    } else {
+      logger.error(format(this.strings['cantKickMyself'], db.groups[gid].title, gid));
+    }
   }
 
   async checkTrustedTelegramLink(m: Message, text: string): Promise<void> {
-    const inputMatch = new RegExp('(?:t|telegram|tlgrm).(?:me|dog)/joinchat/([a-zA-Z0-9-]+)', 'gim').exec(text);
+    const inputMatch = telegramLinkRegExp.exec(text);
     if (inputMatch && inputMatch.length > 0) {
       let trustedGroup = false;
       if (inputMatch && inputMatch.length > 0) {

@@ -158,9 +158,11 @@ export class LeagueOfLegendsPlugin extends PluginBase {
       if (!summoner || ('status' in summoner && summoner['status']['status_code'] != 200)) {
         return this.bot.replyMessage(msg, this.bot.errors.connectionError);
       }
-      const account = await this.accountByPuuid(summoner['puuid']);
-      const masteries = await this.championMasteries(summoner['id']);
-      const ranked = await this.leagueEntries(summoner['id']);
+      const [account, masteries, ranked] = await Promise.all([
+        this.accountByPuuid(summoner['puuid']),
+        this.championMasteries(summoner['id']),
+        this.leagueEntries(summoner['id']),
+      ]);
       let iconUrl = null;
       if (this.latestVersion) {
         iconUrl = format(

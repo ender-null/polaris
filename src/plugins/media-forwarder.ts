@@ -33,7 +33,6 @@ export class MediaForwarderPlugin extends PluginBase {
       if (db.users[uid]) {
         name = db.users[uid].first_name;
       }
-
       logger.info(`ignoring message via bot: ${name} [${uid}]`);
       return;
     }

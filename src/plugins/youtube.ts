@@ -49,6 +49,9 @@ export class YouTubePlugin extends PluginBase {
       key: this.bot.config.apiKeys.googleDeveloperConsole,
     };
     const resp = await sendRequest(url, params);
+    if (!resp) {
+      return this.bot.replyMessage(msg, this.bot.errors.connectionError);
+    }
     const content = await resp.json();
     if (content.error != undefined && content.error.code == '403') {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);

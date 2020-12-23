@@ -1,4 +1,4 @@
-import { Bot, Errors, Message } from '..';
+import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
 import { hasTag, isCommand, responseUrlFromRequest } from '../utils';
 
@@ -32,7 +32,7 @@ export class AnimalPlugin extends PluginBase {
       if (photo) {
         return this.bot.replyMessage(msg, photo, 'photo');
       } else {
-        return this.bot.replyMessage(msg, Errors.connectionError);
+        return this.bot.replyMessage(msg, this.bot.errors.connectionError);
       }
     } else if (isCommand(this, 2, msg.content)) {
       const url = 'https://dog.ceo/api/breeds/image/random';
@@ -40,7 +40,7 @@ export class AnimalPlugin extends PluginBase {
       if (photo) {
         return this.bot.replyMessage(msg, photo, 'photo');
       } else {
-        return this.bot.replyMessage(msg, Errors.connectionError);
+        return this.bot.replyMessage(msg, this.bot.errors.connectionError);
       }
     }
   }

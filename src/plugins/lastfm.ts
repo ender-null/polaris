@@ -61,8 +61,11 @@ export class LastFMPlugin extends PluginBase {
         api_key: this.bot.config.apiKeys.lastfm,
         user: username,
       };
-      const res = await sendRequest(url, params);
-      const content = await res.json();
+      const resp = await sendRequest(url, params);
+      if (!resp) {
+        return this.bot.replyMessage(msg, this.bot.errors.connectionError);
+      }
+      const content = await resp.json();
       if (content.error == 6) {
         return this.bot.replyMessage(msg, this.bot.errors.noResults);
       }
@@ -105,6 +108,9 @@ export class LastFMPlugin extends PluginBase {
         key: this.bot.config.apiKeys.googleDeveloperConsole,
       };
       const ytResp = await sendRequest(ytUrl, ytParams);
+      if (!ytResp) {
+        return this.bot.replyMessage(msg, this.bot.errors.connectionError);
+      }
       const ytContent = await ytResp.json();
       if (!ytContent.error && ytContent.pageInfo.totalResults > 0) {
         text += `\n\n🌐 ${this.strings.mightBe}\n${ytContent['items'][0].snippet.title}\nhttps://youtu.be/${ytContent['items'][0].id.videoId}`;

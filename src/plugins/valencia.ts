@@ -41,6 +41,9 @@ export class ValenciaPlugin extends PluginBase {
     body.append('usuario', 'Anonimo');
     body.append('idioma', 'es');
     const resp = await sendRequest(url, null, headers, body, true);
+    if (!resp) {
+      return this.bot.replyMessage(msg, this.bot.errors.connectionError);
+    }
     const html = await resp.text();
     const $ = cheerio.load(html);
     const schedule = $('.llegadaHome');

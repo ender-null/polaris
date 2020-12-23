@@ -29,11 +29,11 @@ export class ImagePlugin extends PluginBase {
     const searchParams = {
       q: input,
     };
-    const searchRes = await sendRequest(searchUrl, searchParams);
-    if (!searchRes) {
+    const searchResp = await sendRequest(searchUrl, searchParams);
+    if (!searchResp) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
     }
-    const searchContent = await searchRes.text();
+    const searchContent = await searchResp.text();
     const searchObj = new RegExp('vqd=([\\d-]+)&', 'gim').exec(searchContent);
     if (!searchObj || searchObj.length == 0) {
       return this.bot.replyMessage(msg, this.bot.errors.unknown);
@@ -68,8 +68,11 @@ export class ImagePlugin extends PluginBase {
     }
 
     const url = searchUrl + 'i.js';
-    const res = await sendRequest(url, params, headers);
-    const content = await res.json();
+    const resp = await sendRequest(url, params, headers);
+    if (!resp) {
+      return this.bot.replyMessage(msg, this.bot.errors.connectionError);
+    }
+    const content = await resp.json();
 
     if (!content || content['results'] == undefined) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);

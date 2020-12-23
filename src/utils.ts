@@ -70,6 +70,7 @@ export function getTags(bot: Bot, target: number | string, tagFilter?: string): 
       }
       if (regex.test(tag)) {
         const inputMatch = regex.exec(tag);
+        console.log(tag, inputMatch);
         if (inputMatch[1] === bot.config.name || inputMatch[1] === bot.user.username) {
           tags.push(tag.replace(regex, ''));
         }

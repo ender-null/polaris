@@ -88,9 +88,9 @@ export class TelegramTDlibBindings extends BindingsBase {
     const extra: Extra = {};
 
     const rawChat = await this.serverRequest('getChat', { chat_id: msg.chat_id });
-    const conversation = new Conversation(msg['chat_id']);
+    const conversation = new Conversation(msg.chat_id);
     let sender = null;
-    if (rawChat && 'title' in rawChat) {
+    if (rawChat && rawChat.title) {
       conversation.title = rawChat.title;
     }
     let userId;
@@ -102,14 +102,16 @@ export class TelegramTDlibBindings extends BindingsBase {
     if (userId) {
       const rawSender = await this.serverRequest('getUser', { user_id: userId });
       sender = new User(userId);
-      if ('first_name' in rawSender) {
-        sender.firstName = String(rawSender.first_name);
-      }
-      if ('last_name' in rawSender) {
-        sender.lastName = String(rawSender.last_name);
-      }
-      if ('username' in rawSender) {
-        sender.username = String(rawSender.username);
+      if (rawSender) {
+        if (rawSender.first_name) {
+          sender.firstName = String(rawSender.first_name);
+        }
+        if (rawSender.last_name) {
+          sender.lastName = String(rawSender.last_name);
+        }
+        if (rawSender.username) {
+          sender.username = String(rawSender.username);
+        }
       }
     } else {
       sender = new User(conversation.id, conversation.title);

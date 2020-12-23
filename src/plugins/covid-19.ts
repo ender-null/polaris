@@ -106,6 +106,10 @@ export class Covid19Plugin extends PluginBase {
       await this.getCountryCodes();
     }
     const resp = await sendRequest('https://covid19.who.int/page-data/table/page-data.json');
+    if (!resp) {
+      logger.error(this.bot.errors.connectionError);
+      return;
+    }
     const content = await resp.json();
     const countryGroups = content.result.pageContext.countryGroups;
     this.data = {};
@@ -135,6 +139,10 @@ export class Covid19Plugin extends PluginBase {
 
   async getCountryCodes(): Promise<void> {
     const resp = await sendRequest('https://www.iban.com/country-codes');
+    if (!resp) {
+      logger.error(this.bot.errors.connectionError);
+      return;
+    }
     const html = await resp.text();
     const $ = cheerio.load(html);
     const table = $('tbody');

@@ -1,6 +1,9 @@
+import * as BluebirdPromise from 'bluebird';
 import http from 'http';
 import { Bot, Config, Database } from '.';
 import { catchException, logger } from './utils';
+
+global.Promise = BluebirdPromise;
 
 const bots: Bot[] = [];
 

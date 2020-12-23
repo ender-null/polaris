@@ -122,14 +122,15 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         characterName = words.pop();
         realm = words.join('-').toLowerCase();
       }
-      const character = await this.getCharacter(region, realm, characterName);
-      const media = await this.getCharacterMedia(region, realm, characterName);
-      const raids = await this.getCharacterRaids(region, realm, characterName);
-      const pvp = await this.getCharacterPVP(region, realm, characterName);
-      const professions = await this.getCharacterProfessions(region, realm, characterName);
+      const [character, media, raids, pvp, professions, raiderIO] = await Promise.all([
+        this.getCharacter(region, realm, characterName),
+        this.getCharacterMedia(region, realm, characterName),
+        this.getCharacterRaids(region, realm, characterName),
+        this.getCharacterPVP(region, realm, characterName),
+        this.getCharacterProfessions(region, realm, characterName),
+        this.getRaiderIO(region, realm, characterName),
+      ]);
       // const statistics = await this.getCharacterStatistics(region, realm, characterName);
-      const raiderIO = await this.getRaiderIO(region, realm, characterName);
-
       if (!character) {
         return this.bot.replyMessage(msg, this.bot.errors.connectionError);
       }

@@ -45,8 +45,11 @@ export class WeatherPlugin extends PluginBase {
       units: 'metric',
       lang: this.bot.config.locale.slice(0, 2),
     };
-    const res = await sendRequest(url, params);
-    const content = await res.json();
+    const resp = await sendRequest(url, params);
+    if (!resp) {
+      return this.bot.replyMessage(msg, this.bot.errors.connectionError);
+    }
+    const content = await resp.json();
     if (!content || content.cod != 200) {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);
     }

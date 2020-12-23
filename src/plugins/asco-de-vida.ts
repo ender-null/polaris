@@ -15,6 +15,9 @@ export class AscoDeVidaPlugin extends PluginBase {
   }
   async run(msg: Message): Promise<void> {
     const resp = await sendRequest('http://www.ascodevida.com/aleatorio');
+    if (!resp) {
+      return this.bot.replyMessage(msg, this.bot.errors.connectionError);
+    }
     const html = await resp.text();
     const $ = cheerio.load(html);
     const story = $('.story').first();

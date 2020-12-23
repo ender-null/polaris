@@ -30,6 +30,9 @@ export class UrbanDictionaryPlugin extends PluginBase {
       term: term,
     };
     const resp = await sendRequest(url, params);
+    if (!resp) {
+      return this.bot.replyMessage(msg, this.bot.errors.connectionError);
+    }
     const content = await resp.json();
 
     if (!content.list || content.list.length == 0) {

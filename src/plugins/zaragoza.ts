@@ -61,8 +61,11 @@ export class ZaragozaPlugin extends PluginBase {
       } else {
         params['street'] = input;
       }
-      const res = await sendRequest(url, params);
-      const content = await res.json();
+      const resp = await sendRequest(url, params);
+      if (!resp) {
+        return this.bot.replyMessage(msg, this.bot.errors.connectionError);
+      }
+      const content = await resp.json();
       if (!content || content.errors) {
         if (content && content.errors && content.errors.status == '404 Not Found') {
           return this.bot.replyMessage(msg, this.bot.errors.noResults);
@@ -89,8 +92,11 @@ export class ZaragozaPlugin extends PluginBase {
         rf: 'html',
         srsname: 'utm30n',
       };
-      const res = await sendRequest(url, params);
-      const content = await res.json();
+      const resp = await sendRequest(url, params);
+      if (!resp) {
+        return this.bot.replyMessage(msg, this.bot.errors.connectionError);
+      }
+      const content = await resp.json();
 
       if (!content || content.error) {
         if (content && content.error == 'Parametros incorrectos') {

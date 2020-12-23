@@ -43,6 +43,9 @@ export class VoicePlugin extends PluginBase {
     };
 
     const file = await download(url, params, headers);
+    if (!file) {
+      return this.bot.replyMessage(msg, this.bot.errors.connectionError);
+    }
     const voice = await mp3ToOgg(file);
     if (voice) {
       this.bot.replyMessage(msg, voice, 'voice');
