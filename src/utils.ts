@@ -64,15 +64,13 @@ export function getTags(bot: Bot, target: number | string, tagFilter?: string): 
     const tags = [];
     for (const i in db.tags[target]) {
       const tag = db.tags[target][i];
-      const regex = new RegExp('@(\\w+):', 'gim');
       if (tagFilter && tagFilter.indexOf('?') > -1 && !tag.startsWith(tagFilter.split('?')[0])) {
         continue;
       }
-      if (regex.test(tag)) {
-        const inputMatch = regex.exec(tag);
-        console.log(tag, inputMatch);
-        if (inputMatch[1] === bot.config.name || inputMatch[1] === bot.user.username) {
-          tags.push(tag.replace(regex, ''));
+      const inputMatch = tagForBot.exec(tag);
+      if (inputMatch) {
+        if (inputMatch && (inputMatch[1] === bot.config.name || inputMatch[1] === bot.user.username)) {
+          tags.push(tag.replace(tagForBot, ''));
         }
       } else {
         tags.push(tag);
@@ -817,6 +815,7 @@ export function catchException(exception: Error | error, bot: Bot = null, messag
 }
 
 export const telegramLinkRegExp = new RegExp('(?:t|telegram|tlgrm).(?:me|dog)/joinchat/([a-zA-Z0-9-]+)', 'gim');
+export const tagForBot = new RegExp('@(\\w+):', 'gim');
 
 export const transport = new winston.transports.DailyRotateFile({
   dirname: 'logs',

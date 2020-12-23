@@ -52,7 +52,7 @@ export class MediaForwarderPlugin extends PluginBase {
               }
             }
           }
-          logger.info(`tag: {tag}, forward: {forward}`);
+          logger.info(`tag: ${tag}, forward: ${forward}`);
         }
         if (tag.startsWith('resend:') && !forward) {
           const cid = tag.split(':')[1];

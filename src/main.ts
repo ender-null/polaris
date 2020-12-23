@@ -2,7 +2,7 @@ import http from 'http';
 import { Bot, Config, Database } from '.';
 import { catchException, logger } from './utils';
 
-global.Promise = require('bluebird');
+// global.Promise = require('bluebird');
 
 const bots: Bot[] = [];
 
