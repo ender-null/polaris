@@ -64,7 +64,7 @@ export function getTags(bot: Bot, target: number | string, tagFilter?: string): 
     const tags = [];
     for (const i in db.tags[target]) {
       const tag = db.tags[target][i];
-      const regex = new RegExp('(@w+:)', 'gim');
+      const regex = new RegExp('@(\\w+):', 'gim');
       if (tagFilter && tagFilter.indexOf('?') > -1 && !tag.startsWith(tagFilter.split('?')[0])) {
         continue;
       }
