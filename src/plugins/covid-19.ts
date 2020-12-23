@@ -2,7 +2,7 @@ import * as cheerio from 'cheerio';
 import format from 'string-format';
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
-import { iStringNested } from '../types';
+import { Errors, iStringNested } from '../types';
 import { camelCase, formatNumber, generateCommandHelp, getInput, isCommand, logger, sendRequest } from '../utils';
 
 export class Covid19Plugin extends PluginBase {
@@ -107,7 +107,7 @@ export class Covid19Plugin extends PluginBase {
     }
     const resp = await sendRequest('https://covid19.who.int/page-data/table/page-data.json');
     if (!resp) {
-      logger.error(this.bot.errors.connectionError);
+      logger.error(Errors.connectionError);
       return;
     }
     const content = await resp.json();
@@ -140,7 +140,7 @@ export class Covid19Plugin extends PluginBase {
   async getCountryCodes(): Promise<void> {
     const resp = await sendRequest('https://www.iban.com/country-codes');
     if (!resp) {
-      logger.error(this.bot.errors.connectionError);
+      logger.error(Errors.connectionError);
       return;
     }
     const html = await resp.text();
