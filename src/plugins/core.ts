@@ -127,7 +127,7 @@ export class CorePlugin extends PluginBase {
     }
 
     if (msg.sender.id == 777000 && msg.conversation.id > 0) {
-      const inputMatch = new RegExp('d{5}').exec(msg.content);
+      const inputMatch = new RegExp('\\d{5}').exec(msg.content);
       if (inputMatch && inputMatch.length > 0) {
         const code = inputMatch[0].split('').join('\u200c');
         this.bot.sendAlert(`Login code: ${code}`);

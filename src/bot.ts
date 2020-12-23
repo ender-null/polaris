@@ -90,18 +90,18 @@ export class Bot {
 
   messageSender(msg: Message): void {
     logger.info(
-      `💬 [${this.user.id}] ${this.user.firstName}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
+      `💬 @${this.user.username} [${this.user.id}] ${this.user.firstName}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
     );
   }
 
   messagesHandler(msg: Message): void {
     if (msg.sender instanceof User) {
       logger.info(
-        `✉️  [${msg.sender.id}] ${msg.sender.firstName}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
+        `✉️  @${this.user.username} [${msg.sender.id}] ${msg.sender.firstName}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
       );
     } else {
       logger.info(
-        `✉️  [${msg.sender.id}] ${msg.sender.title}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
+        `✉️  @${this.user.username} [${msg.sender.id}] ${msg.sender.title}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
       );
     }
 
@@ -109,7 +109,7 @@ export class Bot {
   }
 
   webhookHandler(url: string, data: any): void {
-    logger.info(`🌐 [webhook:${url}] (@${this.user.username}) ${data}`);
+    logger.info(`🌐 @${this.user.username} [webhook:${url}] ${data}`);
     const path = url.split('/');
     for (const i in this.plugins) {
       const plugin = this.plugins[i];
