@@ -102,6 +102,7 @@ export class Covid19Plugin extends PluginBase {
   }
 
   async update(): Promise<void> {
+    logger.info('Updating COVID-19 data');
     if (this.countryCodes == undefined) {
       await this.getCountryCodes();
     }

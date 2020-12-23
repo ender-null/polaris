@@ -208,9 +208,9 @@ export class Bot {
 
   scheduleCronJobs(): void {
     for (const plugin of this.plugins) {
-      if ('cronExpression' in plugin && 'cron' in plugin) {
+      if (plugin.cronExpression && plugin.cron) {
         this.tasks.push(
-          cron.schedule(plugin.cronExpression, () => {
+          cron.schedule(plugin.cronExpression, (plugin) => {
             logger.debug(`Running ${plugin.constructor.name} cron job of @${this.user.username}`);
             plugin.cron();
           }),
