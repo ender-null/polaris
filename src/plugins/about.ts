@@ -27,7 +27,7 @@ export class AboutPlugin extends PluginBase {
       greeting: "Hi! I'm <b>{0}</b>!\nNice to meet you.",
       version: 'Running <a href="https://git.io/polaris.js">polaris.js</a> <code>{0}</code> by @endernull.',
       license:
-        '<b>Polaris.js</b> (including all plugins and documentation) is <b>free software</b>; you are free to redistribute it and/or modify it under the terms of the <b>MIT</b>.',
+        '<b>Polaris.js</b> (including all plugins and documentation) is <b>free software</b>; you are free to redistribute it and/or modify it under the terms of the <b>AGPL-3.0 License</b>.',
       help: 'Write {0}help to know what I can do!',
       about: 'Use {0}about to know more about me',
       channel: 'Support & suggestions at <a href="https://t.me/PolarisSupport">@PolarisSupport</a>',
