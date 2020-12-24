@@ -565,7 +565,7 @@ export async function download(
     logger.error(`unexpected response ${response.statusText}`);
     return null;
   }
-  if (response.headers.get('Content-Length') == '0') {
+  if (!response || response.headers.get('Content-Length') == '0') {
     return null;
   }
   const streamPipeline = util.promisify(pipeline);
