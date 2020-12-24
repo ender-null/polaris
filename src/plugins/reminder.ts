@@ -138,7 +138,7 @@ export class ReminderPlugin extends PluginBase {
   }
 
   async cron(): Promise<void> {
-    if (db.reminders) {
+    if (db.reminders && this.bot) {
       // Reminders are indexed by alarm time so there os no need to check more than one
       const index = Object.keys(db.reminders)[0];
       const reminder = db.reminders[index];
