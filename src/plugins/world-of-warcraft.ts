@@ -11,6 +11,7 @@ import {
   getInput,
   getTags,
   isCommand,
+  logger,
   now,
   sendRequest,
   setTag,
@@ -254,6 +255,9 @@ export class WorldOfWarcraftPlugin extends PluginBase {
     } else if (isCommand(this, 3, msg.content)) {
       const url = 'https://wowtokenprices.com/current_prices.json';
       const resp = await sendRequest(url);
+      if (!resp) {
+        return this.bot.replyMessage(msg, this.bot.errors.connectionError);
+      }
       const content = await resp.json();
       if (content) {
         text = `<b>${this.strings['tokenTitle']}</b>:`;
@@ -267,7 +271,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
           );
         }
       } else {
-        this.bot.replyMessage(msg, this.bot.errors.connectionError);
+        return this.bot.replyMessage(msg, this.bot.errors.connectionError);
       }
     }
     this.bot.replyMessage(msg, text);
@@ -282,8 +286,13 @@ export class WorldOfWarcraftPlugin extends PluginBase {
     const body = new FormData();
     body.append('grant_type', 'client_credentials');
     const resp = await sendRequest('https://eu.battle.net/oauth/token', {}, headers, body, true);
-    const content = await resp.json();
-    return content.access_token;
+    if (!resp) {
+      logger.error(this.bot.errors.connectionError);
+      return null;
+    } else {
+      const content = await resp.json();
+      return content.access_token;
+    }
   }
 
   async getCharacter(region: string, realm: string, characterName: string, method = '', retries = 3): Promise<any> {
@@ -294,16 +303,21 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       access_token: this.accessToken,
     };
     const resp = await sendRequest(url, params);
-    const content = await resp.text();
-    try {
-      return JSON.parse(content);
-    } catch (e) {
-      this.accessToken = await this.retrievingAccessToken();
-      retries -= 1;
-      if (retries > 0) {
-        return await this.getCharacter(region, realm, characterName, method, retries);
-      } else {
-        return null;
+    if (!resp) {
+      logger.error(this.bot.errors.connectionError);
+      return null;
+    } else {
+      const content = await resp.text();
+      try {
+        return JSON.parse(content);
+      } catch (e) {
+        this.accessToken = await this.retrievingAccessToken();
+        retries -= 1;
+        if (retries > 0) {
+          return await this.getCharacter(region, realm, characterName, method, retries);
+        } else {
+          return null;
+        }
       }
     }
   }

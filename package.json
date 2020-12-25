@@ -41,6 +41,7 @@
     "discord.js": "^12.5.1",
     "form-data": "^3.0.0",
     "mime-types": "^2.1.27",
+    "node-abort-controller": "^1.1.0",
     "node-cron": "^2.0.3",
     "string-format": "^2.0.0",
     "tdl": "^6.2.0",

@@ -16,7 +16,18 @@ import {
 import * as bindings from './bindings/index';
 import { db } from './main';
 import * as plugins from './plugins/index';
-import { catchException, escapeRegExp, getPluginSlug, hasTag, isTrusted, logger, merge, now, setInput } from './utils';
+import {
+  catchException,
+  escapeRegExp,
+  getPluginSlug,
+  hasTag,
+  isTrusted,
+  logger,
+  merge,
+  now,
+  setInput,
+  t,
+} from './utils';
 
 export class Bot {
   config: Config;
@@ -222,7 +233,7 @@ export class Bot {
   onMessageReceive(msg: Message): void {
     try {
       let ignoreMessage = false;
-      if (msg.content == null || (msg.type != 'inline_query' && msg.date < now() - 60 * 5)) {
+      if (msg.content == null || (msg.type != 'inline_query' && msg.date < now() - 5 * t.minute)) {
         return;
       }
 

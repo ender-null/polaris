@@ -1,6 +1,7 @@
 import { exec } from 'child_process';
 import fs from 'fs';
 import mime from 'mime-types';
+import AbortController from 'node-abort-controller';
 import fetch, { BodyInit, HeadersInit, RequestInit, Response } from 'node-fetch';
 import querystring, { ParsedUrlQueryInput } from 'querystring';
 import { pipeline } from 'stream';
@@ -517,9 +518,16 @@ export async function sendRequest(
     method: post ? 'POST' : 'GET',
     body: data,
     headers: headers,
+    timeout: 8000,
   };
   try {
-    const response = await fetch(`${url}?${querystring.stringify(params)}`, options);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), options.timeout);
+    const response = await fetch(`${url}?${querystring.stringify(params)}`, {
+      ...options,
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
     if (response.status != 200) {
       const error = response.clone();
       const json = await error.json().catch((e) => catchException(e));
@@ -560,12 +568,19 @@ export async function download(
   post?: boolean,
 ): Promise<string> {
   const response = await sendRequest(url, params, headers, null, post);
-  const tempfile = tmp.fileSync({ mode: 0o644, postfix: `.${mime.extension(response.headers.get('Content-Type'))}` });
-  if (!response.ok) {
-    logger.error(`unexpected response ${response.statusText}`);
+  if (!response) {
     return null;
   }
-  if (!response || response.headers.get('Content-Length') == '0') {
+  const contentType =
+    response.headers.get('content-type') || response.headers.get('Content-Type') || 'application/octet-stream';
+  const contentLength = response.headers.get('content-length') || response.headers.get('Content-Length') || '0';
+  const tempfile = tmp.fileSync({ mode: 0o644, postfix: `.${mime.extension(contentType)}` });
+  if (response.ok == undefined) {
+    logger.error(`Unexpected response: ${response.statusText}`);
+    return null;
+  }
+  if (contentLength == '0') {
+    logger.error(`Content-Length is 0`);
     return null;
   }
   const streamPipeline = util.promisify(pipeline);
@@ -816,6 +831,16 @@ export function catchException(exception: Error | error, bot: Bot = null, messag
 
 export const telegramLinkRegExp = new RegExp('(?:t|telegram|tlgrm).(?:me|dog)/joinchat/([a-zA-Z0-9-]+)', 'gim');
 export const tagForBot = new RegExp('@(\\w+):', 'gim');
+
+export const t = {
+  second: 1,
+  minute: 60,
+  hour: 60 * 60,
+  day: 60 * 60 * 24,
+  week: 60 * 60 * 24 * 7,
+  month: 60 * 60 * 24 * 30,
+  year: 60 * 60 * 24 * 365,
+};
 
 export const transport = new winston.transports.DailyRotateFile({
   dirname: 'logs',

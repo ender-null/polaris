@@ -103,7 +103,7 @@ export class Covid19Plugin extends PluginBase {
 
   async update(): Promise<void> {
     logger.info('Updating COVID-19 data');
-    if (this.countryCodes == undefined) {
+    if (!this.countryCodes) {
       await this.getCountryCodes();
     }
     const resp = await sendRequest('https://covid19.who.int/page-data/table/page-data.json');

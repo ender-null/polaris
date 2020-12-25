@@ -25,7 +25,7 @@ export class AscoDeVidaPlugin extends PluginBase {
     let content = story.find('.advlink').text();
     content = content.replace('<br/>', '\n');
     content = content.replace('ADV', '<b>ADV</b>');
-    const text = `${content}\n<i>${published}</i>`;
+    const text = `${content}\n\n<i>${published.trim()}</i>`;
     this.bot.replyMessage(msg, text);
   }
 }
