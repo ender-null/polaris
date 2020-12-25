@@ -544,7 +544,7 @@ export async function sendRequest(
     }
     return response;
   } catch (e) {
-    if (e.message == 'The user aborted a request.') {
+    if (!e.message.startsWith('Response timeout')) {
       catchException(e);
     }
     return null;
