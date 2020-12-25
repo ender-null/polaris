@@ -544,7 +544,9 @@ export async function sendRequest(
     }
     return response;
   } catch (e) {
-    catchException(e);
+    if (!e.message.startsWith('FetchError: Response timeout')) {
+      catchException(e);
+    }
     return null;
   }
 }

@@ -42,7 +42,7 @@ export class Covid19Plugin extends PluginBase {
       casesLast7Days: 'Cases in last 7 days',
       casesPerMillion: 'Cases per million',
     };
-    this.cronExpression = '0 * * * *';
+    this.cronExpression = '0 */3 * * *';
 
     this.dataSource = 'https://covid19.who.int/table';
   }
