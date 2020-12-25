@@ -518,7 +518,7 @@ export async function sendRequest(
     method: post ? 'POST' : 'GET',
     body: data,
     headers: headers,
-    timeout: 8000,
+    timeout: 30000,
   };
   try {
     const controller = new AbortController();
@@ -539,12 +539,12 @@ export async function sendRequest(
       if (error.status == 429) {
         setTimeout(async () => {
           await sendRequest(url, params, headers, data, post, bot);
-        }, 5000);
+        }, 10000);
       }
     }
     return response;
   } catch (e) {
-    if (!e.message.startsWith('FetchError: Response timeout')) {
+    if (e.message == 'The user aborted a request.') {
       catchException(e);
     }
     return null;
@@ -814,8 +814,7 @@ export function merge(base: any, extension: any): any {
 }
 
 export function catchException(exception: Error | error, bot: Bot = null, message: Message = null): Error | error {
-  logger.info(`Catched exception: ${exception.message}`);
-  logger.error(`${exception.message}`);
+  logger.error(`Catched exception: ${exception.message}`);
   if (bot) {
     if (exception['stack']) {
       bot.sendAlert(replaceHtml(exception['stack']));

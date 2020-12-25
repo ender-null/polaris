@@ -355,6 +355,9 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       fields: 'mythic_plus_scores_by_season:current,mythic_plus_scores_by_season:previous',
     };
     const resp = await sendRequest(url, params);
+    if (!resp) {
+      return null;
+    }
     return await resp.json();
   }
 }
