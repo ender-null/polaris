@@ -16,6 +16,7 @@ import {
 import * as bindings from './bindings/index';
 import { db } from './main';
 import * as plugins from './plugins/index';
+import { Errors } from './types';
 import {
   catchException,
   escapeRegExp,
@@ -49,6 +50,7 @@ export class Bot {
     this.bindings = new bindings[this.config.bindings](this);
     this.plugins = [];
     this.tasks = [];
+    this.errors = new Errors();
   }
 
   async start(): Promise<void> {

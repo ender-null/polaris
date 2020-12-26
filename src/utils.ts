@@ -632,37 +632,38 @@ export async function getCoords(input: string, bot?: Bot): Promise<CoordinatesRe
     key: key,
   };
   const res = await sendRequest(url, params);
-  const content = await res.json();
-  if (content.status != 'OK') {
-    logger.error(JSON.stringify(content));
-    if (bot) {
-      bot.sendAlert(JSON.stringify(content));
-    }
-  }
-  if (content && content.results.length > 0) {
-    const locality = content.results[0].address_components[0].long_name;
-    let country;
-    for (const address of content.results[0].address_components) {
-      if (address.types.indexOf('country') > -1) {
-        country = address.long_name;
+  if (res) {
+    const content = await res.json();
+    if (content.status != 'OK') {
+      logger.error(JSON.stringify(content));
+      if (bot) {
+        bot.sendAlert(JSON.stringify(content));
       }
     }
-    return {
-      status: content.status,
-      lat: content.results[0].geometry.location.lat,
-      lng: content.results[0].geometry.location.lng,
-      locality: locality,
-      country: country,
-    };
-  } else {
-    return {
-      status: content.status,
-      lat: null,
-      lng: null,
-      locality: null,
-      country: null,
-    };
+    if (content && content.results.length > 0) {
+      const locality = content.results[0].address_components[0].long_name;
+      let country;
+      for (const address of content.results[0].address_components) {
+        if (address.types.indexOf('country') > -1) {
+          country = address.long_name;
+        }
+      }
+      return {
+        status: content.status,
+        lat: content.results[0].geometry.location.lat,
+        lng: content.results[0].geometry.location.lng,
+        locality: locality,
+        country: country,
+      };
+    }
   }
+  return {
+    status: 'ERROR',
+    lat: null,
+    lng: null,
+    locality: null,
+    country: null,
+  };
 }
 
 export function removeHtml(text: string): string {
