@@ -252,7 +252,7 @@ export class LeagueOfLegendsPlugin extends PluginBase {
     const headers = {
       'X-Riot-Token': this.bot.config.apiKeys.riotApi,
     };
-    const resp = await sendRequest(endpoint + method, {}, headers);
+    const resp = await sendRequest(endpoint + method, {}, headers, null, false, this.bot);
     const content = await resp.json();
     return content;
   }

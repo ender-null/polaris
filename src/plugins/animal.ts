@@ -28,7 +28,7 @@ export class AnimalPlugin extends PluginBase {
         api_key: this.bot.config.apiKeys.catApi,
         format: 'src',
       };
-      const photo = await responseUrlFromRequest(url, params);
+      const photo = await responseUrlFromRequest(url, params, null, this.bot);
       if (photo) {
         return this.bot.replyMessage(msg, photo, 'photo');
       } else {
@@ -36,7 +36,7 @@ export class AnimalPlugin extends PluginBase {
       }
     } else if (isCommand(this, 2, msg.content)) {
       const url = 'https://dog.ceo/api/breeds/image/random';
-      const photo = await responseUrlFromRequest(url);
+      const photo = await responseUrlFromRequest(url, null, null, this.bot);
       if (photo) {
         return this.bot.replyMessage(msg, photo, 'photo');
       } else {

@@ -518,17 +518,15 @@ export async function sendRequest(
     method: post ? 'POST' : 'GET',
     body: data,
     headers: headers,
-    timeout: 30000,
+    timeout: 90000,
   };
+  const controller = new AbortController();
+  const timeout = setTimeout(() => {
+    controller.abort();
+  }, options.timeout);
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), options.timeout);
-    const response = await fetch(`${url}?${querystring.stringify(params)}`, {
-      ...options,
-      signal: controller.signal,
-    });
-    clearTimeout(timeout);
-    if (response.status != 200) {
+    const response = await fetch(`${url}?${querystring.stringify(params)}`, { ...options, signal: controller.signal });
+    if (!response.ok) {
       const error = response.clone();
       const json = await error.json().catch((e) => catchException(e));
       logger.error(JSON.stringify(json));
@@ -536,18 +534,18 @@ export async function sendRequest(
         bot.sendAlert(JSON.stringify(json));
       }
 
-      if (error.status == 429) {
-        setTimeout(async () => {
-          await sendRequest(url, params, headers, data, post, bot);
-        }, 10000);
-      }
+      // if (error.status == 429) {
+      //   setTimeout(async () => {
+      //     await sendRequest(url, params, headers, data, post, bot);
+      //   }, 10000);
+      // }
     }
     return response;
-  } catch (e) {
-    if (!e.message.startsWith('Response timeout')) {
-      catchException(e);
-    }
+  } catch (error) {
+    catchException(error, bot);
     return null;
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
@@ -555,8 +553,9 @@ export async function responseUrlFromRequest(
   url: string,
   params?: ParsedUrlQueryInput,
   headers?: HeadersInit,
+  bot?: Bot,
 ): Promise<string> {
-  const response = await sendRequest(url, params, headers);
+  const response = await sendRequest(url, params, headers, null, false, bot);
   if (response) {
     return response.url;
   }
@@ -568,8 +567,9 @@ export async function download(
   params?: ParsedUrlQueryInput,
   headers?: HeadersInit,
   post?: boolean,
+  bot?: Bot,
 ): Promise<string> {
-  const response = await sendRequest(url, params, headers, null, post);
+  const response = await sendRequest(url, params, headers, null, post, bot);
   if (!response) {
     return null;
   }

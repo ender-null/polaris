@@ -61,7 +61,7 @@ export class ZaragozaPlugin extends PluginBase {
       } else {
         params['street'] = input;
       }
-      const resp = await sendRequest(url, params);
+      const resp = await sendRequest(url, params, null, null, false, this.bot);
       if (!resp) {
         return this.bot.replyMessage(msg, this.bot.errors.connectionError);
       }
@@ -92,7 +92,7 @@ export class ZaragozaPlugin extends PluginBase {
         rf: 'html',
         srsname: 'utm30n',
       };
-      const resp = await sendRequest(url, params);
+      const resp = await sendRequest(url, params, null, null, false, this.bot);
       if (!resp) {
         return this.bot.replyMessage(msg, this.bot.errors.connectionError);
       }

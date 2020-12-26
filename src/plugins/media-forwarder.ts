@@ -129,6 +129,7 @@ export class MediaForwarderPlugin extends PluginBase {
                 },
                 null,
                 true,
+                this.bot,
               );
             }
           } else {
@@ -141,6 +142,7 @@ export class MediaForwarderPlugin extends PluginBase {
                 },
                 null,
                 true,
+                this.bot,
               );
             } else {
               const file = await this.bot.bindings.getFile(msg.content);
@@ -154,6 +156,7 @@ export class MediaForwarderPlugin extends PluginBase {
                   },
                   null,
                   true,
+                  this.bot,
                 );
               }
             }

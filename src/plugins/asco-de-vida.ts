@@ -14,7 +14,7 @@ export class AscoDeVidaPlugin extends PluginBase {
     ];
   }
   async run(msg: Message): Promise<void> {
-    const resp = await sendRequest('http://www.ascodevida.com/aleatorio');
+    const resp = await sendRequest('http://www.ascodevida.com/aleatorio', null, null, null, false, this.bot);
     if (!resp) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
     }

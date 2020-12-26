@@ -43,7 +43,7 @@ export class SearchPlugin extends PluginBase {
     const searchParams = {
       q: input,
     };
-    const searchResp = await sendRequest(searchUrl, searchParams);
+    const searchResp = await sendRequest(searchUrl, searchParams, null, null, false, this.bot);
     if (!searchResp) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
     }
@@ -82,7 +82,7 @@ export class SearchPlugin extends PluginBase {
     }
 
     const url = searchUrl + 'd.js';
-    const resp = await sendRequest(url, params, headers);
+    const resp = await sendRequest(url, params, headers, null, false, this.bot);
     if (!resp) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
     }

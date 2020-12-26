@@ -40,7 +40,7 @@ export class ValenciaPlugin extends PluginBase {
     body.append('adaptados', '0');
     body.append('usuario', 'Anonimo');
     body.append('idioma', 'es');
-    const resp = await sendRequest(url, null, headers, body, true);
+    const resp = await sendRequest(url, null, headers, body, true, this.bot);
     if (!resp) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
     }

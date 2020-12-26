@@ -61,7 +61,7 @@ export class LastFMPlugin extends PluginBase {
         api_key: this.bot.config.apiKeys.lastfm,
         user: username,
       };
-      const resp = await sendRequest(url, params);
+      const resp = await sendRequest(url, params, null, null, false, this.bot);
       if (!resp) {
         return this.bot.replyMessage(msg, this.bot.errors.connectionError);
       }
@@ -107,7 +107,7 @@ export class LastFMPlugin extends PluginBase {
         regionCode: this.bot.config.locale.slice(0, 2),
         key: this.bot.config.apiKeys.googleDeveloperConsole,
       };
-      const ytResp = await sendRequest(ytUrl, ytParams);
+      const ytResp = await sendRequest(ytUrl, ytParams, null, null, false, this.bot);
       if (!ytResp) {
         return this.bot.replyMessage(msg, this.bot.errors.connectionError);
       }

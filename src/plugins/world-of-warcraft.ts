@@ -285,7 +285,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
     };
     const body = new FormData();
     body.append('grant_type', 'client_credentials');
-    const resp = await sendRequest('https://eu.battle.net/oauth/token', {}, headers, body, true);
+    const resp = await sendRequest('https://eu.battle.net/oauth/token', {}, headers, body, true, this.bot);
     if (!resp) {
       logger.error(this.bot.errors.connectionError);
       return null;
@@ -302,7 +302,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       locale: this.bot.config.locale,
       access_token: this.accessToken,
     };
-    const resp = await sendRequest(url, params);
+    const resp = await sendRequest(url, params, null, null, false, this.bot);
     if (!resp) {
       logger.error(this.bot.errors.connectionError);
       return null;
@@ -354,7 +354,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       name: characterName,
       fields: 'mythic_plus_scores_by_season:current,mythic_plus_scores_by_season:previous',
     };
-    const resp = await sendRequest(url, params);
+    const resp = await sendRequest(url, params, null, null, false, this.bot);
     if (!resp) {
       return null;
     }
