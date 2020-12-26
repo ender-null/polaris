@@ -2,13 +2,24 @@ import * as cheerio from 'cheerio';
 import format from 'string-format';
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
-import { Errors, iStringNested } from '../types';
-import { camelCase, formatNumber, generateCommandHelp, getInput, isCommand, logger, sendRequest } from '../utils';
+import { iStringNested } from '../types';
+import {
+  camelCase,
+  formatNumber,
+  generateCommandHelp,
+  getInput,
+  isCommand,
+  logger,
+  now,
+  sendRequest,
+  t,
+} from '../utils';
 
 export class Covid19Plugin extends PluginBase {
   countryCodes: iStringNested;
   data: iStringNested;
   dataSource: string;
+  lastUpdate: number;
 
   constructor(bot: Bot) {
     super(bot);
@@ -42,17 +53,22 @@ export class Covid19Plugin extends PluginBase {
       casesLast7Days: 'Cases in last 7 days',
       casesPerMillion: 'Cases per million',
     };
-    this.cronExpression = '0 */3 * * *';
 
     this.dataSource = 'https://covid19.who.int/table';
   }
   async run(msg: Message): Promise<void> {
-    if (this.data == undefined) {
-      await this.update();
+    const input = getInput(msg, false);
+    if (isCommand(this, 2, msg.content) || input) {
+      if (!this.data || !this.lastUpdate || this.lastUpdate < now() - 3 * t.hour) {
+        const update = await this.update();
+        if (!update) {
+          return this.bot.replyMessage(msg, this.bot.errors.connectionError);
+        }
+      }
     }
+
     let text = '';
     if (isCommand(this, 1, msg.content)) {
-      const input = getInput(msg, false);
       if (!input) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       } else {
@@ -97,14 +113,13 @@ export class Covid19Plugin extends PluginBase {
     this.bot.replyMessage(msg, text);
   }
 
-  async cron(): Promise<void> {
-    await this.update();
-  }
-
-  async update(): Promise<void> {
+  async update(): Promise<boolean> {
     logger.info('Updating COVID-19 data');
     if (!this.countryCodes) {
-      await this.getCountryCodes();
+      const countryCodes = await this.getCountryCodes();
+      if (!countryCodes) {
+        return false;
+      }
     }
     const resp = await sendRequest(
       'https://covid19.who.int/page-data/table/page-data.json',
@@ -115,8 +130,7 @@ export class Covid19Plugin extends PluginBase {
       this.bot,
     );
     if (!resp) {
-      logger.error(Errors.connectionError);
-      return;
+      return false;
     }
     const content = await resp.json();
     const countryGroups = content.result.pageContext.countryGroups;
@@ -142,14 +156,15 @@ export class Covid19Plugin extends PluginBase {
         },
       };
     }
+    this.lastUpdate = now();
     logger.info('Updated COVID-19 data');
+    return true;
   }
 
-  async getCountryCodes(): Promise<void> {
+  async getCountryCodes(): Promise<boolean> {
     const resp = await sendRequest('https://www.iban.com/country-codes', null, null, null, false, this.bot);
     if (!resp) {
-      logger.error(Errors.connectionError);
-      return;
+      return false;
     }
     const html = await resp.text();
     const $ = cheerio.load(html);
@@ -170,6 +185,7 @@ export class Covid19Plugin extends PluginBase {
         code2: code2,
       };
     });
+    return true;
   }
 
   findCountryCode(name: string): string {
