@@ -241,7 +241,10 @@ export class TelegramTDlibBindings extends BindingsBase {
         });
       }
       if (update.message) {
-        this.bot.inbox.emit('message', await this.convertMessage(update.message));
+        const msg = await this.convertMessage(update.message);
+        if (msg) {
+          this.bot.inbox.emit('message', msg);
+        }
       }
     }
   }

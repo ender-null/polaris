@@ -122,7 +122,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         characterName = words.pop();
         realm = words.join('-').toLowerCase();
       }
-      const [character, media, raids, pvp, professions, raiderIO] = await Promise.all([
+      const [character, media, raids, pvp, professions] = await Promise.all([
         this.getCharacter(region, realm, characterName),
         this.getCharacterMedia(region, realm, characterName),
         this.getCharacterRaids(region, realm, characterName),
@@ -131,6 +131,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         this.getRaiderIO(region, realm, characterName),
       ]);
       // const statistics = await this.getCharacterStatistics(region, realm, characterName);
+      // const raiderIO = this.getRaiderIO(region, realm, characterName);
       if (!character || !media || !raids || !pvp || !professions) {
         this.accessToken = await this.retrievingAccessToken();
         return this.bot.replyMessage(msg, this.bot.errors.connectionError);
@@ -206,22 +207,22 @@ export class WorldOfWarcraftPlugin extends PluginBase {
           raidProgression += `\n\t${mode.difficulty.name}: ${mode.progress.completed_count}/${mode.progress.total_count}`;
         }
       }
-      let mythicScore = '';
-      if (raiderIO.mythic_plus_scores_by_season && raiderIO.mythic_plus_scores_by_season.length > 0) {
-        const lastSeason = raiderIO.mythic_plus_scores_by_season[0];
-        mythicScore = `${this.strings['mythicPlusScores']}:`;
-        let empty = true;
-        const scores = ['dps', 'healer', 'tank'];
-        for (const score of scores) {
-          mythicScore += `\n\t${this.strings[score]}: ${lastSeason.scores[score]}`;
-          if (lastSeason.scores[score] > 0) {
-            empty = false;
-          }
-        }
-        if (empty) {
-          mythicScore = '';
-        }
-      }
+      // let mythicScore = '';
+      // if (raiderIO.mythic_plus_scores_by_season && raiderIO.mythic_plus_scores_by_season.length > 0) {
+      //   const lastSeason = raiderIO.mythic_plus_scores_by_season[0];
+      //   mythicScore = `${this.strings['mythicPlusScores']}:`;
+      //   let empty = true;
+      //   const scores = ['dps', 'healer', 'tank'];
+      //   for (const score of scores) {
+      //     mythicScore += `\n\t${this.strings[score]}: ${lastSeason.scores[score]}`;
+      //     if (lastSeason.scores[score] > 0) {
+      //       empty = false;
+      //     }
+      //   }
+      //   if (empty) {
+      //     mythicScore = '';
+      //   }
+      // }
       let photo = null;
       for (const asset of media.assets) {
         if (asset.key == 'main') {
@@ -233,7 +234,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         guild ? guild + '\n\n' : ''
       }${characterClass}\n\t${race}\n\n${info}\n\n${professionLevels ? professionLevels + '\n\n' : ''}${
         raidProgression ? raidProgression + '\n\n' : ''
-      }${mythicScore}`;
+      }`;
       if (photo) {
         return this.bot.replyMessage(msg, photo, 'photo', null, { caption: text });
       }
