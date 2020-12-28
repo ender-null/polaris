@@ -518,7 +518,7 @@ export async function sendRequest(
     method: post ? 'POST' : 'GET',
     body: data,
     headers: headers,
-    timeout: 90000,
+    timeout: 5 * t.minute * 1000,
   };
   const controller = new AbortController();
   const timeout = setTimeout(() => {
