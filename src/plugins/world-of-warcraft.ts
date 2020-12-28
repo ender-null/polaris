@@ -11,7 +11,6 @@ import {
   getInput,
   getTags,
   isCommand,
-  logger,
   now,
   sendRequest,
   setTag,
@@ -132,7 +131,8 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         this.getRaiderIO(region, realm, characterName),
       ]);
       // const statistics = await this.getCharacterStatistics(region, realm, characterName);
-      if (!character) {
+      if (!character || !media || !raids || !pvp || !professions) {
+        this.accessToken = await this.retrievingAccessToken();
         return this.bot.replyMessage(msg, this.bot.errors.connectionError);
       }
       if (character.code == 404) {
@@ -287,7 +287,6 @@ export class WorldOfWarcraftPlugin extends PluginBase {
     body.append('grant_type', 'client_credentials');
     const resp = await sendRequest('https://eu.battle.net/oauth/token', {}, headers, body, true, this.bot);
     if (!resp) {
-      logger.error(this.bot.errors.connectionError);
       return null;
     } else {
       const content = await resp.json();
@@ -295,7 +294,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
     }
   }
 
-  async getCharacter(region: string, realm: string, characterName: string, method = '', retries = 3): Promise<any> {
+  async getCharacter(region: string, realm: string, characterName: string, method = ''): Promise<any> {
     const url = `https://${region}.api.blizzard.com/profile/wow/character/${realm}/${characterName}${method}`;
     const params = {
       namespace: `profile-${region}`,
@@ -304,20 +303,13 @@ export class WorldOfWarcraftPlugin extends PluginBase {
     };
     const resp = await sendRequest(url, params, null, null, false, this.bot);
     if (!resp) {
-      logger.error(this.bot.errors.connectionError);
       return null;
     } else {
       const content = await resp.text();
       try {
         return JSON.parse(content);
       } catch (e) {
-        this.accessToken = await this.retrievingAccessToken();
-        retries -= 1;
-        if (retries > 0) {
-          return await this.getCharacter(region, realm, characterName, method, retries);
-        } else {
-          return null;
-        }
+        return null;
       }
     }
   }
