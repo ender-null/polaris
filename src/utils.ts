@@ -315,7 +315,7 @@ export function getUsername(uid: number | string): string {
       name = `@${db.groups[uid].username}`;
     }
   } else {
-    name = '[UNKNOWN]';
+    name = '[not found]';
   }
   return name;
 }
@@ -341,9 +341,9 @@ export function getFullName(uid: number | string, includeUsername = true): strin
       name += ` (@${db.groups[uid].username})`;
     }
   } else {
-    name = '[UNKNOWN]';
+    name = '[not found]';
   }
-  return name;
+  return escapeMarkdown(name);
 }
 
 export function fixTelegramLink(link: string): string {
