@@ -12,7 +12,7 @@ export class TelegramTDlibBindings extends BindingsBase {
   lastChatUpdate: number;
   constructor(bot: Bot) {
     super(bot);
-    this.client = new Client(new TDLib(), {
+    this.client = new Client(new TDLib('/usr/local/lib/libtdjson.so'), {
       apiId: this.bot.config.apiKeys.telegramAppId,
       apiHash: this.bot.config.apiKeys.telegramApiHash,
       databaseDirectory: `${process.cwd()}/.tdlib_files/${this.bot.config.name}/database`,
