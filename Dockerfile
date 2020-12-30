@@ -1,4 +1,4 @@
-FROM ghcr.io/luksireiku/polaris-base as builder
+FROM ghcr.io/luksireiku/polaris-base:1.7.0-alpine as builder
 
 RUN mkdir -p /usr/src/app
 
@@ -12,7 +12,7 @@ COPY . .
 
 RUN npm run build
 
-FROM ghcr.io/luksireiku/polaris-base AS release
+FROM ghcr.io/luksireiku/polaris-base:1.7.0-alpine AS release
 
 WORKDIR /usr/src/app
 
