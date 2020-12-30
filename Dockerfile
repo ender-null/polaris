@@ -1,4 +1,4 @@
-FROM ghcr.io/luksireiku/polaris-base:debian as builder
+FROM ghcr.io/luksireiku/polaris-base:latest as builder
 
 RUN mkdir -p /usr/src/app
 
@@ -12,7 +12,7 @@ COPY . .
 
 RUN npm run build
 
-FROM ghcr.io/luksireiku/polaris-base:debian AS release
+FROM ghcr.io/luksireiku/polaris-base:latest AS release
 
 WORKDIR /usr/src/app
 
