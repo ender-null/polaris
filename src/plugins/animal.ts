@@ -1,6 +1,6 @@
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
-import { hasTag, isCommand, responseUrlFromRequest } from '../utils';
+import { hasTag, isCommand, responseUrlFromRequest, sendRequest } from '../utils';
 
 export class AnimalPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -36,9 +36,12 @@ export class AnimalPlugin extends PluginBase {
       }
     } else if (isCommand(this, 2, msg.content)) {
       const url = 'https://dog.ceo/api/breeds/image/random';
-      const photo = await responseUrlFromRequest(url, null, null, this.bot);
-      if (photo) {
-        return this.bot.replyMessage(msg, photo, 'photo');
+      const resp = await sendRequest(url, null, null, null, false, this.bot);
+      if (resp) {
+        const content = await resp.json();
+        if (content) {
+          return this.bot.replyMessage(msg, content.message, 'photo');
+        }
       } else {
         return this.bot.replyMessage(msg, this.bot.errors.connectionError);
       }
