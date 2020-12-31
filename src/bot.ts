@@ -239,6 +239,10 @@ export class Bot {
         return;
       }
 
+      if (msg.type != 'text') {
+        ignoreMessage = true;
+      }
+
       if (
         msg.sender.id != +this.config.owner &&
         !isTrusted(this, msg.sender.id, msg) &&
