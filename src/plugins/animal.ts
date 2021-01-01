@@ -28,7 +28,6 @@ export class AnimalPlugin extends PluginBase {
       url = 'https://api.thecatapi.com/v1/images/search';
       params = {
         api_key: this.bot.config.apiKeys.catApi,
-        format: 'src',
       };
     } else if (isCommand(this, 2, msg.content)) {
       url = 'https://dog.ceo/api/breeds/image/random';

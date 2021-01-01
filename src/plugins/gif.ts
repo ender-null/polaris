@@ -9,6 +9,12 @@ export class GifPlugin extends PluginBase {
       {
         command: '/gif',
         shortcut: '/g',
+        parameters: [
+          {
+            name: 'query',
+            required: false,
+          },
+        ],
         description: 'Send a GIF for input query',
       },
     ];
