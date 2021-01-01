@@ -39,7 +39,7 @@ export class AnimalPlugin extends PluginBase {
       if (content) {
         let photo;
         if (isCommand(this, 1, msg.content)) {
-          photo = content.url;
+          photo = content[0].url;
         } else {
           photo = content.message;
         }

@@ -37,7 +37,7 @@ export class GifPlugin extends PluginBase {
     if (content.results.length == 0) {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);
     }
-    const photo = content.results[random(0, content.results.length - 1)].media[0].mp4;
+    const photo = content.results[random(0, content.results.length - 1)].media[0].mp4.url;
     return this.bot.replyMessage(msg, photo, 'photo');
   }
 }
