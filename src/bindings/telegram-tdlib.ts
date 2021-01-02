@@ -250,49 +250,51 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async updateChats(loadAll?: boolean) {
-    const chats = await this.serverRequest('getChats', {
+    // const chats =
+    logger.info(`updateChats loadAll: ${loadAll}`);
+    await this.serverRequest('getChats', {
       chat_list: { '@type': 'chatListMain' },
       offset_order: '9223372036854775807',
       offset_chat_id: 0,
       limit: 100,
     });
 
-    for (const chatId of chats.chat_ids) {
-      await this.serverRequest('openChat', {
-        chat_id: chatId,
-      });
+    // for (const chatId of chats.chat_ids) {
+    //   await this.serverRequest('openChat', {
+    //     chat_id: chatId,
+    //   });
 
-      if (loadAll) {
-        const cid = String(chatId);
-        if (chatId > 0) {
-          if (db.users[cid] == undefined) {
-            const user = await this.serverRequest('getUser', {
-              user_id: chatId,
-            });
-            if (user) {
-              db.users[cid] = {
-                first_name: user['first_name'],
-                last_name: user['last_name'],
-                username: user['username'],
-              };
-              db.usersSnap.child(cid).ref.set(db.users[cid]);
-            }
-          }
-        } else {
-          if (db.groups[cid] == undefined) {
-            const group = await this.serverRequest('getChat', {
-              chat_id: chatId,
-            });
-            if (group) {
-              db.groups[cid] = {
-                title: group['title'],
-              };
-              db.groupsSnap.child(cid).ref.set(db.groups[cid]);
-            }
-          }
-        }
-      }
-    }
+    //   if (loadAll) {
+    //     const cid = String(chatId);
+    //     if (chatId > 0) {
+    //       if (db.users[cid] == undefined) {
+    //         const user = await this.serverRequest('getUser', {
+    //           user_id: chatId,
+    //         });
+    //         if (user) {
+    //           db.users[cid] = {
+    //             first_name: user['first_name'],
+    //             last_name: user['last_name'],
+    //             username: user['username'],
+    //           };
+    //           db.usersSnap.child(cid).ref.set(db.users[cid]);
+    //         }
+    //       }
+    //     } else {
+    //       if (db.groups[cid] == undefined) {
+    //         const group = await this.serverRequest('getChat', {
+    //           chat_id: chatId,
+    //         });
+    //         if (group) {
+    //           db.groups[cid] = {
+    //             title: group['title'],
+    //           };
+    //           db.groupsSnap.child(cid).ref.set(db.groups[cid]);
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
 
     this.lastChatUpdate = now();
   }
