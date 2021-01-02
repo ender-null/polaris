@@ -5,7 +5,7 @@ import { TDLib } from 'tdl-tdlib-addon';
 import { message, ok, Update, user } from 'tdl/types/tdlib';
 import { BindingsBase, Bot, Conversation, ConversationInfo, Extra, Message, User } from '..';
 import { db } from '../main';
-import { catchException, download, hasTag, isInt, logger, now, sendRequest, splitLargeMessage } from '../utils';
+import { catchException, download, hasTag, isInt, logger, now, sendRequest, splitLargeMessage, t } from '../utils';
 
 export class TelegramTDlibBindings extends BindingsBase {
   client: Client;
@@ -66,6 +66,7 @@ export class TelegramTDlibBindings extends BindingsBase {
           retry ? Promise.reject('Invalid phone number') : Promise.resolve(this.bot.config.apiKeys.telegramPhoneNumber),
       }));
     }
+    await this.updateChats();
 
     this.client.on('update', (update: Update) => this.updateHandler(update));
     this.client.on('error', logger.error);
@@ -218,7 +219,7 @@ export class TelegramTDlibBindings extends BindingsBase {
 
   async updateHandler(update: Update): Promise<void> {
     if (update._ == 'updateNewMessage') {
-      if (this.bot.user && !this.bot.user.isBot && this.lastChatUpdate < now() - 60 * 5) {
+      if (this.bot.user && !this.bot.user.isBot && this.lastChatUpdate < now() - t.minute * 10) {
         await this.updateChats(true);
       }
       if (update.message.is_outgoing) {
@@ -250,53 +251,50 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async updateChats(loadAll?: boolean) {
-    // const chats =
-    logger.info(`updateChats loadAll: ${loadAll}`);
-    await this.serverRequest('getChats', {
+    this.lastChatUpdate = now();
+    const chats = await this.serverRequest('getChats', {
       chat_list: { '@type': 'chatListMain' },
       offset_order: '9223372036854775807',
       offset_chat_id: 0,
       limit: 100,
     });
 
-    // for (const chatId of chats.chat_ids) {
-    //   await this.serverRequest('openChat', {
-    //     chat_id: chatId,
-    //   });
+    for (const chatId of chats.chat_ids) {
+      await this.serverRequest('openChat', {
+        chat_id: chatId,
+      });
 
-    //   if (loadAll) {
-    //     const cid = String(chatId);
-    //     if (chatId > 0) {
-    //       if (db.users[cid] == undefined) {
-    //         const user = await this.serverRequest('getUser', {
-    //           user_id: chatId,
-    //         });
-    //         if (user) {
-    //           db.users[cid] = {
-    //             first_name: user['first_name'],
-    //             last_name: user['last_name'],
-    //             username: user['username'],
-    //           };
-    //           db.usersSnap.child(cid).ref.set(db.users[cid]);
-    //         }
-    //       }
-    //     } else {
-    //       if (db.groups[cid] == undefined) {
-    //         const group = await this.serverRequest('getChat', {
-    //           chat_id: chatId,
-    //         });
-    //         if (group) {
-    //           db.groups[cid] = {
-    //             title: group['title'],
-    //           };
-    //           db.groupsSnap.child(cid).ref.set(db.groups[cid]);
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
-
-    this.lastChatUpdate = now();
+      if (loadAll) {
+        const cid = String(chatId);
+        if (chatId > 0) {
+          if (db.users[cid] == undefined) {
+            const user = await this.serverRequest('getUser', {
+              user_id: chatId,
+            });
+            if (user) {
+              db.users[cid] = {
+                first_name: user['first_name'],
+                last_name: user['last_name'],
+                username: user['username'],
+              };
+              db.usersSnap.child(cid).ref.set(db.users[cid]);
+            }
+          }
+        } else {
+          if (db.groups[cid] == undefined) {
+            const group = await this.serverRequest('getChat', {
+              chat_id: chatId,
+            });
+            if (group) {
+              db.groups[cid] = {
+                title: group['title'],
+              };
+              db.groupsSnap.child(cid).ref.set(db.groups[cid]);
+            }
+          }
+        }
+      }
+    }
   }
 
   async sendMessage(msg: Message): Promise<void> {
@@ -530,10 +528,10 @@ export class TelegramTDlibBindings extends BindingsBase {
         const texts = splitLargeMessage(data['input_message_content']['text']['text'], 4000);
         for (const text of texts) {
           data['input_message_content']['text']['text'] = text;
-          await this.serverRequest(data['@type'], data);
+          await this.serverRequest(data['@type'], data, false, true);
         }
       } else {
-        await this.serverRequest(data['@type'], data);
+        await this.serverRequest(data['@type'], data, false, true);
       }
       await this.sendChatAction(+msg.conversation.id, 'cancel');
     }
