@@ -71,9 +71,6 @@ export class TelegramTDlibBindings extends BindingsBase {
     this.client.on('error', logger.error);
     this.bot.status.emit('started');
     this.bot.outbox.on('message', (msg: Message) => this.sendMessage(msg));
-    if (!this.bot.user.isBot) {
-      await this.updateChats();
-    }
   }
 
   async stop(): Promise<void> {
@@ -84,6 +81,7 @@ export class TelegramTDlibBindings extends BindingsBase {
 
   async getMe(): Promise<User> {
     const me: user = await this.serverRequest('getMe');
+    this.lastChatUpdate = 0;
     return new User(me.id, me.first_name, me.last_name, me.username, me.type['_'] == 'userTypeBot');
   }
 
