@@ -66,12 +66,14 @@ export class TelegramTDlibBindings extends BindingsBase {
           retry ? Promise.reject('Invalid phone number') : Promise.resolve(this.bot.config.apiKeys.telegramPhoneNumber),
       }));
     }
-    await this.updateChats();
 
     this.client.on('update', (update: Update) => this.updateHandler(update));
     this.client.on('error', logger.error);
     this.bot.status.emit('started');
     this.bot.outbox.on('message', (msg: Message) => this.sendMessage(msg));
+    if (!this.bot.user.isBot) {
+      await this.updateChats();
+    }
   }
 
   async stop(): Promise<void> {
