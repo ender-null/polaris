@@ -610,12 +610,12 @@ export class TelegramTDlibBindings extends BindingsBase {
       }
     }
 
-    if (response['message'].lower() == 'chat not found') {
+    if (response['message'].toLowerCase() == 'chat not found') {
       logger.info(`Chat not found: ${request['chat_id']}`);
       otherError = false;
     }
 
-    if (response['message'].lower() == 'bad request: file is too big') {
+    if (response['message'].toLowerCase() == 'bad request: file is too big') {
       logger.info(`File is too big`);
       otherError = false;
     }
