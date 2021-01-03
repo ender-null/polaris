@@ -599,7 +599,7 @@ export class TelegramTDlibBindings extends BindingsBase {
     let otherError = true;
     for (const term of leaveList) {
       if (
-        term in response['message'].toLowerCase() &&
+        response['message'].toLowerCase().indexOf(term) > -1 &&
         !hasTag(this.bot, request['chat_id'], 'resend:?') &&
         !hasTag(this.bot, request['chat_id'], 'fwd:?')
       ) {
