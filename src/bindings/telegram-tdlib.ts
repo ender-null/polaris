@@ -603,7 +603,7 @@ export class TelegramTDlibBindings extends BindingsBase {
         !hasTag(this.bot, request['chat_id'], 'resend:?') &&
         !hasTag(this.bot, request['chat_id'], 'fwd:?')
       ) {
-        this.bot.sendAdminAlert(`Leaving chat: ${db.groups[request['chat_id']].title} [{request['chat_id']}]`);
+        this.bot.sendAdminAlert(`Leaving chat: ${db.groups[request['chat_id']].title} [${request['chat_id']}]`);
         await this.bot.bindings.kickConversationMember(request['chat_id'], this.bot.user.id);
         otherError = false;
         break;
