@@ -108,7 +108,7 @@ export class CorePlugin extends PluginBase {
       }
       let result;
       try {
-        result = new Function(input)();
+        result = eval(input);
       } catch (error) {
         result = error.message;
       }
@@ -148,17 +148,19 @@ export class CorePlugin extends PluginBase {
         }
       }
     }
+    logger.info(urls);
 
     for (const url in urls) {
       const inputMatch = telegramLinkRegExp.exec(url);
       if (inputMatch && inputMatch.length > 0) {
+        logger.info(`found telegram url: ${url}`);
         const fixedUrl = fixTelegramLink(url);
 
         let knownLink = false;
         for (const gid in db.groups) {
           if (db.groups[gid].invite_link && db.groups[gid].invite_link == fixedUrl) {
             knownLink = true;
-            logger.info(`known link: {fixedUrl}`);
+            logger.info(`known link: ${fixedUrl}`);
             break;
           }
         }
@@ -187,7 +189,7 @@ export class CorePlugin extends PluginBase {
               }
             }
           } else {
-            logger.info(`invalid link: {fixedUrl}`);
+            logger.info(`invalid link: ${fixedUrl}`);
           }
         }
       }
