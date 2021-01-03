@@ -321,6 +321,7 @@ export class TelegramTDlibBindings extends BindingsBase {
           text: msg.content,
           parse_mode: {
             '@type': parseMode,
+            version: 2,
           },
         });
 

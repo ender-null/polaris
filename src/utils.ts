@@ -691,7 +691,7 @@ export function escapeHtml(text: string): string {
 
 export function escapeMarkdown(text: string): string {
   if (text) {
-    text = text.replace(new RegExp('[`*_{}[]()#+-.!]', 'gim'), '\\$&');
+    text = text.replace(new RegExp('[_\\*\\(\\)\\[\\]~`]', 'gim'), '\\$&');
   }
   return text;
 }
