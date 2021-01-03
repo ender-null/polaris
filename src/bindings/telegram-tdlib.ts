@@ -701,9 +701,6 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async promoteConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    if (this.bot.user.isBot) {
-      return null;
-    }
     return await this.serverRequest('setChatMemberStatus', {
       chat_id: conversationId,
       user_id: userId,
@@ -712,9 +709,6 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async kickConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    if (this.bot.user.isBot) {
-      return null;
-    }
     return await this.serverRequest('setChatMemberStatus', {
       chat_id: conversationId,
       user_id: userId,
@@ -723,9 +717,6 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async banConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    if (this.bot.user.isBot) {
-      return null;
-    }
     return await this.serverRequest('setChatMemberStatus', {
       chat_id: conversationId,
       user_id: userId,
@@ -734,9 +725,6 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async unbanConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    if (this.bot.user.isBot) {
-      return null;
-    }
     return await this.serverRequest('setChatMemberStatus', {
       chat_id: conversationId,
       user_id: userId,
