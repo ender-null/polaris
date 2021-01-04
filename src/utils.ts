@@ -5,7 +5,6 @@ import AbortController from 'node-abort-controller';
 import fetch, { BodyInit, HeadersInit, RequestInit, Response } from 'node-fetch';
 import querystring, { ParsedUrlQueryInput } from 'querystring';
 import { pipeline } from 'stream';
-import format from 'string-format';
 import { error } from 'tdl/types/tdlib';
 import tmp from 'tmp';
 import util from 'util';
@@ -349,8 +348,8 @@ export function getFullName(uid: number | string, includeUsername = true): strin
 export function fixTelegramLink(link: string): string {
   const inputMatch = telegramLinkRegExp.exec(link);
   if (inputMatch && inputMatch.length > 0) {
-    const fixedLink = format('https://t.me/joinchat/{0}', inputMatch[1]);
-    logger.info(format('Fixed telegram link: {0}', fixedLink));
+    const fixedLink = `https://t.me/joinchat/${inputMatch[1]}`;
+    logger.info(`Fixed Telegram link: ${fixedLink}`);
     return fixedLink;
   }
   return link;

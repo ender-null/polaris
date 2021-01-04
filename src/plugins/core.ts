@@ -139,7 +139,7 @@ export class CorePlugin extends PluginBase {
       urls.push(...msg.extra['urls']);
     }
 
-    if (msg.extra && msg.extra.replyMarkup && msg.extra.replyMarkup['@type'] == 'replyMarkupInlineKeyboard') {
+    if (msg.extra && msg.extra.replyMarkup && msg.extra.replyMarkup._ == 'replyMarkupInlineKeyboard') {
       for (const row of msg.extra.replyMarkup.rows) {
         for (const btn of row) {
           if (btn.type == 'inlineKeyboardButtonTypeUrl') {
@@ -148,19 +148,18 @@ export class CorePlugin extends PluginBase {
         }
       }
     }
-    logger.info(urls);
 
     for (const url in urls) {
       const inputMatch = telegramLinkRegExp.exec(url);
       if (inputMatch && inputMatch.length > 0) {
-        logger.info(`found telegram url: ${url}`);
+        logger.info(`Found Telegram link: ${url}`);
         const fixedUrl = fixTelegramLink(url);
 
         let knownLink = false;
         for (const gid in db.groups) {
           if (db.groups[gid].invite_link && db.groups[gid].invite_link == fixedUrl) {
             knownLink = true;
-            logger.info(`known link: ${fixedUrl}`);
+            logger.info(`Known link: ${fixedUrl}`);
             break;
           }
         }
@@ -189,9 +188,11 @@ export class CorePlugin extends PluginBase {
               }
             }
           } else {
-            logger.info(`invalid link: ${fixedUrl}`);
+            logger.info(`Invalid link: ${fixedUrl}`);
           }
         }
+      } else {
+        logger.info(`Found NON Telegram link: ${url}`);
       }
     }
   }
