@@ -142,7 +142,7 @@ export class TelegramTDlibBindings extends BindingsBase {
             if (!Array.isArray(extra.mentions)) {
               extra.mentions = [];
             }
-            extra.mentions.push(entity['user']['id']);
+            extra.mentions.push(entity['user_id']);
           }
           if (entity.type._ == 'textEntityTypeHashtag') {
             if (!Array.isArray(extra.hashtags)) {
