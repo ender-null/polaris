@@ -10,7 +10,6 @@ import {
   isAdmin,
   isGroupAdmin,
   isTrusted,
-  logger,
   setTag,
   telegramLinkRegExp,
 } from '../utils';
@@ -91,14 +90,14 @@ export class AntiSpamPlugin extends PluginBase {
             await this.kickSpammer(msg, 'russian', 'content');
           }
         }
-        if (msg.sender.constructor.name == 'User') {
-          if (this.detectArab(msg.sender['first_name'])) {
-            await this.kickSpammer(msg, 'arab', 'name');
-          }
-          if (this.detectRussian(msg.sender['first_name'])) {
-            await this.kickSpammer(msg, 'russian', 'name');
-          }
-        }
+        // if (msg.sender.constructor.name == 'User') {
+        //   if (this.detectArab(msg.sender['first_name'])) {
+        //     await this.kickSpammer(msg, 'arab', 'name');
+        //   }
+        //   if (this.detectRussian(msg.sender['first_name'])) {
+        //     await this.kickSpammer(msg, 'russian', 'name');
+        //   }
+        // }
       }
     }
   }
@@ -163,7 +162,7 @@ export class AntiSpamPlugin extends PluginBase {
     if (res) {
       this.bot.sendAdminAlert(format(this.strings['kickedMyself'], db.groups[gid].title, gid));
     } else {
-      logger.error(format(this.strings['cantKickMyself'], db.groups[gid].title, gid));
+      this.bot.sendAdminAlert(format(this.strings['cantKickMyself'], db.groups[gid].title, gid));
     }
   }
 

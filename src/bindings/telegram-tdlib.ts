@@ -81,7 +81,6 @@ export class TelegramTDlibBindings extends BindingsBase {
 
   async getMe(): Promise<User> {
     const me: user = await this.serverRequest('getMe');
-    this.lastChatUpdate = 0;
     return new User(me.id, me.first_name, me.last_name, me.username, me.type['_'] == 'userTypeBot');
   }
 
@@ -219,6 +218,9 @@ export class TelegramTDlibBindings extends BindingsBase {
 
   async updateHandler(update: Update): Promise<void> {
     if (update._ == 'updateNewMessage') {
+      if (!this.lastChatUpdate) {
+        this.lastChatUpdate = 0;
+      }
       if (this.bot.user && !this.bot.user.isBot && this.lastChatUpdate < now() - t.minute * 10) {
         await this.updateChats(true);
       }
