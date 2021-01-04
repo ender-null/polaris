@@ -4,6 +4,7 @@ import { Instance } from './types';
 import { merge } from './utils';
 
 export class Config {
+  icon?: string;
   name?: string;
   prefix?: string;
   locale?: string;
@@ -19,7 +20,7 @@ export class Config {
   instances?: Instance[];
 
   constructor() {
-    (this.name = null), (this.prefix = '/');
+    (this.icon = '👤'), (this.name = null), (this.prefix = '/');
     this.locale = 'en_US';
     this.owner = null;
     this.plugins = '*';

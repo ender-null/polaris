@@ -73,10 +73,10 @@ export class Bot {
     this.user = await this.bindings.getMe();
     this.initTranslations();
     logger.info(
-      `🟢 Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`,
+      `🟢 Connected as ${this.config.icon} ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`,
     );
     this.sendAdminAlert(
-      `Connected as ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`,
+      `Connected as ${this.config.icon} ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`,
     );
     this.scheduleCronJobs();
   }
@@ -90,7 +90,9 @@ export class Bot {
     this.outbox.removeAllListeners('message');
     this.status.removeAllListeners('started');
     this.status.removeAllListeners('stopped');
-    logger.info(`🔴 Stopped ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`);
+    logger.info(
+      `🔴 Stopped ${this.config.icon} ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`,
+    );
   }
 
   async stop(): Promise<void> {
@@ -103,20 +105,22 @@ export class Bot {
 
   messageSender(msg: Message): void {
     logger.info(
-      `💬 @${this.user.username} [${this.user.id}] ${this.user.firstName}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
+      `💬 ${this.config.icon} [${this.user.id}] ${this.user.firstName}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
     );
   }
 
   messagesHandler(msg: Message): void {
     if (msg.sender instanceof User) {
       logger.info(
-        `${this.getMessageIcon(msg.type)}  @${this.user.username} [${msg.sender.id}] ${msg.sender.firstName}@${
+        `${this.getMessageIcon(msg.type)} ${this.config.icon} [${msg.sender.id}] ${msg.sender.firstName}@${
           msg.conversation.title
         } [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
       );
     } else {
       logger.info(
-        `✉️  @${this.user.username} [${msg.sender.id}] ${msg.sender.title}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
+        `${this.getMessageIcon(msg.type)} ${this.config.icon} [${msg.sender.id}] ${msg.sender.title}@${
+          msg.conversation.title
+        } [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
       );
     }
 
@@ -124,7 +128,7 @@ export class Bot {
   }
 
   webhookHandler(url: string, data: any): void {
-    logger.info(`🌐 @${this.user.username} [webhook:${url}] ${data}`);
+    logger.info(`🌐 ${this.config.icon} [webhook:${url}] ${data}`);
     const path = url.split('/');
     for (const i in this.plugins) {
       const plugin = this.plugins[i];
