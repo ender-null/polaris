@@ -126,25 +126,25 @@ export class TelegramTDlibBindings extends BindingsBase {
       type = 'text';
       if (Array.isArray(msg.content.text['entities'])) {
         for (const entity of msg.content.text.entities) {
-          if (entity.type['@type'] == 'textEntityTypeUrl') {
+          if (entity.type._ == 'textEntityTypeUrl') {
             if (!Array.isArray(extra.urls)) {
               extra.urls = [];
             }
             extra.urls.push(content.slice(entity.offset, entity.offset + entity.length));
           }
-          if (entity.type['@type'] == 'textEntityTypeMention') {
+          if (entity.type._ == 'textEntityTypeMention') {
             if (!Array.isArray(extra.mentions)) {
               extra.mentions = [];
             }
             extra.mentions.push(content.slice(entity.offset, entity.offset + entity.length));
           }
-          if (entity.type['@type'] == 'textEntityTypeMentionText') {
+          if (entity.type._ == 'textEntityTypeMentionName') {
             if (!Array.isArray(extra.mentions)) {
               extra.mentions = [];
             }
             extra.mentions.push(entity['user']['id']);
           }
-          if (entity.type['@type'] == 'textEntityTypeHashtag') {
+          if (entity.type._ == 'textEntityTypeHashtag') {
             if (!Array.isArray(extra.hashtags)) {
               extra.hashtags = [];
             }
