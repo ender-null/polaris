@@ -126,8 +126,6 @@ export class Bot {
     const path = url.split('/');
     for (const i in this.plugins) {
       const plugin = this.plugins[i];
-      const slug = getPluginSlug(plugin);
-      logger.info(`slug: ${slug}, path[2]: ${path[2]}`);
       if (getPluginSlug(plugin) == path[2] && 'webhook' in plugin) {
         plugin.webhook(url, data);
       }
