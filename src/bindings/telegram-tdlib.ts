@@ -261,16 +261,19 @@ export class TelegramTDlibBindings extends BindingsBase {
       limit: 100,
     });
 
-    for (const chatId of chats.chat_ids) {
-      await this.serverRequest('openChat', {
+    const openPromises = chats.chat_ids.map((chatId) =>
+      this.serverRequest('openChat', {
         chat_id: chatId,
-      });
+      }),
+    );
+    await Promise.all(openPromises);
 
-      if (loadAll) {
+    if (loadAll) {
+      const chatPromises = chats.chat_ids.map((chatId) => {
         const cid = String(chatId);
         if (chatId > 0) {
           if (db.users[cid] == undefined) {
-            const user = await this.serverRequest('getUser', {
+            const user = this.serverRequest('getUser', {
               user_id: chatId,
             });
             if (user) {
@@ -284,7 +287,7 @@ export class TelegramTDlibBindings extends BindingsBase {
           }
         } else {
           if (db.groups[cid] == undefined) {
-            const group = await this.serverRequest('getChat', {
+            const group = this.serverRequest('getChat', {
               chat_id: chatId,
             });
             if (group) {
@@ -295,7 +298,9 @@ export class TelegramTDlibBindings extends BindingsBase {
             }
           }
         }
-      }
+      });
+
+      await Promise.all(chatPromises);
     }
   }
 
@@ -323,7 +328,6 @@ export class TelegramTDlibBindings extends BindingsBase {
           text: msg.content,
           parse_mode: {
             '@type': parseMode,
-            version: 2,
           },
         });
 
