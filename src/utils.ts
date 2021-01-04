@@ -844,13 +844,21 @@ export const t = {
   year: 60 * 60 * 24 * 365,
 };
 
+export const loggerFormat = winstonFormat.printf(({ level, message, timestamp, ...metadata }) => {
+  let msg = `${timestamp} [${level}]: ${message} `;
+  if (metadata && Object.keys(metadata).length > 0) {
+    msg += JSON.stringify(metadata);
+  }
+  return msg;
+});
+
 export const transport = new winston.transports.DailyRotateFile({
   dirname: 'logs',
   filename: 'polaris-js-%DATE%.log',
   datePattern: 'YYYY-MM-DD-HH',
   zippedArchive: true,
   maxSize: '20m',
-  maxFiles: '14d',
+  maxFiles: '7d',
 });
 
 // Configure logger
@@ -859,7 +867,13 @@ export const logger = createLogger({
   format: winstonFormat.combine(winstonFormat.timestamp(), winstonFormat.json()),
   transports: [
     new transports.Console({
-      format: winstonFormat.combine(winstonFormat.simple(), winstonFormat.colorize()),
+      format: winstonFormat.combine(
+        winstonFormat.colorize(),
+        winstonFormat.timestamp({
+          format: 'Do HH:mm:ss',
+        }),
+        loggerFormat,
+      ),
     }),
     transport,
   ],
