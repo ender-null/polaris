@@ -105,22 +105,22 @@ export class Bot {
 
   messageSender(msg: Message): void {
     logger.info(
-      `💬 ${this.config.icon} [${this.user.id}] ${this.user.firstName}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
+      `💬 ${this.config.icon} [${msg.conversation.id}] ${msg.conversation.title} | ${this.user.firstName} [${this.user.id}] > ${msg.content}`,
     );
   }
 
   messagesHandler(msg: Message): void {
     if (msg.sender instanceof User) {
       logger.info(
-        `${this.getMessageIcon(msg.type)} ${this.config.icon} [${msg.sender.id}] ${msg.sender.firstName}@${
-          msg.conversation.title
-        } [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
+        `${this.getMessageIcon(msg.type)} ${this.config.icon} [${msg.conversation.id}] ${msg.conversation.title} | ${
+          msg.sender.firstName
+        } [${msg.sender.id}] > ${msg.content}`,
       );
     } else {
       logger.info(
-        `${this.getMessageIcon(msg.type)} ${this.config.icon} [${msg.sender.id}] ${msg.sender.title}@${
-          msg.conversation.title
-        } [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
+        `${this.getMessageIcon(msg.type)} ${this.config.icon} [${msg.conversation.id}] ${msg.conversation.title} | ${
+          msg.sender.title
+        } [${msg.conversation.id}] > ${msg.content}`,
       );
     }
 
