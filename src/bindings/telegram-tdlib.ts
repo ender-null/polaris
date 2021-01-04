@@ -222,7 +222,7 @@ export class TelegramTDlibBindings extends BindingsBase {
         this.lastChatUpdate = 0;
       }
       if (this.bot.user && !this.bot.user.isBot && this.lastChatUpdate < now() - t.minute * 10) {
-        await this.updateChats(true);
+        await this.updateChats();
       }
       if (update.message.is_outgoing) {
         if (update.message.is_channel_post) {
@@ -261,14 +261,14 @@ export class TelegramTDlibBindings extends BindingsBase {
       limit: 100,
     });
 
-    const openPromises = chats.chat_ids.map((chatId) =>
-      this.serverRequest('openChat', {
-        chat_id: chatId,
-      }),
-    );
-    await Promise.all(openPromises);
-
     if (loadAll) {
+      const openPromises = chats.chat_ids.map((chatId) =>
+        this.serverRequest('openChat', {
+          chat_id: chatId,
+        }),
+      );
+      await Promise.all(openPromises);
+
       const chatPromises = chats.chat_ids.map((chatId) => {
         const cid = String(chatId);
         if (chatId > 0) {
