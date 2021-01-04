@@ -13,6 +13,11 @@ export class HelpPlugin extends PluginBase {
         keepDefault: true,
       },
       {
+        command: '/allhelp',
+        description: 'Help about all commands.',
+        keepDefault: true,
+      },
+      {
         command: '/genhelp',
         description: 'Regenerate command list',
         hidden: true,
@@ -24,6 +29,7 @@ export class HelpPlugin extends PluginBase {
     };
   }
   async run(msg: Message): Promise<void> {
+    const showAll = isCommand(this, 2, msg.content) || isCommand(this, 3, msg.content);
     const commands = [];
     let text = this.strings['commands'];
 
@@ -36,7 +42,13 @@ export class HelpPlugin extends PluginBase {
             const doc = generateCommandHelp(plugin, command.command, false);
             if (doc) {
               const lines = doc.split('\n');
-              text += `\n • ${lines[0]}`;
+              if (showAll) {
+                text += `\n • ${lines[0]}`;
+              } else {
+                if (!command.skipHelp) {
+                  text += `\n • ${lines[0]}\n   <i>${lines[1]}</i>`;
+                }
+              }
               if (this.bot.config.prefix == '/' || command.keepDefault) {
                 if (lines.length > 1) {
                   commands.push({
@@ -56,7 +68,7 @@ export class HelpPlugin extends PluginBase {
       }
     }
 
-    if (isCommand(this, 2, msg.content) && this.bot.config.bindings == 'TelegramTDlibBindings') {
+    if (isCommand(this, 3, msg.content) && this.bot.config.bindings == 'TelegramTDlibBindings') {
       this.bot.replyMessage(msg, 'setMyCommands', 'api', null, {
         commands: JSON.stringify(commands),
       });

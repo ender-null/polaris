@@ -5,6 +5,7 @@ import { PluginBase } from '../plugin';
 import {
   allButNWord,
   capitalize,
+  formatNumber,
   generateCommandHelp,
   getInput,
   getTags,
@@ -158,8 +159,7 @@ export class LeagueOfLegendsPlugin extends PluginBase {
       if (!summoner || ('status' in summoner && summoner['status']['status_code'] != 200)) {
         return this.bot.replyMessage(msg, this.bot.errors.connectionError);
       }
-      const [account, masteries, ranked] = await Promise.all([
-        this.accountByPuuid(summoner['puuid']),
+      const [masteries, ranked] = await Promise.all([
         this.championMasteries(summoner['id']),
         this.leagueEntries(summoner['id']),
       ]);
@@ -172,9 +172,6 @@ export class LeagueOfLegendsPlugin extends PluginBase {
         );
       }
       text = format('{0} ({1}: {2})\n', summoner['name'], this.strings['lv'], summoner['summonerLevel']);
-      if (account && 'gameName' in account) {
-        text += `${account['gameName']}#${account['tagLine']}\n`;
-      }
       if (masteries) {
         text += `\n${this.strings['masteries']}:`;
         let limit = 5;
@@ -185,7 +182,7 @@ export class LeagueOfLegendsPlugin extends PluginBase {
             this.championIds[String(mastery['championId'])],
             this.strings['lv'],
             mastery['championLevel'],
-            String(mastery['championPoints'] / 1000).split('.')[0],
+            formatNumber(mastery['championPoints']),
           );
           limit -= 1;
           if (limit == 0) {

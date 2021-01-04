@@ -82,6 +82,7 @@ export abstract class Command {
   hidden?: boolean;
   description?: string;
   keepDefault?: boolean;
+  skipHelp?: boolean;
 
   constructor() {
     this.friendly = null;

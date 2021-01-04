@@ -18,6 +18,7 @@ export class ValenciaPlugin extends PluginBase {
           },
         ],
         description: 'Wait times of EMT Valencia bus',
+        skipHelp: true,
       },
     ];
     this.strings = {

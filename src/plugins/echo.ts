@@ -16,6 +16,7 @@ export class EchoPlugin extends PluginBase {
           },
         ],
         description: 'Repeat the input',
+        skipHelp: true,
       },
     ];
   }

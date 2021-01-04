@@ -323,10 +323,6 @@ export class WorldOfWarcraftPlugin extends PluginBase {
     return await this.getCharacter(region, realm, characterName, '/encounters/raids');
   }
 
-  async getCharacterDungeons(region: string, realm: string, characterName: string): Promise<any> {
-    return await this.getCharacter(region, realm, characterName, '/encounters/dungeons');
-  }
-
   async getCharacterPVP(region: string, realm: string, characterName: string): Promise<any> {
     return await this.getCharacter(region, realm, characterName, '/pvp-summary');
   }

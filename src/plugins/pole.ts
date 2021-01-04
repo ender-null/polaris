@@ -12,45 +12,53 @@ export class PolePlugin extends PluginBase {
       {
         command: '/polerank',
         description: 'Get the pole ranking',
+        skipHelp: true,
       },
       {
         command: '/polereset',
         description: 'Reset the pole ranking',
+        skipHelp: true,
       },
       {
         command: '/pole',
         friendly: '^pole$|oro',
         description: 'Get the pole',
+        skipHelp: true,
       },
       {
         command: '/subpole',
         friendly: '^subpole|plata',
         description: 'Get the subpole',
         hidden: true,
+        skipHelp: true,
       },
       {
         command: '/fail',
         friendly: '^fail|bronce',
         description: 'Get the fail',
         hidden: true,
+        skipHelp: true,
       },
       {
         command: '/iron',
         friendly: '(^| )hierro($| )',
         description: 'Get the iron',
         hidden: true,
+        skipHelp: true,
       },
       {
         command: '/polecanaria',
         friendly: '(^| )pole canaria($| )',
         description: 'Get the pole canaria',
         hidden: true,
+        skipHelp: true,
       },
       {
         command: '/poleandaluza',
         friendly: '(^| )pole andaluza($| )',
         description: 'Get the pole andaluza',
         hidden: true,
+        skipHelp: true,
       },
     ];
     this.strings = {

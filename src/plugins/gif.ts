@@ -16,6 +16,7 @@ export class GifPlugin extends PluginBase {
           },
         ],
         description: 'Send a GIF for input query',
+        skipHelp: true,
       },
     ];
   }

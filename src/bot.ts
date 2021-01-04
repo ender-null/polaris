@@ -110,7 +110,9 @@ export class Bot {
   messagesHandler(msg: Message): void {
     if (msg.sender instanceof User) {
       logger.info(
-        `✉️  @${this.user.username} [${msg.sender.id}] ${msg.sender.firstName}@${msg.conversation.title} [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
+        `${this.getMessageIcon(msg.type)}  @${this.user.username} [${msg.sender.id}] ${msg.sender.firstName}@${
+          msg.conversation.title
+        } [${msg.conversation.id}] sent [${msg.type}] ${msg.content}`,
       );
     } else {
       logger.info(
@@ -130,6 +132,27 @@ export class Bot {
         plugin.webhook(url, data);
       }
     }
+  }
+
+  getMessageIcon(type: string): string {
+    if (type == 'text') {
+      return '🗨️';
+    } else if (type == 'photo') {
+      return '🖼️';
+    } else if (type == 'voice') {
+      return '🔊';
+    } else if (type == 'audio') {
+      return '🎵';
+    } else if (type == 'video') {
+      return '🎥';
+    } else if (type == 'animation') {
+      return '🎬';
+    } else if (type == 'document') {
+      return '📎';
+    } else if (type == 'sticker') {
+      return '🩹';
+    }
+    return '❓';
   }
 
   initPlugins(): void {
@@ -194,6 +217,9 @@ export class Bot {
                   }
                   if ('hidden' in com) {
                     plugin.commands[commandIndex].hidden = com.hidden;
+                  }
+                  if ('skipHelp' in com) {
+                    plugin.commands[commandIndex].skipHelp = com.skipHelp;
                   }
                   if ('parameters' in com) {
                     plugin.commands[commandIndex].parameters = [];
