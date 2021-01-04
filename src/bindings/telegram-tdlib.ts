@@ -5,7 +5,7 @@ import { TDLib } from 'tdl-tdlib-addon';
 import { message, ok, Update, user } from 'tdl/types/tdlib';
 import { BindingsBase, Bot, Conversation, ConversationInfo, Extra, Message, User } from '..';
 import { db } from '../main';
-import { catchException, download, hasTag, isInt, logger, now, sendRequest, splitLargeMessage, t } from '../utils';
+import { catchException, download, hasTag, isInt, logger, now, sendRequest, splitLargeMessage } from '../utils';
 
 export class TelegramTDlibBindings extends BindingsBase {
   client: Client;
@@ -218,12 +218,12 @@ export class TelegramTDlibBindings extends BindingsBase {
 
   async updateHandler(update: Update): Promise<void> {
     if (update._ == 'updateNewMessage') {
-      if (!this.lastChatUpdate) {
-        this.lastChatUpdate = 0;
-      }
-      if (this.bot.user && !this.bot.user.isBot && this.lastChatUpdate < now() - t.minute * 10) {
-        await this.updateChats();
-      }
+      // if (!this.lastChatUpdate) {
+      //   this.lastChatUpdate = 0;
+      // }
+      // if (this.bot.user && !this.bot.user.isBot && this.lastChatUpdate < now() - t.minute * 10) {
+      //   await this.updateChats();
+      // }
       if (update.message.is_outgoing) {
         if (update.message.is_channel_post) {
           if (update.message.content._ == 'messageText') {
