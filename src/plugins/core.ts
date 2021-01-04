@@ -149,7 +149,7 @@ export class CorePlugin extends PluginBase {
       }
     }
 
-    for (const url in urls) {
+    for (const url of urls) {
       const inputMatch = telegramLinkRegExp.exec(url);
       if (inputMatch && inputMatch.length > 0) {
         logger.info(`Found Telegram link: ${url}`);
