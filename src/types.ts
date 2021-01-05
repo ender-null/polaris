@@ -194,7 +194,8 @@ export interface DatabaseUser {
   last_name?: string;
   username?: string;
   description?: string;
-  is_bot?: string;
+  is_bot?: boolean;
+  is_scam?: boolean;
 }
 
 export interface DatabaseConversation {

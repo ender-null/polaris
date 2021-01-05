@@ -39,8 +39,6 @@ export class InfoPlugin extends PluginBase {
     } else if (target && isInt(target) && target.startsWith('-100')) {
       info = this.bot.bindings['serverRequest']('getSupergroup', { supergroup_id: target.slice(4) });
       infoFull = this.bot.bindings['serverRequest']('getSupergroupFullInfo', { supergroup_id: target.slice(4) });
-    } else {
-      info = this.bot.bindings['serverRequest']('getChat', { chat_id: target });
     }
     logger.info(`info: ${JSON.stringify(info)}`);
     logger.info(`infoFull: ${JSON.stringify(infoFull)}`);
@@ -65,41 +63,37 @@ export class InfoPlugin extends PluginBase {
           if (db.users[target].description) {
             user.description = db.users[target].description;
           }
-        } else {
-          if (info) {
-            db.users[target] = {};
+          if (db.users[target].description) {
+            user.description = db.users[target].description;
+          }
+          if (db.users[target].is_bot) {
+            user.is_bot = db.users[target].is_bot;
+          }
+          if (db.users[target].is_scam) {
+            user.is_scam = db.users[target].is_scam;
           }
         }
 
         if (info) {
-          if (info['first_name'] && info['first_name'].length > 0) {
-            user.first_name = info['first_name'];
-            db.users[target].first_name = user.first_name;
-          }
-          if (info['last_name'] && info['last_name'].length > 0) {
-            user.last_name = info['last_name'];
-            db.users[target].last_name = user.last_name;
-          }
-          if (info['username'] && info['username'].length > 0) {
-            user.username = info['username'];
-            db.users[target].username = user.username;
-          }
+          user.first_name = info.first_name || '';
+          user.last_name = info.last_name || '';
+          user.username = info.username || '';
+          user.is_scam = info.is_scam || false;
+          user.is_bot = info.type._ == 'userTypeBot';
         }
         if (infoFull) {
-          if (info['bio'] && info['bio'].length > 0) {
-            user.description = info['bio'];
-            db.users[target].description = user.description;
-          }
+          user.description = info['bio'] || '';
         }
-        logger.info(JSON.stringify(db.users[target]));
-        db.usersSnap.child(target).ref.set(db.users[target]);
+        logger.info(JSON.stringify(user));
+        db.users[target] = user;
+        db.usersSnap.child(target).ref.set(user);
         const tags = getTags(this.bot, userId);
         if (tags && tags.length > 0) {
           userTags = tags.join(', ');
         }
       } else {
         showGroup = true;
-        groupId = gid;
+        groupId = target;
       }
     } else {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);
@@ -108,7 +102,7 @@ export class InfoPlugin extends PluginBase {
     if (+gid < 0 && !getInput(msg)) {
       showGroup = true;
       target = gid;
-      groupId = target;
+      groupId = gid;
     }
 
     if (showGroup) {
@@ -128,32 +122,20 @@ export class InfoPlugin extends PluginBase {
         if (db.groups[target].invite_link) {
           group.invite_link = db.groups[target].invite_link;
         }
-      } else {
-        if (info) {
-          db.groups[target] = {};
-        }
       }
 
       if (info) {
-        if (info['title'] && info['title'].length > 0) {
-          group.title = info['title'];
-          db.groups[target].username = group.title;
-        }
-        if (info['username'] && info['username'].length > 0) {
-          group.username = info['username'] || null;
-          db.groups[target].username = group.username;
-        }
+        group.title = info.title || '';
+        group.username = info.username || '';
       }
       if (infoFull) {
         group.description = infoFull['description'] || '';
-        db.groups[target].description = group.description;
         group.member_count = infoFull['member_count'] || 0;
-        db.groups[target].member_count = group.member_count;
         group.invite_link = infoFull['invite_link'] || '';
-        db.groups[target].invite_link = group.invite_link;
       }
-      logger.info(JSON.stringify(db.groups[target]));
-      db.groupsSnap.child(target).ref.set(db.groups[target]);
+      logger.info(JSON.stringify(group));
+      db.groups[target] = group;
+      db.groupsSnap.child(target).ref.set(group);
       const tags = getTags(this.bot, groupId);
       if (tags && tags.length > 0) {
         groupTags = tags.join(', ');
@@ -166,6 +148,12 @@ export class InfoPlugin extends PluginBase {
         name += `\n\t     @${user.username}`;
       }
       text = `👤 ${name}\n🆔 ${userId}`;
+      if (user.is_scam) {
+        text += '\n🚫 Reported';
+      }
+      if (user.is_bot) {
+        text += '\n🤖 Bot';
+      }
       if (userTags && userTags.length > 0) {
         text += `\n🏷 ${userTags}`;
       }
@@ -174,7 +162,7 @@ export class InfoPlugin extends PluginBase {
       }
     }
     if (text.length > 0) {
-      text += '\n';
+      text += '\n\n';
     }
     if (Object.keys(group).length > 0) {
       let name = group.title;
