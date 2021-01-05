@@ -17,6 +17,7 @@ export class InfoPlugin extends PluginBase {
           },
         ],
         description: 'Info about the user and group',
+        skipHelp: true,
       },
     ];
   }
@@ -188,7 +189,7 @@ export class InfoPlugin extends PluginBase {
         text += `\n🏷 ${userTags}`;
       }
     } else if (target && +target < 0) {
-      let name = group.title;
+      const name = group.title;
       text = `👥 ${name}\n🆔 ${target}`;
       if (groupTags.length > 0) {
         text += `\n🏷 ${userTags}`;
