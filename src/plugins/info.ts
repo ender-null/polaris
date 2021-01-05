@@ -34,11 +34,11 @@ export class InfoPlugin extends PluginBase {
 
     logger.info(`target: ${target}`);
     if (target && isInt(target) && +target > 0) {
-      info = this.bot.bindings['serverRequest']('getUser', { user_id: target });
-      infoFull = this.bot.bindings['serverRequest']('getUserFullInfo', { user_id: target });
+      info = await this.bot.bindings['serverRequest']('getUser', { user_id: target });
+      infoFull = await this.bot.bindings['serverRequest']('getUserFullInfo', { user_id: target });
     } else if (target && isInt(target) && target.startsWith('-100')) {
-      info = this.bot.bindings['serverRequest']('getSupergroup', { supergroup_id: target.slice(4) });
-      infoFull = this.bot.bindings['serverRequest']('getSupergroupFullInfo', { supergroup_id: target.slice(4) });
+      info = await this.bot.bindings['serverRequest']('getSupergroup', { supergroup_id: target.slice(4) });
+      infoFull = await this.bot.bindings['serverRequest']('getSupergroupFullInfo', { supergroup_id: target.slice(4) });
     }
     logger.info(`info: ${JSON.stringify(info)}`);
     logger.info(`infoFull: ${JSON.stringify(infoFull)}`);
@@ -74,14 +74,14 @@ export class InfoPlugin extends PluginBase {
           }
         }
 
-        if (info) {
+        if (info && Object.keys(info).length > 0) {
           user.first_name = info.first_name || '';
           user.last_name = info.last_name || '';
           user.username = info.username || '';
           user.is_scam = info.is_scam || false;
-          //   user.is_bot = info.type._ == 'userTypeBot';
+          user.is_bot = info.type._ == 'userTypeBot';
         }
-        if (infoFull) {
+        if (infoFull && Object.keys(infoFull).length > 0) {
           user.description = info['bio'] || '';
         }
         logger.info(JSON.stringify(user));
@@ -124,11 +124,11 @@ export class InfoPlugin extends PluginBase {
         }
       }
 
-      if (info) {
+      if (info && Object.keys(info).length > 0) {
         group.title = info.title || '';
         group.username = info.username || '';
       }
-      if (infoFull) {
+      if (infoFull && Object.keys(infoFull).length > 0) {
         group.description = infoFull['description'] || '';
         group.member_count = infoFull['member_count'] || 0;
         group.invite_link = infoFull['invite_link'] || '';
