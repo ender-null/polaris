@@ -2,7 +2,7 @@ import { Bot, Message } from '..';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
 import { DatabaseConversation, DatabaseUser } from '../types';
-import { getFullName, getInput, getTags, getTarget } from '../utils';
+import { getFullName, getInput, getTags, getTarget, logger } from '../utils';
 
 export class InfoPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -56,7 +56,7 @@ export class InfoPlugin extends PluginBase {
             user.last_name = db.users[target].last_name;
           }
           if (db.users[target].username) {
-            user.username = '@' + db.users[target].username;
+            user.username = db.users[target].username;
           }
           if (db.users[target].description) {
             user.description = db.users[target].description;
@@ -64,23 +64,25 @@ export class InfoPlugin extends PluginBase {
         } else {
           if (info) {
             db.users[target] = {
-              first_name: info['first_name'],
-              last_name: info['last_name'],
+              first_name: info['first_name'] || null,
+              last_name: info['last_name'] || null,
             };
           }
         }
 
         if (info) {
-          user.first_name = info['first_name'] + ' ' + info['last_name'];
+          user.first_name = info['first_name'] || null;
+          user.last_name = info['last_name'] || null;
           if (info['username'] && info['username'].length > 0) {
             user.username = info['username'];
             db.users[target].username = user.username;
           }
         }
         if (infoFull) {
-          user.description = infoFull['bio'];
+          user.description = infoFull['bio'] || null;
           db.users[target].description = user.description;
         }
+        logger.info(JSON.stringify(db.users[target]));
         db.usersSnap.child(target).ref.set(db.users[target]);
         const tags = getTags(this.bot, target);
         if (tags && tags.length > 0) {
@@ -104,7 +106,7 @@ export class InfoPlugin extends PluginBase {
           group.title = db.groups[target].title;
         }
         if (db.groups[target].username) {
-          group.username = '@' + db.groups[target].username;
+          group.username = db.groups[target].username;
         }
         if (db.groups[target].description) {
           group.description = db.groups[target].description;
@@ -118,25 +120,26 @@ export class InfoPlugin extends PluginBase {
       } else {
         if (info) {
           db.groups[target] = {
-            title: info['title'],
+            title: info['title'] || null,
           };
         }
       }
 
       if (info) {
         if (info['username'] && info['username'].length > 0) {
-          group.username = info['username'];
+          group.username = info['username'] || null;
           db.groups[target].username = group.username;
         }
       }
       if (infoFull) {
-        group.description = infoFull['description'];
-        group.member_count = infoFull['member_count'];
-        group.invite_link = infoFull['invite_link'];
+        group.description = infoFull['description'] || null;
+        group.member_count = infoFull['member_count'] || 0;
+        group.invite_link = infoFull['invite_link'] || null;
         db.groups[target].description = group.description;
         db.groups[target].member_count = group.member_count;
         db.groups[target].invite_link = group.invite_link;
       }
+      logger.info(JSON.stringify(db.groups[target]));
       db.groupsSnap.child(target).ref.set(db.groups[target]);
       const tags = getTags(this.bot, target);
       if (tags && tags.length > 0) {
