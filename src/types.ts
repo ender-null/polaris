@@ -198,8 +198,10 @@ export interface DatabaseUser {
 
 export interface DatabaseConversation {
   title?: string;
+  description?: string;
   username?: string;
   invite_link?: string;
+  member_count?: string;
 }
 
 export interface DatabaseReminder {

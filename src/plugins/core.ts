@@ -167,23 +167,24 @@ export class CorePlugin extends PluginBase {
         if (!knownLink) {
           const chat = this.bot.bindings.checkInviteLink(fixedUrl);
           if (chat) {
+            logger.info('checkInviteLink: ' + JSON.stringify(chat));
             if (chat['chat_id'] == 0) {
               const ok = this.bot.bindings.joinByInviteLink(fixedUrl);
               if (ok) {
                 const cid = ok['id'];
                 this.bot.sendAdminAlert(`Joined ${ok['title']} [${cid}] by invite link: ${fixedUrl}`);
                 if (db.groups[cid] != undefined) {
-                  db.groupsSnap.child(cid).ref.update({
-                    invite_link: fixedUrl,
-                    member_count: chat['member_count'] || 0,
-                    title: ok['title'],
-                  });
+                  db.groups[cid].invite_link = fixedUrl;
+                  db.groups[cid].member_count = chat['member_count'] || 0;
+                  db.groups[cid].title = ok['title'];
+                  db.groupsSnap.child(cid).ref.update(db.groups[cid]);
                 } else {
-                  db.groupsSnap.child(cid).ref.set({
+                  db.groups[cid] = {
                     invite_link: fixedUrl,
                     member_count: chat['member_count'] || 0,
                     title: ok['title'],
-                  });
+                  };
+                  db.groupsSnap.child(cid).ref.set(db.groups[cid]);
                 }
               }
             }
@@ -191,8 +192,6 @@ export class CorePlugin extends PluginBase {
             logger.info(`Invalid link: ${fixedUrl}`);
           }
         }
-      } else {
-        logger.info(`Found NON Telegram link: ${url}`);
       }
     }
   }
