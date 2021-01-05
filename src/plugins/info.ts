@@ -71,9 +71,9 @@ export class InfoPlugin extends PluginBase {
 
         if (info) {
           user.first_name = info['first_name'] + ' ' + info['last_name'];
-          if (info['username'].length > 0) {
-            user.username = '@' + info['username'];
-            db.users[target].username = user.username.slice(1);
+          if (info['username'] && info['username'].length > 0) {
+            user.username = info['username'];
+            db.users[target].username = user.username;
           }
         }
         if (infoFull) {
@@ -82,7 +82,7 @@ export class InfoPlugin extends PluginBase {
         }
         db.usersSnap.child(target).ref.set(db.users[target]);
         const tags = getTags(this.bot, target);
-        if (tags.length > 0) {
+        if (tags && tags.length > 0) {
           userTags = tags.join(', ');
         }
       } else {
@@ -111,9 +111,9 @@ export class InfoPlugin extends PluginBase {
         }
 
         if (info) {
-          if (info['username'].length > 0) {
-            group.username = '@' + info['username'];
-            db.groups[target].username = group.username.slice(1);
+          if (info['username'] && info['username'].length > 0) {
+            group.username = info['username'];
+            db.groups[target].username = group.username;
           }
         }
         if (infoFull) {
@@ -126,7 +126,7 @@ export class InfoPlugin extends PluginBase {
         }
         db.groupsSnap.child(target).ref.set(db.groups[target]);
         const tags = getTags(this.bot, target);
-        if (tags.length > 0) {
+        if (tags && tags.length > 0) {
           groupTags = tags.join(', ');
         }
       }
@@ -158,9 +158,9 @@ export class InfoPlugin extends PluginBase {
         }
 
         if (info) {
-          if (info['username'].length > 0) {
-            group.username = '@' + info['username'];
-            db.groups[target].username = group.username.slice(1);
+          if (info['username'] && info['username'].length > 0) {
+            group.username = info['username'];
+            db.groups[target].username = group.username;
           }
         }
         if (infoFull) {
@@ -173,26 +173,42 @@ export class InfoPlugin extends PluginBase {
         }
         db.groupsSnap.child(target).ref.set(db.groups[target]);
         const tags = getTags(this.bot, target);
-        if (tags.length > 0) {
+        if (tags && tags.length > 0) {
           groupTags = tags.join(', ');
         }
       }
     }
 
-    if (target && +target > 0) {
+    if (Object.keys(user).length > 0) {
       let name = getFullName(target, false);
-      if (user.username.length > 0) {
-        name += `\n\t     ${user.username}`;
+      if (user.username && user.username.length > 0) {
+        name += `\n\t     @${user.username}`;
       }
       text = `👤 ${name}\n🆔 ${target}`;
-      if (userTags.length > 0) {
+      if (userTags && userTags.length > 0) {
         text += `\n🏷 ${userTags}`;
       }
-    } else if (target && +target < 0) {
-      const name = group.title;
-      text = `👥 ${name}\n🆔 ${target}`;
-      if (groupTags.length > 0) {
+      if (user.description && user.description.length > 0) {
+        text += '\n\n${user.description}';
+      }
+    }
+    if (text.length > 0) {
+      text += '\n';
+    }
+    if (Object.keys(group).length > 0) {
+      let name = group.title;
+      if (group.username && group.username.length > 0) {
+        name += `\n\t     @${group.username}`;
+      }
+      text += `👥 ${name}\n🆔 ${target}`;
+      if (group.invite_link && group.invite_link.length > 0) {
+        text += '\n🔗 ${group.invite_link}';
+      }
+      if (groupTags && groupTags.length > 0) {
         text += `\n🏷 ${userTags}`;
+      }
+      if (group.description && group.description.length > 0) {
+        text += '\n\n${group.description}';
       }
     }
 
