@@ -79,7 +79,7 @@ export class InfoPlugin extends PluginBase {
           user.last_name = info.last_name || '';
           user.username = info.username || '';
           user.is_scam = info.is_scam || false;
-          user.is_bot = info.type._ == 'userTypeBot';
+          //   user.is_bot = info.type._ == 'userTypeBot';
         }
         if (infoFull) {
           user.description = info['bio'] || '';
