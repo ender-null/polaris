@@ -24,11 +24,12 @@ export class InfoPlugin extends PluginBase {
   async run(msg: Message): Promise<void> {
     const gid = String(msg.conversation.id);
     const input = getInput(msg, false);
-    const target = getTarget(this.bot, msg, input);
+    let target = getTarget(this.bot, msg, input);
 
     let text = '';
     const user: DatabaseUser = {};
     const group: DatabaseConversation = {};
+    let showGroup = false;
     let info, infoFull, userTags, groupTags;
 
     if (target && +target > 0) {
@@ -86,55 +87,18 @@ export class InfoPlugin extends PluginBase {
           userTags = tags.join(', ');
         }
       } else {
-        if (db.groups[target]) {
-          if (db.groups[target].title) {
-            group.title = db.groups[target].title;
-          }
-          if (db.groups[target].username) {
-            group.username = '@' + db.groups[target].username;
-          }
-          if (db.groups[target].description) {
-            group.description = db.groups[target].description;
-          }
-          if (db.groups[target].member_count) {
-            group.member_count = db.groups[target].member_count;
-          }
-          if (db.groups[target].invite_link) {
-            group.invite_link = db.groups[target].invite_link;
-          }
-        } else {
-          if (info) {
-            db.groups[target] = {
-              title: info['title'],
-            };
-          }
-        }
-
-        if (info) {
-          if (info['username'] && info['username'].length > 0) {
-            group.username = info['username'];
-            db.groups[target].username = group.username;
-          }
-        }
-        if (infoFull) {
-          group.description = infoFull['description'];
-          group.member_count = infoFull['member_count'];
-          group.invite_link = infoFull['invite_link'];
-          db.groups[target].description = group.description;
-          db.groups[target].member_count = group.member_count;
-          db.groups[target].invite_link = group.invite_link;
-        }
-        db.groupsSnap.child(target).ref.set(db.groups[target]);
-        const tags = getTags(this.bot, target);
-        if (tags && tags.length > 0) {
-          groupTags = tags.join(', ');
-        }
+        showGroup = true;
       }
     } else {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);
     }
 
     if (+gid < 0 && !getInput(msg)) {
+      showGroup = true;
+      target = gid;
+    }
+
+    if (showGroup) {
       if (db.groups[target]) {
         if (db.groups[target].title) {
           group.title = db.groups[target].title;
@@ -151,31 +115,32 @@ export class InfoPlugin extends PluginBase {
         if (db.groups[target].invite_link) {
           group.invite_link = db.groups[target].invite_link;
         }
-
-        if (gid.startsWith('-100')) {
-          info = this.bot.bindings['serverRequest']('getSupergroup', { supergroup_id: target.slice(4) });
-          infoFull = this.bot.bindings['serverRequest']('getSupergroupFullInfo', { supergroup_id: target.slice(4) });
-        }
-
+      } else {
         if (info) {
-          if (info['username'] && info['username'].length > 0) {
-            group.username = info['username'];
-            db.groups[target].username = group.username;
-          }
+          db.groups[target] = {
+            title: info['title'],
+          };
         }
-        if (infoFull) {
-          group.description = infoFull['description'];
-          group.member_count = infoFull['member_count'];
-          group.invite_link = infoFull['invite_link'];
-          db.groups[target].description = group.description;
-          db.groups[target].member_count = group.member_count;
-          db.groups[target].invite_link = group.invite_link;
+      }
+
+      if (info) {
+        if (info['username'] && info['username'].length > 0) {
+          group.username = info['username'];
+          db.groups[target].username = group.username;
         }
-        db.groupsSnap.child(target).ref.set(db.groups[target]);
-        const tags = getTags(this.bot, target);
-        if (tags && tags.length > 0) {
-          groupTags = tags.join(', ');
-        }
+      }
+      if (infoFull) {
+        group.description = infoFull['description'];
+        group.member_count = infoFull['member_count'];
+        group.invite_link = infoFull['invite_link'];
+        db.groups[target].description = group.description;
+        db.groups[target].member_count = group.member_count;
+        db.groups[target].invite_link = group.invite_link;
+      }
+      db.groupsSnap.child(target).ref.set(db.groups[target]);
+      const tags = getTags(this.bot, target);
+      if (tags && tags.length > 0) {
+        groupTags = tags.join(', ');
       }
     }
 
