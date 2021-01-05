@@ -193,6 +193,7 @@ export interface DatabaseUser {
   first_name?: string;
   last_name?: string;
   username?: string;
+  description?: string;
   is_bot?: string;
 }
 

@@ -11,6 +11,7 @@ export { GifPlugin } from './gif';
 export { GitHubPlugin } from './github';
 export { HelpPlugin } from './help';
 export { ImagePlugin } from './image';
+export { InfoPlugin } from './info';
 export { LastFMPlugin } from './lastfm';
 export { LeagueOfLegendsPlugin } from './league-of-legends';
 export { MediaForwarderPlugin } from './media-forwarder';
