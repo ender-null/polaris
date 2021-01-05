@@ -2,7 +2,7 @@ import { Bot, Message } from '..';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
 import { DatabaseConversation, DatabaseUser } from '../types';
-import { getFullName, getInput, getTags, getTarget, logger } from '../utils';
+import { getFullName, getInput, getTags, getTarget, isInt, logger } from '../utils';
 
 export class InfoPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -30,17 +30,20 @@ export class InfoPlugin extends PluginBase {
     const user: DatabaseUser = {};
     const group: DatabaseConversation = {};
     let showGroup = false;
-    let info, infoFull, userTags, groupTags;
+    let info, infoFull, userId, groupId, userTags, groupTags;
 
-    if (target && +target > 0) {
+    logger.info(`target: ${target}`);
+    if (target && isInt(target) && +target > 0) {
       info = this.bot.bindings['serverRequest']('getUser', { user_id: target });
       infoFull = this.bot.bindings['serverRequest']('getUserFullInfo', { user_id: target });
-    } else if (target && target.startsWith('-100')) {
+    } else if (target && isInt(target) && target.startsWith('-100')) {
       info = this.bot.bindings['serverRequest']('getSupergroup', { supergroup_id: target.slice(4) });
       infoFull = this.bot.bindings['serverRequest']('getSupergroupFullInfo', { supergroup_id: target.slice(4) });
     } else {
       info = this.bot.bindings['serverRequest']('getChat', { chat_id: target });
     }
+    logger.info(`info: ${JSON.stringify(info)}`);
+    logger.info(`infoFull: ${JSON.stringify(infoFull)}`);
 
     if (target && (+target == 0 || !(db.users[target] || db.users[target] || info))) {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);
@@ -48,6 +51,7 @@ export class InfoPlugin extends PluginBase {
 
     if (target) {
       if (+target > 0) {
+        userId = target;
         if (db.users[target]) {
           if (db.users[target].first_name) {
             user.first_name = db.users[target].first_name;
@@ -63,33 +67,39 @@ export class InfoPlugin extends PluginBase {
           }
         } else {
           if (info) {
-            db.users[target] = {
-              first_name: info['first_name'] || null,
-              last_name: info['last_name'] || null,
-            };
+            db.users[target] = {};
           }
         }
 
         if (info) {
-          user.first_name = info['first_name'] || null;
-          user.last_name = info['last_name'] || null;
+          if (info['first_name'] && info['first_name'].length > 0) {
+            user.first_name = info['first_name'];
+            db.users[target].first_name = user.first_name;
+          }
+          if (info['last_name'] && info['last_name'].length > 0) {
+            user.last_name = info['last_name'];
+            db.users[target].last_name = user.last_name;
+          }
           if (info['username'] && info['username'].length > 0) {
             user.username = info['username'];
             db.users[target].username = user.username;
           }
         }
         if (infoFull) {
-          user.description = infoFull['bio'] || null;
-          db.users[target].description = user.description;
+          if (info['bio'] && info['bio'].length > 0) {
+            user.description = info['bio'];
+            db.users[target].description = user.description;
+          }
         }
         logger.info(JSON.stringify(db.users[target]));
         db.usersSnap.child(target).ref.set(db.users[target]);
-        const tags = getTags(this.bot, target);
+        const tags = getTags(this.bot, userId);
         if (tags && tags.length > 0) {
           userTags = tags.join(', ');
         }
       } else {
         showGroup = true;
+        groupId = gid;
       }
     } else {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);
@@ -98,6 +108,7 @@ export class InfoPlugin extends PluginBase {
     if (+gid < 0 && !getInput(msg)) {
       showGroup = true;
       target = gid;
+      groupId = target;
     }
 
     if (showGroup) {
@@ -119,40 +130,42 @@ export class InfoPlugin extends PluginBase {
         }
       } else {
         if (info) {
-          db.groups[target] = {
-            title: info['title'] || null,
-          };
+          db.groups[target] = {};
         }
       }
 
       if (info) {
+        if (info['title'] && info['title'].length > 0) {
+          group.title = info['title'];
+          db.groups[target].username = group.title;
+        }
         if (info['username'] && info['username'].length > 0) {
           group.username = info['username'] || null;
           db.groups[target].username = group.username;
         }
       }
       if (infoFull) {
-        group.description = infoFull['description'] || null;
-        group.member_count = infoFull['member_count'] || 0;
-        group.invite_link = infoFull['invite_link'] || null;
+        group.description = infoFull['description'] || '';
         db.groups[target].description = group.description;
+        group.member_count = infoFull['member_count'] || 0;
         db.groups[target].member_count = group.member_count;
+        group.invite_link = infoFull['invite_link'] || '';
         db.groups[target].invite_link = group.invite_link;
       }
       logger.info(JSON.stringify(db.groups[target]));
       db.groupsSnap.child(target).ref.set(db.groups[target]);
-      const tags = getTags(this.bot, target);
+      const tags = getTags(this.bot, groupId);
       if (tags && tags.length > 0) {
         groupTags = tags.join(', ');
       }
     }
 
     if (Object.keys(user).length > 0) {
-      let name = getFullName(target, false);
+      let name = getFullName(userId, false);
       if (user.username && user.username.length > 0) {
         name += `\n\t     @${user.username}`;
       }
-      text = `👤 ${name}\n🆔 ${target}`;
+      text = `👤 ${name}\n🆔 ${userId}`;
       if (userTags && userTags.length > 0) {
         text += `\n🏷 ${userTags}`;
       }
@@ -168,7 +181,7 @@ export class InfoPlugin extends PluginBase {
       if (group.username && group.username.length > 0) {
         name += `\n\t     @${group.username}`;
       }
-      text += `👥 ${name}\n🆔 ${target}`;
+      text += `👥 ${name}\n🆔 ${groupId}`;
       if (group.invite_link && group.invite_link.length > 0) {
         text += '\n🔗 ${group.invite_link}';
       }
