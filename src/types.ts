@@ -165,6 +165,8 @@ export abstract class Extra extends Object {
   preview?: boolean;
   caption?: string;
   message?: number | string;
+  title?: string;
+  description?: string;
   photo?: string;
   conversation?: number | string;
   commands?: string;

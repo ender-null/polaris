@@ -455,62 +455,62 @@ export class TelegramTDlibBindings extends BindingsBase {
       };
 
       if (msg.extra && 'title' in msg.extra) {
-        data['title'] = msg.extra['title'];
+        data.title = msg.extra.title;
       }
       if (msg.extra && 'userId' in msg.extra) {
-        data['user_id'] = msg.extra['userId'];
+        data.user_id = msg.extra.userId;
       }
 
       if (msg.extra && 'customTitle' in msg.extra) {
-        data['custom_title'] = msg.extra['customTitle'];
+        data.custom_title = msg.extra.customTitle;
       }
 
       if (msg.extra && 'photo' in msg.extra) {
-        data['photo'] = this.getInputFile(msg.extra['photo']);
+        data.photo = this.getInputFile(msg.extra.photo);
       }
 
       if (msg.extra && 'description' in msg.extra) {
-        data['description'] = msg.extra['description'];
+        data.description = msg.extra.description;
       }
 
       if (msg.extra && 'messageId' in msg.extra) {
-        data['message_id'] = msg.extra['messageId'];
+        data.message_id = msg.extra.messageId;
       }
 
       if (msg.extra && 'stickerSetName' in msg.extra) {
-        data['sticker_set_name'] = msg.extra['stickerSetName'];
+        data.sticker_set_name = msg.extra.stickerSetName;
       }
 
       if (msg.extra && 'commands' in msg.extra) {
-        data['commands'] = msg.extra['commands'];
+        data.commands = msg.extra.commands;
       }
     } else if (msg.type == 'api') {
-      const params = {
+      const params: { chat_id?; user_id?; custom_title?; photo?; message_id?; sticker_set_name?; commands? } = {
         chat_id: msg.conversation.id,
       };
 
       if (msg.extra && 'userId' in msg.extra) {
-        params['user_id'] = msg.extra['userId'];
+        params.user_id = msg.extra.userId;
       }
 
       if (msg.extra && 'customTitle' in msg.extra) {
-        params['custom_title'] = msg.extra['customTitle'];
+        params.custom_title = msg.extra.customTitle;
       }
 
       if (msg.extra && 'photo' in msg.extra) {
-        params['photo'] = msg.extra['photo'];
+        params.photo = msg.extra.photo;
       }
 
       if (msg.extra && 'messageId' in msg.extra) {
-        params['message_id'] = msg.extra['messageId'];
+        params.message_id = msg.extra.messageId;
       }
 
       if (msg.extra && 'stickerSetName' in msg.extra) {
-        params['sticker_set_name'] = msg.extra['stickerSetName'];
+        params.sticker_set_name = msg.extra.stickerSetName;
       }
 
       if (msg.extra && 'commands' in msg.extra) {
-        params['commands'] = msg.extra['commands'];
+        params.commands = msg.extra.commands;
       }
 
       await this.apiRequest(msg.content, params);
@@ -526,15 +526,27 @@ export class TelegramTDlibBindings extends BindingsBase {
       };
 
       if (msg.reply) {
-        data['reply_to_message_id'] = msg.reply.id;
+        data.reply_to_message_id = msg.reply.id;
       }
     }
 
     if (data) {
-      if (msg.type == 'text' && data['input_message_content']['text']['text'].length > 4000) {
-        const texts = splitLargeMessage(data['input_message_content']['text']['text'], 4000);
+      if (msg.type == 'text' && data.input_message_content.text.text.length > 4000) {
+        const texts = splitLargeMessage(data.input_message_content.text.text, 4000);
+        let parseMode;
+        if (msg.extra.format == 'HTML') {
+          parseMode = 'textParseModeHTML';
+        } else {
+          parseMode = 'textParseModeMarkdown';
+        }
         for (const text of texts) {
-          data['input_message_content']['text']['text'] = text;
+          const formatedText = await this.serverRequest('parseTextEntities', {
+            text: text,
+            parse_mode: {
+              '@type': parseMode,
+            },
+          });
+          data.input_message_content.text = formatedText;
           await this.serverRequest(data['@type'], data, false, true);
         }
       } else {
