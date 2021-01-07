@@ -2,7 +2,7 @@ import { Bot, Message } from '..';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
 import { DatabaseConversation, DatabaseUser } from '../types';
-import { dateFromTimestamp, getFullName, getInput, getTags, getTarget, isInt, logger } from '../utils';
+import { dateFromTimestamp, formatNumber, getFullName, getInput, getTags, getTarget, isInt, logger } from '../utils';
 
 export class InfoPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -142,7 +142,7 @@ export class InfoPlugin extends PluginBase {
       }
 
       if (info && Object.keys(info).length > 0) {
-        group.title = info.title || '';
+        // group.title = info.title || '';
         group.username = info.username || '';
         group.member_count = info.member_count || 0;
         group.is_channel || false;
@@ -196,7 +196,7 @@ export class InfoPlugin extends PluginBase {
         text += `\n🔗 ${group.invite_link}`;
       }
       if (group.member_count && group.member_count > 0) {
-        text += `\n👪 ${group.member_count}`;
+        text += `\n👪 ${formatNumber(group.member_count)}`;
       }
       if (group.linked_chat_id && group.linked_chat_id > 0) {
         let title;
@@ -222,10 +222,10 @@ export class InfoPlugin extends PluginBase {
         text += `\n⚠️ ${this.strings['reported']}`;
       }
       if (group.restriction_reason && group.restriction_reason.length > 0) {
-        text += `\n\n🚫 ${group.restriction_reason}`;
+        text += `\n🚫 <i>${group.restriction_reason}</i>`;
       }
       if (group.description && group.description.length > 0) {
-        text += `\n\nℹ️ ${group.description}`;
+        text += `\nℹ️ <i>${group.description}</i>`;
       }
     }
 

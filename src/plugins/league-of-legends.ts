@@ -178,7 +178,7 @@ export class LeagueOfLegendsPlugin extends PluginBase {
         for (const i in Object.keys(masteries)) {
           const mastery = masteries[i];
           text += format(
-            '\n\t{0}: {1} {2} ({3}k)',
+            '\n\t{0}: {1} {2} ({3})',
             this.championIds[String(mastery['championId'])],
             this.strings['lv'],
             mastery['championLevel'],
