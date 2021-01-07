@@ -1,11 +1,136 @@
 import { Bot, Message } from '..';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
-import { getTags, hasTag, logger, sendRequest, telegramLinkRegExp } from '../utils';
+import {
+  delTag,
+  generateCommandHelp,
+  getInput,
+  getTags,
+  getWord,
+  hasTag,
+  isCommand,
+  isInt,
+  logger,
+  sendRequest,
+  setTag,
+  telegramLinkRegExp,
+} from '../utils';
 
 export class MediaForwarderPlugin extends PluginBase {
   constructor(bot: Bot) {
     super(bot);
+    this.commands = [
+      {
+        command: '/resends',
+        hidden: true,
+      },
+      {
+        command: '/resend',
+        parameters: [
+          {
+            name: 'origin',
+            required: true,
+          },
+          {
+            name: 'destination',
+            required: true,
+          },
+        ],
+        description: 'Resend all media from origin to destination',
+        hidden: true,
+      },
+      {
+        command: '/rmresend',
+        parameters: [
+          {
+            name: 'origin',
+            required: true,
+          },
+        ],
+        description: 'Remove all resends from origin',
+        hidden: true,
+      },
+    ];
+    this.strings = {
+      resends: 'Resends',
+      forwards: 'Forwards',
+    };
+  }
+
+  async run(msg: Message): Promise<void> {
+    if (isCommand(this, 1, msg.content)) {
+      const resends = [];
+      const forwards = [];
+      let text = '';
+
+      for (const gid in db.tags) {
+        for (const tag of getTags(this.bot, gid)) {
+          if (tag.indexOf('resend:') > -1) {
+            resends.push(`${gid}:${tag.split(':')[1]}`);
+          }
+          if (tag.indexOf('fwd:') > -1) {
+            forwards.push(`${gid}:${tag.split(':')[1]}`);
+          }
+        }
+      }
+
+      if (resends.length > 0) {
+        text += `<b>${this.strings['resends']}:</b>`;
+        text += this.generateText(resends);
+      }
+
+      if (forwards.length > 0) {
+        text += `\n<b>${this.strings['forwards']}:</b>`;
+        text += this.generateText(forwards);
+      }
+
+      this.bot.replyMessage(msg, text);
+    } else if (isCommand(this, 2, msg.content)) {
+      const input = getInput(msg, false);
+      if (!input) {
+        return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
+      }
+      const orig = getWord(input, 1);
+      const dest = getWord(input, 2);
+      if (!isInt(orig) || !isInt(dest)) {
+        return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
+      }
+      setTag(this.bot, orig, `resend:${dest}`);
+      this.bot.replyMessage(msg, '✅');
+    } else if (isCommand(this, 3, msg.content)) {
+      const input = getInput(msg, false);
+      if (!input) {
+        return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
+      }
+      const orig = getWord(input, 1);
+      delTag(this.bot, orig, 'resend:?');
+      delTag(this.bot, orig, 'fwd:?');
+      this.bot.replyMessage(msg, '✅');
+    }
+  }
+
+  generateText(items: string[]) {
+    let text = '';
+    for (const item of items) {
+      const orig = item.split(':')[0];
+      const dest = item.split(':')[1];
+
+      text += '\n';
+      if (db.groups[orig]) {
+        text += `\t${db.groups[orig].title} [${orig}]`;
+      } else {
+        text += `\t${orig}`;
+      }
+      if (db.groups[dest]) {
+        text += ` ➡️ ${db.groups[dest].title} [${dest}]`;
+      } else {
+        text += ` ➡️ ${dest}`;
+      }
+
+      text += '\n';
+    }
+
+    return text;
   }
 
   async always(msg: Message): Promise<void> {
