@@ -183,11 +183,13 @@ export function isInt(number: number | string): boolean {
 }
 
 export function getTarget(bot: Bot, m: Message, input: string): string {
-  if (input) {
+  if (m.reply) {
+    return String(m.reply.sender.id);
+  } else if (input) {
     const target = getWord(input, 1);
-    if (isInt(target)) {
+    if (target && isInt(target)) {
       return String(target);
-    } else if (target.startsWith('@')) {
+    } else if (target && target.startsWith('@')) {
       if (bot.user.username.toLowerCase() == target.substr(1).toLowerCase()) {
         return String(bot.user.id);
       }
@@ -207,9 +209,9 @@ export function getTarget(bot: Bot, m: Message, input: string): string {
           return gid;
         }
       }
-    } else if (target.startsWith('<@')) {
+    } else if (target && target.startsWith('<@')) {
       target.replace(new RegExp('<@!?([d]+)>', 'gim'), '$1');
-    } else if (target == '-g') {
+    } else if (target && target == '-g') {
       return String(m.conversation.id);
     } else {
       for (const uid in db.users) {
@@ -231,8 +233,6 @@ export function getTarget(bot: Bot, m: Message, input: string): string {
       }
     }
     return target;
-  } else if (m.reply) {
-    return String(m.reply.sender.id);
   } else {
     return String(m.sender.id);
   }
