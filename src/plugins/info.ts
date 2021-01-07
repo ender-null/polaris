@@ -2,7 +2,7 @@ import { Bot, Message } from '..';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
 import { DatabaseConversation, DatabaseUser } from '../types';
-import { getFullName, getInput, getTags, getTarget, isInt, logger } from '../utils';
+import { dateFromTimestamp, getFullName, getInput, getTags, getTarget, isInt, logger } from '../utils';
 
 export class InfoPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -20,6 +20,13 @@ export class InfoPlugin extends PluginBase {
         skipHelp: true,
       },
     ];
+    this.strings = {
+      bot: 'Bot',
+      reported: 'Reported',
+      channel: 'Channel',
+      members: 'Members',
+      restrictionReason: 'Restriction reason',
+    };
   }
   async run(msg: Message): Promise<void> {
     const gid = String(msg.conversation.id);
@@ -75,6 +82,7 @@ export class InfoPlugin extends PluginBase {
         }
 
         if (info && Object.keys(info).length > 0) {
+          userId = info.id;
           user.first_name = info.first_name || '';
           user.last_name = info.last_name || '';
           user.username = info.username || '';
@@ -99,7 +107,7 @@ export class InfoPlugin extends PluginBase {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);
     }
 
-    if (+gid < 0 && !getInput(msg)) {
+    if (+gid < 0 && !input) {
       showGroup = true;
       target = gid;
       groupId = gid;
@@ -124,14 +132,28 @@ export class InfoPlugin extends PluginBase {
         }
       }
 
+      if (target == gid) {
+        info = await this.bot.bindings['serverRequest']('getSupergroup', { supergroup_id: target.slice(4) });
+        infoFull = await this.bot.bindings['serverRequest']('getSupergroupFullInfo', {
+          supergroup_id: target.slice(4),
+        });
+        logger.info(`info: ${JSON.stringify(info)}`);
+        logger.info(`infoFull: ${JSON.stringify(infoFull)}`);
+      }
+
       if (info && Object.keys(info).length > 0) {
         group.title = info.title || '';
         group.username = info.username || '';
+        group.member_count = info.member_count || 0;
+        group.is_channel || false;
+        group.is_scam || false;
+        group.date = info.date || '';
+        group.restriction_reason || '';
       }
       if (infoFull && Object.keys(infoFull).length > 0) {
-        group.description = infoFull['description'] || '';
-        group.member_count = infoFull['member_count'] || 0;
-        group.invite_link = infoFull['invite_link'] || '';
+        group.description = infoFull.description || '';
+        group.invite_link = infoFull.invite_link || '';
+        group.linked_chat_id = infoFull.linked_chat_id || '';
       }
       logger.info(JSON.stringify(group));
       db.groups[target] = group;
@@ -149,16 +171,16 @@ export class InfoPlugin extends PluginBase {
       }
       text = `👤 ${name}\n🆔 ${userId}`;
       if (user.is_scam) {
-        text += '\n🚫 Reported';
+        text += `\n🚫 ${this.strings['reported']}`;
       }
       if (user.is_bot) {
-        text += '\n🤖 Bot';
+        text += `\n🤖 ${this.strings['bot']}`;
       }
       if (userTags && userTags.length > 0) {
         text += `\n🏷 ${userTags}`;
       }
       if (user.description && user.description.length > 0) {
-        text += '\n\n${user.description}';
+        text += `\n\n${user.description}`;
       }
     }
     if (text.length > 0) {
@@ -171,13 +193,39 @@ export class InfoPlugin extends PluginBase {
       }
       text += `👥 ${name}\n🆔 ${groupId}`;
       if (group.invite_link && group.invite_link.length > 0) {
-        text += '\n🔗 ${group.invite_link}';
+        text += `\n🔗 ${group.invite_link}`;
+      }
+      if (group.member_count && group.member_count > 0) {
+        text += `\n<b>${group.member_count}</b> ${this.strings['members']}`;
+      }
+      if (group.linked_chat_id && group.linked_chat_id > 0) {
+        let title;
+        if (db.groups[group.linked_chat_id]) {
+          title = db.groups[group.linked_chat_id].title;
+        }
+        if (title) {
+          text += `\n📎 ${title} [<code>${group.linked_chat_id}</code>]`;
+        } else {
+          text += `\n📎 <code>${group.linked_chat_id}</code>`;
+        }
+      }
+      if (group.date && group.date > 0) {
+        text += `\n📅 ${dateFromTimestamp(group.date)}`;
       }
       if (groupTags && groupTags.length > 0) {
         text += `\n🏷 ${userTags}`;
       }
+      if (group.is_channel) {
+        text += `\n📰 ${this.strings['channel']}`;
+      }
+      if (group.is_scam) {
+        text += `\n🚫 ${this.strings['reported']}`;
+      }
+      if (group.restriction_reason && group.restriction_reason.length > 0) {
+        text += `\n\n<b>${this.strings['restrictionReason']}</b>:\n${group.restriction_reason}`;
+      }
       if (group.description && group.description.length > 0) {
-        text += '\n\n${group.description}';
+        text += `\n\n${group.description}`;
       }
     }
 

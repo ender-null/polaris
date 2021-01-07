@@ -843,6 +843,11 @@ export const t = {
   year: 60 * 60 * 24 * 365,
 };
 
+export function dateFromTimestamp(timestamp: number): string {
+  const date = new Date(timestamp * 1000);
+  return date.toISOString();
+}
+
 export const loggerFormat = winstonFormat.printf(({ level, message, timestamp, ...metadata }) => {
   let msg = `${timestamp} [${level}]: ${message} `;
   if (metadata && Object.keys(metadata).length > 0) {

@@ -203,7 +203,12 @@ export interface DatabaseConversation {
   description?: string;
   username?: string;
   invite_link?: string;
-  member_count?: string;
+  member_count?: number;
+  is_scam?: boolean;
+  is_channel?: boolean;
+  linked_chat_id?: number;
+  date?: number;
+  restriction_reason?: string;
 }
 
 export interface DatabaseReminder {
