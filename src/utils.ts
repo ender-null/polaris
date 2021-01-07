@@ -728,16 +728,13 @@ export function splitLargeMessage(content: string, maxLength: number): string[] 
   if (content) {
     const lines = content.split(lineBreak);
     let text = '';
-    let length = 0;
 
     for (const line of lines) {
-      if (length + line.length + lineBreak.length < maxLength) {
+      if (text.length + line.length + lineBreak.length < maxLength) {
         text += line + lineBreak;
-        length += line.length + lineBreak.length;
       } else {
         texts.push(text);
         text = line + lineBreak;
-        length += line.length + lineBreak.length;
       }
     }
   }
@@ -817,7 +814,7 @@ export function catchException(exception: Error | error, bot: Bot = null, messag
   logger.error(`Catched exception: ${exception.message}`);
   if (bot) {
     if (exception['stack']) {
-      bot.sendAlert(replaceHtml(exception['stack']));
+      bot.sendAlert(JSON.stringify(replaceHtml(exception['stack'])));
     } else if (exception['_'] == 'error') {
       bot.sendAlert(JSON.stringify(exception));
     } else {

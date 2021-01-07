@@ -628,8 +628,8 @@ export class TelegramTDlibBindings extends BindingsBase {
     }
 
     if (otherError) {
-      this.bot.sendAlert(request);
-      this.bot.sendAlert(response);
+      this.bot.sendAlert(JSON.stringify(request));
+      this.bot.sendAlert(JSON.stringify(response));
     }
   }
 
