@@ -171,7 +171,7 @@ export class InfoPlugin extends PluginBase {
       }
       text = `👤 ${name}\n🆔 ${userId}`;
       if (user.is_scam) {
-        text += `\n🚫 ${this.strings['reported']}`;
+        text += `\n⚠️ ${this.strings['reported']}`;
       }
       if (user.is_bot) {
         text += `\n🤖 ${this.strings['bot']}`;
@@ -196,7 +196,7 @@ export class InfoPlugin extends PluginBase {
         text += `\n🔗 ${group.invite_link}`;
       }
       if (group.member_count && group.member_count > 0) {
-        text += `\n<b>${group.member_count}</b> ${this.strings['members']}`;
+        text += `\n👪 ${group.member_count}`;
       }
       if (group.linked_chat_id && group.linked_chat_id > 0) {
         let title;
@@ -204,28 +204,28 @@ export class InfoPlugin extends PluginBase {
           title = db.groups[group.linked_chat_id].title;
         }
         if (title) {
-          text += `\n📎 ${title} [<code>${group.linked_chat_id}</code>]`;
+          text += `\n🗨️ ${title} [<code>${group.linked_chat_id}</code>]`;
         } else {
-          text += `\n📎 <code>${group.linked_chat_id}</code>`;
+          text += `\n🗨️ <code>${group.linked_chat_id}</code>`;
         }
       }
       if (group.date && group.date > 0) {
         text += `\n📅 ${dateFromTimestamp(group.date)}`;
       }
       if (groupTags && groupTags.length > 0) {
-        text += `\n🏷 ${userTags}`;
+        text += `\n🏷 ${groupTags}`;
       }
       if (group.is_channel) {
-        text += `\n📰 ${this.strings['channel']}`;
+        text += `\n📢 ${this.strings['channel']}`;
       }
       if (group.is_scam) {
-        text += `\n🚫 ${this.strings['reported']}`;
+        text += `\n⚠️ ${this.strings['reported']}`;
       }
       if (group.restriction_reason && group.restriction_reason.length > 0) {
-        text += `\n\n<b>${this.strings['restrictionReason']}</b>:\n${group.restriction_reason}`;
+        text += `\n\n🚫 ${group.restriction_reason}`;
       }
       if (group.description && group.description.length > 0) {
-        text += `\n\n${group.description}`;
+        text += `\n\nℹ️ ${group.description}`;
       }
     }
 
