@@ -319,11 +319,7 @@ export class TelegramTDlibBindings extends BindingsBase {
       }
       inputMessageContent = {
         '@type': 'inputMessageText',
-        text: {
-          '@type': 'formattedText',
-          text: msg.content,
-          entities: [],
-        },
+        text: this.formatTextEntities(msg),
         disable_web_page_preview: !preview,
       };
     } else if (msg.type == 'photo') {
