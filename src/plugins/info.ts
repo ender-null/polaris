@@ -58,12 +58,7 @@ export class InfoPlugin extends PluginBase {
       infoFull = await this.bot.bindings['serverRequest']('getSupergroupFullInfo', { supergroup_id: target.slice(4) });
     }
 
-    if (
-      target &&
-      (+target == 0 ||
-        !(db.users[target] || db.users[target] || info) ||
-        !(db.groups[target] || db.groups[target] || info || chat))
-    ) {
+    if (target && (!isInt(target) || !(db.users[target] || db.groups[target] || info || chat))) {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);
     }
 
