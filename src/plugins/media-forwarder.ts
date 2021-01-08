@@ -94,8 +94,8 @@ export class MediaForwarderPlugin extends PluginBase {
           const dest = item.split(':')[1];
           if (!db.groups[orig] || !db.groups[dest]) {
             delTag(this.bot, orig, `resend:${dest}`);
+            removedResends.push(item);
           }
-          removedResends.push(item);
         }
         for (const item of forwards) {
           const orig = item.split(':')[0];
@@ -103,8 +103,8 @@ export class MediaForwarderPlugin extends PluginBase {
 
           if (!db.groups[orig] || !db.groups[dest]) {
             delTag(this.bot, orig, `fwd:${dest}`);
+            removedForwards.push(item);
           }
-          removedForwards.push(item);
         }
       }
 

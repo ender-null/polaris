@@ -508,6 +508,7 @@ export class TelegramTDlibBindings extends BindingsBase {
           await this.serverRequest(data['@type'], split, false, true);
         }
       } else {
+        data.input_message_content.text = this.formatTextEntities(msg);
         await this.serverRequest(data['@type'], data, false, true);
       }
       await this.sendChatAction(+msg.conversation.id, 'cancel');
