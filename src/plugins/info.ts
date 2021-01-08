@@ -62,7 +62,11 @@ export class InfoPlugin extends PluginBase {
       );
     }
 
-    if (target && (!isInt(target) || !(db.users[target] || db.groups[target] || info || chat))) {
+    logger.info(`target: ${target}`);
+    logger.info(`chat: ${JSON.stringify(chat)}`);
+    logger.info(`info: ${JSON.stringify(info)}`);
+    logger.info(`infoFull: ${JSON.stringify(infoFull)}`);
+    if (!target || (target && (!isInt(target) || !(db.users[target] || db.groups[target] || info || chat)))) {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);
     }
 
@@ -95,16 +99,24 @@ export class InfoPlugin extends PluginBase {
 
         if (info) {
           userId = info.id;
-          user.first_name = info.first_name || '';
-          user.last_name = info.last_name || '';
-          user.username = info.username || '';
-          user.is_scam = info.is_scam || false;
+          if (info.first_name && info.first_name.length > 0) {
+            user.first_name = info.first_name;
+          }
+          if (info.last_name && info.last_name.length > 0) {
+            user.last_name = info.last_name;
+          }
+          if (info.username && info.username.length > 0) {
+            user.username = info.username;
+          }
+          if (info.is_scam) {
+            user.is_scam = info.is_scam;
+          }
           user.is_bot = info.type._ == 'userTypeBot';
         }
         if (infoFull) {
           user.description = info.bio || '';
         }
-        logger.info(JSON.stringify(user));
+        logger.info(`user: ${JSON.stringify(user)}`);
         db.users[target] = user;
         db.usersSnap.child(target).ref.set(user);
         const tags = getTags(this.bot, userId);
@@ -154,6 +166,9 @@ export class InfoPlugin extends PluginBase {
           },
           true,
         );
+        logger.info(`chat: ${JSON.stringify(chat)}`);
+        logger.info(`info: ${JSON.stringify(info)}`);
+        logger.info(`infoFull: ${JSON.stringify(infoFull)}`);
       }
 
       if (chat) {
@@ -193,8 +208,7 @@ export class InfoPlugin extends PluginBase {
           group.linked_chat_id = infoFull.linked_chat_id;
         }
       }
-      //  {"title":"Lazy & Horny","username":"LazyAndHorny","description":"","member_count":0,"date":1453940718,"invite_link":"","linked_chat_id":0}
-      logger.info(JSON.stringify(group));
+      logger.info(`group: ${JSON.stringify(group)}`);
       db.groups[target] = group;
       db.groupsSnap.child(target).ref.set(group);
       const tags = getTags(this.bot, groupId);
