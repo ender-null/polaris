@@ -551,7 +551,7 @@ export class TelegramTDlibBindings extends BindingsBase {
 
   async addPingToMessage(msg: Message, message: message) {
     const ping = now() - msg.extra.received;
-    const text = await this.formatTextEntities(msg, message.content['text'] + `\n<code>${ping}</code>`);
+    const text = await this.formatTextEntities(msg, message.content['text']['text'] + `\n<code>${ping}</code>`);
     const data = {
       '@type': 'editMessageText',
       message_id: message.id,
