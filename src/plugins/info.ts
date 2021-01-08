@@ -154,22 +154,43 @@ export class InfoPlugin extends PluginBase {
       }
 
       if (chat) {
-        group.title = chat.title || '';
+        if (chat.title && chat.title.length > 0) {
+          group.title = chat.title;
+        }
       }
 
       if (info) {
-        group.username = info.username || '';
-        group.member_count = info.member_count || 0;
-        group.is_channel || false;
-        group.is_scam || false;
-        group.date = info.date || '';
-        group.restriction_reason || '';
+        if (info.username && info.username.length > 0) {
+          group.username = info.username;
+        }
+        if (info.member_count) {
+          group.member_count = info.member_count;
+        }
+        if (info.is_channel) {
+          group.is_channel = info.is_channel;
+        }
+        if (info.is_scam) {
+          group.is_scam = info.is_scam;
+        }
+        if (info.date) {
+          group.date = info.date;
+        }
+        if (info.restriction_reason && info.restriction_reason.length > 0) {
+          group.restriction_reason = info.restriction_reason;
+        }
       }
       if (infoFull) {
-        group.description = infoFull.description || '';
-        group.invite_link = infoFull.invite_link || '';
-        group.linked_chat_id = infoFull.linked_chat_id || 0;
+        if (infoFull.description && infoFull.description.length > 0) {
+          group.description = infoFull.description;
+        }
+        if (infoFull.invite_link && infoFull.invite_link.length > 0) {
+          group.invite_link = infoFull.invite_link;
+        }
+        if (infoFull.linked_chat_id) {
+          group.linked_chat_id = infoFull.linked_chat_id;
+        }
       }
+      //  {"title":"Lazy & Horny","username":"LazyAndHorny","description":"","member_count":0,"date":1453940718,"invite_link":"","linked_chat_id":0}
       logger.info(JSON.stringify(group));
       db.groups[target] = group;
       db.groupsSnap.child(target).ref.set(group);
