@@ -49,13 +49,17 @@ export class InfoPlugin extends PluginBase {
     let showGroup = false;
     let chat, info, infoFull, userId, groupId, userTags, groupTags;
 
-    chat = await this.bot.bindings['serverRequest']('getChat', { chat_id: target });
+    chat = await this.bot.bindings['serverRequest']('getChat', { chat_id: target }, true);
     if (target && isInt(target) && +target > 0) {
-      info = await this.bot.bindings['serverRequest']('getUser', { user_id: target });
-      infoFull = await this.bot.bindings['serverRequest']('getUserFullInfo', { user_id: target });
+      info = await this.bot.bindings['serverRequest']('getUser', { user_id: target }, true);
+      infoFull = await this.bot.bindings['serverRequest']('getUserFullInfo', { user_id: target }, true);
     } else if (target && isInt(target) && target.startsWith('-100')) {
-      info = await this.bot.bindings['serverRequest']('getSupergroup', { supergroup_id: target.slice(4) });
-      infoFull = await this.bot.bindings['serverRequest']('getSupergroupFullInfo', { supergroup_id: target.slice(4) });
+      info = await this.bot.bindings['serverRequest']('getSupergroup', { supergroup_id: target.slice(4) }, true);
+      infoFull = await this.bot.bindings['serverRequest'](
+        'getSupergroupFullInfo',
+        { supergroup_id: target.slice(4) },
+        true,
+      );
     }
 
     if (target && (!isInt(target) || !(db.users[target] || db.groups[target] || info || chat))) {
@@ -141,11 +145,15 @@ export class InfoPlugin extends PluginBase {
       }
 
       if (target == gid) {
-        chat = await this.bot.bindings['serverRequest']('getChat', { chat_id: target });
-        info = await this.bot.bindings['serverRequest']('getSupergroup', { supergroup_id: target.slice(4) });
-        infoFull = await this.bot.bindings['serverRequest']('getSupergroupFullInfo', {
-          supergroup_id: target.slice(4),
-        });
+        chat = await this.bot.bindings['serverRequest']('getChat', { chat_id: target }, true);
+        info = await this.bot.bindings['serverRequest']('getSupergroup', { supergroup_id: target.slice(4) }, true);
+        infoFull = await this.bot.bindings['serverRequest'](
+          'getSupergroupFullInfo',
+          {
+            supergroup_id: target.slice(4),
+          },
+          true,
+        );
       }
 
       if (chat) {
