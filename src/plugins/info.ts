@@ -74,26 +74,11 @@ export class InfoPlugin extends PluginBase {
       if (+target > 0) {
         userId = target;
         if (db.users[target]) {
-          if (db.users[target].first_name) {
-            user.first_name = db.users[target].first_name;
-          }
-          if (db.users[target].last_name) {
-            user.last_name = db.users[target].last_name;
-          }
-          if (db.users[target].username) {
-            user.username = db.users[target].username;
-          }
-          if (db.users[target].description) {
-            user.description = db.users[target].description;
-          }
-          if (db.users[target].description) {
-            user.description = db.users[target].description;
-          }
-          if (db.users[target].is_bot) {
-            user.is_bot = db.users[target].is_bot;
-          }
-          if (db.users[target].is_scam) {
-            user.is_scam = db.users[target].is_scam;
+          const props = ['first_name', 'last_name', 'username', 'description', 'is_bot', 'is_scam'];
+          for (const prop of props) {
+            if (db.users[target][prop]) {
+              user[prop] = db.users[target][prop];
+            }
           }
         }
 
@@ -139,20 +124,22 @@ export class InfoPlugin extends PluginBase {
 
     if (showGroup) {
       if (db.groups[target]) {
-        if (db.groups[target].title) {
-          group.title = db.groups[target].title;
-        }
-        if (db.groups[target].username) {
-          group.username = db.groups[target].username;
-        }
-        if (db.groups[target].description) {
-          group.description = db.groups[target].description;
-        }
-        if (db.groups[target].member_count) {
-          group.member_count = db.groups[target].member_count;
-        }
-        if (db.groups[target].invite_link) {
-          group.invite_link = db.groups[target].invite_link;
+        const props = [
+          'title',
+          'username',
+          'description',
+          'member_count',
+          'invite_link',
+          'is_channel',
+          'is_scam',
+          'date',
+          'restriction_reason',
+          'linked_chat_id',
+        ];
+        for (const prop of props) {
+          if (db.groups[target][prop]) {
+            group[prop] = db.groups[target][prop];
+          }
         }
       }
 
