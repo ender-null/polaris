@@ -21,7 +21,7 @@ export class TelegramTDlibBindings extends BindingsBase {
       verbosityLevel: 1,
       tdlibParameters: {
         application_version: 'latest',
-        device_model: 'polaris.js',
+        device_model: 'polaris',
       },
     });
   }

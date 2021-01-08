@@ -862,7 +862,7 @@ export const loggerFormat = winstonFormat.printf(({ level, message, timestamp, .
 
 export const transport = new winston.transports.DailyRotateFile({
   dirname: 'logs',
-  filename: 'polaris-js-%DATE%.log',
+  filename: 'polaris-%DATE%.log',
   datePattern: 'YYYY-MM-DD-HH',
   zippedArchive: true,
   maxSize: '20m',

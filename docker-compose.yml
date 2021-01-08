@@ -3,8 +3,8 @@ services:
   bot:
     build: .
     restart: unless-stopped
-    container_name: polaris-js
+    container_name: polaris
     volumes:
-      - ./error.log:/usr/src/app/error.log
-      - ./combined.log:/usr/src/app/combined.log
+      - ./logs:/usr/src/app/logs
+      - ./.tdlib_files:/usr/src/app/.tdlib_files
       - ./firebase.json:/usr/src/app/firebase.json
