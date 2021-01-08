@@ -251,6 +251,10 @@ export class DiscordBindings extends BindingsBase {
     }
     return false;
   }
+  async leaveConversation(conversationId: string | number): Promise<boolean> {
+    console.debug(conversationId);
+    return null;
+  }
   async banConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
     let chat;
     if (+conversationId > 0) {
