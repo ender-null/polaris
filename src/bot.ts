@@ -424,6 +424,9 @@ export class Bot {
     if (extra) {
       extra.received = msg.extra.received;
       extra.replied = now();
+      if (msg.extra.addPing) {
+        extra.addPing = msg.extra.addPing;
+      }
     } else {
       extra = {
         received: msg.extra.received,
