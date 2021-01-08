@@ -2,7 +2,7 @@
   "name": "polaris",
   "version": "0.9.0",
   "description": "A multiplatform Typescript bot using plugins!",
-  "license": "MIT",
+  "license": "AGPL-3.0",
   "author": {
     "name": "luksireiku",
     "email": "endernull@icloud.com",
@@ -16,7 +16,7 @@
   "bugs": {
     "url": "https://github.com/luksireiku/polaris/issues"
   },
-  "main": "",
+  "main": "build/src/main.js",
   "scripts": {
     "typedoc": "typedoc",
     "build": "tsc -p tsconfig.release.json",

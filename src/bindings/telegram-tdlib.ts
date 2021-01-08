@@ -12,7 +12,7 @@ export class TelegramTDlibBindings extends BindingsBase {
   lastChatUpdate: number;
   constructor(bot: Bot) {
     super(bot);
-    this.client = new Client(new TDLib('/usr/local/lib/libtdjson.so'), {
+    this.client = new Client(new TDLib(), {
       apiId: this.bot.config.apiKeys.telegramAppId,
       apiHash: this.bot.config.apiKeys.telegramApiHash,
       databaseDirectory: `${process.cwd()}/.tdlib_files/${this.bot.config.name}/database`,
@@ -508,7 +508,9 @@ export class TelegramTDlibBindings extends BindingsBase {
           await this.serverRequest(data['@type'], split, false, true);
         }
       } else {
-        data.input_message_content.text = await this.formatTextEntities(msg);
+        if (msg.type == 'text') {
+          data.input_message_content.text = await this.formatTextEntities(msg);
+        }
         await this.serverRequest(data['@type'], data, false, true);
       }
       await this.sendChatAction(+msg.conversation.id, 'cancel');

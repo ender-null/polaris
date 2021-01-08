@@ -16,6 +16,7 @@ export { LastFMPlugin } from './lastfm';
 export { LeagueOfLegendsPlugin } from './league-of-legends';
 export { MediaForwarderPlugin } from './media-forwarder';
 export { NSFWPlugin } from './nsfw';
+export { PharmacyPlugin } from './pharmacy';
 export { PinPlugin } from './pin';
 export { PolePlugin } from './pole';
 export { ReactionPlugin } from './reaction';
