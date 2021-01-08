@@ -151,25 +151,25 @@ export function delTag(bot: Bot, target: number | string, tag: string): void {
   if (typeof target != 'string') {
     target = String(target);
   }
-  const tags = getTags(bot, target);
-  if (tags && tag.indexOf('?') > -1) {
+
+  if (db.tags[target]) {
     for (const i of Object.keys(db.tags[target])) {
-      const targetTag = db.tags[target][i];
-      if (targetTag.startsWith(tag.split('?')[0])) {
+      let targetTag = db.tags[target][i];
+      const inputMatch = tagForBot.exec(targetTag);
+      if (inputMatch) {
+        if (inputMatch && (inputMatch[1] === bot.config.name || inputMatch[1] === bot.user.username)) {
+          targetTag = targetTag.replace(tagForBot, '');
+        }
+      }
+      if (
+        (tag.indexOf('?') > -1 && targetTag.startsWith(tag.split('?')[0])) ||
+        (tag.indexOf('?') == -1 && targetTag == tag)
+      ) {
         delete db.tags[target][i];
       }
     }
     db.tags[target] = sortList(db.tags[target]);
     db.tagsSnap.child(target).ref.set(db.tags[target]);
-  } else if (tags && tags.indexOf(tag) > -1) {
-    for (const i of Object.keys(db.tags[target])) {
-      const targetTag = db.tags[target][i];
-      if (targetTag == tag) {
-        delete db.tags[target][i];
-      }
-    }
-    db.tags[target] = sortList(db.tags[target]);
-    db.tagsSnap.child(target).ref.set(sortList(db.tags[target]));
   }
 }
 

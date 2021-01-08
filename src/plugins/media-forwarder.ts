@@ -50,6 +50,11 @@ export class MediaForwarderPlugin extends PluginBase {
         description: 'Remove all resends from origin',
         hidden: true,
       },
+      {
+        command: '/cleanresends',
+        description: 'Remove all resends from unknown groups',
+        hidden: true,
+      },
     ];
     this.strings = {
       resends: 'Resends',
@@ -58,9 +63,13 @@ export class MediaForwarderPlugin extends PluginBase {
   }
 
   async run(msg: Message): Promise<void> {
-    if (isCommand(this, 1, msg.content)) {
+    const clean = isCommand(this, 4, msg.content);
+    if (isCommand(this, 1, msg.content) || clean) {
       const resends = [];
       const forwards = [];
+      const removedResends = [];
+      const removedForwards = [];
+
       let text = '';
 
       for (const gid in db.tags) {
@@ -74,14 +83,45 @@ export class MediaForwarderPlugin extends PluginBase {
         }
       }
 
-      if (resends.length > 0) {
-        text += `<b>${this.strings['resends']}:</b>`;
-        text += this.generateText(resends);
+      if (clean) {
+        for (const item of resends) {
+          const orig = item.split(':')[0];
+          const dest = item.split(':')[1];
+          if (!db.groups[orig] || !db.groups[dest]) {
+            delTag(this.bot, orig, `resend:${dest}`);
+          }
+          removedResends.push(item);
+        }
+        for (const item of forwards) {
+          const orig = item.split(':')[0];
+          const dest = item.split(':')[1];
+          if (!db.groups[orig] || !db.groups[dest]) {
+            delTag(this.bot, orig, `fwd:${dest}`);
+          }
+          removedForwards.push(item);
+        }
       }
 
-      if (forwards.length > 0) {
-        text += `\n<b>${this.strings['forwards']}:</b>`;
-        text += this.generateText(forwards);
+      if (!clean) {
+        if (resends.length > 0) {
+          text += `<b>${this.strings['resends']}:</b>`;
+          text += this.generateText(resends);
+        }
+
+        if (forwards.length > 0) {
+          text += `\n<b>${this.strings['forwards']}:</b>`;
+          text += this.generateText(forwards);
+        }
+      } else {
+        if (removedResends.length > 0) {
+          text += `<b>${this.strings['resends']}:</b>`;
+          text += this.generateText(removedResends);
+        }
+
+        if (removedForwards.length > 0) {
+          text += `\n<b>${this.strings['forwards']}:</b>`;
+          text += this.generateText(removedForwards);
+        }
       }
 
       this.bot.replyMessage(msg, text);
