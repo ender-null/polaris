@@ -158,7 +158,7 @@ export class MediaForwarderPlugin extends PluginBase {
     }
   }
 
-  generateText(items: string[]) {
+  generateText(items: string[]): string {
     let text = '';
     for (const item of items) {
       const orig = item.split(':')[0];

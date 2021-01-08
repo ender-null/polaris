@@ -2,7 +2,17 @@ import { Bot, Message } from '..';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
 import { DatabaseConversation, DatabaseUser } from '../types';
-import { dateFromTimestamp, formatNumber, getFullName, getInput, getTags, getTarget, isInt, logger } from '../utils';
+import {
+  formatDate,
+  formatNumber,
+  getFullName,
+  getInput,
+  getTags,
+  getTarget,
+  isInt,
+  logger,
+  telegramShortLink,
+} from '../utils';
 
 export class InfoPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -37,9 +47,9 @@ export class InfoPlugin extends PluginBase {
     const user: DatabaseUser = {};
     const group: DatabaseConversation = {};
     let showGroup = false;
-    let info, infoFull, userId, groupId, userTags, groupTags;
+    let chat, info, infoFull, userId, groupId, userTags, groupTags;
 
-    logger.info(`target: ${target}`);
+    chat = await this.bot.bindings['serverRequest']('getChat', { chat_id: target });
     if (target && isInt(target) && +target > 0) {
       info = await this.bot.bindings['serverRequest']('getUser', { user_id: target });
       infoFull = await this.bot.bindings['serverRequest']('getUserFullInfo', { user_id: target });
@@ -47,10 +57,13 @@ export class InfoPlugin extends PluginBase {
       info = await this.bot.bindings['serverRequest']('getSupergroup', { supergroup_id: target.slice(4) });
       infoFull = await this.bot.bindings['serverRequest']('getSupergroupFullInfo', { supergroup_id: target.slice(4) });
     }
-    logger.info(`info: ${JSON.stringify(info)}`);
-    logger.info(`infoFull: ${JSON.stringify(infoFull)}`);
 
-    if (target && (+target == 0 || !(db.users[target] || db.users[target] || info))) {
+    if (
+      target &&
+      (+target == 0 ||
+        !(db.users[target] || db.users[target] || info) ||
+        !(db.groups[target] || db.groups[target] || info || chat))
+    ) {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);
     }
 
@@ -81,7 +94,7 @@ export class InfoPlugin extends PluginBase {
           }
         }
 
-        if (info && Object.keys(info).length > 0) {
+        if (info) {
           userId = info.id;
           user.first_name = info.first_name || '';
           user.last_name = info.last_name || '';
@@ -89,8 +102,8 @@ export class InfoPlugin extends PluginBase {
           user.is_scam = info.is_scam || false;
           user.is_bot = info.type._ == 'userTypeBot';
         }
-        if (infoFull && Object.keys(infoFull).length > 0) {
-          user.description = info['bio'] || '';
+        if (infoFull) {
+          user.description = info.bio || '';
         }
         logger.info(JSON.stringify(user));
         db.users[target] = user;
@@ -133,16 +146,18 @@ export class InfoPlugin extends PluginBase {
       }
 
       if (target == gid) {
+        chat = await this.bot.bindings['serverRequest']('getChat', { chat_id: target });
         info = await this.bot.bindings['serverRequest']('getSupergroup', { supergroup_id: target.slice(4) });
         infoFull = await this.bot.bindings['serverRequest']('getSupergroupFullInfo', {
           supergroup_id: target.slice(4),
         });
-        logger.info(`info: ${JSON.stringify(info)}`);
-        logger.info(`infoFull: ${JSON.stringify(infoFull)}`);
       }
 
-      if (info && Object.keys(info).length > 0) {
-        // group.title = info.title || '';
+      if (chat) {
+        group.title = chat.title || '';
+      }
+
+      if (info) {
         group.username = info.username || '';
         group.member_count = info.member_count || 0;
         group.is_channel || false;
@@ -150,10 +165,10 @@ export class InfoPlugin extends PluginBase {
         group.date = info.date || '';
         group.restriction_reason || '';
       }
-      if (infoFull && Object.keys(infoFull).length > 0) {
+      if (infoFull) {
         group.description = infoFull.description || '';
         group.invite_link = infoFull.invite_link || '';
-        group.linked_chat_id = infoFull.linked_chat_id || '';
+        group.linked_chat_id = infoFull.linked_chat_id || 0;
       }
       logger.info(JSON.stringify(group));
       db.groups[target] = group;
@@ -180,7 +195,7 @@ export class InfoPlugin extends PluginBase {
         text += `\n🏷 ${userTags}`;
       }
       if (user.description && user.description.length > 0) {
-        text += `\n\n${user.description}`;
+        text += `\nℹ️ ${user.description}`;
       }
     }
     if (text.length > 0) {
@@ -192,13 +207,10 @@ export class InfoPlugin extends PluginBase {
         name += `\n\t     @${group.username}`;
       }
       text += `👥 ${name}\n🆔 ${groupId}`;
-      if (group.invite_link && group.invite_link.length > 0) {
-        text += `\n🔗 ${group.invite_link}`;
-      }
       if (group.member_count && group.member_count > 0) {
         text += `\n👪 ${formatNumber(group.member_count)}`;
       }
-      if (group.linked_chat_id && group.linked_chat_id > 0) {
+      if (group.linked_chat_id && group.linked_chat_id < 0) {
         let title;
         if (db.groups[group.linked_chat_id]) {
           title = db.groups[group.linked_chat_id].title;
@@ -210,7 +222,10 @@ export class InfoPlugin extends PluginBase {
         }
       }
       if (group.date && group.date > 0) {
-        text += `\n📅 ${dateFromTimestamp(group.date)}`;
+        text += `\n📅 ${formatDate(group.date)}`;
+      }
+      if (group.invite_link && group.invite_link.length > 0) {
+        text += `\n🔗 ${telegramShortLink(group.invite_link)}`;
       }
       if (groupTags && groupTags.length > 0) {
         text += `\n🏷 ${groupTags}`;

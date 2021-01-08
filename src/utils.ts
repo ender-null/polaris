@@ -14,7 +14,7 @@ import { Bot, Message, PluginBase } from '.';
 import { db } from './main';
 import { CoordinatesResult, iString } from './types';
 
-export function getPluginSlug(plugin: PluginBase) {
+export function getPluginSlug(plugin: PluginBase): string {
   return plugin.constructor.name.replace('Plugin', '').toLowerCase();
 }
 
@@ -232,6 +232,9 @@ export function getTarget(bot: Bot, m: Message, input: string): string {
         }
       }
     }
+    if (!target) {
+      return '0';
+    }
     return target;
   } else {
     return String(m.sender.id);
@@ -353,6 +356,10 @@ export function fixTelegramLink(link: string): string {
     return fixedLink;
   }
   return link;
+}
+
+export function telegramShortLink(link: string): string {
+  return fixTelegramLink(link).slice(8);
 }
 
 export function setInput(message: Message, trigger: string): Message {
@@ -840,9 +847,9 @@ export const t = {
   year: 60 * 60 * 24 * 365,
 };
 
-export function dateFromTimestamp(timestamp: number): string {
+export function formatDate(timestamp: number): string {
   const date = new Date(timestamp * 1000);
-  return date.toISOString();
+  return date.toLocaleString();
 }
 
 export const loggerFormat = winstonFormat.printf(({ level, message, timestamp, ...metadata }) => {
