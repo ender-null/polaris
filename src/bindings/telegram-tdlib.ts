@@ -85,6 +85,7 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async convertMessage(msg: message, ignoreReply?: boolean): Promise<Message> {
+    const received = now();
     const id = msg['id'];
     const extra: Extra = {};
 
@@ -212,6 +213,7 @@ export class TelegramTDlibBindings extends BindingsBase {
     if (msg['reply_markup'] != undefined) {
       extra.replyMarkup = msg['reply_markup'];
     }
+    extra.received = received;
     const date = msg['date'];
     return new Message(id, conversation, sender, content, type, date, reply, extra);
   }

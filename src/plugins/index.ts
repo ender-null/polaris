@@ -18,6 +18,7 @@ export { MediaForwarderPlugin } from './media-forwarder';
 export { NSFWPlugin } from './nsfw';
 export { PharmacyPlugin } from './pharmacy';
 export { PinPlugin } from './pin';
+export { PingPlugin } from './ping';
 export { PolePlugin } from './pole';
 export { ReactionPlugin } from './reaction';
 export { ReminderPlugin } from './reminder';

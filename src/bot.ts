@@ -421,6 +421,15 @@ export class Bot {
   }
 
   replyMessage(msg: Message, content: string, type = 'text', reply?: Message, extra?: Extra): void {
+    if (extra) {
+      extra.received = msg.extra.received;
+      extra.replied = now();
+    } else {
+      extra = {
+        received: msg.extra.received,
+        replied: now(),
+      };
+    }
     this.sendMessage(msg.conversation, content, type, reply, extra);
   }
 

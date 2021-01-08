@@ -161,6 +161,9 @@ export class Message {
 export abstract class Extra extends Object {
   input?: string;
   inputReply?: string;
+  received?: number;
+  replied?: number;
+  sent?: number;
   format?: string;
   preview?: boolean;
   caption?: string;
