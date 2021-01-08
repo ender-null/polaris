@@ -29,6 +29,8 @@ export abstract class BindingsBase {
 
   abstract kickConversationMember(conversationId: string | number, userId: string | number): Promise<boolean>;
 
+  abstract leaveConversation(conversationId: string | number): Promise<boolean>;
+
   abstract banConversationMember(conversationId: string | number, userId: string | number): Promise<boolean>;
 
   abstract unbanConversationMember(conversationId: string | number, userId: string | number): Promise<boolean>;

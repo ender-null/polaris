@@ -63,6 +63,11 @@ export class MediaForwarderPlugin extends PluginBase {
   }
 
   async run(msg: Message): Promise<void> {
+    const ids = {
+      nsfw: -1001230470587,
+      hentai: -1001495126561,
+      porn: -1001409180171,
+    };
     const clean = isCommand(this, 4, msg.content);
     if (isCommand(this, 1, msg.content) || clean) {
       const resends = [];
@@ -95,6 +100,7 @@ export class MediaForwarderPlugin extends PluginBase {
         for (const item of forwards) {
           const orig = item.split(':')[0];
           const dest = item.split(':')[1];
+
           if (!db.groups[orig] || !db.groups[dest]) {
             delTag(this.bot, orig, `fwd:${dest}`);
           }
@@ -131,7 +137,10 @@ export class MediaForwarderPlugin extends PluginBase {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       }
       const orig = getWord(input, 1);
-      const dest = getWord(input, 2);
+      let dest = getWord(input, 2);
+      if (ids[dest]) {
+        dest = ids[dest];
+      }
       if (!isInt(orig) || !isInt(dest)) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       }

@@ -623,7 +623,7 @@ export class TelegramTDlibBindings extends BindingsBase {
         !hasTag(this.bot, request['chat_id'], 'fwd:?')
       ) {
         this.bot.sendAdminAlert(`Leaving chat: ${db.groups[request['chat_id']].title} [${request['chat_id']}]`);
-        await this.bot.bindings.kickConversationMember(request['chat_id'], this.bot.user.id);
+        await this.bot.bindings.leaveConversation(request['chat_id']);
         otherError = false;
         break;
       }
@@ -732,6 +732,12 @@ export class TelegramTDlibBindings extends BindingsBase {
       chat_id: conversationId,
       user_id: userId,
       status: { _: 'chatMemberStatusLeft' },
+    });
+  }
+
+  async leaveConversation(conversationId: string | number): Promise<boolean> {
+    return await this.serverRequest('leaveChat', {
+      chat_id: conversationId,
     });
   }
 

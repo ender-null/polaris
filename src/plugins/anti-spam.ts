@@ -36,7 +36,7 @@ export class AntiSpamPlugin extends PluginBase {
       return;
     }
 
-    const spamTypes = ['spam', 'arab', 'russian'];
+    const spamTypes = ['spam', 'arab', 'russian', 'ethiopic'];
     for (const spamType of spamTypes) {
       if (hasTag(this.bot, msg.sender.id, spamType)) {
         if (!isAdmin(this.bot, msg.sender.id, msg)) {
@@ -74,6 +74,9 @@ export class AntiSpamPlugin extends PluginBase {
         if (this.detectRussian(msg.extra['caption'])) {
           await this.kickSpammer(msg, 'russian', 'caption');
         }
+        if (this.detectEthiopic(msg.extra['caption'])) {
+          await this.kickSpammer(msg, 'ethiopic', 'caption');
+        }
         await this.checkTrustedTelegramLink(msg, msg.extra['caption']);
       }
 
@@ -89,15 +92,21 @@ export class AntiSpamPlugin extends PluginBase {
           if (this.detectRussian(msg.content)) {
             await this.kickSpammer(msg, 'russian', 'content');
           }
+          if (this.detectEthiopic(msg.content)) {
+            await this.kickSpammer(msg, 'ethiopic', 'content');
+          }
         }
-        // if (msg.sender.constructor.name == 'User') {
-        //   if (this.detectArab(msg.sender['first_name'])) {
-        //     await this.kickSpammer(msg, 'arab', 'name');
-        //   }
-        //   if (this.detectRussian(msg.sender['first_name'])) {
-        //     await this.kickSpammer(msg, 'russian', 'name');
-        //   }
-        // }
+        if (msg.sender.constructor.name == 'User') {
+          if (this.detectArab(msg.sender['first_name'])) {
+            await this.kickSpammer(msg, 'arab', 'name');
+          }
+          if (this.detectRussian(msg.sender['first_name'])) {
+            await this.kickSpammer(msg, 'russian', 'name');
+          }
+          if (this.detectEthiopic(msg.sender['first_name'])) {
+            await this.kickSpammer(msg, 'ethiopic', 'name');
+          }
+        }
       }
     }
   }
@@ -157,7 +166,7 @@ export class AntiSpamPlugin extends PluginBase {
   }
 
   async kickMyself(msg: Message): Promise<void> {
-    const res = await this.bot.bindings.kickConversationMember(msg.conversation.id, this.bot.user.id);
+    const res = await this.bot.bindings.leaveConversation(msg.conversation.id);
     const gid = String(msg.conversation.id);
     if (res) {
       this.bot.sendAdminAlert(format(this.strings['kickedMyself'], db.groups[gid].title, gid));
@@ -204,7 +213,7 @@ export class AntiSpamPlugin extends PluginBase {
   }
 
   detectArab(text: string): boolean {
-    if (new RegExp('[\u0600-\u06FF]', 'gim').test(text)) {
+    if (new RegExp('(.*[\u0600-\u06FF]){3,}', 'gim').test(text)) {
       return true;
     }
     if (new RegExp('\u202E', 'gim').test(text)) {
@@ -217,7 +226,14 @@ export class AntiSpamPlugin extends PluginBase {
   }
 
   detectRussian(text: string): boolean {
-    if (new RegExp('[А-Яа-яЁё]', 'gim').test(text)) {
+    if (new RegExp('(.*[А-Яа-яЁё]){3,}', 'gim').test(text)) {
+      return true;
+    }
+    return false;
+  }
+
+  detectEthiopic(text: string): boolean {
+    if (new RegExp('(.*[\u1200-\u137F]){3,}', 'gim').test(text)) {
       return true;
     }
     return false;
