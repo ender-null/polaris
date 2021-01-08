@@ -313,48 +313,17 @@ export class TelegramTDlibBindings extends BindingsBase {
       if (!msg.content || (typeof msg.content == 'string' && msg.content.length == 0)) {
         return;
       }
-      let text = null;
-      if (msg.extra && 'format' in msg.extra) {
-        let parseMode = null;
-        let formatedText = null;
-
-        if (msg.extra.format == 'HTML') {
-          parseMode = 'textParseModeHTML';
-        } else {
-          parseMode = 'textParseModeMarkdown';
-        }
-
-        formatedText = await this.serverRequest('parseTextEntities', {
-          text: msg.content,
-          parse_mode: {
-            '@type': parseMode,
-          },
-        });
-
-        if (formatedText) {
-          text = formatedText;
-        } else {
-          text = {
-            '@type': 'formattedText',
-            text: msg.content,
-            entities: [],
-          };
-        }
-      } else {
-        text = {
-          '@type': 'formattedText',
-          text: msg.content,
-          entities: [],
-        };
-      }
-
       let preview = false;
       if (msg.extra && 'preview' in msg.extra) {
         preview = msg.extra.preview;
       }
       inputMessageContent = {
         '@type': 'inputMessageText',
-        text: text,
+        text: {
+          '@type': 'formattedText',
+          text: msg.content,
+          entities: [],
+        },
         disable_web_page_preview: !preview,
       };
     } else if (msg.type == 'photo') {
@@ -531,23 +500,12 @@ export class TelegramTDlibBindings extends BindingsBase {
     }
 
     if (data) {
-      if (msg.type == 'text' && data.input_message_content.text.text.length > 4000) {
-        const texts = splitLargeMessage(data.input_message_content.text.text, 4000);
-        let parseMode;
-        if (msg.extra.format == 'HTML') {
-          parseMode = 'textParseModeHTML';
-        } else {
-          parseMode = 'textParseModeMarkdown';
-        }
+      if (msg.type == 'text' && data.input_message_content.text.text.length > 4096) {
+        const texts = splitLargeMessage(data.input_message_content.text.text, 4096);
         for (const text of texts) {
-          const formatedText = await this.serverRequest('parseTextEntities', {
-            text: text,
-            parse_mode: {
-              '@type': parseMode,
-            },
-          });
-          data.input_message_content.text = formatedText;
-          await this.serverRequest(data['@type'], data, false, true);
+          const split = { ...data };
+          split.input_message_content.text = this.formatTextEntities(msg, text);
+          await this.serverRequest(data['@type'], split, false, true);
         }
       } else {
         await this.serverRequest(data['@type'], data, false, true);
@@ -581,6 +539,42 @@ export class TelegramTDlibBindings extends BindingsBase {
       },
       true,
     );
+  }
+
+  async formatTextEntities(msg: Message, text?: string) {
+    if (msg.extra && 'format' in msg.extra) {
+      let parseMode = null;
+      let formatedText = null;
+
+      if (msg.extra.format == 'HTML') {
+        parseMode = 'textParseModeHTML';
+      } else {
+        parseMode = 'textParseModeMarkdown';
+      }
+
+      formatedText = await this.serverRequest('parseTextEntities', {
+        text: text ? text : msg.content,
+        parse_mode: {
+          '@type': parseMode,
+        },
+      });
+
+      if (formatedText) {
+        return formatedText;
+      } else {
+        return {
+          '@type': 'formattedText',
+          text: text ? text : msg.content,
+          entities: [],
+        };
+      }
+    } else {
+      return {
+        '@type': 'formattedText',
+        text: text ? text : msg.content,
+        entities: [],
+      };
+    }
   }
 
   getInputFile(content: string): Record<string, unknown> {
