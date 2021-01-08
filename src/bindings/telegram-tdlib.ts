@@ -539,6 +539,9 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async formatTextEntities(msg: Message, text?: string) {
+    if (!text) {
+      text = msg.content;
+    }
     if (msg.extra && 'format' in msg.extra) {
       let parseMode = null;
       let formatedText = null;
@@ -550,7 +553,7 @@ export class TelegramTDlibBindings extends BindingsBase {
       }
 
       formatedText = await this.serverRequest('parseTextEntities', {
-        text: text ? text : msg.content,
+        text: text,
         parse_mode: {
           '@type': parseMode,
         },
@@ -561,14 +564,14 @@ export class TelegramTDlibBindings extends BindingsBase {
       } else {
         return {
           '@type': 'formattedText',
-          text: text ? text : msg.content,
+          text: text,
           entities: [],
         };
       }
     } else {
       return {
         '@type': 'formattedText',
-        text: text ? text : msg.content,
+        text: text,
         entities: [],
       };
     }
