@@ -319,7 +319,11 @@ export class TelegramTDlibBindings extends BindingsBase {
       }
       inputMessageContent = {
         '@type': 'inputMessageText',
-        text: this.formatTextEntities(msg),
+        text: {
+          '@type': 'formattedText',
+          text: msg.content,
+          entities: [],
+        },
         disable_web_page_preview: !preview,
       };
     } else if (msg.type == 'photo') {
@@ -500,11 +504,11 @@ export class TelegramTDlibBindings extends BindingsBase {
         const texts = splitLargeMessage(data.input_message_content.text.text, 4096);
         for (const text of texts) {
           const split = { ...data };
-          split.input_message_content.text = this.formatTextEntities(msg, text);
+          split.input_message_content.text = await this.formatTextEntities(msg, text);
           await this.serverRequest(data['@type'], split, false, true);
         }
       } else {
-        data.input_message_content.text = this.formatTextEntities(msg);
+        data.input_message_content.text = await this.formatTextEntities(msg);
         await this.serverRequest(data['@type'], data, false, true);
       }
       await this.sendChatAction(+msg.conversation.id, 'cancel');
