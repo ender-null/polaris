@@ -28,7 +28,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run format && npm test && npm run lint"
+      "pre-commit": "npm test && npm run lint"
     }
   },
   "type": "commonjs",
