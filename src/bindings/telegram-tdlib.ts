@@ -513,7 +513,10 @@ export class TelegramTDlibBindings extends BindingsBase {
         if (msg.type == 'text') {
           data.input_message_content.text = await this.formatTextEntities(msg);
         }
-        await this.serverRequest(data['@type'], data, false, true);
+        const message = await this.serverRequest(data['@type'], data, false, true);
+        if (msg.type == 'text' && msg.extra.addPing) {
+          await this.addPingToMessage(msg, message);
+        }
       }
       await this.sendChatAction(+msg.conversation.id, 'cancel');
     }
@@ -544,6 +547,17 @@ export class TelegramTDlibBindings extends BindingsBase {
       },
       true,
     );
+  }
+
+  async addPingToMessage(msg: Message, message: message) {
+    const ping = now() - msg.extra.received;
+    const text = await this.formatTextEntities(msg, message.content['text'] + `\n<code>${ping}</code>`);
+    const data = {
+      '@type': 'editMessageText',
+      message_id: message.id,
+      input_message_content: text,
+    };
+    await this.serverRequest(data['@type'], data);
   }
 
   async formatTextEntities(msg: Message, text?: string) {

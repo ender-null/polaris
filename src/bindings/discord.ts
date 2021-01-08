@@ -1,7 +1,7 @@
 import { Client, Message as DiscordMessage, MessageAttachment, MessageEmbed } from 'discord.js';
 import { BindingsBase, Bot, Conversation, ConversationInfo, Message, User } from '..';
 import { db } from '../main';
-import { getExtension, htmlToDiscordMarkdown, logger, splitLargeMessage } from '../utils';
+import { getExtension, htmlToDiscordMarkdown, logger, now, splitLargeMessage } from '../utils';
 
 export class DiscordBindings extends BindingsBase {
   client: Client;
@@ -62,8 +62,11 @@ export class DiscordBindings extends BindingsBase {
   }
 
   async convertMessage(msg: DiscordMessage): Promise<Message> {
+    const received = now();
     const id = msg.id;
-    const extra = {};
+    const extra = {
+      received,
+    };
     const content = msg.content;
     const type = 'text';
     const date = new Date().getTime() / 1000;

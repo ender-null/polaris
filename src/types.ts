@@ -163,7 +163,7 @@ export abstract class Extra extends Object {
   inputReply?: string;
   received?: number;
   replied?: number;
-  sent?: number;
+  addPing?: boolean;
   format?: string;
   preview?: boolean;
   caption?: string;
