@@ -551,11 +551,28 @@ export class TelegramTDlibBindings extends BindingsBase {
 
   async addPingToMessage(msg: Message, message: message) {
     const ping = now() - msg.extra.received;
-    const text = await this.formatTextEntities(msg, message.content['text']['text'] + `\n<code>${ping}</code>`);
+    let parseMode = null;
+
+    if (msg.extra.format == 'HTML') {
+      parseMode = 'textParseModeHTML';
+    } else {
+      parseMode = 'textParseModeMarkdown';
+    }
+
+    const text = await this.serverRequest('parseTextEntities', {
+      text: message.content['text']['text'] + `\n<code>${ping}</code>`,
+      parse_mode: {
+        '@type': parseMode,
+      },
+    });
+
     const data = {
       '@type': 'editMessageText',
       message_id: message.id,
-      input_message_content: text,
+      input_message_content: {
+        '@type': 'inputMessageText',
+        text: text,
+      },
     };
     await this.serverRequest(data['@type'], data);
   }
