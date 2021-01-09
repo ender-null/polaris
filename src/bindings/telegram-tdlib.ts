@@ -568,6 +568,7 @@ export class TelegramTDlibBindings extends BindingsBase {
 
     const data = {
       '@type': 'editMessageText',
+      chat_id: message.chat_id,
       message_id: message.id,
       input_message_content: {
         '@type': 'inputMessageText',
