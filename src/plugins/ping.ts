@@ -7,6 +7,7 @@ export class PingPlugin extends PluginBase {
     this.commands = [
       {
         command: '/ping',
+        friendly: '^ping$',
         description: 'Checks response time',
         skipHelp: true,
       },
