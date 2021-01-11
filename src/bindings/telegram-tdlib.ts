@@ -550,8 +550,9 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async addPingToMessage(msg: Message, message: message) {
+    logger.info('message: ' + JSON.stringify(message));
     const ping = now() - msg.extra.received;
-    message.content['text']['text'] + `\n${ping}`;
+    message.content['text']['text'] += `\n${ping}`;
     // let parseMode = null;
 
     // if (msg.extra.format == 'HTML') {
