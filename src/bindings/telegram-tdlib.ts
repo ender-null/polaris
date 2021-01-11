@@ -251,6 +251,8 @@ export class TelegramTDlibBindings extends BindingsBase {
           this.bot.inbox.emit('message', msg);
         }
       }
+    } else if (update._ == 'updateMessageSendSucceeded') {
+      logger.info(JSON.stringify(update));
     }
   }
 
@@ -513,10 +515,7 @@ export class TelegramTDlibBindings extends BindingsBase {
         if (msg.type == 'text') {
           data.input_message_content.text = await this.formatTextEntities(msg);
         }
-        const message = await this.serverRequest(data._, data, false, true);
-        if (msg.type == 'text' && msg.extra.addPing) {
-          await this.addPingToMessage(msg, message);
-        }
+        await this.serverRequest(data._, data, false, true);
       }
       await this.sendChatAction(+msg.conversation.id, 'cancel');
     }
@@ -550,23 +549,21 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async addPingToMessage(msg: Message, message: message) {
-    logger.info('message: ' + JSON.stringify(message));
     const ping = now() - msg.extra.received;
-    message.content['text']['text'] += `\n${ping}`;
-    // let parseMode = null;
+    let parseMode = null;
 
-    // if (msg.extra.format == 'HTML') {
-    //   parseMode = 'textParseModeHTML';
-    // } else {
-    //   parseMode = 'textParseModeMarkdown';
-    // }
+    if (msg.extra.format == 'HTML') {
+      parseMode = 'textParseModeHTML';
+    } else {
+      parseMode = 'textParseModeMarkdown';
+    }
 
-    // const text = await this.serverRequest('parseTextEntities', {
-    //   text: message.content['text']['text'] + `\n<code>${ping}</code>`,
-    //   parse_mode: {
-    //     _: parseMode,
-    //   },
-    // });
+    const text = await this.serverRequest('parseTextEntities', {
+      text: message.content['text']['text'] + `\n<code>${ping}</code>`,
+      parse_mode: {
+        _: parseMode,
+      },
+    });
 
     const data = {
       _: 'editMessageText',
@@ -574,7 +571,7 @@ export class TelegramTDlibBindings extends BindingsBase {
       message_id: message.id,
       input_message_content: {
         _: 'inputMessageText',
-        text: message.content['text'],
+        text: text,
       },
     };
     await this.serverRequest(data._, data);
