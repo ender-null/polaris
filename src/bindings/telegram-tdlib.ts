@@ -10,7 +10,7 @@ import { catchException, download, hasTag, isInt, logger, now, sendRequest, spli
 export class TelegramTDlibBindings extends BindingsBase {
   client: Client;
   lastChatUpdate: number;
-  pendingMessages: any[];
+  pendingMessages: { msg: Message; message: message }[];
   constructor(bot: Bot) {
     super(bot);
     this.client = new Client(new TDLib(), {
@@ -256,9 +256,9 @@ export class TelegramTDlibBindings extends BindingsBase {
     } else if (update._ == 'updateMessageSendSucceeded') {
       if (this.pendingMessages.length > 0) {
         for (const m of this.pendingMessages) {
-          if (update.old_message_id == m.msg.id) {
-            this.pendingMessages.splice(this.pendingMessages.indexOf(m), 1);
+          if (update.old_message_id == m.message.id) {
             this.addPingToMessage(m.msg, update.message);
+            this.pendingMessages.splice(this.pendingMessages.indexOf(m), 1);
             break;
           }
         }
