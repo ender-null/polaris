@@ -14,7 +14,7 @@ export class PingPlugin extends PluginBase {
     ];
   }
   async run(msg: Message): Promise<void> {
-    const text = `Pong`;
+    const text = `Pong!`;
     this.bot.replyMessage(msg, text, 'text', null, {
       addPing: true,
     });

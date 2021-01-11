@@ -572,7 +572,7 @@ export class TelegramTDlibBindings extends BindingsBase {
     }
 
     const text = await this.serverRequest('parseTextEntities', {
-      text: message.content['text']['text'] + `\n<code>${ping}</code>`,
+      text: message.content['text']['text'] + `\n<code>${ping.toFixed(3)}</code>`,
       parse_mode: {
         _: parseMode,
       },
