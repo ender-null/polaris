@@ -38,7 +38,7 @@ export class TelegramTDlibBindings extends BindingsBase {
     processRequest?: boolean,
   ): Promise<any> {
     const query: any = {
-      '@type': method,
+      _: method,
       ...params,
     };
     return await this.client.invoke(query).catch(async (e) => {
@@ -257,7 +257,7 @@ export class TelegramTDlibBindings extends BindingsBase {
   async updateChats(loadAll?: boolean) {
     this.lastChatUpdate = now();
     const chats = await this.serverRequest('getChats', {
-      chat_list: { '@type': 'chatListMain' },
+      chat_list: { _: 'chatListMain' },
       offset_order: '9223372036854775807',
       offset_chat_id: 0,
       limit: 100,
@@ -320,9 +320,9 @@ export class TelegramTDlibBindings extends BindingsBase {
         preview = msg.extra.preview;
       }
       inputMessageContent = {
-        '@type': 'inputMessageText',
+        _: 'inputMessageText',
         text: {
-          '@type': 'formattedText',
+          _: 'formattedText',
           text: msg.content,
           entities: [],
         },
@@ -330,98 +330,98 @@ export class TelegramTDlibBindings extends BindingsBase {
       };
     } else if (msg.type == 'photo') {
       inputMessageContent = {
-        '@type': 'inputMessagePhoto',
+        _: 'inputMessagePhoto',
         photo: this.getInputFile(msg.content),
       };
 
       if (msg.extra && 'caption' in msg.extra) {
         inputMessageContent['caption'] = {
-          '@type': 'formattedText',
+          _: 'formattedText',
           text: msg.extra.caption,
         };
       }
     } else if (msg.type == 'animation') {
       inputMessageContent = {
-        '@type': 'inputMessageAnimation',
+        _: 'inputMessageAnimation',
         animation: this.getInputFile(msg.content),
       };
 
       if (msg.extra && 'caption' in msg.extra) {
         inputMessageContent['caption'] = {
-          '@type': 'formattedText',
+          _: 'formattedText',
           text: msg.extra.caption,
         };
       }
     } else if (msg.type == 'audio') {
       inputMessageContent = {
-        '@type': 'inputMessageAudio',
+        _: 'inputMessageAudio',
         audio: this.getInputFile(msg.content),
       };
 
       if (msg.extra && 'caption' in msg.extra) {
         inputMessageContent['caption'] = {
-          '@type': 'formattedText',
+          _: 'formattedText',
           text: msg.extra.caption,
         };
       }
     } else if (msg.type == 'document') {
       inputMessageContent = {
-        '@type': 'inputMessageDocument',
+        _: 'inputMessageDocument',
         document: this.getInputFile(msg.content),
       };
 
       if (msg.extra && 'caption' in msg.extra) {
         inputMessageContent['caption'] = {
-          '@type': 'formattedText',
+          _: 'formattedText',
           text: msg.extra.caption,
         };
       }
     } else if (msg.type == 'sticker') {
       inputMessageContent = {
-        '@type': 'inputMessageSticker',
+        _: 'inputMessageSticker',
         sticker: this.getInputFile(msg.content),
       };
 
       if (msg.extra && 'caption' in msg.extra) {
         inputMessageContent['caption'] = {
-          '@type': 'formattedText',
+          _: 'formattedText',
           text: msg.extra.caption,
         };
       }
     } else if (msg.type == 'video') {
       inputMessageContent = {
-        '@type': 'inputMessageVideo',
+        _: 'inputMessageVideo',
         video: this.getInputFile(msg.content),
       };
 
       if (msg.extra && 'caption' in msg.extra) {
         inputMessageContent['caption'] = {
-          '@type': 'formattedText',
+          _: 'formattedText',
           text: msg.extra.caption,
         };
       }
     } else if (msg.type == 'voice') {
       inputMessageContent = {
-        '@type': 'inputMessageVoiceNote',
+        _: 'inputMessageVoiceNote',
         voice_note: this.getInputFile(msg.content),
       };
 
       if (msg.extra && 'caption' in msg.extra) {
         inputMessageContent['caption'] = {
-          '@type': 'formattedText',
+          _: 'formattedText',
           text: msg.extra.caption,
         };
       }
     } else if (msg.type == 'forward') {
       data = {
-        '@type': 'forwardMessages',
+        _: 'forwardMessages',
         chat_id: msg.extra.conversation,
         from_chat_id: msg.conversation.id,
         message_ids: [msg.extra.message],
       };
     } else if (msg.type == 'native') {
       data = {
-        '@type': msg.content,
+        _: msg.content,
         chat_id: msg.conversation.id,
       };
 
@@ -491,7 +491,7 @@ export class TelegramTDlibBindings extends BindingsBase {
 
     if (inputMessageContent) {
       data = {
-        '@type': 'sendMessage',
+        _: 'sendMessage',
         chat_id: msg.conversation.id,
         input_message_content: inputMessageContent,
       };
@@ -507,13 +507,13 @@ export class TelegramTDlibBindings extends BindingsBase {
         for (const text of texts) {
           const split = { ...data };
           split.input_message_content.text = await this.formatTextEntities(msg, text);
-          await this.serverRequest(data['@type'], split, false, true);
+          await this.serverRequest(data._, split, false, true);
         }
       } else {
         if (msg.type == 'text') {
           data.input_message_content.text = await this.formatTextEntities(msg);
         }
-        const message = await this.serverRequest(data['@type'], data, false, true);
+        const message = await this.serverRequest(data._, data, false, true);
         if (msg.type == 'text' && msg.extra.addPing) {
           await this.addPingToMessage(msg, message);
         }
@@ -551,31 +551,32 @@ export class TelegramTDlibBindings extends BindingsBase {
 
   async addPingToMessage(msg: Message, message: message) {
     const ping = now() - msg.extra.received;
-    let parseMode = null;
+    message.content['text']['text'] + `\n${ping}`;
+    // let parseMode = null;
 
-    if (msg.extra.format == 'HTML') {
-      parseMode = 'textParseModeHTML';
-    } else {
-      parseMode = 'textParseModeMarkdown';
-    }
+    // if (msg.extra.format == 'HTML') {
+    //   parseMode = 'textParseModeHTML';
+    // } else {
+    //   parseMode = 'textParseModeMarkdown';
+    // }
 
-    const text = await this.serverRequest('parseTextEntities', {
-      text: message.content['text']['text'] + `\n<code>${ping}</code>`,
-      parse_mode: {
-        '@type': parseMode,
-      },
-    });
+    // const text = await this.serverRequest('parseTextEntities', {
+    //   text: message.content['text']['text'] + `\n<code>${ping}</code>`,
+    //   parse_mode: {
+    //     _: parseMode,
+    //   },
+    // });
 
     const data = {
-      '@type': 'editMessageText',
+      _: 'editMessageText',
       chat_id: message.chat_id,
       message_id: message.id,
       input_message_content: {
-        '@type': 'inputMessageText',
-        text: text,
+        _: 'inputMessageText',
+        text: message.content['text'],
       },
     };
-    await this.serverRequest(data['@type'], data);
+    await this.serverRequest(data._, data);
   }
 
   async formatTextEntities(msg: Message, text?: string) {
@@ -595,7 +596,7 @@ export class TelegramTDlibBindings extends BindingsBase {
       formatedText = await this.serverRequest('parseTextEntities', {
         text: text,
         parse_mode: {
-          '@type': parseMode,
+          _: parseMode,
         },
       });
 
@@ -603,14 +604,14 @@ export class TelegramTDlibBindings extends BindingsBase {
         return formatedText;
       } else {
         return {
-          '@type': 'formattedText',
+          _: 'formattedText',
           text: text,
           entities: [],
         };
       }
     } else {
       return {
-        '@type': 'formattedText',
+        _: 'formattedText',
         text: text,
         entities: [],
       };
@@ -620,22 +621,22 @@ export class TelegramTDlibBindings extends BindingsBase {
   getInputFile(content: string): Record<string, unknown> {
     if (content.startsWith('/') || content.startsWith('C:\\')) {
       return {
-        '@type': 'inputFileLocal',
+        _: 'inputFileLocal',
         path: content,
       };
     } else if (content.startsWith('http')) {
       return {
-        '@type': 'inputFileRemote',
+        _: 'inputFileRemote',
         id: content,
       };
     } else if (isInt(content)) {
       return {
-        '@type': 'inputFileId',
+        _: 'inputFileId',
         id: content,
       };
     } else {
       return {
-        '@type': 'inputFileRemote',
+        _: 'inputFileRemote',
         id: content,
       };
     }
