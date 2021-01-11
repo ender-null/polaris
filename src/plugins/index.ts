@@ -15,7 +15,6 @@ export { InfoPlugin } from './info';
 export { LastFMPlugin } from './lastfm';
 export { LeagueOfLegendsPlugin } from './league-of-legends';
 export { MediaForwarderPlugin } from './media-forwarder';
-export { NSFWPlugin } from './nsfw';
 export { PharmacyPlugin } from './pharmacy';
 export { PinPlugin } from './pin';
 export { PingPlugin } from './ping';
