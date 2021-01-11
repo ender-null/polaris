@@ -33,6 +33,11 @@ export class CorePlugin extends PluginBase {
         hidden: true,
       },
       {
+        command: '/rebirth',
+        description: 'Reset all client data',
+        hidden: true,
+      },
+      {
         command: '/msg',
         description: 'Send message to chat',
         parameters: [
@@ -97,12 +102,18 @@ export class CorePlugin extends PluginBase {
     } else if (isCommand(this, 4, msg.content)) {
       text = this.bot.errors.notImplemented;
     } else if (isCommand(this, 5, msg.content)) {
+      if (this.bot.user.isBot || this.bot.config.bindings != 'TelegramTDlibBindings') {
+        text = this.bot.errors.notImplemented;
+      } else {
+        text = 'TODO';
+      }
+    } else if (isCommand(this, 6, msg.content)) {
       if (!input) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       }
       const result = await execResult(input);
       text = `<code class="language-shell">$ ${input}\n\n${result}</code>`;
-    } else if (isCommand(this, 6, msg.content)) {
+    } else if (isCommand(this, 7, msg.content)) {
       if (!input) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       }
