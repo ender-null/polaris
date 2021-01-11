@@ -10,6 +10,7 @@ import { catchException, download, hasTag, isInt, logger, now, sendRequest, spli
 export class TelegramTDlibBindings extends BindingsBase {
   client: Client;
   lastChatUpdate: number;
+  pendingMessages: any[];
   constructor(bot: Bot) {
     super(bot);
     this.client = new Client(new TDLib(), {
@@ -24,6 +25,7 @@ export class TelegramTDlibBindings extends BindingsBase {
         device_model: 'polaris',
       },
     });
+    this.pendingMessages = [];
   }
 
   async apiRequest(method: string, params: ParsedUrlQueryInput = {}): Promise<Response> {
@@ -252,7 +254,15 @@ export class TelegramTDlibBindings extends BindingsBase {
         }
       }
     } else if (update._ == 'updateMessageSendSucceeded') {
-      logger.info(JSON.stringify(update));
+      if (this.pendingMessages.length > 0) {
+        for (const m of this.pendingMessages) {
+          if (update.old_message_id == m.msg.id) {
+            this.pendingMessages.splice(this.pendingMessages.indexOf(m), 1);
+            this.addPingToMessage(m.msg, update.message);
+            break;
+          }
+        }
+      }
     }
   }
 
@@ -515,7 +525,10 @@ export class TelegramTDlibBindings extends BindingsBase {
         if (msg.type == 'text') {
           data.input_message_content.text = await this.formatTextEntities(msg);
         }
-        await this.serverRequest(data._, data, false, true);
+        const message = await this.serverRequest(data._, data, false, true);
+        if (msg.type == 'text' && msg.extra.addPing) {
+          this.pendingMessages.push({ msg, message });
+        }
       }
       await this.sendChatAction(+msg.conversation.id, 'cancel');
     }
