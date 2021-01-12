@@ -7,4 +7,4 @@ services:
     volumes:
       - ./logs:/usr/src/app/logs
       - ./.tdlib_files:/usr/src/app/.tdlib_files
-      - ./firebase.json:/usr/src/app/firebase.json
+      - ./docs/firebase.json:/usr/src/app/firebase.json
