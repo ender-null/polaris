@@ -136,7 +136,7 @@ export class DiscordBindings extends BindingsBase {
             const message = await chat.send(content);
             if (msg.type == 'text' && msg.extra.addPing) {
               const ping = message.createdTimestamp - msg.date;
-              message.edit(msg.content + `\n<code>${ping.toFixed(3)}</code>`);
+              message.edit(msg.content + `\n\`${ping.toFixed(3)}\``);
             }
           }
         } else if (msg.type == 'photo' || msg.type == 'document' || msg.type == 'video' || msg.type == 'voice') {

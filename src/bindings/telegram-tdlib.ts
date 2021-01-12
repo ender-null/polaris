@@ -560,7 +560,7 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async addPingToMessage(msg: Message, message: message) {
-    const ping = message.date - msg.date;
+    const ping = msg.date - message.date;
     let parseMode = null;
 
     if (msg.extra.format == 'HTML') {
