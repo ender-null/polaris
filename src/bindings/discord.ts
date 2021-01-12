@@ -5,6 +5,7 @@ import { getExtension, htmlToDiscordMarkdown, logger, now, splitLargeMessage } f
 
 export class DiscordBindings extends BindingsBase {
   client: Client;
+  pendingMessages: { msg: Message; message: DiscordMessage }[];
   constructor(bot: Bot) {
     super(bot);
     this.client = new Client({
@@ -69,7 +70,7 @@ export class DiscordBindings extends BindingsBase {
     };
     const content = msg.content;
     const type = 'text';
-    const date = new Date().getTime() / 1000;
+    const date = msg.createdTimestamp;
     const reply = null;
     const sender = new User(
       msg.author.id,
@@ -132,7 +133,11 @@ export class DiscordBindings extends BindingsBase {
               await chat.send(text);
             }
           } else {
-            await chat.send(content);
+            const message = await chat.send(content);
+            if (msg.type == 'text' && msg.extra.addPing) {
+              const ping = message.createdTimestamp - msg.date;
+              message.edit(msg.content + `\n<code>${ping.toFixed(3)}</code>`);
+            }
           }
         } else if (msg.type == 'photo' || msg.type == 'document' || msg.type == 'video' || msg.type == 'voice') {
           let sendContent = true;
