@@ -58,7 +58,9 @@ export class ZaragozaPlugin extends PluginBase {
       if (isCommand(this, 2, msg.content)) {
         url = 'https://api.drk.cat/zgzpls/tram/stations';
       }
-      const params = {};
+      const params = {
+        source: 'official-api',
+      };
       if (isInt(input)) {
         params['number'] = input;
       } else {
