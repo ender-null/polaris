@@ -161,8 +161,6 @@ export class Message {
 export abstract class Extra extends Object {
   input?: string;
   inputReply?: string;
-  received?: number;
-  replied?: number;
   addPing?: boolean;
   format?: string;
   preview?: boolean;
