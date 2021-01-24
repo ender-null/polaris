@@ -83,52 +83,68 @@ export class MatrixBindings extends BindingsBase {
     const profile = await this.client.getUserProfile(userId);
     return new User(usernameSanitize(userId), profile.displayname, null, usernameSanitize(userId), false);
   }
-  getMessage(chatId: string | number, messageId: string | number, ignoreReply?: boolean): Promise<Message> {
-    throw new Error('Method not implemented.');
+  async getMessage(chatId: string | number, messageId: string | number, ignoreReply?: boolean): Promise<Message> {
+    console.debug(chatId, messageId, ignoreReply);
+    return null;
   }
-  deleteMessage(chatId: string | number, messageId: string | number): Promise<boolean> {
-    throw new Error('Method not implemented.');
+  async deleteMessage(chatId: string | number, messageId: string | number): Promise<boolean> {
+    console.debug(chatId, messageId);
+    return null;
   }
-  getFile(fileId: string | number, link?: boolean): Promise<string> {
-    throw new Error('Method not implemented.');
+  async getFile(fileId: string | number, link?: boolean): Promise<string> {
+    console.debug(fileId, link);
+    return null;
   }
-  checkInviteLink(inviteLink: string | number): Promise<boolean> {
-    throw new Error('Method not implemented.');
+  async checkInviteLink(inviteLink: string | number): Promise<boolean> {
+    console.debug(inviteLink);
+    return null;
   }
-  joinByInviteLink(inviteLink: string | number): Promise<boolean> {
-    throw new Error('Method not implemented.');
+  async joinByInviteLink(inviteLink: string | number): Promise<boolean> {
+    console.debug(inviteLink);
+    return null;
   }
-  inviteConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    throw new Error('Method not implemented.');
+  async inviteConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
+    console.debug(conversationId, userId);
+    return null;
   }
-  promoteConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    throw new Error('Method not implemented.');
+  async promoteConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
+    console.debug(conversationId, userId);
+    return null;
   }
-  kickConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    throw new Error('Method not implemented.');
+  async kickConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
+    console.debug(conversationId, userId);
+    return null;
   }
-  leaveConversation(conversationId: string | number): Promise<boolean> {
-    throw new Error('Method not implemented.');
+  async leaveConversation(conversationId: string | number): Promise<boolean> {
+    console.debug(conversationId);
+    return null;
   }
-  banConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    throw new Error('Method not implemented.');
+  async banConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
+    console.debug(conversationId, userId);
+    return null;
   }
-  unbanConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    throw new Error('Method not implemented.');
+  async unbanConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
+    console.debug(conversationId, userId);
+    return null;
   }
-  renameConversation(conversationId: string | number, title: string): Promise<boolean> {
-    throw new Error('Method not implemented.');
+  async renameConversation(conversationId: string | number, title: string): Promise<boolean> {
+    console.debug(conversationId, title);
+    return null;
   }
-  changeConversationDescription(conversationId: string | number, description: string): Promise<boolean> {
-    throw new Error('Method not implemented.');
+  async changeConversationDescription(conversationId: string | number, description: string): Promise<boolean> {
+    console.debug(conversationId, description);
+    return null;
   }
-  changeConversationPhoto(conversationId: string | number, photo: string): Promise<boolean> {
-    throw new Error('Method not implemented.');
+  async changeConversationPhoto(conversationId: string | number, photo: string): Promise<boolean> {
+    console.debug(conversationId, photo);
+    return null;
   }
-  conversationInfo(conversationId: string | number): Promise<ConversationInfo> {
-    throw new Error('Method not implemented.');
+  async conversationInfo(conversationId: string | number): Promise<ConversationInfo> {
+    console.debug(conversationId);
+    return null;
   }
-  getChatAdministrators(conversationId: string | number): Promise<User[]> {
-    throw new Error('Method not implemented.');
+  async getChatAdministrators(conversationId: string | number): Promise<User[]> {
+    console.debug(conversationId);
+    return [];
   }
 }
