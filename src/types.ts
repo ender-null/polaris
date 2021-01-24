@@ -62,6 +62,8 @@ export interface ApiKeys {
   tenor?: string;
   riotApi?: string;
   wolframAlpha?: string;
+  matrixAccessToken?: string;
+  matrixHomeserverUrl?: string;
 }
 
 export interface Instance {
