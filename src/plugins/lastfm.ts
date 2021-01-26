@@ -88,9 +88,9 @@ export class LastFMPlugin extends PluginBase {
       const nowplaying = !!(last['@attr'] && last['@attr'].nowplaying);
 
       if (nowplaying) {
-        text = format(this.strings['isPlaying'], username);
+        text = format(this.strings.isPlaying, username);
       } else {
-        text = format(this.strings['lastPlayed'], username);
+        text = format(this.strings.lastPlayed, username);
       }
       text += `:\n\t🎵 <i>${track}</i>\n\t💽 ${artist}`;
       if (album) {
@@ -121,7 +121,7 @@ export class LastFMPlugin extends PluginBase {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       } else {
         setTag(this.bot, msg.sender.id, `lastfm:${input}`);
-        const text = format(this.strings['usernameSet'], this.bot.config.prefix);
+        const text = format(this.strings.usernameSet, this.bot.config.prefix);
         this.bot.replyMessage(msg, text);
       }
     }

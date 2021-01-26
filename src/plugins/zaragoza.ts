@@ -80,9 +80,9 @@ export class ZaragozaPlugin extends PluginBase {
       }
 
       if (content.street) {
-        text = `<b>${content.street}</b>\n   ${this.strings['station']}: <b>${content.number}</b>  [${content.lines}]\n\n`;
+        text = `<b>${content.street}</b>\n   ${this.strings.station}: <b>${content.number}</b>  [${content.lines}]\n\n`;
       } else {
-        text = `<b>${this.strings['station']}: ${content.number}</b>\n\n`;
+        text = `<b>${this.strings.station}: ${content.number}</b>\n\n`;
       }
 
       for (const bus of content.transports) {
@@ -110,7 +110,7 @@ export class ZaragozaPlugin extends PluginBase {
           return this.bot.replyMessage(msg, this.bot.errors.connectionError);
         }
       }
-      text = `<b>${capitalize(content.title)}</b>\n   ${this.strings['station']}: <b>${
+      text = `<b>${capitalize(content.title)}</b>\n   ${this.strings.station}: <b>${
         content.id
       }</b>\n\n • Bicis Disponibles: <b>${content.bicisDisponibles}</b>\n • Anclajes Disponibles: <b>${
         content.anclajesDisponibles

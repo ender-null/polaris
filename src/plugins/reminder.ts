@@ -36,7 +36,7 @@ export class ReminderPlugin extends PluginBase {
       hours: 'hours',
       day: 'day',
       days: 'days',
-      message: "<b>{0}</b>, I'll remint you in <b>{1}</b> to <i>{2}</i>.",
+      message: "<b>{0}</b>, I'll remind you in <b>{1}</b> to <i>{2}</i>.",
       noReminder: '',
       wrongDelay: '',
     };
@@ -58,11 +58,11 @@ export class ReminderPlugin extends PluginBase {
     const alarm = this.generateAlarm(delay, unit);
 
     if (!text) {
-      return this.bot.replyMessage(msg, this.strings['noReminder']);
+      return this.bot.replyMessage(msg, this.strings.noReminder);
     }
 
     if (!isInt(delay)) {
-      return this.bot.replyMessage(msg, this.strings['wrongDelay']);
+      return this.bot.replyMessage(msg, this.strings.wrongDelay);
     }
 
     const reminder: DatabaseReminder = {
@@ -76,8 +76,8 @@ export class ReminderPlugin extends PluginBase {
     try {
       let delayText = delay;
       if (
-        unit == this.strings['second'] ||
-        unit == this.strings['seconds'] ||
+        unit == this.strings.second ||
+        unit == this.strings.seconds ||
         unit == 's' ||
         unit == 'sec' ||
         unit == 'secs' ||
@@ -85,13 +85,13 @@ export class ReminderPlugin extends PluginBase {
         unit == 'seconds'
       ) {
         if (+delay > 1) {
-          delayText = `${delay} ${this.strings['seconds']}`;
+          delayText = `${delay} ${this.strings.seconds}`;
         } else {
-          delayText = `${delay} ${this.strings['second']}`;
+          delayText = `${delay} ${this.strings.second}`;
         }
       } else if (
-        unit == this.strings['minute'] ||
-        unit == this.strings['minutes'] ||
+        unit == this.strings.minute ||
+        unit == this.strings.minutes ||
         unit == 'm' ||
         unit == 'min' ||
         unit == 'mins' ||
@@ -99,29 +99,33 @@ export class ReminderPlugin extends PluginBase {
         unit == 'minutes'
       ) {
         if (+delay > 1) {
-          delayText = `${delay} ${this.strings['minutes']}`;
+          delayText = `${delay} ${this.strings.minutes}`;
         } else {
-          delayText = `${delay} ${this.strings['minute']}`;
+          delayText = `${delay} ${this.strings.minute}`;
         }
       } else if (
-        unit == this.strings['hour'] ||
-        unit == this.strings['hours'] ||
+        unit == this.strings.hour ||
+        unit == this.strings.hours ||
         unit == 'h' ||
         unit == 'hour' ||
         unit == 'hours'
       ) {
-        delayText = `${delay} ${this.strings['hours']}`;
+        if (+delay > 1) {
+          delayText = `${delay} ${this.strings.hours}`;
+        } else {
+          delayText = `${delay} ${this.strings.hour}`;
+        }
       } else if (
-        unit == this.strings['day'] ||
-        unit == this.strings['days'] ||
+        unit == this.strings.day ||
+        unit == this.strings.days ||
         unit == 'd' ||
         unit == 'day' ||
         unit == 'days'
       ) {
         if (+delay > 1) {
-          delayText = `${delay} ${this.strings['days']}`;
+          delayText = `${delay} ${this.strings.days}`;
         } else {
-          delayText = `${delay} ${this.strings['day']}`;
+          delayText = `${delay} ${this.strings.day}`;
         }
       } else {
         return this.bot.replyMessage(msg, this.bot.errors.invalidArgument);
@@ -165,8 +169,8 @@ export class ReminderPlugin extends PluginBase {
   generateAlarm(delay: string, unit: string): number {
     const alarm = now();
     if (
-      unit == this.strings['second'] ||
-      unit == this.strings['seconds'] ||
+      unit == this.strings.second ||
+      unit == this.strings.seconds ||
       unit == 's' ||
       unit == 'sec' ||
       unit == 'secs' ||
@@ -175,8 +179,8 @@ export class ReminderPlugin extends PluginBase {
     ) {
       return now() + parseFloat(delay);
     } else if (
-      unit == this.strings['minute'] ||
-      unit == this.strings['minutes'] ||
+      unit == this.strings.minute ||
+      unit == this.strings.minutes ||
       unit == 'm' ||
       unit == 'min' ||
       unit == 'mins' ||
@@ -185,16 +189,16 @@ export class ReminderPlugin extends PluginBase {
     ) {
       return now() + parseFloat(delay) * 60;
     } else if (
-      unit == this.strings['hour'] ||
-      unit == this.strings['hours'] ||
+      unit == this.strings.hour ||
+      unit == this.strings.hours ||
       unit == 'h' ||
       unit == 'hour' ||
       unit == 'hours'
     ) {
       return now() + parseFloat(delay) * 60 * 60;
     } else if (
-      unit == this.strings['day'] ||
-      unit == this.strings['days'] ||
+      unit == this.strings.day ||
+      unit == this.strings.days ||
       unit == 'd' ||
       unit == 'day' ||
       unit == 'days'

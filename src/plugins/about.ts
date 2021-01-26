@@ -48,15 +48,15 @@ export class AboutPlugin extends PluginBase {
       } catch (e) {
         catchException(e, this.bot);
       }
-      const greeting = format(this.strings['greeting'], this.bot.user.firstName);
-      const version = format(this.strings['version'], tag);
-      const license = this.strings['license'];
-      const help = format(this.strings['help'], this.bot.config.prefix);
-      const about = format(this.strings['about'], this.bot.config.prefix);
-      const notice = this.strings['notice'];
-      const channel = this.strings['channel'];
-      const donations = format(this.strings['donations'], this.bot.config.prefix);
-      const stats = format(this.strings['stats'], Object.keys(db.users).length, Object.keys(db.groups).length);
+      const greeting = format(this.strings.greeting, this.bot.user.firstName);
+      const version = format(this.strings.version, tag);
+      const license = this.strings.license;
+      const help = format(this.strings.help, this.bot.config.prefix);
+      const about = format(this.strings.about, this.bot.config.prefix);
+      const notice = this.strings.notice;
+      const channel = this.strings.channel;
+      const donations = format(this.strings.donations, this.bot.config.prefix);
+      const stats = format(this.strings.stats, Object.keys(db.users).length, Object.keys(db.groups).length);
 
       if (isCommand(this, 1, msg.content)) {
         text = `${greeting}\n\n${notice}\n${channel}\n\n${help}\n${about}\n\n${version}\n${donations}\n\n${license}\n\n${stats}`;
@@ -64,8 +64,8 @@ export class AboutPlugin extends PluginBase {
         text = `${greeting}\n\n${notice}\n${channel}\n\n${help}\n${about}\n\n${donations}`;
       }
     } else if (isCommand(this, 2, msg.content)) {
-      const donationsExplanation = this.strings['donationsExplanation'];
-      const supportersTitle = this.strings['supportersTitle'];
+      const donationsExplanation = this.strings.donationsExplanation;
+      const supportersTitle = this.strings.supportersTitle;
       const supporters = '';
       if (supporters.length > 0) {
         text = `${donationsExplanation}\n\n${supportersTitle}${supporters}`;

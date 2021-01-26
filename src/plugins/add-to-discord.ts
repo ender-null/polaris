@@ -22,7 +22,7 @@ export class AddToDiscordPlugin extends PluginBase {
       this.bot.config.apiKeys.discordClientId,
       permissions,
     );
-    const text = format(this.strings['info'], url);
+    const text = format(this.strings.info, url);
     this.bot.replyMessage(msg, text);
   }
 }

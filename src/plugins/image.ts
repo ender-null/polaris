@@ -36,7 +36,7 @@ export class ImagePlugin extends PluginBase {
     const searchContent = await searchResp.text();
     const searchObj = new RegExp('vqd=([\\d-]+)&', 'gim').exec(searchContent);
     if (!searchObj || searchObj.length == 0) {
-      return this.bot.replyMessage(msg, this.bot.errors.unknown);
+      return this.bot.replyMessage(msg, this.bot.errors.failed);
     }
 
     const headers = {

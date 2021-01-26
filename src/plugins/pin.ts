@@ -62,12 +62,12 @@ export class PinPlugin extends PluginBase {
       }
       let text = '';
       if (pins.length > 0) {
-        text = format(this.strings['pins'], pins.length);
+        text = format(this.strings.pins, pins.length);
         for (const pin of pins) {
           text += `\n • #${pin}`;
         }
       } else {
-        text = this.strings['noPins'];
+        text = this.strings.noPins;
       }
       return this.bot.replyMessage(msg, text);
     } else if (isCommand(this, 2, msg.content)) {
@@ -83,7 +83,7 @@ export class PinPlugin extends PluginBase {
       }
       tag = tag.toLowerCase();
       if (db.pins && Object.keys(db.pins).indexOf(tag) > -1) {
-        return this.bot.replyMessage(msg, format(this.strings['alreadyPinned'], tag));
+        return this.bot.replyMessage(msg, format(this.strings.alreadyPinned, tag));
       }
       let pinType;
       if (msg.reply.type == 'text' && msg.reply.content.startsWith(this.bot.config.prefix)) {
@@ -103,7 +103,7 @@ export class PinPlugin extends PluginBase {
         type: pinType,
         bot: this.bot.user.id,
       };
-      this.bot.replyMessage(msg, format(this.strings['pinned'], tag));
+      this.bot.replyMessage(msg, format(this.strings.pinned, tag));
     } else if (isCommand(this, 3, msg.content)) {
       if (!input) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
@@ -114,14 +114,14 @@ export class PinPlugin extends PluginBase {
       }
       tag = tag.toLowerCase();
       if (db.pins && Object.keys(db.pins).indexOf(tag) == -1) {
-        return this.bot.replyMessage(msg, format(this.strings['notFound'], tag));
+        return this.bot.replyMessage(msg, format(this.strings.notFound, tag));
       }
       if (db.pins && msg.sender.id != db.pins[tag].creator) {
-        return this.bot.replyMessage(msg, format(this.strings['notCreator'], tag));
+        return this.bot.replyMessage(msg, format(this.strings.notCreator, tag));
       }
       db.pinsSnap.child(tag).ref.set(null);
       delete db.pins[tag];
-      this.bot.replyMessage(msg, format(this.strings['unpinned'], tag));
+      this.bot.replyMessage(msg, format(this.strings.unpinned, tag));
     } else {
       // Finds the first 3 pins of the message and sends them.
       const pins = new RegExp('#(\\w+)', 'gim').exec(msg.content);

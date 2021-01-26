@@ -31,7 +31,7 @@ export class HelpPlugin extends PluginBase {
   async run(msg: Message): Promise<void> {
     const showAll = isCommand(this, 2, msg.content) || isCommand(this, 3, msg.content);
     const commands = [];
-    let text = this.strings['commands'];
+    let text = this.strings.commands;
 
     // Iterates the initialized plugin
     for (const plugin of this.bot.plugins) {
@@ -58,7 +58,7 @@ export class HelpPlugin extends PluginBase {
                 } else {
                   commands.push({
                     command: getWord(lines[0], 1).substr(1),
-                    description: this.strings['noDescription'],
+                    description: this.strings.noDescription,
                   });
                 }
               }

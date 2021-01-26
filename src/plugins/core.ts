@@ -91,14 +91,14 @@ export class CorePlugin extends PluginBase {
 
     if (isCommand(this, 1, msg.content)) {
       await this.bot.stop();
-      text = this.strings['shuttingDown'];
+      text = this.strings.shuttingDown;
     } else if (isCommand(this, 2, msg.content)) {
       await this.bot.stop();
       await this.bot.start();
-      text = this.strings['restarting'];
+      text = this.strings.restarting;
     } else if (isCommand(this, 3, msg.content)) {
       this.bot.initPlugins();
-      text = this.strings['reloadingPlugins'];
+      text = this.strings.reloadingPlugins;
     } else if (isCommand(this, 4, msg.content)) {
       text = this.bot.errors.notImplemented;
     } else if (isCommand(this, 5, msg.content)) {

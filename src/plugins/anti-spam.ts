@@ -77,7 +77,7 @@ export class AntiSpamPlugin extends PluginBase {
         if (this.detectEthiopic(msg.extra['caption'])) {
           await this.kickSpammer(msg, 'ethiopic', 'caption');
         }
-        await this.checkTrustedTelegramLink(msg, msg.extra['caption']);
+        await this.checkTrustedTelegramLink(msg, msg.extra.caption);
       }
 
       if (
@@ -142,7 +142,7 @@ export class AntiSpamPlugin extends PluginBase {
 
       if (db.groups[gid][spamType] >= 10 || String(m.sender.id) == gid) {
         setTag(this.bot, gid, spamType);
-        this.bot.sendAdminAlert(format(this.strings['markedGroup'], spamType, db.groups[gid].title, gid));
+        this.bot.sendAdminAlert(format(this.strings.markedGroup, spamType, db.groups[gid].title, gid));
         if (
           !hasTag(this.bot, m.conversation.id, 'safe') &&
           !hasTag(this.bot, gid, 'resend:?') &&
@@ -153,15 +153,17 @@ export class AntiSpamPlugin extends PluginBase {
       }
     }
 
-    if (isGroupAdmin(this.bot, this.bot.user.id, m) && hasTag(this.bot, m.conversation.id, 'anti' + spamType)) {
+    if (
+      isGroupAdmin(this.bot, this.bot.user.id, m) &&
+      !isAdmin(this.bot, m.sender.id) &&
+      hasTag(this.bot, m.conversation.id, 'anti' + spamType)
+    ) {
       await this.bot.bindings.kickConversationMember(m.conversation.id, m.sender.id);
       this.bot.sendAdminAlert(
         format(this.strings['kicked'], spamType, name, m.sender.id, db.groups[gid].title, gid, content, text),
       );
       this.bot.replyMessage(m, this.bot.errors.idiotKicked);
-      this.bot.replyMessage(m, 'deleteMessage', 'system', null, {
-        messageId: m.id,
-      });
+      this.bot.bindings.deleteMessage(m.conversation.id, m.id);
     }
   }
 
@@ -169,9 +171,9 @@ export class AntiSpamPlugin extends PluginBase {
     const res = await this.bot.bindings.leaveConversation(msg.conversation.id);
     const gid = String(msg.conversation.id);
     if (res) {
-      this.bot.sendAdminAlert(format(this.strings['kickedMyself'], db.groups[gid].title, gid));
+      this.bot.sendAdminAlert(format(this.strings.kickedMyself, db.groups[gid].title, gid));
     } else {
-      this.bot.sendAdminAlert(format(this.strings['cantKickMyself'], db.groups[gid].title, gid));
+      this.bot.sendAdminAlert(format(this.strings.cantKickMyself, db.groups[gid].title, gid));
     }
   }
 
@@ -193,7 +195,7 @@ export class AntiSpamPlugin extends PluginBase {
         const name = getFullName(m.sender.id);
         const gid = String(m.conversation.id);
         this.bot.sendAdminAlert(
-          format(this.strings['unsafeTelegramLink'], name, m.sender.id, db.groups[gid].title, gid, text),
+          format(this.strings.unsafeTelegramLink, name, m.sender.id, db.groups[gid].title, gid, text),
         );
         await this.kickSpammer(m, 'spam', 'link');
       }

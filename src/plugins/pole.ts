@@ -3,7 +3,18 @@ import { Bot, Message } from '..';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
 import { DatabasePoleList, SortedPole } from '../types';
-import { capitalize, getCommandIndex, getFullName, getUsername, hasTag, now, time, timeInRange } from '../utils';
+import {
+  capitalize,
+  getCommandIndex,
+  getFullName,
+  getUsername,
+  hasTag,
+  isAdmin,
+  isTrusted,
+  now,
+  time,
+  timeInRange,
+} from '../utils';
 
 export class PolePlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -123,10 +134,10 @@ export class PolePlugin extends PluginBase {
             }
           }
         }
-        text = `<b>${this.strings['ranking']}:</b>`;
+        text = `<b>${this.strings.ranking}:</b>`;
         const rank = this.sortRanking(ranking, 'points');
         for (const i in rank) {
-          text += `\n • ${getFullName(rank[i].uid, false)}: <b>${rank[i].points}</b> ${this.strings['points']}`;
+          text += `\n • ${getFullName(rank[i].uid, false)}: <b>${rank[i].points}</b> ${this.strings.points}`;
         }
 
         for (const type of types) {
@@ -147,6 +158,17 @@ export class PolePlugin extends PluginBase {
         this.bot.replyMessage(msg, this.bot.errors.noResults);
       }
     } else if (commandIndex == 1) {
+      if (hasTag(this.bot, msg.conversation.id, 'polereset')) {
+        if (isTrusted(this.bot, msg.sender.id, msg) || isAdmin(this.bot, msg.sender.id)) {
+          text = this.strings.polereset;
+          delete db.poles[gid];
+          db.polesSnap.child(gid).ref.remove();
+        } else {
+          text = this.bot.errors.adminRequired;
+        }
+      } else {
+        text = this.bot.errors.disabled;
+      }
       return this.bot.replyMessage(msg, this.bot.errors.notImplemented);
     } else if (commandIndex >= 2 && commandIndex <= 7) {
       const type = types[commandIndex - 2];
@@ -156,13 +178,13 @@ export class PolePlugin extends PluginBase {
           ((type == 'fail' || type == 'iron') && db.poles[gid][date].subpole == undefined) ||
           (type == 'iron' && db.poles[gid][date].fail == undefined)
         ) {
-          return this.bot.replyMessage(msg, format(this.strings['tooSoon'], getUsername(uid)));
+          return this.bot.replyMessage(msg, format(this.strings.tooSoon, getUsername(uid)));
         }
       }
       if (type == 'canaria' && !timeInRange(time(1), time(2), now())) {
         return this.bot.replyMessage(msg, `${capitalize(type)} not available`);
       } else if (type == 'andaluza' && !timeInRange(time(12), time(13), now())) {
-        return this.bot.replyMessage(msg, format(this.strings['tooSoonAndaluza'], getUsername(uid)));
+        return this.bot.replyMessage(msg, format(this.strings.tooSoonAndaluza, getUsername(uid)));
       }
       if (this.hasPole(gid, uid, date) && type != 'canaria' && type != 'andaluza') {
         return;

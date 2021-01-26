@@ -143,7 +143,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       if (character.active_title) {
         title = character.active_title.display_string.replace('{name}', character.name);
       }
-      const name = `${character.name}-${character.realm.name} (${this.strings['lv']}: ${character.level})`;
+      const name = `${character.name}-${character.realm.name} (${this.strings.lv}: ${character.level})`;
       let guild = null;
       if ('guild' in character) {
         if (character.realm.name == character.guild.realm.name) {
@@ -174,7 +174,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       const characterClass = `${character.character_class.name} ${character.active_spec.name}`;
       const race = `${character.race.name} ${character.gender.type == 'FEMALE' ? '♀️' : '♂️'}`;
       const info = format(
-        `${this.strings['achievementPoints']}: {0} \n${this.strings['ilvl']}: {1}\n${this.strings['honorLevel']}: {2}\n${this.strings['honorableKills']}: {3}`,
+        `${this.strings.achievementPoints}: {0} \n${this.strings.ilvl}: {1}\n${this.strings.honorLevel}: {2}\n${this.strings.honorableKills}: {3}`,
         formatNumber(character.achievement_points),
         character.average_item_level,
         pvp.honor_level,
@@ -247,7 +247,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         const realm = words.join('-').toLowerCase();
         setTag(this.bot, uid, `wow:${realm}/${characterName}`);
         text = format(
-          this.strings['characterSet'],
+          this.strings.characterSet,
           capitalize(characterName),
           capitalizeEachWord(realm.replace(new RegExp('-', 'gim'), ' ')),
           this.bot.config.prefix,
@@ -261,7 +261,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       }
       const content = await resp.json();
       if (content) {
-        text = `<b>${this.strings['tokenTitle']}</b>:`;
+        text = `<b>${this.strings.tokenTitle}</b>:`;
         for (const region in content) {
           text += format(
             '\n\t<b>{0}</b>: {1}k💰 {2}k📈{2}k',

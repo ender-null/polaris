@@ -50,7 +50,7 @@ export class ValenciaPlugin extends PluginBase {
     const schedule = $('.llegadaHome');
 
     let line = '';
-    text = `<b>${this.strings['station']}: ${input}</b>\n\n`;
+    text = `<b>${this.strings.station}: ${input}</b>\n\n`;
 
     schedule.each((i, elem) => {
       line = $('img').eq(i).attr('title');

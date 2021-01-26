@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+import { Agent } from 'http';
 import * as cron from 'node-cron';
 import os from 'os';
 import {
@@ -41,6 +42,7 @@ export class Bot {
   tasks: cron.Task[];
   user: User;
   errors: ErrorMessages;
+  agent: Agent;
 
   constructor(config: Config) {
     this.inbox = new EventEmitter();
@@ -51,6 +53,9 @@ export class Bot {
     this.plugins = [];
     this.tasks = [];
     this.errors = new Errors();
+    this.agent = new Agent({
+      keepAlive: true,
+    });
   }
 
   async start(): Promise<void> {

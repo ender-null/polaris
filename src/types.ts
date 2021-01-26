@@ -4,13 +4,13 @@ export class ErrorMessages {
   adminRequired?: string;
   apiLimitExceeded?: string;
   connectionError?: string;
+  disabled?: string;
   downloadFailed?: string;
   exceptionFound?: string;
   failed?: string;
   groupOnly?: string;
   idiotKicked?: string;
   invalidArgument?: string;
-  invalidSyntax?: string;
   missingId?: string;
   missingParameter?: string;
   needsReply?: string;
@@ -19,20 +19,19 @@ export class ErrorMessages {
   permissionRequired?: string;
   privateOnly?: string;
   spammerDetected?: string;
-  unknown?: string;
 }
 
 export class Errors extends ErrorMessages {
   static adminRequired = 'Only works with <b>admin privileges</b>';
   static apiLimitExceeded = 'The API limits have been exceeded';
   static connectionError = 'Connection error';
+  static disabled = 'That feature is disabled';
   static downloadFailed = 'Download failed';
   static exceptionFound = 'Exception found';
   static failed = 'Failed';
   static groupOnly = 'Only works with <b>groups</b>';
   static idiotKicked = 'Idiot kicked';
   static invalidArgument = 'Invalid argument';
-  static invalidSyntax = 'Invalid syntax';
   static missingId = 'Missing ID';
   static missingParameter = 'Missing parameter';
   static needsReply = 'Only works with <b>replies</b>';
@@ -41,7 +40,6 @@ export class Errors extends ErrorMessages {
   static permissionRequired = 'Permission required';
   static privateOnly = 'Only works in <b>private</b>';
   static spammerDetected = 'Spammer detected, proceed to commit death';
-  static unknown = 'Unknown';
 }
 
 export interface ApiKeys {

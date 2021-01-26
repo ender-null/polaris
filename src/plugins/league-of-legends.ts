@@ -173,14 +173,14 @@ export class LeagueOfLegendsPlugin extends PluginBase {
       }
       text = format('{0} ({1}: {2})\n', summoner['name'], this.strings['lv'], summoner['summonerLevel']);
       if (masteries) {
-        text += `\n${this.strings['masteries']}:`;
+        text += `\n${this.strings.masteries}:`;
         let limit = 5;
         for (const i in Object.keys(masteries)) {
           const mastery = masteries[i];
           text += format(
             '\n\t{0}: {1} {2} ({3})',
             this.championIds[String(mastery['championId'])],
-            this.strings['lv'],
+            this.strings.lv,
             mastery['championLevel'],
             formatNumber(mastery['championPoints']),
           );
@@ -196,16 +196,16 @@ export class LeagueOfLegendsPlugin extends PluginBase {
           text += format(
             '\n\n{0}:\n\t{1}: {2} {3} ({4}{5})',
             this.rankedQueueType(queue['queueType']),
-            this.strings['league'],
+            this.strings.league,
             this.rankedTier(queue['tier']),
             queue['rank'],
             queue['leaguePoints'],
-            this.strings['lp'],
+            this.strings.lp,
           );
           text += format(
             '\n\t{0}/{1}: {2} / {3} ({4}%)',
-            this.strings['wins'],
-            this.strings['losses'],
+            this.strings.wins,
+            this.strings.losses,
             queue['wins'],
             queue['losses'],
             (Math.round((queue['wins'] / (queue['wins'] + queue['losses'])) * 100) * 10) / 10,
@@ -227,7 +227,7 @@ export class LeagueOfLegendsPlugin extends PluginBase {
         const summonerName = allButNWord(input, 1).replace(new RegExp(' ', 'gim'), '_');
         setTag(this.bot, uid, `lol:${region}/${summonerName}`);
         text = format(
-          this.strings['summonerSet'],
+          this.strings.summonerSet,
           summonerName.replace(new RegExp('_', 'gim'), ' '),
           region.toUpperCase(),
           this.bot.config.prefix,
@@ -296,9 +296,9 @@ export class LeagueOfLegendsPlugin extends PluginBase {
 
   rankedQueueType(queueType: string): string {
     if (queueType == 'RANKED_FLEX_SR') {
-      return this.strings['rankedFlex'];
+      return this.strings.rankedFlex;
     } else if (queueType == 'RANKED_SOLO_5x5') {
-      return this.strings['rankedSolo'];
+      return this.strings.rankedSolo;
     } else {
       return queueType;
     }

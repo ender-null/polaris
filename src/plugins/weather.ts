@@ -53,7 +53,7 @@ export class WeatherPlugin extends PluginBase {
     if (!content || content.cod != 200) {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);
     }
-    const title = `<b>${format(this.strings['title'], coords.locality, coords.country)}</b>:`;
+    const title = `<b>${format(this.strings.title, coords.locality, coords.country)}</b>:`;
     const weather = capitalize(content.weather[0].description);
     const icon = this.getWeatherIcon(content.weather[0].icon);
     const temp = content.main.temp;

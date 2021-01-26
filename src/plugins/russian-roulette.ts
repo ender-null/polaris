@@ -1,7 +1,7 @@
 import format from 'string-format';
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
-import { delTag, getTags, getUsername, hasTag, isGroupAdmin, now, random, setTag } from '../utils';
+import { delTag, getTags, getUsername, hasTag, isAdmin, isGroupAdmin, now, random, setTag } from '../utils';
 
 export class RussianRoulettePlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -42,20 +42,20 @@ export class RussianRoulettePlugin extends PluginBase {
     if (random(1, bullets) == 1) {
       setTag(this.bot, gid, 'roulette:6');
 
-      if (isGroupAdmin(this.bot, uid, msg)) {
+      if (isGroupAdmin(this.bot, uid, msg) && !isAdmin(this.bot, uid)) {
         const res = await this.bot.bindings.kickConversationMember(msg.conversation.id, uid);
         if (!res) {
-          text = format(this.strings['saved'], getUsername(uid));
+          text = format(this.strings.saved, getUsername(uid));
         } else {
-          text = format(this.strings['shot'], getUsername(uid));
+          text = format(this.strings.shot, getUsername(uid));
         }
       } else {
-        text = format(this.strings['saved'], getUsername(uid));
+        text = format(this.strings.saved, getUsername(uid));
       }
     } else {
       bullets -= 1;
       setTag(this.bot, gid, `roulette:${bullets}`);
-      text = format(this.strings['miss'], getUsername(uid), bullets);
+      text = format(this.strings.miss, getUsername(uid), bullets);
     }
     setTag(this.bot, gid, `lastroulette:${now()}`);
 

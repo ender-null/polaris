@@ -110,22 +110,22 @@ export class MediaForwarderPlugin extends PluginBase {
 
       if (!clean) {
         if (resends.length > 0) {
-          text += `<b>${this.strings['resends']}:</b>`;
+          text += `<b>${this.strings.resends}:</b>`;
           text += this.generateText(resends);
         }
 
         if (forwards.length > 0) {
-          text += `\n<b>${this.strings['forwards']}:</b>`;
+          text += `\n<b>${this.strings.forwards}:</b>`;
           text += this.generateText(forwards);
         }
       } else {
         if (removedResends.length > 0) {
-          text += `<b>${this.strings['resends']}:</b>`;
+          text += `<b>${this.strings.resends}:</b>`;
           text += this.generateText(removedResends);
         }
 
         if (removedForwards.length > 0) {
-          text += `\n<b>${this.strings['forwards']}:</b>`;
+          text += `\n<b>${this.strings.forwards}:</b>`;
           text += this.generateText(removedForwards);
         }
       }
