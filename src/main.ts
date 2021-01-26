@@ -33,14 +33,14 @@ export async function start(): Promise<void> {
       await bot.stop();
     }
   }
+  const agent = new Agent({
+    keepAlive: true,
+    maxSockets: 32 * bots.length,
+  });
   for (const key of Object.keys(db.configs)) {
     const configs = Config.loadInstancesFromJSON(db.configs[key]);
     for (const config of configs) {
       const bot = new Bot(config);
-      const agent = new Agent({
-        keepAlive: true,
-        maxSockets: 32,
-      });
       bot.setHttpAgent(agent);
       if (config.enabled) {
         process.on('unhandledRejection', (exception: Error) => {
