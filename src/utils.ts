@@ -801,13 +801,6 @@ export function rstrip(str: string, strip: string): string {
   return str;
 }
 
-export function usernameSanitize(username: string): string {
-  if (username.startsWith('@')) {
-    username = username.slice(1);
-  }
-  return username;
-}
-
 export function merge(base: any, extension: any): any {
   const merged = { ...base };
   for (const key of Object.keys(extension)) {

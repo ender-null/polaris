@@ -77,61 +77,59 @@ export class AboutPlugin extends PluginBase {
   }
 
   async always(msg: Message): Promise<void> {
-    if (this.bot.config.bindings != 'MatrixBindings') {
-      // Update group data
-      const gid = String(msg.conversation.id);
-      if (+msg.conversation.id < 0) {
-        if (!db.groups) {
-          db.groups = {};
-        }
-        if (db.groups && db.groups[gid] != undefined) {
-          db.groupsSnap.child(gid).ref.update({
-            title: msg.conversation.title || '',
-          });
-          db.groups[gid]['title'] = msg.conversation.title || '';
-        } else {
-          db.groupsSnap.child(gid).ref.set({
-            title: msg.conversation.title || '',
-          });
-          db.groups[gid] = {
-            title: msg.conversation.title || '',
-          };
-        }
+    // Update group data
+    const gid = String(msg.conversation.id);
+    if (String(msg.conversation.id).startsWith('-')) {
+      if (!db.groups) {
+        db.groups = {};
       }
-
-      const uid = String(msg.sender.id);
-      if (uid.startsWith('-100')) {
-        return;
-      }
-
-      if (!db.users) {
-        db.users = {};
-      }
-      if (db.users[uid] != undefined) {
-        db.usersSnap.child(uid).ref.update({
-          first_name: msg.sender['firstName'] || '',
-          last_name: msg.sender['lastName'] || '',
-          username: msg.sender['username'] || '',
-          is_bot: msg.sender['isBot'] || false,
+      if (db.groups && db.groups[gid] != undefined) {
+        db.groupsSnap.child(gid).ref.update({
+          title: msg.conversation.title || '',
         });
-        db.users[uid]['first_name'] = msg.sender['firstName'] || '';
-        db.users[uid]['last_name'] = msg.sender['lastName'] || '';
-        db.users[uid]['username'] = msg.sender['username'] || '';
-        db.users[uid]['is_bot'] = msg.sender['isBot'] || false;
+        db.groups[gid]['title'] = msg.conversation.title || '';
       } else {
-        db.usersSnap.child(uid).ref.set({
-          first_name: msg.sender['firstName'] || '',
-          last_name: msg.sender['lastName'] || '',
-          username: msg.sender['username'] || '',
-          is_bot: msg.sender['isBot'] || false,
+        db.groupsSnap.child(gid).ref.set({
+          title: msg.conversation.title || '',
         });
-        db.users[uid] = {
-          first_name: msg.sender['firstName'] || '',
-          last_name: msg.sender['lastName'] || '',
-          username: msg.sender['username'] || '',
-          is_bot: msg.sender['isBot'] || false,
+        db.groups[gid] = {
+          title: msg.conversation.title || '',
         };
       }
+    }
+
+    const uid = String(msg.sender.id);
+    if (uid.startsWith('-100')) {
+      return;
+    }
+
+    if (!db.users) {
+      db.users = {};
+    }
+    if (db.users[uid] != undefined) {
+      db.usersSnap.child(uid).ref.update({
+        first_name: msg.sender['firstName'] || '',
+        last_name: msg.sender['lastName'] || '',
+        username: msg.sender['username'] || '',
+        is_bot: msg.sender['isBot'] || false,
+      });
+      db.users[uid]['first_name'] = msg.sender['firstName'] || '';
+      db.users[uid]['last_name'] = msg.sender['lastName'] || '';
+      db.users[uid]['username'] = msg.sender['username'] || '';
+      db.users[uid]['is_bot'] = msg.sender['isBot'] || false;
+    } else {
+      db.usersSnap.child(uid).ref.set({
+        first_name: msg.sender['firstName'] || '',
+        last_name: msg.sender['lastName'] || '',
+        username: msg.sender['username'] || '',
+        is_bot: msg.sender['isBot'] || false,
+      });
+      db.users[uid] = {
+        first_name: msg.sender['firstName'] || '',
+        last_name: msg.sender['lastName'] || '',
+        username: msg.sender['username'] || '',
+        is_bot: msg.sender['isBot'] || false,
+      };
     }
   }
 }

@@ -1,10 +1,10 @@
 import { htmlToText } from 'html-to-text';
 import { AutojoinRoomsMixin, LogLevel, LogService, MatrixClient, SimpleFsStorageProvider } from 'matrix-bot-sdk';
 import { BindingsBase, Bot, Conversation, ConversationInfo, Message, User } from '..';
-import { usernameSanitize } from '../utils';
 
 export class MatrixBindings extends BindingsBase {
   client: MatrixClient;
+  joinedRooms: string[];
   constructor(bot: Bot) {
     super(bot);
   }
@@ -54,26 +54,50 @@ export class MatrixBindings extends BindingsBase {
     const date = msg.origin_server_ts;
     const reply = null;
     const senderRaw = await this.client.getUserProfile(msg.sender);
-    const sender = new User(msg.sender, senderRaw.displayname, msg.sender);
-    const conversation = new Conversation(roomId, roomId);
+    const sender = new User(this.getSafeUsername(msg.sender), senderRaw.displayname, null, msg.sender.slice(1));
+    const name = await this.client.getRoomStateEvent(roomId, 'm.room.name', '');
+    const conversation = new Conversation('-' + this.getSafeUsername(roomId), name.name);
     return new Message(id, conversation, sender, content, type, date, reply, extra);
   }
 
   async sendMessage(msg: Message): Promise<void> {
     if (msg.extra && 'format' in msg.extra && msg.extra.format == 'HTML') {
       const content = msg.content.replace(/(\r\n|\r|\n)/g, '<br>');
-      this.client.sendMessage(String(msg.conversation.id), {
+      this.client.sendMessage(this.getMatrixUsername(msg.conversation.id), {
         body: htmlToText(content, { wordwrap: false }),
         msgtype: 'm.text',
         format: 'org.matrix.custom.html',
         formatted_body: content,
       });
     } else {
-      this.client.sendMessage(String(msg.conversation.id), {
+      this.client.sendMessage(this.getMatrixUsername(msg.conversation.id), {
         msgtype: 'm.text',
         body: msg.content,
       });
     }
+  }
+
+  getSafeUsername(username: string): string {
+    if (typeof username != 'string') {
+      username = String(username);
+    }
+    if (username.startsWith('@')) {
+      username = username.slice(1);
+    }
+    username = username.replace(/\./g, '!');
+    return username;
+  }
+
+  getMatrixUsername(id: string | number): string {
+    if (typeof id != 'string') {
+      id = String(id);
+    }
+    if (id.startsWith('-')) {
+      id = id.slice(2);
+    }
+    id = '!' + id.replace(/!/g, '.');
+    console.log(id);
+    return id;
   }
 
   stop(): Promise<void> {
@@ -82,7 +106,7 @@ export class MatrixBindings extends BindingsBase {
   async getMe(): Promise<User> {
     const userId = await this.client.getUserId();
     const profile = await this.client.getUserProfile(userId);
-    return new User(usernameSanitize(userId), profile.displayname, null, usernameSanitize(userId), false);
+    return new User(this.getSafeUsername(userId), profile.displayname, null, this.getSafeUsername(userId), false);
   }
   async getMessage(chatId: string | number, messageId: string | number, ignoreReply?: boolean): Promise<Message> {
     console.debug(chatId, messageId, ignoreReply);

@@ -109,7 +109,7 @@ export class Bot {
     );
   }
 
-  messagesHandler(msg: Message): void {
+  async messagesHandler(msg: Message): Promise<void> {
     if (msg.sender instanceof User) {
       logger.info(
         `${this.getMessageIcon(msg.type)} ${this.config.icon} [${msg.conversation.id}] ${msg.conversation.title} 👤 ${
@@ -124,7 +124,7 @@ export class Bot {
       );
     }
 
-    this.onMessageReceive(msg);
+    await this.onMessageReceive(msg);
   }
 
   webhookHandler(url: string, data: any): void {
@@ -262,7 +262,7 @@ export class Bot {
     }
   }
 
-  onMessageReceive(msg: Message): void {
+  async onMessageReceive(msg: Message): Promise<void> {
     try {
       let ignoreMessage = false;
       if (msg.content == null || (msg.type != 'inline_query' && msg.date < now() - 5 * t.minute)) {
@@ -290,12 +290,12 @@ export class Bot {
           for (const i in plugin.commands) {
             const command = plugin.commands[i];
             if ('command' in command) {
-              if (this.checkTrigger(command.command, command.parameters, msg, plugin)) {
+              if (await this.checkTrigger(command.command, command.parameters, msg, plugin)) {
                 break;
               }
 
               if ('keepDefault' in command && command.keepDefault) {
-                if (this.checkTrigger(command.command, command.parameters, msg, plugin, false, true)) {
+                if (await this.checkTrigger(command.command, command.parameters, msg, plugin, false, true)) {
                   break;
                 }
               }
@@ -308,18 +308,18 @@ export class Bot {
               msg.conversation.id != +this.config.alertsConversationId &&
               msg.conversation.id != +this.config.adminConversationId
             ) {
-              if (this.checkTrigger(command.friendly, command.parameters, msg, plugin, true)) {
+              if (await this.checkTrigger(command.friendly, command.parameters, msg, plugin, true)) {
                 break;
               }
             }
 
             if ('shortcut' in command) {
-              if (this.checkTrigger(command.shortcut, command.parameters, msg, plugin)) {
+              if (await this.checkTrigger(command.shortcut, command.parameters, msg, plugin)) {
                 break;
               }
 
               if ('keepDefault' in command && command.keepDefault) {
-                if (this.checkTrigger(command.shortcut, command.parameters, msg, plugin, false, true)) {
+                if (await this.checkTrigger(command.shortcut, command.parameters, msg, plugin, false, true)) {
                   break;
                 }
               }
@@ -332,14 +332,14 @@ export class Bot {
     }
   }
 
-  checkTrigger(
+  async checkTrigger(
     command: string,
     parameters: Parameter[],
     message: Message,
     plugin: PluginBase,
     friendly = false,
     keepDefault = false,
-  ): boolean {
+  ): Promise<boolean> {
     command = command.toLowerCase();
     if (
       typeof message.content == 'string' &&
@@ -387,7 +387,7 @@ export class Bot {
     if (message.content && typeof message.content == 'string' && new RegExp(trigger, 'gim').test(message.content)) {
       message = setInput(message, trigger);
       try {
-        plugin.run(message);
+        await plugin.run(message);
       } catch (e) {
         catchException(e, this, message);
       }

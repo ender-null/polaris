@@ -49,29 +49,31 @@ export class InfoPlugin extends PluginBase {
     let showGroup = false;
     let chat, info, infoFull, userId, groupId, userTags, groupTags;
 
-    chat = await this.bot.bindings['serverRequest']('getChat', { chat_id: target }, true);
-    if (target && isInt(target) && +target > 0) {
-      info = await this.bot.bindings['serverRequest']('getUser', { user_id: target }, true);
-      infoFull = await this.bot.bindings['serverRequest']('getUserFullInfo', { user_id: target }, true);
-    } else if (target && isInt(target) && target.startsWith('-100')) {
-      info = await this.bot.bindings['serverRequest']('getSupergroup', { supergroup_id: target.slice(4) }, true);
-      infoFull = await this.bot.bindings['serverRequest'](
-        'getSupergroupFullInfo',
-        { supergroup_id: target.slice(4) },
-        true,
-      );
+    if (this.bot.config.bindings == 'TelegramTDlibBindings') {
+      chat = await this.bot.bindings['serverRequest']('getChat', { chat_id: target }, true);
+      if (target && isInt(target) && !String(target).startsWith('-')) {
+        info = await this.bot.bindings['serverRequest']('getUser', { user_id: target }, true);
+        infoFull = await this.bot.bindings['serverRequest']('getUserFullInfo', { user_id: target }, true);
+      } else if (target && isInt(target) && target.startsWith('-100')) {
+        info = await this.bot.bindings['serverRequest']('getSupergroup', { supergroup_id: target.slice(4) }, true);
+        infoFull = await this.bot.bindings['serverRequest'](
+          'getSupergroupFullInfo',
+          { supergroup_id: target.slice(4) },
+          true,
+        );
+      }
     }
 
-    logger.info(`target: ${target}`);
-    logger.info(`chat: ${JSON.stringify(chat)}`);
-    logger.info(`info: ${JSON.stringify(info)}`);
-    logger.info(`infoFull: ${JSON.stringify(infoFull)}`);
-    if (!target || (target && (!isInt(target) || !(db.users[target] || db.groups[target] || info || chat)))) {
+    // logger.info(`target: ${target}`);
+    // logger.info(`chat: ${JSON.stringify(chat)}`);
+    // logger.info(`info: ${JSON.stringify(info)}`);
+    // logger.info(`infoFull: ${JSON.stringify(infoFull)}`);
+    if (!target || (target && !(db.users[target] || db.groups[target] || !isInt(target) || info || chat))) {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);
     }
 
     if (target) {
-      if (+target > 0) {
+      if (!String(target).startsWith('-')) {
         userId = target;
         if (db.users[target]) {
           const props = ['first_name', 'last_name', 'username', 'description', 'is_bot', 'is_scam'];
@@ -116,7 +118,7 @@ export class InfoPlugin extends PluginBase {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);
     }
 
-    if (+gid < 0 && !input) {
+    if (String(target).startsWith('-') && !input) {
       showGroup = true;
       target = gid;
       groupId = gid;
@@ -143,7 +145,7 @@ export class InfoPlugin extends PluginBase {
         }
       }
 
-      if (target == gid) {
+      if (target == gid && this.bot.config.bindings == 'TelegramTDlibBindings') {
         chat = await this.bot.bindings['serverRequest']('getChat', { chat_id: target }, true);
         info = await this.bot.bindings['serverRequest']('getSupergroup', { supergroup_id: target.slice(4) }, true);
         infoFull = await this.bot.bindings['serverRequest'](
@@ -211,10 +213,10 @@ export class InfoPlugin extends PluginBase {
       }
       text = `👤 ${name}\n🆔 ${userId}`;
       if (user.is_scam) {
-        text += `\n⚠️ ${this.strings['reported']}`;
+        text += `\n⚠️ ${this.strings.reported}`;
       }
       if (user.is_bot) {
-        text += `\n🤖 ${this.strings['bot']}`;
+        text += `\n🤖 ${this.strings.bot}`;
       }
       if (userTags && userTags.length > 0) {
         text += `\n🏷 ${userTags}`;
@@ -256,10 +258,10 @@ export class InfoPlugin extends PluginBase {
         text += `\n🏷 ${groupTags}`;
       }
       if (group.is_channel) {
-        text += `\n📢 ${this.strings['channel']}`;
+        text += `\n📢 ${this.strings.channel}`;
       }
       if (group.is_scam) {
-        text += `\n⚠️ ${this.strings['reported']}`;
+        text += `\n⚠️ ${this.strings.reported}`;
       }
       if (group.restriction_reason && group.restriction_reason.length > 0) {
         text += `\n🚫 <i>${group.restriction_reason}</i>`;
