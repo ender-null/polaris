@@ -186,19 +186,19 @@ export class MediaForwarderPlugin extends PluginBase {
     const gid = String(msg.conversation.id);
 
     if (msg.sender['isBot']) {
-      logger.info(`ignoring bot: ${msg.sender['firstName']} [${msg.sender.id}]`);
+      logger.debug(`ignoring bot: ${msg.sender['firstName']} [${msg.sender.id}]`);
       return;
     }
     if (msg.sender.id == 777000) {
-      logger.info(`ignoring anonymous message: ${msg.sender['firstName']} [${msg.sender.id}]`);
+      logger.debug(`ignoring anonymous message: ${msg.sender['firstName']} [${msg.sender.id}]`);
       return;
     }
     if (hasTag(this.bot, msg.sender.id, 'muted')) {
-      logger.info(`ignoring muted user: ${msg.sender['firstName']} [${msg.sender.id}]`);
+      logger.debug(`ignoring muted user: ${msg.sender['firstName']} [${msg.sender.id}]`);
       return;
     }
     if (msg.extra.replyMarkup) {
-      logger.info(`ignoring reply markup: ${msg.sender['firstName']} [${msg.sender.id}]`);
+      logger.debug(`ignoring reply markup: ${msg.sender['firstName']} [${msg.sender.id}]`);
       return;
     }
     if (msg.extra.viaBotUserId) {
@@ -207,7 +207,7 @@ export class MediaForwarderPlugin extends PluginBase {
       if (db.users[uid]) {
         name = db.users[uid].first_name;
       }
-      logger.info(`ignoring message via bot: ${name} [${uid}]`);
+      logger.debug(`ignoring message via bot: ${name} [${uid}]`);
       return;
     }
 
@@ -221,12 +221,12 @@ export class MediaForwarderPlugin extends PluginBase {
               break;
             } else if (String(msg.extra.fromChatId) != '0') {
               if (hasTag(this.bot, cid, 'resend:?') || hasTag(this.bot, cid, 'fwd:?')) {
-                logger.info('forward');
+                logger.debug('forward');
                 forward = true;
               }
             }
           }
-          logger.info(`tag: ${tag}, forward: ${forward}`);
+          logger.debug(`tag: ${tag}, forward: ${forward}`);
         }
         if (tag.startsWith('resend:') && !forward) {
           const cid = tag.split(':')[1];
@@ -245,7 +245,7 @@ export class MediaForwarderPlugin extends PluginBase {
               for (let url of r.extra.urls) {
                 const inputMatch = telegramLinkRegExp.exec(url);
                 if (inputMatch && inputMatch.length > 0) {
-                  logger.info(`ignoring telegram url: ${url}`);
+                  logger.debug(`ignoring telegram url: ${url}`);
                 } else {
                   if (url.indexOf('instagram') > -1) {
                     url = url.split('?')[0];
@@ -257,7 +257,7 @@ export class MediaForwarderPlugin extends PluginBase {
               this.bot.replyMessage(r, msg.content, msg.type, null, { preview: true });
             }
           } else if (msg.type != 'text') {
-            logger.info(`invalid type: ${msg.type}`);
+            logger.debug(`invalid type: ${msg.type}`);
           }
         } else if (tag.startsWith('fwd:') || forward) {
           const cid = tag.split(':')[1];
@@ -289,7 +289,7 @@ export class MediaForwarderPlugin extends PluginBase {
             for (let url of msg.extra.urls) {
               const inputMatch = telegramLinkRegExp.exec(url);
               if (inputMatch && inputMatch.length > 0) {
-                logger.info(`ignoring telegram url: ${url}`);
+                logger.debug(`ignoring telegram url: ${url}`);
               } else {
                 if (url.indexOf('instagram') > -1) {
                   url = url.split('?')[0];

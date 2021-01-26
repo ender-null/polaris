@@ -6,7 +6,7 @@ import { catchException, logger } from './utils';
 
 const bots: Bot[] = [];
 
-export async function stop(): Promise<void> {
+export async function stop(exit?: boolean): Promise<void> {
   let pending = bots.length;
   logger.info(`🟡 Stopping ${pending} bots...`);
   for (const bot of bots) {
@@ -17,7 +17,7 @@ export async function stop(): Promise<void> {
     }
 
     pending -= 1;
-    if (pending == 0) {
+    if (pending == 0 && exit) {
       logger.info('✅ Closed all bots, exiting process');
       process.exit();
     } else {
@@ -28,9 +28,7 @@ export async function stop(): Promise<void> {
 
 export async function start(): Promise<void> {
   if (Array.isArray(bots) && bots.length > 0) {
-    for (const bot of bots) {
-      await bot.stop();
-    }
+    this.stop();
   }
   const config = Config.loadFromFile('config.json');
   const configs = [];
@@ -55,8 +53,8 @@ export async function start(): Promise<void> {
   logger.info(`✅ Started ${configs.length} bots`);
 }
 
-process.once('SIGINT', () => stop());
-process.once('SIGTERM', () => stop());
+process.once('SIGINT', () => stop(true));
+process.once('SIGTERM', () => stop(true));
 
 http
   .createServer((req: http.IncomingMessage, res: http.ServerResponse) => {

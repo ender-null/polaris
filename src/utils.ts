@@ -345,7 +345,7 @@ export function getFullName(uid: number | string, includeUsername = true): strin
   } else {
     name = '[not found]';
   }
-  return escapeMarkdown(name);
+  return name;
 }
 
 export function fixTelegramLink(link: string): string {

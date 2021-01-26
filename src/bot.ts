@@ -144,17 +144,17 @@ export class Bot {
     } else if (type == 'photo') {
       return '🖼️';
     } else if (type == 'voice') {
-      return '🔊';
-    } else if (type == 'audio') {
       return '🎵';
+    } else if (type == 'audio') {
+      return '🎶';
     } else if (type == 'video') {
       return '🎥';
     } else if (type == 'animation') {
       return '🎬';
     } else if (type == 'document') {
-      return '📎';
+      return '📦';
     } else if (type == 'sticker') {
-      return '🩹';
+      return '🎭';
     } else if (type == 'unsupported') {
       return '🚫';
     }
