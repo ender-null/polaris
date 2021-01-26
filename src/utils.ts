@@ -19,7 +19,7 @@ export function getPluginSlug(plugin: PluginBase): string {
 }
 
 export function isOwner(bot: Bot, uid: number | string, msg: Message = null): boolean {
-  return hasTag(bot, uid, 'owner') || msg.sender.id == bot.config.owner;
+  return hasTag(bot, uid, 'owner') || (msg && msg.sender.id == bot.config.owner);
 }
 
 export async function isAdmin(bot: Bot, uid: number | string, msg: Message = null): Promise<boolean> {

@@ -83,7 +83,7 @@ export class CorePlugin extends PluginBase {
   }
 
   async run(msg: Message): Promise<void> {
-    if (!isOwner(this.bot, msg.sender.id) && !isTrusted(this.bot, msg.sender.id)) {
+    if (!isOwner(this.bot, msg.sender.id, msg) && !isTrusted(this.bot, msg.sender.id, msg)) {
       return this.bot.replyMessage(msg, this.bot.errors.permissionRequired);
     }
     const input = getInput(msg);
