@@ -147,7 +147,7 @@ export class MatrixBindings extends BindingsBase {
   async getMe(): Promise<User> {
     const userId = await this.client.getUserId();
     const profile = await this.client.getUserProfile(userId);
-    return new User(this.getSafeUsername(userId), profile.displayname, null, this.getSafeUsername(userId), false);
+    return new User(this.getSafeUsername(userId), profile.displayname, null, userId.slice(1), false);
   }
   async getMessage(chatId: string | number, messageId: string | number, ignoreReply?: boolean): Promise<Message> {
     console.debug(chatId, messageId, ignoreReply);

@@ -8,7 +8,7 @@ const bots: Bot[] = [];
 
 export async function stop(exit?: boolean): Promise<void> {
   let pending = bots.length;
-  logger.info(`🟡 Stopping ${pending} bots...`);
+  logger.info(`🟡 Stopping ${pending} bot(s)...`);
   for (const bot of bots) {
     try {
       await bot.stop();
@@ -19,14 +19,14 @@ export async function stop(exit?: boolean): Promise<void> {
     pending -= 1;
     if (pending == 0) {
       if (exit) {
-        logger.info('✅ Closed all bots, exiting process');
+        logger.info('✅ Closed all bot(s), exiting process');
         process.exit();
       } else {
-        logger.info('✅ Closed all bots');
+        logger.info('✅ Closed all bot(s)');
         process.exit();
       }
     } else {
-      logger.info(`⏳ Pending ${pending} bots...`);
+      logger.info(`⏳ Pending ${pending} bot(s)...`);
     }
   }
 }
@@ -55,7 +55,7 @@ export async function start(): Promise<void> {
       bots.push(bot);
     }
   }
-  logger.info(`✅ Started ${configs.length} bots`);
+  logger.info(`✅ Started ${configs.length} bot(s)`);
 }
 
 process.once('SIGINT', () => stop(true));

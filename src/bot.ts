@@ -156,7 +156,7 @@ export class Bot {
     } else if (type == 'sticker') {
       return '🎭';
     } else if (type == 'unsupported') {
-      return '🚫';
+      return '⚠️';
     }
     return type;
   }

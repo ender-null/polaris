@@ -878,7 +878,7 @@ export const logger = createLogger({
       format: winstonFormat.combine(
         winstonFormat.colorize(),
         winstonFormat.timestamp({
-          format: 'Do HH:mm:ss',
+          format: 'HH:mm:ss',
         }),
         loggerFormat,
       ),
