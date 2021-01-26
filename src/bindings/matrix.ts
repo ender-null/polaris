@@ -25,7 +25,7 @@ export class MatrixBindings extends BindingsBase {
       storage,
     );
     AutojoinRoomsMixin.setupOnClient(this.client);
-    this.client.on('room.event', (roomId: string, event) => this.eventHandler(roomId, event));
+    this.client.on('room.message', (roomId: string, event) => this.eventHandler(roomId, event));
     this.bot.outbox.on('message', (msg: Message) => this.sendMessage(msg));
     this.client.start().then(() => this.bot.status.emit('started'));
   }
@@ -139,8 +139,10 @@ export class MatrixBindings extends BindingsBase {
     return 'm.notice';
   }
 
-  stop(): Promise<void> {
-    return null;
+  async stop(): Promise<void> {
+    this.client.removeAllListeners('room.message');
+    this.bot.outbox.removeAllListeners('message');
+    this.bot.status.emit('stopped');
   }
   async getMe(): Promise<User> {
     const userId = await this.client.getUserId();
