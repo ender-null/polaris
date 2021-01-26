@@ -61,11 +61,12 @@ export class MatrixBindings extends BindingsBase {
 
   async sendMessage(msg: Message): Promise<void> {
     if (msg.extra && 'format' in msg.extra && msg.extra.format == 'HTML') {
+      const content = msg.content.replace(/(\r\n|\r|\n)/g, '<br>');
       this.client.sendMessage(String(msg.conversation.id), {
-        body: htmlToText(msg.content, { wordwrap: false }),
+        body: htmlToText(content, { wordwrap: false }),
         msgtype: 'm.text',
         format: 'org.matrix.custom.html',
-        formatted_body: msg.content,
+        formatted_body: content,
       });
     } else {
       this.client.sendMessage(String(msg.conversation.id), {
