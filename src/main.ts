@@ -33,7 +33,7 @@ export async function stop(exit?: boolean): Promise<void> {
 
 export async function start(): Promise<void> {
   if (Array.isArray(bots) && bots.length > 0) {
-    this.stop();
+    stop();
   }
   const config = Config.loadFromFile('config.json');
   const configs = [];
@@ -45,8 +45,7 @@ export async function start(): Promise<void> {
     }
   }
 
-  let started = configs.length;
-
+  let started = 0;
   for (const config of configs) {
     if (config.enabled) {
       const bot = new Bot(config);
@@ -54,10 +53,10 @@ export async function start(): Promise<void> {
         catchException(exception, bot);
       });
       await bot.start();
-      started -= 1;
+      started += 1;
       bots.push(bot);
     } else {
-      logger.info(`❎ ${config.name} [${config.bindings}] is disabled`);
+      logger.info(`🔴 Bot is disabled: ${config.name} [${config.bindings}]`);
     }
   }
   logger.info(`✅ Started ${started}/${configs.length} bot(s)`);
