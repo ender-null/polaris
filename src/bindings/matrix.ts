@@ -88,13 +88,13 @@ export class MatrixBindings extends BindingsBase {
         content = content.replace(/(\t)/g, ' ');
         data = {
           body: htmlToText(content, { wordwrap: false }),
-          msgtype: 'm.notice',
+          msgtype: 'm.text',
           format: 'org.matrix.custom.html',
           formatted_body: content,
         };
       } else {
         data = {
-          msgtype: 'm.notice',
+          msgtype: 'm.text',
           body: content,
         };
       }

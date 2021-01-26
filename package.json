@@ -21,7 +21,8 @@
     "typedoc": "typedoc",
     "build": "tsc -p tsconfig.release.json",
     "build:watch": "tsc -w -p tsconfig.release.json",
-    "start": "node build/src/main.js",
+    "start": "NODE_OPTIONS=\"--max_old_space_size=4096\" node build/src/main.js",
+    "start:dev": "node build/src/main.js",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write src"

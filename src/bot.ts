@@ -269,7 +269,7 @@ export class Bot {
         return;
       }
 
-      if (msg.type != 'text') {
+      if (msg.type != 'text' || msg.sender['isBot']) {
         ignoreMessage = true;
       }
 
