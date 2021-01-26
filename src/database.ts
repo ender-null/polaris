@@ -61,7 +61,7 @@ export class Database {
             ready.push(table);
           }
           if (ready.length == tables.length) {
-            logger.info('✅ Initial load complete');
+            logger.info('✅ Loaded database');
             this.events.emit('loaded');
             loaded = true;
           }

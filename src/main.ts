@@ -17,9 +17,14 @@ export async function stop(exit?: boolean): Promise<void> {
     }
 
     pending -= 1;
-    if (pending == 0 && exit) {
-      logger.info('✅ Closed all bots, exiting process');
-      process.exit();
+    if (pending == 0) {
+      if (exit) {
+        logger.info('✅ Closed all bots, exiting process');
+        process.exit();
+      } else {
+        logger.info('✅ Closed all bots');
+        process.exit();
+      }
     } else {
       logger.info(`⏳ Pending ${pending} bots...`);
     }
@@ -41,14 +46,14 @@ export async function start(): Promise<void> {
   }
 
   for (const config of configs) {
-    const bot = new Bot(config);
     if (config.enabled) {
+      const bot = new Bot(config);
       process.on('unhandledRejection', (exception: Error) => {
         catchException(exception, bot);
       });
       await bot.start();
+      bots.push(bot);
     }
-    bots.push(bot);
   }
   logger.info(`✅ Started ${configs.length} bots`);
 }
