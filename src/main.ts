@@ -1,4 +1,4 @@
-import http from 'http';
+import http, { Agent } from 'http';
 import { Bot, Config, Database } from '.';
 import { catchException, logger } from './utils';
 
@@ -37,6 +37,11 @@ export async function start(): Promise<void> {
     const configs = Config.loadInstancesFromJSON(db.configs[key]);
     for (const config of configs) {
       const bot = new Bot(config);
+      const agent = new Agent({
+        keepAlive: true,
+        maxSockets: 32,
+      });
+      bot.setHttpAgent(agent);
       if (config.enabled) {
         process.on('unhandledRejection', (exception: Error) => {
           catchException(exception, bot);

@@ -55,6 +55,7 @@ export class Bot {
     this.errors = new Errors();
     this.agent = new Agent({
       keepAlive: true,
+      maxSockets: 32,
     });
   }
 
@@ -404,6 +405,10 @@ export class Bot {
 
   async getChatAdmins(conversationId: string | number): Promise<User[]> {
     return await this.bindings.getChatAdministrators(conversationId);
+  }
+
+  setHttpAgent(agent: Agent) {
+    this.agent = agent;
   }
 
   sendMessage(chat: Conversation, content: string, type = 'text', reply?: Message, extra?: Extra): void {
