@@ -535,9 +535,9 @@ export async function sendRequest(
     if (!response.ok) {
       const error = response.clone();
       const json = await error.json().catch((e) => catchException(e));
-      logger.error(JSON.stringify(json));
+      logger.error(JSON.stringify(json, null, 4));
       if (bot) {
-        bot.sendAlert(JSON.stringify(json));
+        bot.sendAlert(JSON.stringify(json, null, 4));
       }
 
       // if (error.status == 429) {
@@ -641,9 +641,9 @@ export async function getCoords(input: string, bot?: Bot): Promise<CoordinatesRe
   if (res) {
     const content = await res.json();
     if (content.status != 'OK') {
-      logger.error(JSON.stringify(content));
+      logger.error(JSON.stringify(content, null, 4));
       if (bot) {
-        bot.sendAlert(JSON.stringify(content));
+        bot.sendAlert(JSON.stringify(content, null, 4));
       }
     }
     if (content && content.results.length > 0) {
@@ -821,9 +821,9 @@ export function catchException(exception: Error | error, bot: Bot = null, messag
   logger.error(`Catched exception: ${exception.message}`);
   if (bot) {
     if (exception['stack']) {
-      bot.sendAlert(JSON.stringify(replaceHtml(exception['stack'])));
+      bot.sendAlert(JSON.stringify(replaceHtml(exception['stack']), null, 4));
     } else if (exception['_'] == 'error') {
-      bot.sendAlert(JSON.stringify(exception));
+      bot.sendAlert(JSON.stringify(exception, null, 4));
     } else {
       bot.sendAlert(exception.message);
     }

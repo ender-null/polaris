@@ -128,7 +128,7 @@ export class Bot {
   }
 
   webhookHandler(url: string, data: any): void {
-    logger.info(`🌐 ${this.config.icon} [webhook:${url}] ${data}`);
+    logger.info(`🌐 ${this.config.icon} [webhook:${url}] ${JSON.stringify(data, null, 4)}`);
     const path = url.split('/');
     for (const i in this.plugins) {
       const plugin = this.plugins[i];
