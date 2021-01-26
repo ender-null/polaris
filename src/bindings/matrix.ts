@@ -61,19 +61,44 @@ export class MatrixBindings extends BindingsBase {
   }
 
   async sendMessage(msg: Message): Promise<void> {
-    if (msg.extra && 'format' in msg.extra && msg.extra.format == 'HTML') {
-      const content = msg.content.replace(/(\r\n|\r|\n)/g, '<br>');
+    let data = {};
+    let content = msg.content;
+    let url;
+
+    if (msg.type != 'text') {
+      content = null;
+      if (msg.extra && msg.extra.caption) {
+        content = msg.extra.caption;
+      }
+      if (msg.content.startsWith('http')) {
+        url = await this.client.uploadContentFromUrl(msg.content);
+      } else if (msg.content.startsWith('/') || msg.content.startsWith('C:\\')) {
+        url = await this.client.uploadContent(Buffer.from(msg.content));
+      }
       this.client.sendMessage(this.getMatrixUsername(msg.conversation.id), {
-        body: htmlToText(content, { wordwrap: false }),
-        msgtype: 'm.text',
-        format: 'org.matrix.custom.html',
-        formatted_body: content,
+        msgtype: this.getMessageType(msg.type),
+        url: url,
+        body: '',
       });
-    } else {
-      this.client.sendMessage(this.getMatrixUsername(msg.conversation.id), {
-        msgtype: 'm.text',
-        body: msg.content,
-      });
+    }
+
+    if (content) {
+      if (msg.extra && 'format' in msg.extra && msg.extra.format == 'HTML') {
+        content = content.replace(/(\r\n|\r|\n)/g, '<br>');
+        content = content.replace(/(\t)/g, ' ');
+        data = {
+          body: htmlToText(content, { wordwrap: false }),
+          msgtype: 'm.notice',
+          format: 'org.matrix.custom.html',
+          formatted_body: content,
+        };
+      } else {
+        data = {
+          msgtype: 'm.notice',
+          body: content,
+        };
+      }
+      this.client.sendMessage(this.getMatrixUsername(msg.conversation.id), data);
     }
   }
 
@@ -96,8 +121,22 @@ export class MatrixBindings extends BindingsBase {
       id = id.slice(2);
     }
     id = '!' + id.replace(/!/g, '.');
-    console.log(id);
     return id;
+  }
+
+  getMessageType(type: string): string {
+    if (type == 'photo') {
+      return 'm.image';
+    } else if (type == 'document') {
+      return 'm.file';
+    } else if (type == 'audio') {
+      return 'm.audio';
+    } else if (type == 'video') {
+      return 'm.video';
+    } else if (type == 'location') {
+      return 'm.location';
+    }
+    return 'm.notice';
   }
 
   stop(): Promise<void> {
