@@ -1,5 +1,4 @@
 import { EventEmitter } from 'events';
-import { Agent } from 'https';
 import * as cron from 'node-cron';
 import os from 'os';
 import {
@@ -42,7 +41,6 @@ export class Bot {
   tasks: cron.Task[];
   user: User;
   errors: ErrorMessages;
-  agent: Agent;
 
   constructor(config: Config) {
     this.inbox = new EventEmitter();
@@ -401,10 +399,6 @@ export class Bot {
 
   async getChatAdmins(conversationId: string | number): Promise<User[]> {
     return await this.bindings.getChatAdministrators(conversationId);
-  }
-
-  setHttpAgent(agent: Agent) {
-    this.agent = agent;
   }
 
   sendMessage(chat: Conversation, content: string, type = 'text', reply?: Message, extra?: Extra): void {

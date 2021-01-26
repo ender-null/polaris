@@ -818,7 +818,7 @@ export class TelegramTDlibBindings extends BindingsBase {
   async changeConversationPhoto(conversationId: string | number, photo: string): Promise<boolean> {
     return await this.serverRequest('setChatPhoto', {
       chat_id: conversationId,
-      photo: photo,
+      photo: this.getInputFile(photo),
     });
   }
 
