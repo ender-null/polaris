@@ -819,7 +819,7 @@ export class TelegramTDlibBindings extends BindingsBase {
     return await this.serverRequest('setChatPhoto', {
       chat_id: conversationId,
       photo: {
-        _: 'InputChatPhoto',
+        _: 'inputChatPhotoStatic',
         photo: this.getInputFile(photo),
       },
     });

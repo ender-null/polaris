@@ -146,7 +146,12 @@ export class TelegramPlugin extends PluginBase {
     } else if (isCommand(this, 4, msg.content)) {
       if (this.checkPermissions(msg)) {
         if (msg.reply && msg.reply.type == 'photo') {
-          ok = await this.bot.bindings.changeConversationPhoto(msg.conversation.id, msg.reply.content);
+          const photo = await this.bot.bindings.getFile(msg.reply.content);
+          if (photo) {
+            ok = await this.bot.bindings.changeConversationPhoto(msg.conversation.id, photo);
+          } else {
+            ok = await this.bot.bindings.changeConversationPhoto(msg.conversation.id, msg.reply.content);
+          }
         }
       }
     } else if (isCommand(this, 5, msg.content)) {

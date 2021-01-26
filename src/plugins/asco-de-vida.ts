@@ -8,8 +8,9 @@ export class AscoDeVidaPlugin extends PluginBase {
     super(bot);
     this.commands = [
       {
-        command: '/adv',
+        command: '/ascodevida',
         description: 'Random story from Asco de Vida',
+        shortcut: '/adv',
         skipHelp: true,
       },
     ];
