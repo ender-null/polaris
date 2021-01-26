@@ -56,7 +56,7 @@ export async function start(): Promise<void> {
       started += 1;
       bots.push(bot);
     } else {
-      logger.info(`🔴 Bot is disabled: ${config.name} [${config.bindings}]`);
+      logger.info(`🔴 Bot is disabled: ${config.icon} ${config.name} [${config.bindings}]`);
     }
   }
   logger.info(`✅ Started ${started}/${configs.length} bot(s)`);
