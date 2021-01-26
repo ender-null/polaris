@@ -18,34 +18,41 @@ export async function stop(): Promise<void> {
 
     pending -= 1;
     if (pending == 0) {
-      logger.info(`✅ Closed all bots, exiting process. PID: ${process.pid}`);
+      logger.info('✅ Closed all bots, exiting process');
       process.exit();
     } else {
-      logger.info(`🕓 Pending ${pending} bots...`);
+      logger.info(`⏳ Pending ${pending} bots...`);
     }
   }
 }
 
 export async function start(): Promise<void> {
-  logger.info('✅ Configurations updated');
   if (Array.isArray(bots) && bots.length > 0) {
     for (const bot of bots) {
       await bot.stop();
     }
   }
-  for (const key of Object.keys(db.configs)) {
-    const configs = Config.loadInstancesFromJSON(db.configs[key]);
-    for (const config of configs) {
-      const bot = new Bot(config);
-      if (config.enabled) {
-        process.on('unhandledRejection', (exception: Error) => {
-          catchException(exception, bot);
-        });
-        await bot.start();
-      }
-      bots.push(bot);
+  const config = Config.loadFromFile('config.json');
+  const configs = [];
+  if (config) {
+    configs.push(config);
+  } else {
+    for (const key of Object.keys(db.configs)) {
+      configs.push(...Config.loadInstancesFromJSON(db.configs[key]));
     }
   }
+
+  for (const config of configs) {
+    const bot = new Bot(config);
+    if (config.enabled) {
+      process.on('unhandledRejection', (exception: Error) => {
+        catchException(exception, bot);
+      });
+      await bot.start();
+    }
+    bots.push(bot);
+  }
+  logger.info(`✅ Started ${configs.length} bots`);
 }
 
 process.once('SIGINT', () => stop());

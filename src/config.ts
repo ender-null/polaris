@@ -41,9 +41,13 @@ export class Config {
   }
 
   static loadFromFile(path: string): Config {
-    const file = readFileSync(path, 'utf-8');
-    const config: Config = { ...JSON.parse(file) };
-    return config;
+    try {
+      const file = readFileSync(path, 'utf-8');
+      const config: Config = { ...JSON.parse(file) };
+      return config;
+    } catch (error) {
+      return null;
+    }
   }
 
   static loadInstancesFromJSON(config: Config): Config[] {
