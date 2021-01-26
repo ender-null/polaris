@@ -1,5 +1,5 @@
 import { EventEmitter } from 'events';
-import { Agent } from 'http';
+import { Agent } from 'https';
 import * as cron from 'node-cron';
 import os from 'os';
 import {

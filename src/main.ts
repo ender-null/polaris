@@ -1,4 +1,5 @@
-import http, { Agent } from 'http';
+import http from 'http';
+import { Agent } from 'https';
 import { Bot, Config, Database } from '.';
 import { catchException, logger } from './utils';
 
