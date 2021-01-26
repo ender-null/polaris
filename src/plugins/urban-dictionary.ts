@@ -25,7 +25,7 @@ export class UrbanDictionaryPlugin extends PluginBase {
       return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
     }
     const term = input.toLowerCase();
-    const url = 'http://api.urbandictionary.com/v0/define';
+    const url = 'https://api.urbandictionary.com/v0/define';
     const params = {
       term: term,
     };

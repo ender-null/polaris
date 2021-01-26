@@ -53,10 +53,6 @@ export class Bot {
     this.plugins = [];
     this.tasks = [];
     this.errors = new Errors();
-    this.agent = new Agent({
-      keepAlive: true,
-      maxSockets: 32,
-    });
   }
 
   async start(): Promise<void> {

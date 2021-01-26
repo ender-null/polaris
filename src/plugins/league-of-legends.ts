@@ -166,7 +166,7 @@ export class LeagueOfLegendsPlugin extends PluginBase {
       let iconUrl = null;
       if (this.latestVersion) {
         iconUrl = format(
-          'http://ddragon.leagueoflegends.com/cdn/{0}/img/profileicon/{1}.png',
+          'https://ddragon.leagueoflegends.com/cdn/{0}/img/profileicon/{1}.png',
           this.latestVersion,
           summoner['profileIconId'],
         );
@@ -285,7 +285,7 @@ export class LeagueOfLegendsPlugin extends PluginBase {
       this.latestVersion = await this.ddragonVersions();
     }
     const data = await sendRequest(
-      `http://ddragon.leagueoflegends.com/cdn/${this.latestVersion}/data/${this.bot.config.locale}/champion.json`,
+      `https://ddragon.leagueoflegends.com/cdn/${this.latestVersion}/data/${this.bot.config.locale}/champion.json`,
     );
     if (data) {
       const champions = await data.json();

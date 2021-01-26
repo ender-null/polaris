@@ -53,7 +53,7 @@ export class LastFMPlugin extends PluginBase {
         }
       }
       let text = '';
-      const url = 'http://ws.audioscrobbler.com/2.0/';
+      const url = 'https://ws.audioscrobbler.com/2.0/';
       const params = {
         method: 'user.getrecenttracks',
         format: 'json',

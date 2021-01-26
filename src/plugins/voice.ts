@@ -37,7 +37,7 @@ export class VoicePlugin extends PluginBase {
       key: this.bot.config.apiKeys.googleDeveloperConsole,
     };
     const headers = {
-      Referer: 'http://translate.google.com/',
+      Referer: 'https://translate.google.com/',
       'User-Agent':
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.8 Safari/537.36',
     };

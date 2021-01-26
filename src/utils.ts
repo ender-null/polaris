@@ -525,8 +525,10 @@ export async function sendRequest(
     body: data,
     headers: headers,
     timeout: 5 * t.minute * 1000,
-    agent: bot ? bot.agent : null,
   };
+  if (bot && bot.agent) {
+    options.agent = bot.agent;
+  }
   const controller = new AbortController();
   const timeout = setTimeout(() => {
     controller.abort();

@@ -36,7 +36,7 @@ export async function start(): Promise<void> {
   }
   const agent = new Agent({
     keepAlive: true,
-    maxSockets: 32 * bots.length,
+    maxSockets: 100,
   });
   for (const key of Object.keys(db.configs)) {
     const configs = Config.loadInstancesFromJSON(db.configs[key]);
