@@ -45,6 +45,8 @@ export async function start(): Promise<void> {
     }
   }
 
+  let started = configs.length;
+
   for (const config of configs) {
     if (config.enabled) {
       const bot = new Bot(config);
@@ -52,10 +54,13 @@ export async function start(): Promise<void> {
         catchException(exception, bot);
       });
       await bot.start();
+      started -= 1;
       bots.push(bot);
+    } else {
+      logger.info(`❎ ${config.name} is disabled`);
     }
   }
-  logger.info(`✅ Started ${configs.length} bot(s)`);
+  logger.info(`✅ Started ${started}/${configs.length} bot(s)`);
 }
 
 process.once('SIGINT', () => stop(true));
