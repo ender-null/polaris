@@ -67,7 +67,7 @@ http
     req.on('data', (data: string) => {
       for (const bot of bots) {
         if (bot.config.name == path[1]) {
-          bot.inbox.emit('webhook', req.url, data);
+          bot.inbox.emit('webhook', req.url, JSON.stringify(JSON.parse(data), null, 4));
         }
       }
     });
