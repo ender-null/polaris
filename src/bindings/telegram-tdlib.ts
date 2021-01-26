@@ -16,13 +16,13 @@ export class TelegramTDlibBindings extends BindingsBase {
     this.client = new Client(new TDLib(), {
       apiId: this.bot.config.apiKeys.telegramAppId,
       apiHash: this.bot.config.apiKeys.telegramApiHash,
-      databaseDirectory: `${process.cwd()}/.tdlib_files/${this.bot.config.name}/database`,
+      databaseDirectory: `${process.cwd()}/data/${this.bot.config.name}/database`,
       databaseEncryptionKey: this.bot.config.apiKeys.databaseEncryptionKey,
-      filesDirectory: `${process.cwd()}/.tdlib_files/${this.bot.config.name}/files`,
+      filesDirectory: `${process.cwd()}/data/${this.bot.config.name}/files`,
+      skipOldUpdates: true,
       verbosityLevel: 1,
       tdlibParameters: {
-        application_version: 'latest',
-        device_model: 'polaris',
+        application_version: 'polaris:latest',
       },
     });
     this.pendingMessages = [];

@@ -194,6 +194,19 @@ export class TelegramPlugin extends PluginBase {
           });
         }
       }
+    } else if (isCommand(this, 11, msg.content)) {
+      if (this.checkPermissions(msg)) {
+        if (msg.reply) {
+          ok = true;
+          this.bot.replyMessage(msg, 'unpinChatMessage', 'native', null, {
+            messageId: msg.reply.id,
+          });
+        }
+      }
+    } else if (isCommand(this, 12, msg.content)) {
+      if (this.checkPermissions(msg)) {
+        ok = await this.bot.bindings.leaveConversation(msg.conversation.id);
+      }
     }
 
     if (!ok) {
