@@ -132,6 +132,13 @@ export class Bot {
 
   webhookHandler(url: string, data: any): void {
     logger.info(`☁️ ${this.config.icon} [webhook:${url}] ${data}`);
+    let dataObject;
+    try {
+      dataObject = JSON.parse(data);
+    } catch (e) {
+      dataObject = null;
+      logger.error(e.message);
+    }
     const path = url.split('/');
     if (path[2] == 'webhook') {
       logger.info('TODO send webhook to bindings');
@@ -139,7 +146,7 @@ export class Bot {
       for (const i in this.plugins) {
         const plugin = this.plugins[i];
         if (getPluginSlug(plugin) == path[2] && 'webhook' in plugin) {
-          plugin.webhook(url, data);
+          plugin.webhook(url, dataObject);
         }
       }
     }

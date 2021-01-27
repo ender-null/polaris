@@ -8,23 +8,17 @@ export class GitHubPlugin extends PluginBase {
     super(bot);
   }
 
-  async webhook(url: string, data: string): Promise<void> {
+  async webhook(url: string, data: any): Promise<void> {
     logger.debug(`github plugin: ${url}`);
-    let cb;
-    try {
-      cb = JSON.parse(data);
-    } catch (e) {
-      logger.error(e.message);
-    }
 
-    if (cb && cb.head_commit) {
-      const text = `<a href="${cb.compare}">${cb.commits.length} new commit</a> to <b>${
-        cb.repository.name
-      }:${cb.ref.replace('refs/heads/', '')}</b>\n\n<a href="${cb.head_commit.url}">${cb.head_commit.id.slice(
+    if (data && data.head_commit) {
+      const text = `<a href="${data.compare}">${data.commits.length} new commit</a> to <b>${
+        data.repository.name
+      }:${data.ref.replace('refs/heads/', '')}</b>\n\n<a href="${data.head_commit.url}">${data.head_commit.id.slice(
         0,
         7,
-      )}</a>: <i>${cb.head_commit.message}</i> by ${cb.repository.owner.name}`;
-      const subs = getTaggedWith(this.bot, `sub:github/${cb.repository.name}`);
+      )}</a>: <i>${data.head_commit.message}</i> by ${data.repository.owner.name}`;
+      const subs = getTaggedWith(this.bot, `sub:github/${data.repository.name}`);
       for (const sub of subs) {
         this.bot.sendMessage(new Conversation(sub), text);
       }
