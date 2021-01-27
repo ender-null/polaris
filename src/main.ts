@@ -93,10 +93,18 @@ createServer(options, async (req: IncomingMessage, res: ServerResponse) => {
   }
 
   for (const bot of bots) {
-    if (bot.config.name == path[1]) {
+    let name = path[1];
+    let bindings = null;
+    if (name.indexOf(':') > -1) {
+      name = path[1].split(':')[0];
+      bindings = path[1].split(':')[1];
+    }
+    const slug = getBindingsSlug(bot.bindings);
+    if (bot.config.name == name) {
       found = true;
-      if (path[1].indexOf(':') > -1) {
-        if (path[1].split(':')[1] == getBindingsSlug(bot.bindings)) {
+      if (bindings) {
+        logger.info(`${path[1]} | ${name} | ${bindings} | ${slug}`);
+        if (bindings == slug) {
           await bot.webhookHandler(req, res, content);
         }
       } else {
