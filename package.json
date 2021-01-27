@@ -39,7 +39,6 @@
   "dependencies": {
     "cheerio": "^1.0.0-rc.5",
     "discord.js": "^12.5.1",
-    "fluture": "^13.0.1",
     "form-data": "^3.0.0",
     "html-to-text": "^6.0.0",
     "matrix-bot-sdk": "^0.5.13",
@@ -74,6 +73,7 @@
     "husky": "^4.3.0",
     "prettier": "^2.1.2",
     "tdlib-types": "^0.1001007.1",
+    "fluture": "^8.0.2",
     "typedoc": "^0.19.2",
     "typescript": "4.0.3"
   },
