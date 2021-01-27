@@ -264,8 +264,8 @@ export class MediaForwarderPlugin extends PluginBase {
                   if (url.indexOf('instagram') > -1) {
                     url = url.split('?')[0];
                   }
+                  this.bot.replyMessage(r, url, 'text', null, { preview: true });
                 }
-                this.bot.replyMessage(r, url, 'text', null, { preview: true });
               }
             } else {
               this.bot.replyMessage(r, msg.content, msg.type, null, { preview: true });

@@ -1,6 +1,7 @@
 import { htmlToText } from 'html-to-text';
 import { AutojoinRoomsMixin, LogLevel, LogService, MatrixClient, SimpleFsStorageProvider } from 'matrix-bot-sdk';
 import { BindingsBase, Bot, Conversation, ConversationInfo, Message, User } from '..';
+import { catchException } from '../utils';
 
 export class MatrixBindings extends BindingsBase {
   client: MatrixClient;
@@ -61,44 +62,48 @@ export class MatrixBindings extends BindingsBase {
   }
 
   async sendMessage(msg: Message): Promise<void> {
-    let data = {};
-    let content = msg.content;
-    let url;
+    try {
+      let data = {};
+      let content = msg.content;
+      let url;
 
-    if (msg.type != 'text') {
-      content = null;
-      if (msg.extra && msg.extra.caption) {
-        content = msg.extra.caption;
+      if (msg.type != 'text') {
+        content = null;
+        if (msg.extra && msg.extra.caption) {
+          content = msg.extra.caption;
+        }
+        if (msg.content.startsWith('http')) {
+          url = await this.client.uploadContentFromUrl(msg.content);
+        } else if (msg.content.startsWith('/') || msg.content.startsWith('C:\\')) {
+          url = await this.client.uploadContent(Buffer.from(msg.content));
+        }
+        this.client.sendMessage(this.getMatrixUsername(msg.conversation.id), {
+          msgtype: this.getMessageType(msg.type),
+          url: url,
+          body: '',
+        });
       }
-      if (msg.content.startsWith('http')) {
-        url = await this.client.uploadContentFromUrl(msg.content);
-      } else if (msg.content.startsWith('/') || msg.content.startsWith('C:\\')) {
-        url = await this.client.uploadContent(Buffer.from(msg.content));
-      }
-      this.client.sendMessage(this.getMatrixUsername(msg.conversation.id), {
-        msgtype: this.getMessageType(msg.type),
-        url: url,
-        body: '',
-      });
-    }
 
-    if (content) {
-      if (msg.extra && 'format' in msg.extra && msg.extra.format == 'HTML') {
-        content = content.replace(/(\r\n|\r|\n)/g, '<br>');
-        content = content.replace(/(\t)/g, ' ');
-        data = {
-          body: htmlToText(content, { wordwrap: false }),
-          msgtype: 'm.text',
-          format: 'org.matrix.custom.html',
-          formatted_body: content,
-        };
-      } else {
-        data = {
-          msgtype: 'm.text',
-          body: content,
-        };
+      if (content) {
+        if (msg.extra && 'format' in msg.extra && msg.extra.format == 'HTML') {
+          content = content.replace(/(\r\n|\r|\n)/g, '<br>');
+          content = content.replace(/(\t)/g, ' ');
+          data = {
+            body: htmlToText(content, { wordwrap: false }),
+            msgtype: 'm.text',
+            format: 'org.matrix.custom.html',
+            formatted_body: content,
+          };
+        } else {
+          data = {
+            msgtype: 'm.text',
+            body: content,
+          };
+        }
+        this.client.sendMessage(this.getMatrixUsername(msg.conversation.id), data);
       }
-      this.client.sendMessage(this.getMatrixUsername(msg.conversation.id), data);
+    } catch (e) {
+      catchException(e, this.bot);
     }
   }
 
@@ -136,7 +141,7 @@ export class MatrixBindings extends BindingsBase {
     } else if (type == 'location') {
       return 'm.location';
     }
-    return 'm.notice';
+    return 'm.text';
   }
 
   async stop(): Promise<void> {
