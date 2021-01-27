@@ -137,7 +137,9 @@ export class Bot {
       logger.error(e.message);
     }
     const path = req.url.split('/');
+    logger.info(path);
     if (path[2] == 'webhook') {
+      logger.info('running bindings webhook');
       await this.bindings.webhookHandler(req, res, dataObject);
     } else {
       for (const i in this.plugins) {
