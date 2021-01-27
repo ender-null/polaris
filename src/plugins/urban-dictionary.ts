@@ -15,7 +15,7 @@ export class UrbanDictionaryPlugin extends PluginBase {
             required: true,
           },
         ],
-        description: 'Search the Urban Dictionary',
+        description: 'Look for definitions in the Urban Dictionary',
       },
     ];
   }

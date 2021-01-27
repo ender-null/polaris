@@ -19,6 +19,7 @@ export { PharmacyPlugin } from './pharmacy';
 export { PinPlugin } from './pin';
 export { PingPlugin } from './ping';
 export { PolePlugin } from './pole';
+export { RAEPlugin } from './rae';
 export { ReactionPlugin } from './reaction';
 export { ReminderPlugin } from './reminder';
 export { RussianRoulettePlugin } from './russian-roulette';
