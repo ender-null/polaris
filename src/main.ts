@@ -75,14 +75,17 @@ const options = {
 
 createServer(options, (req: IncomingMessage, res: ServerResponse) => {
   const path = req.url.split('/');
+  let response = '';
   req.on('data', (data: string) => {
     for (const bot of bots) {
       if (bot.config.name == path[1]) {
+        response += `${bot.config.name}\n${path[2]}\nOK`;
         bot.inbox.emit('webhook', req.url, JSON.stringify(JSON.parse(data), null, 4));
       }
     }
+    res.writeHead(200);
+    res.end(response);
   });
-  res.end();
 }).listen(1984);
 
 export const db = new Database();
