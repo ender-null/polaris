@@ -73,26 +73,41 @@ const options = {
   cert: readFileSync('data/cert.pem'),
 };
 
+function getJSONDataFromRequestStream<T>(request: IncomingMessage): Promise<T> {
+  return new Promise((resolve) => {
+    const chunks = [];
+    request.on('data', (chunk) => {
+      chunks.push(chunk);
+    });
+    request.on('end', () => {
+      resolve(JSON.parse(Buffer.concat(chunks).toString()));
+    });
+  });
+}
+
 createServer(options, (req: IncomingMessage, res: ServerResponse) => {
   let found = false;
-  req.on('data', (data: string) => {
-    logger.info(req.url);
-    logger.info(data);
-    const path = req.url.split('/');
-    // const prettyData = JSON.stringify(JSON.parse(data), null, 4);
+  let content;
 
-    for (const bot of bots) {
-      if (bot.config.name == path[1]) {
-        found = true;
-        bot.inbox.emit('webhook', req.url, data);
-      }
+  if (req.method === 'GET') {
+    content = null;
+  } else if (req.method === 'POST') {
+    getJSONDataFromRequestStream<any>(req).then((body) => {
+      content = JSON.stringify(JSON.parse(body), null, 4);
+    });
+  }
+
+  const path = req.url.split('/');
+  for (const bot of bots) {
+    if (bot.config.name == path[1]) {
+      found = true;
+      bot.inbox.emit('webhook', req.url, content);
     }
-  });
-  req.on('end', () => {
-    res.statusCode = found ? 200 : 404;
-    res.writeHead(found ? 200 : 404);
-    res.end(found ? 'OK' : 'Not Found');
-  });
+  }
+
+  res.statusCode = found ? 200 : 404;
+  res.writeHead(found ? 200 : 404);
+  res.end(found ? 'OK' : 'Not Found');
 }).listen(1984);
 
 export const db = new Database();
