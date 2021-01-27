@@ -105,7 +105,8 @@ export class PolePlugin extends PluginBase {
 
     const gid = String(msg.conversation.id);
     const uid = String(msg.sender.id);
-    const date = new Date().toISOString().split('T')[0];
+    const dateObject = new Date();
+    const date = `${dateObject.getFullYear()}-${dateObject.getMonth()}-${dateObject.getDate()}`;
     let text;
     const commandIndex = getCommandIndex(this, msg.content);
     const types = ['pole', 'subpole', 'fail', 'iron', 'canaria', 'andaluza'];
@@ -182,7 +183,7 @@ export class PolePlugin extends PluginBase {
         }
       }
       if (type == 'canaria' && !timeInRange(time(1), time(2), now())) {
-        return this.bot.replyMessage(msg, `${capitalize(type)} not available`);
+        return this.bot.replyMessage(msg, format(this.strings.tooSoon, getUsername(uid)));
       } else if (type == 'andaluza' && !timeInRange(time(12), time(13), now())) {
         return this.bot.replyMessage(msg, format(this.strings.tooSoonAndaluza, getUsername(uid)));
       }

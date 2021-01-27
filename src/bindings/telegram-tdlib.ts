@@ -22,7 +22,7 @@ export class TelegramTDlibBindings extends BindingsBase {
       skipOldUpdates: true,
       verbosityLevel: 1,
       tdlibParameters: {
-        application_version: 'polaris:latest',
+        application_version: 'latest',
       },
     });
     this.pendingMessages = [];
