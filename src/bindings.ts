@@ -1,3 +1,4 @@
+import { IncomingMessage, ServerResponse } from 'http';
 import { Bot, ConversationInfo, Message, User } from '.';
 
 export abstract class BindingsBase {
@@ -12,6 +13,8 @@ export abstract class BindingsBase {
   abstract stop(): Promise<void>;
 
   abstract getMe(): Promise<User>;
+
+  abstract webhookHandler(req: IncomingMessage, res: ServerResponse, data: any): Promise<void>;
 
   abstract getMessage(chatId: string | number, messageId: string | number, ignoreReply?: boolean): Promise<Message>;
 

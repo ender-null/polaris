@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+import { IncomingMessage, ServerResponse } from 'http';
 import * as cron from 'node-cron';
 import os from 'os';
 import {
@@ -56,7 +57,6 @@ export class Bot {
 
   async start(): Promise<void> {
     this.inbox.on('message', (msg: Message) => this.messagesHandler(msg));
-    this.inbox.on('webhook', (url, data) => this.webhookHandler(url, data));
     this.outbox.on('message', (msg: Message) => this.messageSender(msg));
     this.initPlugins();
     db.events.on('update:translations', () => this.initTranslations());
@@ -130,8 +130,8 @@ export class Bot {
     await this.onMessageReceive(msg);
   }
 
-  webhookHandler(url: string, data: any): void {
-    logger.info(`☁️ ${this.config.icon} [webhook:${url}] ${data}`);
+  async webhookHandler(req: IncomingMessage, res: ServerResponse, data: any): Promise<void> {
+    logger.info(`☁️ ${this.config.icon} [webhook:${req.url}] ${data}`);
     let dataObject;
     try {
       dataObject = JSON.parse(data);
@@ -139,14 +139,14 @@ export class Bot {
       dataObject = null;
       logger.error(e.message);
     }
-    const path = url.split('/');
+    const path = req.url.split('/');
     if (path[2] == 'webhook') {
-      logger.info('TODO send webhook to bindings');
+      await this.bindings.webhookHandler(req, res, data);
     } else {
       for (const i in this.plugins) {
         const plugin = this.plugins[i];
         if (getPluginSlug(plugin) == path[2] && 'webhook' in plugin) {
-          plugin.webhook(url, dataObject);
+          plugin.webhook(req.url, dataObject);
         }
       }
     }

@@ -1,7 +1,7 @@
 import { htmlToText } from 'html-to-text';
 import { AutojoinRoomsMixin, LogLevel, LogService, MatrixClient, SimpleFsStorageProvider } from 'matrix-bot-sdk';
 import { BindingsBase, Bot, Conversation, ConversationInfo, Message, User } from '..';
-import { catchException } from '../utils';
+import { catchException, logger } from '../utils';
 
 export class MatrixBindings extends BindingsBase {
   client: MatrixClient;
@@ -45,6 +45,10 @@ export class MatrixBindings extends BindingsBase {
     if (msg) {
       this.bot.inbox.emit('message', msg);
     }
+  }
+
+  async webhookHandler(data: any): Promise<void> {
+    logger.debug(data);
   }
 
   async convertMessage(roomId: string, msg): Promise<Message> {

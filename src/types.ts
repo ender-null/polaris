@@ -62,6 +62,7 @@ export interface ApiKeys {
   wolframAlpha?: string;
   matrixAccessToken?: string;
   matrixHomeserverUrl?: string;
+  facebookVerifyToken?: string;
 }
 
 export interface Instance {

@@ -100,6 +100,10 @@ export class TelegramTDlibBindings extends BindingsBase {
     return new User(me.id, me.first_name, me.last_name, me.username, me.type['_'] == 'userTypeBot');
   }
 
+  async webhookHandler(data: any): Promise<void> {
+    logger.debug(data);
+  }
+
   async convertMessage(msg: message, ignoreReply?: boolean): Promise<Message> {
     const id = msg['id'];
     const extra: Extra = {};

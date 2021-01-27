@@ -95,13 +95,16 @@ createServer(options, async (req: IncomingMessage, res: ServerResponse) => {
   for (const bot of bots) {
     if (bot.config.name == path[1]) {
       found = true;
-      bot.inbox.emit('webhook', req.url, content);
+      // bot.inbox.emit('webhook', req.url, content);
+      await bot.webhookHandler(req, res, content);
     }
   }
 
-  res.statusCode = found ? 200 : 404;
-  res.writeHead(found ? 200 : 404);
-  res.end(found ? 'OK' : 'Not Found');
+  if (!res.writableEnded) {
+    res.statusCode = found ? 200 : 404;
+    res.writeHead(found ? 200 : 404);
+    res.end(found ? 'OK' : 'Not Found');
+  }
 }).listen(1984);
 
 export const db = new Database();

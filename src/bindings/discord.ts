@@ -62,6 +62,10 @@ export class DiscordBindings extends BindingsBase {
     );
   }
 
+  async webhookHandler(data: any): Promise<void> {
+    logger.debug(data);
+  }
+
   async convertMessage(msg: DiscordMessage): Promise<Message> {
     const received = now();
     const id = msg.id;
