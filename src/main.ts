@@ -85,9 +85,9 @@ createServer(options, (req: IncomingMessage, res: ServerResponse) => {
         bot.inbox.emit('webhook', req.url, prettyData);
       }
     }
+    res.writeHead(found ? 200 : 404);
+    res.end(found ? 'OK' : 'Not Found');
   });
-  res.writeHead(found ? 200 : 404);
-  res.end(found ? 'OK' : 'Not Found');
 }).listen(1984);
 
 export const db = new Database();
