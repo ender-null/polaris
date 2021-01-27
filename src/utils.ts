@@ -3,6 +3,7 @@ import fs from 'fs';
 import mime from 'mime-types';
 import AbortController from 'node-abort-controller';
 import fetch, { BodyInit, HeadersInit, RequestInit, Response } from 'node-fetch';
+import os from 'os';
 import querystring, { ParsedUrlQueryInput } from 'querystring';
 import { pipeline } from 'stream';
 import tmp from 'tmp';
@@ -894,4 +895,12 @@ export async function execResult(command: string): Promise<string> {
     catchException(e);
     return e.message;
   }
+}
+
+export function systemName(): string {
+  return `${os.type()} ${os.platform()} ${os.arch()}`;
+}
+
+export function systemVersion(): string {
+  return os.version();
 }

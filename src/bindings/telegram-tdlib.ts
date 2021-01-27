@@ -5,7 +5,18 @@ import { TDLib } from 'tdl-tdlib-addon';
 import { message, ok, Update, user } from 'tdlib-types';
 import { BindingsBase, Bot, Conversation, ConversationInfo, Extra, Message, User } from '..';
 import { db } from '../main';
-import { catchException, download, hasTag, isInt, logger, now, sendRequest, splitLargeMessage } from '../utils';
+import {
+  catchException,
+  download,
+  hasTag,
+  isInt,
+  logger,
+  now,
+  sendRequest,
+  splitLargeMessage,
+  systemName,
+  systemVersion,
+} from '../utils';
 
 export class TelegramTDlibBindings extends BindingsBase {
   client: Client;
@@ -23,6 +34,9 @@ export class TelegramTDlibBindings extends BindingsBase {
       verbosityLevel: 1,
       tdlibParameters: {
         application_version: 'latest',
+        system_language_code: this.bot.config.locale,
+        device_model: systemName(),
+        system_version: systemVersion(),
       },
     });
     this.pendingMessages = [];
