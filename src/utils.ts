@@ -5,7 +5,6 @@ import AbortController from 'node-abort-controller';
 import fetch, { BodyInit, HeadersInit, RequestInit, Response } from 'node-fetch';
 import querystring, { ParsedUrlQueryInput } from 'querystring';
 import { pipeline } from 'stream';
-import { error } from 'tdl/types/tdlib';
 import tmp from 'tmp';
 import util from 'util';
 import winston, { createLogger, format as winstonFormat, transports } from 'winston';
@@ -817,7 +816,7 @@ export function merge(base: any, extension: any): any {
   return merged;
 }
 
-export function catchException(exception: Error | error, bot: Bot = null, message: Message = null): Error | error {
+export function catchException(exception: Error, bot: Bot = null, message: Message = null): Error {
   logger.error(`Catched exception: ${exception.message}`);
   if (bot) {
     if (exception['stack']) {

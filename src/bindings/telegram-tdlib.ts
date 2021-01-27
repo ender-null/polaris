@@ -2,7 +2,7 @@ import { Response } from 'node-fetch';
 import { ParsedUrlQueryInput } from 'querystring';
 import { Client } from 'tdl';
 import { TDLib } from 'tdl-tdlib-addon';
-import { message, ok, Update, user } from 'tdl/types/tdlib';
+import { message, ok, Update, user } from 'tdlib-types';
 import { BindingsBase, Bot, Conversation, ConversationInfo, Extra, Message, User } from '..';
 import { db } from '../main';
 import { catchException, download, hasTag, isInt, logger, now, sendRequest, splitLargeMessage } from '../utils';
@@ -97,10 +97,8 @@ export class TelegramTDlibBindings extends BindingsBase {
       conversation.title = rawChat.title;
     }
     let userId;
-    if (msg['sender'] && msg['sender']['user_id']) {
-      userId = msg['sender']['user_id'];
-    } else if (msg.sender_user_id && msg.sender_user_id > 0) {
-      userId = msg.sender_user_id;
+    if (msg.sender && msg.sender['user_id']) {
+      userId = msg.sender && msg.sender['user_id'];
     }
     if (userId) {
       const rawSender = await this.serverRequest('getUser', { user_id: userId });
