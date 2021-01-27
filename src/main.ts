@@ -2,7 +2,7 @@ import { readFileSync } from 'fs';
 import { IncomingMessage, ServerResponse } from 'http';
 import { createServer } from 'https';
 import { Bot, Config, Database } from '.';
-import { catchException, logger } from './utils';
+import { catchException, getBindingsSlug, logger } from './utils';
 
 // global.Promise = require('bluebird');
 process.setMaxListeners(0);
@@ -95,8 +95,13 @@ createServer(options, async (req: IncomingMessage, res: ServerResponse) => {
   for (const bot of bots) {
     if (bot.config.name == path[1]) {
       found = true;
-      // bot.inbox.emit('webhook', req.url, content);
-      await bot.webhookHandler(req, res, content);
+      if (path[1].indexOf(':') > -1) {
+        if (path[1].split(':')[1] == getBindingsSlug(bot.bindings)) {
+          await bot.webhookHandler(req, res, content);
+        }
+      } else {
+        await bot.webhookHandler(req, res, content);
+      }
     }
   }
 

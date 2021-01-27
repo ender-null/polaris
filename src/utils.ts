@@ -11,11 +11,16 @@ import util from 'util';
 import winston, { createLogger, format as winstonFormat, transports } from 'winston';
 import 'winston-daily-rotate-file';
 import { Bot, Message, PluginBase } from '.';
+import { BindingsBase } from './bindings';
 import { db } from './main';
 import { CoordinatesResult, iString } from './types';
 
 export function getPluginSlug(plugin: PluginBase): string {
   return plugin.constructor.name.replace('Plugin', '').toLowerCase();
+}
+
+export function getBindingsSlug(plugin: BindingsBase): string {
+  return plugin.constructor.name.replace('Bindings', '').toLowerCase();
 }
 
 export function isOwner(bot: Bot, uid: number | string, msg: Message = null): boolean {

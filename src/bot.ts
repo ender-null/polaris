@@ -76,9 +76,6 @@ export class Bot {
     logger.info(
       `🟢 Connected as ${this.config.icon} ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`,
     );
-    // this.sendAdminAlert(
-    //   `Connected as ${this.config.icon} ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`,
-    // );
     this.scheduleCronJobs();
   }
 
