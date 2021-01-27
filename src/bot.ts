@@ -138,12 +138,12 @@ export class Bot {
     }
     const path = req.url.split('/');
     if (path[2] == 'webhook') {
-      await this.bindings.webhookHandler(req, res, data);
+      await this.bindings.webhookHandler(req, res, dataObject);
     } else {
       for (const i in this.plugins) {
         const plugin = this.plugins[i];
         if (getPluginSlug(plugin) == path[2] && 'webhook' in plugin) {
-          plugin.webhook(req.url, dataObject);
+          await plugin.webhook(req.url, dataObject);
         }
       }
     }

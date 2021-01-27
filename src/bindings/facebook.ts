@@ -25,6 +25,7 @@ export class FacebookBindings extends BindingsBase {
   }
 
   async webhookHandler(req: IncomingMessage, res: ServerResponse, data: any): Promise<void> {
+    logger.info('facebook webhookHandler');
     logger.debug(data);
     // Parse the query params
     const query = parse(req.url, true).query;

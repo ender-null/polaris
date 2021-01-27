@@ -103,7 +103,6 @@ createServer(options, async (req: IncomingMessage, res: ServerResponse) => {
     if (bot.config.name == name) {
       found = true;
       if (bindings) {
-        logger.info(`${path[1]} | ${name} | ${bindings} | ${slug}`);
         if (bindings == slug) {
           await bot.webhookHandler(req, res, content);
         }
@@ -116,7 +115,7 @@ createServer(options, async (req: IncomingMessage, res: ServerResponse) => {
   if (!res.writableEnded) {
     res.statusCode = found ? 200 : 404;
     res.writeHead(found ? 200 : 404);
-    res.end(found ? 'OK' : 'Not Found');
+    res.end(found ? 200 : 404);
   }
 }).listen(1984);
 
