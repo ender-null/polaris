@@ -39,6 +39,7 @@
   "dependencies": {
     "cheerio": "^1.0.0-rc.5",
     "discord.js": "^12.5.1",
+    "fluture": "^13.0.1",
     "form-data": "^3.0.0",
     "html-to-text": "^6.0.0",
     "matrix-bot-sdk": "^0.5.13",
