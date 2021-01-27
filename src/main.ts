@@ -73,7 +73,7 @@ const options = {
   cert: readFileSync('data/cert.pem'),
 };
 
-createServer(options, (req: IncomingMessage, res: ServerResponse) => {
+createServer(options, async (req: IncomingMessage, res: ServerResponse) => {
   const path = req.url.split('/');
   let found = false;
   let content;
@@ -81,12 +81,14 @@ createServer(options, (req: IncomingMessage, res: ServerResponse) => {
   if (req.method === 'GET') {
     content = null;
   } else if (req.method === 'POST') {
-    const chunks = [];
-    req.on('data', (chunk) => {
-      chunks.push(chunk);
-    });
-    req.on('end', () => {
-      content = JSON.stringify(JSON.parse(Buffer.concat(chunks).toString()), null, 4);
+    content = await new Promise((resolve) => {
+      const chunks = [];
+      req.on('data', (chunk) => {
+        chunks.push(chunk);
+      });
+      req.on('end', () => {
+        resolve(JSON.stringify(JSON.parse(Buffer.concat(chunks).toString()), null, 4));
+      });
     });
   }
 
