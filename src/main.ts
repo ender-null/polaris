@@ -73,31 +73,23 @@ const options = {
   cert: readFileSync('data/cert.pem'),
 };
 
-function getJSONDataFromRequestStream<T>(request: IncomingMessage): Promise<T> {
-  return new Promise((resolve) => {
-    const chunks = [];
-    request.on('data', (chunk) => {
-      chunks.push(chunk);
-    });
-    request.on('end', () => {
-      resolve(JSON.parse(Buffer.concat(chunks).toString()));
-    });
-  });
-}
-
 createServer(options, (req: IncomingMessage, res: ServerResponse) => {
+  const path = req.url.split('/');
   let found = false;
   let content;
 
   if (req.method === 'GET') {
     content = null;
   } else if (req.method === 'POST') {
-    getJSONDataFromRequestStream<any>(req).then((body) => {
-      content = JSON.stringify(JSON.parse(body), null, 4);
+    const chunks = [];
+    req.on('data', (chunk) => {
+      chunks.push(chunk);
+    });
+    req.on('end', () => {
+      content = JSON.stringify(JSON.parse(Buffer.concat(chunks).toString()), null, 4);
     });
   }
 
-  const path = req.url.split('/');
   for (const bot of bots) {
     if (bot.config.name == path[1]) {
       found = true;
