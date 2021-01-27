@@ -115,7 +115,7 @@ createServer(options, async (req: IncomingMessage, res: ServerResponse) => {
   if (!res.writableEnded) {
     res.statusCode = found ? 200 : 404;
     res.writeHead(found ? 200 : 404);
-    res.end(found ? 200 : 404);
+    res.end(found ? 'OK' : 'Not Found');
   }
 }).listen(1984);
 
