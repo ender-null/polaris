@@ -14,7 +14,7 @@ export class GitHubPlugin extends PluginBase {
     try {
       cb = JSON.parse(data);
     } catch (e) {
-      logger.error('Invalid JSON object received');
+      logger.error(e.message);
     }
 
     if (cb && cb.head_commit) {
