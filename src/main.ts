@@ -74,11 +74,12 @@ const options = {
 };
 
 createServer(options, (req: IncomingMessage, res: ServerResponse) => {
-  const path = req.url.split('/');
   let found = false;
   req.on('data', (data: string) => {
+    logger.info(req.url);
+    logger.info(data);
+    const path = req.url.split('/');
     // const prettyData = JSON.stringify(JSON.parse(data), null, 4);
-    console.log(req.url, data);
 
     for (const bot of bots) {
       if (bot.config.name == path[1]) {
