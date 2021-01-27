@@ -12,6 +12,7 @@ export class FacebookBindings extends BindingsBase {
   async start(): Promise<void> {
     this.bot.user = new User(this.bot.config.name, this.bot.config.name, null, this.bot.config.name, true);
     this.bot.outbox.on('message', (msg: Message) => this.sendMessage(msg));
+    this.bot.status.emit('started');
   }
 
   async stop(): Promise<void> {
