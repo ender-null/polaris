@@ -3,6 +3,7 @@ import { Bot, Config, Database } from '.';
 import { catchException, logger } from './utils';
 
 // global.Promise = require('bluebird');
+process.setMaxListeners(0);
 
 const bots: Bot[] = [];
 
