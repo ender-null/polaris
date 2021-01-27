@@ -2,7 +2,7 @@ import format from 'string-format';
 import { Bot, Message } from '..';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
-import { catchException, execResult, isCommand } from '../utils';
+import { isCommand } from '../utils';
 
 export class AboutPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -25,14 +25,14 @@ export class AboutPlugin extends PluginBase {
     ];
     this.strings = {
       greeting: "Hi! I'm <b>{0}</b>!\nNice to meet you.",
-      version: 'Running <a href="https://git.io/polaris">polaris</a> <code>{0}</code> by @endernull.',
+      version: 'Running <a href="https://git.io/polaris">polaris</a> by @endernull.',
       license:
         '<b>Polaris</b> (including all plugins and documentation) is <b>free software</b>; you are free to redistribute it and/or modify it under the terms of the <b>AGPL-3.0 License</b>.',
       help: 'Write {0}help to know what I can do!',
       about: 'Use {0}about to know more about me',
       channel: 'Support & suggestions at <a href="https://t.me/PolarisSupport">@PolarisSupport</a>',
       notice:
-        'You can try my other bots: <a href="https://t.me/sakubo">@Sakubo</a> and <a href="https://t.me/PetoBot">@PetoBot</a>',
+        'You can try my other bots: <a href="https://t.me/PolarisChan">@PolarisChan</a> and <a href="https://t.me/PetoBot">@PetoBot</a>',
       donations: 'You can make {0}donations at https://paypal.me/luksireiku',
       stats: '👤 {0} users\n👥 {1} groups',
       donationsExplanation: 'You can make donations at https://paypal.me/luksireiku',
@@ -42,14 +42,8 @@ export class AboutPlugin extends PluginBase {
   async run(msg: Message): Promise<void> {
     let text;
     if (isCommand(this, 1, msg.content) || isCommand(this, 3, msg.content)) {
-      let tag = 'latest';
-      try {
-        tag = await execResult('git rev-parse --short HEAD');
-      } catch (e) {
-        catchException(e, this.bot);
-      }
       const greeting = format(this.strings.greeting, this.bot.user.firstName);
-      const version = format(this.strings.version, tag);
+      const version = this.strings.version;
       const license = this.strings.license;
       const help = format(this.strings.help, this.bot.config.prefix);
       const about = format(this.strings.about, this.bot.config.prefix);

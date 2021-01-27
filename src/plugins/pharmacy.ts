@@ -12,7 +12,7 @@ export class PharmacyPlugin extends PluginBase {
         parameters: [
           {
             name: 'city',
-            required: false,
+            required: true,
           },
         ],
         description: 'Open pharmacies in Spain by city',

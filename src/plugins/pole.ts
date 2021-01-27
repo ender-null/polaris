@@ -89,6 +89,7 @@ export class PolePlugin extends PluginBase {
       points: 'points',
       polereset: 'The pole ranking has been reset',
       tooSoon: 'Too soon, {0}',
+      tooSoonCanaria: 'Too soon, {0} muyayo',
       tooSoonAndaluza: 'Too soon, {0} miarma',
     };
   }
@@ -183,7 +184,7 @@ export class PolePlugin extends PluginBase {
         }
       }
       if (type == 'canaria' && !timeInRange(time(1), time(2), now())) {
-        return this.bot.replyMessage(msg, format(this.strings.tooSoon, getUsername(uid)));
+        return this.bot.replyMessage(msg, format(this.strings.tooSoonCanaria, getUsername(uid)));
       } else if (type == 'andaluza' && !timeInRange(time(12), time(13), now())) {
         return this.bot.replyMessage(msg, format(this.strings.tooSoonAndaluza, getUsername(uid)));
       }
