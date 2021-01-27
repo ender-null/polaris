@@ -122,16 +122,15 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         characterName = words.pop();
         realm = words.join('-').toLowerCase();
       }
-      const [character, media, raids, pvp, professions] = await Promise.all([
+      const [character, media, raids, pvp, professions, statistics, raiderIO] = await Promise.all([
         this.getCharacter(region, realm, characterName),
         this.getCharacterMedia(region, realm, characterName),
         this.getCharacterRaids(region, realm, characterName),
         this.getCharacterPVP(region, realm, characterName),
         this.getCharacterProfessions(region, realm, characterName),
+        this.getCharacterStatistics(region, realm, characterName),
         this.getRaiderIO(region, realm, characterName),
       ]);
-      // const statistics = await this.getCharacterStatistics(region, realm, characterName);
-      // const raiderIO = this.getRaiderIO(region, realm, characterName);
       if (!character || !media || !raids || !pvp || !professions) {
         this.accessToken = await this.retrievingAccessToken();
         return this.bot.replyMessage(msg, this.bot.errors.connectionError);
@@ -152,25 +151,25 @@ export class WorldOfWarcraftPlugin extends PluginBase {
           guild = `<${character.guild.name}-${character.guild.realm.name}>`;
         }
       }
-      // let mainStat = 'strength';
-      // let mainStatAmount = statistics.strength.effective;
-      // if (statistics.agility.effective > mainStatAmount) {
-      //   mainStat = 'agility';
-      //   mainStatAmount = statistics.agility.effective;
-      // }
-      // if (statistics.intellect.effective > mainStatAmount) {
-      //   mainStat = 'intellect';
-      //   mainStatAmount = statistics.intellect.effective;
-      // }
-      // const stats = format(
-      //   `${this.strings['statistics']}:\n\t${this.strings['health']}: {0} \n\t{1}: {2}\n\t${this.strings[mainStat]}: {3}\n\t${this.strings['stamina']}: {4}\n\t${this.strings['armor']}: {5}`,
-      //   formatNumber(statistics.health),
-      //   statistics.power_type.name,
-      //   formatNumber(statistics.power),
-      //   formatNumber(mainStatAmount),
-      //   formatNumber(statistics.stamina.effective),
-      //   formatNumber(statistics.armor.effective),
-      // );
+      let mainStat = 'strength';
+      let mainStatAmount = statistics.strength.effective;
+      if (statistics.agility.effective > mainStatAmount) {
+        mainStat = 'agility';
+        mainStatAmount = statistics.agility.effective;
+      }
+      if (statistics.intellect.effective > mainStatAmount) {
+        mainStat = 'intellect';
+        mainStatAmount = statistics.intellect.effective;
+      }
+      const stats = format(
+        `${this.strings['statistics']}:\n\t${this.strings['health']}: {0} \n\t{1}: {2}\n\t${this.strings[mainStat]}: {3}\n\t${this.strings['stamina']}: {4}\n\t${this.strings['armor']}: {5}`,
+        formatNumber(statistics.health),
+        statistics.power_type.name,
+        formatNumber(statistics.power),
+        formatNumber(mainStatAmount),
+        formatNumber(statistics.stamina.effective),
+        formatNumber(statistics.armor.effective),
+      );
       const characterClass = `${character.character_class.name} ${character.active_spec.name}`;
       const race = `${character.race.name} ${character.gender.type == 'FEMALE' ? '♀️' : '♂️'}`;
       const info = format(
@@ -207,22 +206,25 @@ export class WorldOfWarcraftPlugin extends PluginBase {
           raidProgression += `\n\t${mode.difficulty.name}: ${mode.progress.completed_count}/${mode.progress.total_count}`;
         }
       }
-      // let mythicScore = '';
-      // if (raiderIO.mythic_plus_scores_by_season && raiderIO.mythic_plus_scores_by_season.length > 0) {
-      //   const lastSeason = raiderIO.mythic_plus_scores_by_season[0];
-      //   mythicScore = `${this.strings['mythicPlusScores']}:`;
-      //   let empty = true;
-      //   const scores = ['dps', 'healer', 'tank'];
-      //   for (const score of scores) {
-      //     mythicScore += `\n\t${this.strings[score]}: ${lastSeason.scores[score]}`;
-      //     if (lastSeason.scores[score] > 0) {
-      //       empty = false;
-      //     }
-      //   }
-      //   if (empty) {
-      //     mythicScore = '';
-      //   }
-      // }
+      let mythicScore = '';
+      if (raiderIO.mythic_plus_scores_by_season && raiderIO.mythic_plus_scores_by_season.length > 0) {
+        const lastSeason = raiderIO.mythic_plus_scores_by_season[0];
+        mythicScore = `${this.strings['mythicPlusScores']}:`;
+        let empty = true;
+        const scores = ['dps', 'healer', 'tank'];
+        for (const score of scores) {
+          mythicScore += `\n\t${this.strings[score]}: ${lastSeason.scores[score]}`;
+          if (lastSeason.scores[score] > 0) {
+            empty = false;
+          }
+        }
+        if (empty) {
+          mythicScore = '';
+        }
+      }
+      if (mythicScore.length == 0) {
+        mythicScore = null;
+      }
       let photo = null;
       for (const asset of media.assets) {
         if (asset.key == 'main') {
@@ -232,9 +234,9 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       }
       text = `${title ? title + '\n\t' : ''}${name}\n${
         guild ? guild + '\n\n' : ''
-      }${characterClass}\n\t${race}\n\n${info}\n\n${professionLevels ? professionLevels + '\n\n' : ''}${
-        raidProgression ? raidProgression + '\n\n' : ''
-      }`;
+      }${characterClass}\n\t${race}\n\n${info}\n\n${stats}\n\n${professionLevels ? professionLevels + '\n\n' : ''}${
+        mythicScore ? mythicScore + '\n\n' : ''
+      }${raidProgression ? raidProgression + '\n\n' : ''}`;
       if (photo) {
         return this.bot.replyMessage(msg, photo, 'photo', null, { caption: text });
       }
