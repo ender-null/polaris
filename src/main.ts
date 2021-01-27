@@ -1,4 +1,6 @@
-import http from 'http';
+import { readFileSync } from 'fs';
+import { IncomingMessage, ServerResponse } from 'http';
+import { createServer } from 'https';
 import { Bot, Config, Database } from '.';
 import { catchException, logger } from './utils';
 
@@ -66,19 +68,22 @@ export async function start(): Promise<void> {
 process.once('SIGINT', () => stop(true));
 process.once('SIGTERM', () => stop(true));
 
-http
-  .createServer((req: http.IncomingMessage, res: http.ServerResponse) => {
-    const path = req.url.split('/');
-    req.on('data', (data: string) => {
-      for (const bot of bots) {
-        if (bot.config.name == path[1]) {
-          bot.inbox.emit('webhook', req.url, JSON.stringify(JSON.parse(data), null, 4));
-        }
+const options = {
+  key: readFileSync('data/key.pem'),
+  cert: readFileSync('data/cert.pem'),
+};
+
+createServer(options, (req: IncomingMessage, res: ServerResponse) => {
+  const path = req.url.split('/');
+  req.on('data', (data: string) => {
+    for (const bot of bots) {
+      if (bot.config.name == path[1]) {
+        bot.inbox.emit('webhook', req.url, JSON.stringify(JSON.parse(data), null, 4));
       }
-    });
-    res.end();
-  })
-  .listen(1984);
+    }
+  });
+  res.end();
+}).listen(1984);
 
 export const db = new Database();
 db.events.once('loaded', async () => {

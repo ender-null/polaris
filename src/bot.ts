@@ -131,12 +131,16 @@ export class Bot {
   }
 
   webhookHandler(url: string, data: any): void {
-    logger.info(`🌐 ${this.config.icon} [webhook:${url}] ${data}`);
+    logger.info(`☁️ ${this.config.icon} [webhook:${url}] ${data}`);
     const path = url.split('/');
-    for (const i in this.plugins) {
-      const plugin = this.plugins[i];
-      if (getPluginSlug(plugin) == path[2] && 'webhook' in plugin) {
-        plugin.webhook(url, data);
+    if (path[2] == 'webhook') {
+      logger.info('TODO send webhook to bindings');
+    } else {
+      for (const i in this.plugins) {
+        const plugin = this.plugins[i];
+        if (getPluginSlug(plugin) == path[2] && 'webhook' in plugin) {
+          plugin.webhook(url, data);
+        }
       }
     }
   }
