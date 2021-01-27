@@ -85,8 +85,12 @@ export class ZaragozaPlugin extends PluginBase {
         text = `<b>${this.strings.station}: ${content.number}</b>\n\n`;
       }
 
-      for (const bus of content.transports) {
-        text += ` • <b>${bus.time}</b>  ${bus.line} <i>${bus.destination}</i>\n`;
+      if (content.transports && Array.isArray(content.transports)) {
+        for (const bus of content.transports) {
+          text += ` • <b>${bus.time}</b>  ${bus.line} <i>${bus.destination}</i>\n`;
+        }
+      } else {
+        return this.bot.replyMessage(msg, this.bot.errors.noResults);
       }
     } else if (isCommand(this, 3, msg.content)) {
       const url = `https://www.zaragoza.es/api/recurso/urbanismo-infraestructuras/estacion-bicicleta/${lstrip(
