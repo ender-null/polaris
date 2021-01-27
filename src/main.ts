@@ -85,6 +85,9 @@ createServer(options, (req: IncomingMessage, res: ServerResponse) => {
         bot.inbox.emit('webhook', req.url, prettyData);
       }
     }
+  });
+  req.on('end', () => {
+    res.statusCode = found ? 200 : 404;
     res.writeHead(found ? 200 : 404);
     res.end(found ? 'OK' : 'Not Found');
   });
