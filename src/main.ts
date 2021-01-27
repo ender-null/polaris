@@ -77,12 +77,13 @@ createServer(options, (req: IncomingMessage, res: ServerResponse) => {
   const path = req.url.split('/');
   let found = false;
   req.on('data', (data: string) => {
-    const prettyData = JSON.stringify(JSON.parse(data), null, 4);
+    // const prettyData = JSON.stringify(JSON.parse(data), null, 4);
+    console.log(req.url, data);
 
     for (const bot of bots) {
       if (bot.config.name == path[1]) {
         found = true;
-        bot.inbox.emit('webhook', req.url, prettyData);
+        bot.inbox.emit('webhook', req.url, data);
       }
     }
   });
