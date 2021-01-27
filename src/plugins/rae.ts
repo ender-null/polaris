@@ -25,20 +25,23 @@ export class RAEPlugin extends PluginBase {
     if (!input) {
       return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
     }
-    const resp = await sendRequest('https://dle.rae.es/srv/search?w=' + input, null, null, null, false, this.bot);
+    const url = 'https://dle.rae.es/srv/search';
+    const params = {
+      w: input,
+    };
+    const resp = await sendRequest(url, params, null, null, false, this.bot);
     if (!resp) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
     }
     const html = await resp.text();
     const $ = cheerio.load(html);
+    let text = $('#resultados').text().trim();
+    text = text.replace(input, `<b>${input}</b>`);
 
-    const text = await $('#resultados').text().trim();
-
-    const buf = Buffer.from(text);
-
-    if (buf.indexOf('Aviso') == 0) {
+    if (text.indexOf('Aviso:') > -1) {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);
     }
+
     this.bot.replyMessage(msg, text);
   }
 }
