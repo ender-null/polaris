@@ -4,6 +4,7 @@ import { PluginBase } from '../plugin';
 import {
   delTag,
   generateCommandHelp,
+  getFullName,
   getInput,
   getTags,
   getWord,
@@ -240,7 +241,20 @@ export class MediaForwarderPlugin extends PluginBase {
           ) {
             const r: Message = { ...msg };
             r.conversation.id = cid;
-            r.conversation.title = tag;
+            if (cid.startsWith('-')) {
+              if (db.groups[cid]) {
+                r.conversation.title = db.groups[cid].title;
+              } else {
+                r.conversation.title = tag.toUpperCase();
+              }
+            } else {
+              if (db.users[cid]) {
+                r.conversation.title = getFullName(cid);
+              } else {
+                r.conversation.title = tag.toUpperCase();
+              }
+            }
+            r.conversation.title = tag.toUpperCase();
             if (r.extra.urls) {
               for (let url of r.extra.urls) {
                 const inputMatch = telegramLinkRegExp.exec(url);

@@ -20,6 +20,7 @@ import { Errors } from './types';
 import {
   catchException,
   escapeRegExp,
+  getFullName,
   getPluginSlug,
   hasTag,
   isTrusted,
@@ -105,16 +106,18 @@ export class Bot {
 
   messageSender(msg: Message): void {
     logger.info(
-      `💬 ${this.config.icon} [${msg.conversation.id}] ${msg.conversation.title} 🗣️ ${this.user.firstName} [${this.user.id}]: ${msg.content}`,
+      `💬 ${this.config.icon} [${msg.conversation.id}] ${msg.conversation.title} 🗣️ ${getFullName(this.user.id)} [${
+        this.user.id
+      }]: ${msg.content}`,
     );
   }
 
   async messagesHandler(msg: Message): Promise<void> {
     if (msg.sender instanceof User) {
       logger.info(
-        `${this.getMessageIcon(msg.type)} ${this.config.icon} [${msg.conversation.id}] ${msg.conversation.title} 👤 ${
-          msg.sender.firstName
-        } [${msg.sender.id}]: ${msg.content}`,
+        `${this.getMessageIcon(msg.type)} ${this.config.icon} [${msg.conversation.id}] ${
+          msg.conversation.title
+        } 👤 ${getFullName(msg.sender.id)} [${msg.sender.id}]: ${msg.content}`,
       );
     } else {
       logger.info(

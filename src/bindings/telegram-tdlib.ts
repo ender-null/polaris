@@ -45,7 +45,7 @@ export class TelegramTDlibBindings extends BindingsBase {
     };
     return await this.client.invoke(query).catch(async (e) => {
       if (!ignoreErrors) {
-        this.bot.sendAlert(JSON.stringify(query));
+        this.bot.sendAlert(JSON.stringify(query, null, 4));
         catchException(e, this.bot);
       }
       if (processRequest) {
@@ -560,7 +560,7 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async addPingToMessage(msg: Message, message: message) {
-    const ping = msg.date - message.date;
+    const ping = message.date - msg.date;
     let parseMode = null;
 
     if (msg.extra.format == 'HTML') {
@@ -684,8 +684,8 @@ export class TelegramTDlibBindings extends BindingsBase {
     }
 
     if (otherError) {
-      this.bot.sendAlert(JSON.stringify(request));
-      this.bot.sendAlert(JSON.stringify(response));
+      this.bot.sendAlert(JSON.stringify(request, null, 4));
+      this.bot.sendAlert(JSON.stringify(response, null, 4));
     }
   }
 

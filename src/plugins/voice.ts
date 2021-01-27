@@ -43,7 +43,7 @@ export class VoicePlugin extends PluginBase {
     };
 
     if (encodeURI(input).length > 200) {
-      this.bot.replyMessage(msg, this.bot.errors.failed);
+      return this.bot.replyMessage(msg, this.bot.errors.failed);
     }
 
     const file = await download(url, params, headers, false, this.bot);
