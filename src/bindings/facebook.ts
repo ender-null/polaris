@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { parse } from 'url';
 import { BindingsBase, Bot, Conversation, ConversationInfo, Message, User } from '..';
-import { htmlToDiscordMarkdown, isInt, logger, sendRequest, splitLargeMessage } from '../utils';
+import { htmlToMarkdown, isInt, logger, sendRequest, splitLargeMessage } from '../utils';
 
 export class FacebookBindings extends BindingsBase {
   constructor(bot: Bot) {
@@ -117,7 +117,7 @@ export class FacebookBindings extends BindingsBase {
     if (msg.type == 'text') {
       if ('format' in msg.extra && msg.extra['format'] == 'HTML') {
         data.message = {
-          text: htmlToDiscordMarkdown(msg.content),
+          text: htmlToMarkdown(msg.content),
         };
       } else {
         data.message = {

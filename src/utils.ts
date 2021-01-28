@@ -714,6 +714,26 @@ export function escapeRegExp(text: string): string {
   return text;
 }
 
+export function htmlToMarkdown(text: string): string {
+  if (text) {
+    const replacements = [
+      { pattern: '<code class="language-([\\w]+)">([\\S\\s]+)</code>', sub: '```$1\n$2```' },
+      { pattern: '<a href="(.[^<]+)">(.[^<]+)</a>', sub: '$1' },
+      { pattern: '<[/]?i>', sub: '_' },
+      { pattern: '<[/]?b>', sub: '*' },
+      { pattern: '<[/]?u>', sub: '~' },
+      { pattern: '<[/]?code>', sub: '`' },
+      { pattern: '<[/]?pre>', sub: '```' },
+    ];
+    for (const rep of replacements) {
+      text = text.replace(new RegExp(rep['pattern'], 'gim'), rep['sub']);
+    }
+    text = text.replace(new RegExp('&lt;', 'gim'), '<');
+    text = text.replace(new RegExp('&gt;', 'gim'), '>');
+  }
+  return text;
+}
+
 export function htmlToDiscordMarkdown(text: string): string {
   if (text) {
     const replacements = [
