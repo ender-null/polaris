@@ -87,7 +87,7 @@ export class FacebookBindings extends BindingsBase {
     const date = msg.timestamp;
     const reply = null;
     const sender = new User(msg.sender.id, null, msg.sender.id);
-    const conversation = new Conversation(msg.recipient.id, msg.recipient.id);
+    const conversation = new Conversation(msg.sender.id, msg.sender.id);
     return new Message(id, conversation, sender, content, type, date, reply, extra);
   }
 
