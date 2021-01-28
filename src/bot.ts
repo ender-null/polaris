@@ -442,30 +442,34 @@ export class Bot {
   }
 
   sendAlert(text: string, language = 'javascript'): void {
-    const message = new Message(
-      null,
-      new Conversation(this.config.alertsConversationId, 'Alerts'),
-      this.user,
-      `<code class="language-${language}">${text}</code>`,
-      'text',
-      null,
-      null,
-      { format: 'HTML', preview: false },
-    );
-    this.outbox.emit('message', message);
+    if (this.config.alertsConversationId) {
+      const message = new Message(
+        null,
+        new Conversation(this.config.alertsConversationId, 'Alerts'),
+        this.user,
+        `<code class="language-${language}">${text}</code>`,
+        'text',
+        null,
+        null,
+        { format: 'HTML', preview: false },
+      );
+      this.outbox.emit('message', message);
+    }
   }
 
   sendAdminAlert(text: string): void {
-    const message = new Message(
-      null,
-      new Conversation(this.config.adminConversationId, 'Admin'),
-      this.user,
-      text,
-      'text',
-      null,
-      null,
-      { format: 'HTML', preview: false },
-    );
-    this.outbox.emit('message', message);
+    if (this.config.adminConversationId) {
+      const message = new Message(
+        null,
+        new Conversation(this.config.adminConversationId, 'Admin'),
+        this.user,
+        text,
+        'text',
+        null,
+        null,
+        { format: 'HTML', preview: false },
+      );
+      this.outbox.emit('message', message);
+    }
   }
 }
