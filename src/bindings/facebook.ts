@@ -1,8 +1,7 @@
-import { Message as DiscordMessage } from 'discord.js';
 import { IncomingMessage, ServerResponse } from 'http';
 import { parse } from 'url';
-import { BindingsBase, Bot, ConversationInfo, Message, User } from '..';
-import { logger } from '../utils';
+import { BindingsBase, Bot, Conversation, ConversationInfo, Message, User } from '..';
+import { logger, sendRequest } from '../utils';
 
 export class FacebookBindings extends BindingsBase {
   constructor(bot: Bot) {
@@ -25,8 +24,14 @@ export class FacebookBindings extends BindingsBase {
   }
 
   async webhookHandler(req: IncomingMessage, res: ServerResponse, data: any): Promise<void> {
-    logger.info('facebook webhookHandler');
-    logger.debug(data);
+    if (req.method === 'GET') {
+      this.handleVerification(req, res);
+    } else if (req.method === 'POST') {
+      this.handleMessages(data);
+    }
+  }
+
+  handleVerification(req: IncomingMessage, res: ServerResponse) {
     // Parse the query params
     const query = parse(req.url, true).query;
 
@@ -51,38 +56,57 @@ export class FacebookBindings extends BindingsBase {
     }
   }
 
-  async convertMessage(msg: DiscordMessage): Promise<Message> {
-    logger.debug(msg);
-    return null;
-    // const received = now();
-    // const id = msg.id;
-    // const extra = {
-    //   received,
-    // };
-    // const content = msg.content;
-    // const type = 'text';
-    // const date = msg.createdTimestamp;
-    // const reply = null;
-    // const sender = new User(
-    //   msg.author.id,
-    //   msg.author.username,
-    //   `#${msg.author.discriminator}`,
-    //   msg.author.tag,
-    //   msg.author.bot,
-    // );
-    // const conversation = new Conversation('-' + msg.channel.id);
-    // const channel = await this.client.channels.fetch(msg.channel.id);
-    // if (channel.constructor.name == 'DMChannel') {
-    //   conversation.id = channel['recipient']['id'];
-    //   conversation.title = channel['recipient']['username'];
-    // } else {
-    //   conversation.title = channel['name'];
-    // }
-    // return new Message(id, conversation, sender, content, type, date, reply, extra);
+  handleMessages(data: any) {
+    if (data.object == 'page') {
+      for (const entry of data.entry) {
+        for (const messagingEvent of entry.messaging) {
+          this.bot.inbox.emit('message', this.convertMessage(messagingEvent));
+        }
+      }
+    }
+  }
+
+  async convertMessage(msg): Promise<Message> {
+    const id = msg.mid;
+    const extra = {};
+    let content;
+    let type = 'text';
+    if (msg.message.text) {
+      content = msg.message.text;
+      type = 'text';
+    } else if (msg.message.attachments) {
+      type = msg.message.attachments[0].type;
+      content = msg.message.attachments[0].payload.url;
+      if (msg.message.attachments.length > 1) {
+        content = [];
+        for (const attach of msg.message.attachments) {
+          content.push(attach.payload.url);
+        }
+      }
+    }
+    const date = msg.timestamp;
+    const reply = null;
+    const sender = new User(msg.sender.id, null, msg.sender.id);
+    const conversation = new Conversation(msg.recipient.id, msg.recipient.id);
+    return new Message(id, conversation, sender, content, type, date, reply, extra);
   }
 
   async sendMessage(msg: Message): Promise<void> {
-    logger.debug(msg);
+    const params = {
+      access_token: this.bot.config.apiKeys.facebookPageAccessToken,
+    };
+    const headers = {
+      'Content-Type': 'application/json',
+    };
+    const data = JSON.stringify({
+      recipient: {
+        id: msg.conversation.id,
+      },
+      message: {
+        text: msg.content,
+      },
+    });
+    await sendRequest('https://graph.facebook.com/v2.6/me/messages', params, headers, data);
   }
 
   async getMessage(chatId: string | number, messageId: string | number, ignoreReply?: boolean): Promise<Message> {
