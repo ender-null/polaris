@@ -60,7 +60,12 @@ export class FacebookBindings extends BindingsBase {
     if (data.object == 'page') {
       for (const entry of data.entry) {
         for (const messagingEvent of entry.messaging) {
-          this.bot.inbox.emit('message', this.convertMessage(messagingEvent));
+          const msg = this.convertMessage(messagingEvent);
+          logger.info(JSON.stringify(messagingEvent));
+          logger.info(JSON.stringify(msg));
+          if (msg) {
+            this.bot.inbox.emit('message', msg);
+          }
         }
       }
     }
