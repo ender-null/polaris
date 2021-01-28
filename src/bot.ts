@@ -128,6 +128,7 @@ export class Bot {
   }
 
   async webhookHandler(req: IncomingMessage, res: ServerResponse, data: any): Promise<void> {
+    logger.info(`☁️ ${this.config.icon} [webhook:${req.url}] ${data}`);
     let dataObject;
     try {
       dataObject = JSON.parse(data);
@@ -139,7 +140,6 @@ export class Bot {
     if (path[2].startsWith('webhook')) {
       await this.bindings.webhookHandler(req, res, dataObject);
     } else {
-      logger.info(`☁️ ${this.config.icon} [webhook:${req.url}] ${data}`);
       for (const i in this.plugins) {
         const plugin = this.plugins[i];
         if (getPluginSlug(plugin) == path[2] && 'webhook' in plugin) {
