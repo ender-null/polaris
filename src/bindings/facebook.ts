@@ -27,7 +27,7 @@ export class FacebookBindings extends BindingsBase {
     if (req.method === 'GET') {
       this.handleVerification(req, res);
     } else if (req.method === 'POST') {
-      this.handleMessages(data);
+      await this.handleMessages(data);
     }
   }
 
@@ -56,14 +56,14 @@ export class FacebookBindings extends BindingsBase {
     }
   }
 
-  handleMessages(data: any) {
+  async handleMessages(data: any) {
     if (data.object == 'page') {
       for (const entry of data.entry) {
         for (const messagingEvent of entry.messaging) {
-          const msg = this.convertMessage(messagingEvent);
+          const msg = await this.convertMessage(messagingEvent);
           logger.info(JSON.stringify(messagingEvent));
           logger.info(JSON.stringify(msg));
-          if (msg) {
+          if (msg && Object.keys(msg).length > 0) {
             this.bot.inbox.emit('message', msg);
           }
         }
