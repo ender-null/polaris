@@ -61,8 +61,6 @@ export class FacebookBindings extends BindingsBase {
       for (const entry of data.entry) {
         for (const messagingEvent of entry.messaging) {
           const msg = await this.convertMessage(messagingEvent);
-          logger.info(JSON.stringify(messagingEvent));
-          logger.info(JSON.stringify(msg));
           if (msg && Object.keys(msg).length > 0) {
             this.bot.inbox.emit('message', msg);
           }
