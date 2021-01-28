@@ -98,15 +98,29 @@ export class FacebookBindings extends BindingsBase {
     const headers = {
       'Content-Type': 'application/json',
     };
-    const data = JSON.stringify({
+    const data = {
       recipient: {
         id: msg.conversation.id,
       },
-      message: {
+      message: null,
+    };
+    if (msg.type == 'text') {
+      data.message = {
         text: msg.content,
-      },
-    });
-    await sendRequest('https://graph.facebook.com/v2.6/me/messages', params, headers, data);
+      };
+    } else {
+      data.message = {
+        attachment: {
+          type: msg.type,
+          payload: {
+            url: msg.content,
+            is_reusable: true,
+          },
+        },
+      };
+    }
+    const body = JSON.stringify(data);
+    await sendRequest('https://graph.facebook.com/v9.0/me/messages', params, headers, body, true, this.bot);
   }
 
   async getMessage(chatId: string | number, messageId: string | number, ignoreReply?: boolean): Promise<Message> {
