@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { parse } from 'url';
 import { BindingsBase, Bot, Conversation, ConversationInfo, Message, User } from '..';
-import { isInt, logger, sendRequest } from '../utils';
+import { isInt, logger } from '../utils';
 
 export class FacebookBindings extends BindingsBase {
   constructor(bot: Bot) {
@@ -143,7 +143,10 @@ export class FacebookBindings extends BindingsBase {
       }
     }
     const body = JSON.stringify(data);
-    await sendRequest('https://graph.facebook.com/v9.0/me/messages', params, headers, body, true, this.bot);
+    logger.info(params);
+    logger.info(headers);
+    logger.info(body);
+    // await sendRequest('https://graph.facebook.com/v9.0/me/messages', params, headers, body, true, this.bot);
   }
 
   async getMessage(chatId: string | number, messageId: string | number, ignoreReply?: boolean): Promise<Message> {
