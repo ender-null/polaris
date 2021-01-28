@@ -126,7 +126,7 @@ export class FacebookBindings extends BindingsBase {
       if (isInt(msg.content)) {
         data.message = {
           attachment: {
-            type: msg.type,
+            type: this.getFacebookAttachmentType(msg.type),
             payload: {
               attachment_id: msg.content,
             },
@@ -135,7 +135,7 @@ export class FacebookBindings extends BindingsBase {
       } else if (msg.content.startsWith('http')) {
         data.message = {
           attachment: {
-            type: msg.type,
+            type: this.getFacebookAttachmentType(msg.type),
             payload: {
               url: msg.content,
               is_reusable: true,
@@ -145,7 +145,7 @@ export class FacebookBindings extends BindingsBase {
       } else {
         data.message = {
           attachment: {
-            type: msg.type,
+            type: this.getFacebookAttachmentType(msg.type),
             payload: {
               is_reusable: true,
             },
@@ -169,6 +169,17 @@ export class FacebookBindings extends BindingsBase {
       const body = JSON.stringify(message);
       await sendRequest('https://graph.facebook.com/v9.0/me/messages', params, headers, body, true, this.bot);
     }
+  }
+
+  getFacebookAttachmentType(type: string) {
+    if (type == 'photo') {
+      return 'image';
+    } else if (type == 'voice' || type == 'audio') {
+      return 'audio';
+    } else if (type == 'video') {
+      return 'video';
+    }
+    return 'file';
   }
 
   async getMessage(chatId: string | number, messageId: string | number, ignoreReply?: boolean): Promise<Message> {
