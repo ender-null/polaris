@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { parse } from 'url';
 import { BindingsBase, Bot, Conversation, ConversationInfo, Message, User } from '..';
-import { logger, sendRequest } from '../utils';
+import { isInt, logger, sendRequest } from '../utils';
 
 export class FacebookBindings extends BindingsBase {
   constructor(bot: Bot) {
@@ -103,21 +103,43 @@ export class FacebookBindings extends BindingsBase {
         id: msg.conversation.id,
       },
       message: null,
+      filedata: null,
     };
     if (msg.type == 'text') {
       data.message = {
         text: msg.content,
       };
     } else {
-      data.message = {
-        attachment: {
-          type: msg.type,
-          payload: {
-            url: msg.content,
-            is_reusable: true,
+      if (isInt(msg.content)) {
+        data.message = {
+          attachment: {
+            type: msg.type,
+            payload: {
+              attachment_id: msg.content,
+            },
           },
-        },
-      };
+        };
+      } else if (msg.content.startsWith('http')) {
+        data.message = {
+          attachment: {
+            type: msg.type,
+            payload: {
+              url: msg.content,
+              is_reusable: true,
+            },
+          },
+        };
+      } else {
+        data.message = {
+          attachment: {
+            type: msg.type,
+            payload: {
+              is_reusable: true,
+            },
+          },
+        };
+        data.filedata = msg.content;
+      }
     }
     const body = JSON.stringify(data);
     await sendRequest('https://graph.facebook.com/v9.0/me/messages', params, headers, body, true, this.bot);
