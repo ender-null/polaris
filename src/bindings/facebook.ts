@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http';
 import { parse } from 'url';
 import { BindingsBase, Bot, Conversation, ConversationInfo, Message, User } from '..';
-import { isInt, logger, sendRequest } from '../utils';
+import { htmlToDiscordMarkdown, isInt, logger, sendRequest, splitLargeMessage } from '../utils';
 
 export class FacebookBindings extends BindingsBase {
   constructor(bot: Bot) {
@@ -72,6 +72,9 @@ export class FacebookBindings extends BindingsBase {
   }
 
   async convertMessage(msg): Promise<Message> {
+    if (msg.message.is_echo) {
+      return null;
+    }
     const id = msg.mid;
     const extra = {};
     let content;
@@ -112,9 +115,15 @@ export class FacebookBindings extends BindingsBase {
       filedata: null,
     };
     if (msg.type == 'text') {
-      data.message = {
-        text: msg.content,
-      };
+      if ('format' in msg.extra && msg.extra['format'] == 'HTML') {
+        data.message = {
+          text: htmlToDiscordMarkdown(msg.content),
+        };
+      } else {
+        data.message = {
+          text: msg.content,
+        };
+      }
     } else {
       if (isInt(msg.content)) {
         data.message = {
@@ -147,8 +156,21 @@ export class FacebookBindings extends BindingsBase {
         data.filedata = msg.content;
       }
     }
-    const body = JSON.stringify(data);
-    await sendRequest('https://graph.facebook.com/v9.0/me/messages', params, headers, body, true, this.bot);
+    const messages = [];
+    if (msg.type == 'text' && data.message.text.length > 2000) {
+      const texts = splitLargeMessage(data.message.text, 2000);
+      for (const text of texts) {
+        const message = { ...data };
+        message.message.text = text;
+        messages.push(message);
+      }
+    } else {
+      messages.push(data);
+    }
+    for (const message of messages) {
+      const body = JSON.stringify(message);
+      await sendRequest('https://graph.facebook.com/v9.0/me/messages', params, headers, body, true, this.bot);
+    }
   }
 
   async getMessage(chatId: string | number, messageId: string | number, ignoreReply?: boolean): Promise<Message> {
