@@ -22,7 +22,7 @@ export class GitHubPlugin extends PluginBase {
           7,
         )}</a>: <i>${data.head_commit.message}</i> by ${data.repository.owner.name}`;
       }
-      if (data.action) {
+      if (data.check_run) {
         text = `${capitalize(data.action)} check run <a href="${data.check_run.details_url}">${
           data.check_run.id
         }</a> with status: ${data.check_run.status}`;
