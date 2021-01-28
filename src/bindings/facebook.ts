@@ -99,6 +99,7 @@ export class FacebookBindings extends BindingsBase {
       'Content-Type': 'application/json',
     };
     const data = {
+      messaging_type: 'RESPONSE',
       recipient: {
         id: msg.conversation.id,
       },
