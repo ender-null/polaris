@@ -6,6 +6,5 @@ services:
     container_name: polaris
     volumes:
       - ./logs:/usr/src/app/logs
-      - ./.tdlib_files:/usr/src/app/.tdlib_files
       - ./docs/firebase.json:/usr/src/app/firebase.json
       - ./docs/data:/usr/src/app/data
