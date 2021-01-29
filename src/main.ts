@@ -68,56 +68,58 @@ export async function start(): Promise<void> {
 process.once('SIGINT', () => stop(true));
 process.once('SIGTERM', () => stop(true));
 
-const options = {
-  key: readFileSync('data/key.pem'),
-  cert: readFileSync('data/cert.pem'),
-};
+if (process.env.ENV != 'dev') {
+  const options = {
+    key: readFileSync('data/key.pem'),
+    cert: readFileSync('data/cert.pem'),
+  };
 
-createServer(options, async (req: IncomingMessage, res: ServerResponse) => {
-  const path = req.url.split('/');
-  let found = false;
-  let content;
+  createServer(options, async (req: IncomingMessage, res: ServerResponse) => {
+    const path = req.url.split('/');
+    let found = false;
+    let content;
 
-  if (req.method === 'GET') {
-    content = null;
-  } else if (req.method === 'POST') {
-    content = await new Promise((resolve) => {
-      const chunks = [];
-      req.on('data', (chunk) => {
-        chunks.push(chunk);
+    if (req.method === 'GET') {
+      content = null;
+    } else if (req.method === 'POST') {
+      content = await new Promise((resolve) => {
+        const chunks = [];
+        req.on('data', (chunk) => {
+          chunks.push(chunk);
+        });
+        req.on('end', () => {
+          resolve(JSON.stringify(JSON.parse(Buffer.concat(chunks).toString()), null, 4));
+        });
       });
-      req.on('end', () => {
-        resolve(JSON.stringify(JSON.parse(Buffer.concat(chunks).toString()), null, 4));
-      });
-    });
-  }
-
-  for (const bot of bots) {
-    let name = path[1];
-    let bindings = null;
-    if (name.indexOf(':') > -1) {
-      name = path[1].split(':')[0];
-      bindings = path[1].split(':')[1];
     }
-    const slug = getBindingsSlug(bot.bindings);
-    if (bot.config.name == name) {
-      found = true;
-      if (bindings) {
-        if (bindings == slug) {
+
+    for (const bot of bots) {
+      let name = path[1];
+      let bindings = null;
+      if (name.indexOf(':') > -1) {
+        name = path[1].split(':')[0];
+        bindings = path[1].split(':')[1];
+      }
+      const slug = getBindingsSlug(bot.bindings);
+      if (bot.config.name == name) {
+        found = true;
+        if (bindings) {
+          if (bindings == slug) {
+            await bot.webhookHandler(req, res, content);
+          }
+        } else {
           await bot.webhookHandler(req, res, content);
         }
-      } else {
-        await bot.webhookHandler(req, res, content);
       }
     }
-  }
 
-  if (!res.writableEnded) {
-    res.statusCode = found ? 200 : 404;
-    res.writeHead(found ? 200 : 404);
-    res.end(found ? 'OK' : 'Not Found');
-  }
-}).listen(1984);
+    if (!res.writableEnded) {
+      res.statusCode = found ? 200 : 404;
+      res.writeHead(found ? 200 : 404);
+      res.end(found ? 'OK' : 'Not Found');
+    }
+  }).listen(1984);
+}
 
 export const db = new Database();
 db.events.once('loaded', async () => {
