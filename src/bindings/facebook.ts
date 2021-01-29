@@ -35,20 +35,16 @@ export class FacebookBindings extends BindingsBase {
     // Parse the query params
     const query = parse(req.url, true).query;
 
-    // Checks if a token and mode is in the query string of the request
     if (query['hub.mode'] && query['hub.verify_token']) {
-      // Checks the mode and token sent is correct
       if (
         query['hub.mode'] === 'subscribe' &&
         query['hub.verify_token'] === this.bot.config.apiKeys.facebookVerifyToken
       ) {
-        // Responds with the challenge token from the request
         logger.info('WEBHOOK_VERIFIED');
         res.statusCode = 200;
         res.writeHead(200);
         res.end(query['hub.challenge']);
       } else {
-        // Responds with '403 Forbidden' if verify tokens do not match
         res.statusCode = 403;
         res.writeHead(403);
         res.end(403);
