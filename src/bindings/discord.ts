@@ -133,7 +133,7 @@ export class DiscordBindings extends BindingsBase {
 
           if (content.length > 2000) {
             const texts = splitLargeMessage(content, 2000);
-            for (const text in texts) {
+            for (const text of texts) {
               await chat.send(text);
             }
           } else {
