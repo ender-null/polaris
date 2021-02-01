@@ -19,27 +19,27 @@ export class ErrorMessages {
   permissionRequired?: string;
   privateOnly?: string;
   spammerDetected?: string;
-}
 
-export class Errors extends ErrorMessages {
-  static adminRequired = 'Only works with <b>admin privileges</b>';
-  static apiLimitExceeded = 'The API limits have been exceeded';
-  static connectionError = 'Connection error';
-  static disabled = 'That feature is disabled';
-  static downloadFailed = 'Download failed';
-  static exceptionFound = 'Exception found';
-  static failed = 'Failed';
-  static groupOnly = 'Only works with <b>groups</b>';
-  static idiotKicked = 'Idiot kicked';
-  static invalidArgument = 'Invalid argument';
-  static missingId = 'Missing ID';
-  static missingParameter = 'Missing parameter';
-  static needsReply = 'Only works with <b>replies</b>';
-  static noResults = 'No results';
-  static notImplemented = 'Function not implemented';
-  static permissionRequired = 'Permission required';
-  static privateOnly = 'Only works in <b>private</b>';
-  static spammerDetected = 'Spammer detected, proceed to commit death';
+  constructor() {
+    this.adminRequired = 'Only works with <b>admin privileges</b>';
+    this.apiLimitExceeded = 'The API limits have been exceeded';
+    this.connectionError = 'Connection error';
+    this.disabled = 'That feature is disabled';
+    this.downloadFailed = 'Download failed';
+    this.exceptionFound = 'Exception found';
+    this.failed = 'Failed';
+    this.groupOnly = 'Only works with <b>groups</b>';
+    this.idiotKicked = 'Idiot kicked';
+    this.invalidArgument = 'Invalid argument';
+    this.missingId = 'Missing ID';
+    this.missingParameter = 'Missing parameter';
+    this.needsReply = 'Only works with <b>replies</b>';
+    this.noResults = 'No results';
+    this.notImplemented = 'Function not implemented';
+    this.permissionRequired = 'Permission required';
+    this.privateOnly = 'Only works in <b>private</b>';
+    this.spammerDetected = 'Spammer detected, proceed to commit death';
+  }
 }
 
 export interface ApiKeys {
