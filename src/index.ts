@@ -10,7 +10,6 @@ export {
   ConversationInfo,
   DatabaseReminder,
   ErrorMessages,
-  Errors,
   Extra,
   iConfig,
   iConversation,
