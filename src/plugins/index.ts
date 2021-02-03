@@ -24,6 +24,7 @@ export { ReactionPlugin } from './reaction';
 export { ReminderPlugin } from './reminder';
 export { RussianRoulettePlugin } from './russian-roulette';
 export { SearchPlugin } from './search';
+export { StatusPlugin } from './status';
 export { TagPlugin } from './tag';
 export { TelegramPlugin } from './telegram';
 export { UrbanDictionaryPlugin } from './urban-dictionary';
