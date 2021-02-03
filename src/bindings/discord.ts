@@ -1,7 +1,7 @@
 import { Client, Message as DiscordMessage, MessageAttachment, MessageEmbed } from 'discord.js';
-import { BindingsBase, Bot, Conversation, ConversationInfo, Message, User } from '..';
+import { BindingsBase, Bot, Conversation, ConversationInfo, Extra, Message, User } from '..';
 import { db } from '../main';
-import { getExtension, htmlToDiscordMarkdown, logger, now, splitLargeMessage } from '../utils';
+import { getExtension, htmlToDiscordMarkdown, logger, splitLargeMessage } from '../utils';
 
 export class DiscordBindings extends BindingsBase {
   client: Client;
@@ -67,10 +67,9 @@ export class DiscordBindings extends BindingsBase {
   }
 
   async convertMessage(msg: DiscordMessage): Promise<Message> {
-    const received = now();
     const id = msg.id;
-    const extra = {
-      received,
+    const extra: Extra = {
+      originalMessage: msg,
     };
     const content = msg.content;
     const type = 'text';
@@ -106,13 +105,15 @@ export class DiscordBindings extends BindingsBase {
     if (msg.content) {
       let chat;
       try {
-        if (+msg.conversation.id > 0) {
-          chat = await (await this.client.users.fetch(String(msg.conversation.id))).dmChannel;
-        } else {
+        if (msg.extra.originalMessage) {
+          chat = msg.extra.originalMessage.channel;
+        } else if (String(msg.conversation.id).startsWith('-')) {
           chat = await this.client.channels.fetch(String(msg.conversation.id).slice(1));
+        } else {
+          chat = await (await this.client.users.fetch(String(msg.conversation.id))).dmChannel;
         }
       } catch (e) {
-        logger.error(e.message);
+        logger.error(`${e.message} ${msg.conversation.id}`);
         return;
       }
       if (chat) {
@@ -139,7 +140,7 @@ export class DiscordBindings extends BindingsBase {
           } else {
             const message = await chat.send(content);
             if (msg.type == 'text' && msg.extra.addPing) {
-              const ping = message.createdTimestamp - msg.date;
+              const ping = message.createdTimestamp - msg.extra.originalMessage.createdTimestamp;
               message.edit(msg.content + `\n\`${ping.toFixed(3)}\``);
             }
           }

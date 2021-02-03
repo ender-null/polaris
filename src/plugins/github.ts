@@ -1,7 +1,7 @@
 import { Bot } from '..';
 import { PluginBase } from '../plugin';
 import { Conversation } from '../types';
-import { getTaggedWith, logger } from '../utils';
+import { capitalize, getTaggedWith, logger } from '../utils';
 
 export class GitHubPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -22,20 +22,20 @@ export class GitHubPlugin extends PluginBase {
           7,
         )}</a>: <i>${data.head_commit.message}</i> by ${data.repository.owner.name}`;
       }
-      // if (data.check_run) {
-      //   let icon;
-      //   if (data.check_run.status == 'completed') {
-      //     icon = '✔️';
-      //   } else if (data.check_run.status == 'queued') {
-      //     icon = '➕';
-      //   } else if (data.check_run.status == 'failed') {
-      //     icon = '❌';
-      //   } else {
-      //     icon = '❔';
-      //   }
-      //   const status = capitalize(data.check_run.status);
-      //   text = `${icon} ${status} check run <a href="${data.check_run.details_url}">${data.check_run.id}</a>`;
-      // }
+      if (data.check_run) {
+        let icon;
+        if (data.check_run.status == 'completed') {
+          icon = '✔️';
+        } else if (data.check_run.status == 'queued') {
+          icon = '➕';
+        } else if (data.check_run.status == 'failed') {
+          icon = '❌';
+        } else {
+          icon = '❔';
+        }
+        const status = capitalize(data.check_run.status);
+        text = `${icon} ${status} check run <a href="${data.check_run.details_url}">${data.check_run.id}</a>`;
+      }
       for (const sub of subs) {
         this.bot.sendMessage(new Conversation(sub), text);
       }

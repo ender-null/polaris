@@ -1,6 +1,6 @@
 import { htmlToText } from 'html-to-text';
 import { AutojoinRoomsMixin, LogLevel, LogService, MatrixClient, SimpleFsStorageProvider } from 'matrix-bot-sdk';
-import { BindingsBase, Bot, Conversation, ConversationInfo, Message, User } from '..';
+import { BindingsBase, Bot, Conversation, ConversationInfo, Extra, Message, User } from '..';
 import { catchException, logger } from '../utils';
 
 export class MatrixBindings extends BindingsBase {
@@ -53,7 +53,9 @@ export class MatrixBindings extends BindingsBase {
 
   async convertMessage(roomId: string, msg): Promise<Message> {
     const id = msg.event_id;
-    const extra = {};
+    const extra: Extra = {
+      originalMessage: msg,
+    };
     const content = msg.content.body;
     const type = 'text';
     const date = msg.origin_server_ts;

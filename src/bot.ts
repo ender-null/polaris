@@ -437,6 +437,9 @@ export class Bot {
     if (msg.extra.addPing) {
       extra.addPing = msg.extra.addPing;
     }
+    if (msg.extra.originalMessage) {
+      extra.originalMessage = msg.extra.originalMessage;
+    }
     this.sendMessage(msg.conversation, content, type, reply, extra);
   }
 

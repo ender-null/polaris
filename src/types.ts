@@ -160,7 +160,8 @@ export class Message {
   }
 }
 
-export abstract class Extra extends Object {
+export interface Extra {
+  originalMessage?: any;
   input?: string;
   inputReply?: string;
   addPing?: boolean;

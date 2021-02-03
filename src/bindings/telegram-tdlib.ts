@@ -106,7 +106,9 @@ export class TelegramTDlibBindings extends BindingsBase {
 
   async convertMessage(msg: message, ignoreReply?: boolean): Promise<Message> {
     const id = msg['id'];
-    const extra: Extra = {};
+    const extra: Extra = {
+      originalMessage: msg,
+    };
 
     const rawChat = await this.serverRequest('getChat', { chat_id: msg.chat_id });
     const conversation = new Conversation(msg.chat_id);
