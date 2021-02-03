@@ -11,6 +11,10 @@ export class VoicePlugin extends PluginBase {
         shortcut: '/v',
         parameters: [
           {
+            name: 'language',
+            required: false,
+          },
+          {
             name: 'text',
             required: true,
           },
