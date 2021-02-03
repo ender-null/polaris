@@ -64,6 +64,10 @@ export interface ApiKeys {
   matrixHomeserverUrl?: string;
   facebookPageAccessToken?: string;
   facebookVerifyToken?: string;
+  twitterConsumerKey?: string;
+  twitterConsumerSecret?: string;
+  twitterAccessTokenKey?: string;
+  twitterAccessTokenSecret?: string;
 }
 
 export interface Instance {
