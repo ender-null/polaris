@@ -883,7 +883,7 @@ export function formatTimeInSeconds(seconds: number) {
   const hours = Math.floor(seconds / t.hour);
   seconds = seconds - hours * t.hour;
   const minutes = Math.floor(seconds / t.minute);
-  seconds = seconds - minutes * t.minute;
+  seconds = Math.round(seconds - minutes * t.minute);
   let text = '';
   if (days > 0 && days <= 9) {
     text += `${days}d `;
