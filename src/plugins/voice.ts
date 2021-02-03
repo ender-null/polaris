@@ -1,6 +1,6 @@
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
-import { download, generateCommandHelp, getInput, mp3ToOgg } from '../utils';
+import { download, generateCommandHelp, getInput, getWord, mp3ToOgg } from '../utils';
 
 export class VoicePlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -20,12 +20,23 @@ export class VoicePlugin extends PluginBase {
     ];
   }
   async run(msg: Message): Promise<void> {
-    const input = getInput(msg);
+    let input = getInput(msg);
     if (!input) {
       return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
     }
 
-    const language = this.bot.config.locale || 'en_UK';
+    if (encodeURI(input).length > 200) {
+      return this.bot.replyMessage(msg, this.bot.errors.failed);
+    }
+
+    let language = this.bot.config.locale || 'en_UK';
+    const langRegExp = new RegExp('\\[(\\S+)\\]', 'gim');
+    const inputMatch = langRegExp.exec(getWord(input, 1));
+    if (inputMatch && inputMatch.length > 0 && inputMatch[1]) {
+      language = inputMatch[1];
+      input = input.replace(langRegExp, '');
+    }
+
     const url = 'http://translate.google.com/translate_tts';
     const params = {
       tl: language,
@@ -41,10 +52,6 @@ export class VoicePlugin extends PluginBase {
       'User-Agent':
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.8 Safari/537.36',
     };
-
-    if (encodeURI(input).length > 200) {
-      return this.bot.replyMessage(msg, this.bot.errors.failed);
-    }
 
     const file = await download(url, params, headers, false, this.bot);
     if (!file) {
