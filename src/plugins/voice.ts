@@ -25,7 +25,7 @@ export class VoicePlugin extends PluginBase {
       return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
     }
 
-    const language = this.bot.config.locale;
+    const language = this.bot.config.locale || 'en_UK';
     const url = 'http://translate.google.com/translate_tts';
     const params = {
       tl: language,
