@@ -877,6 +877,14 @@ export function formatDate(timestamp: number): string {
   return date.toLocaleString();
 }
 
+export function toDateTime(seconds: number, format?: boolean) {
+  if (format) {
+    return formatDate(seconds * 1000);
+  } else {
+    return new Date(seconds * 1000);
+  }
+}
+
 export const loggerFormat = winstonFormat.printf(({ level, message, timestamp, ...metadata }) => {
   let msg = `${timestamp} [${level}]: ${message} `;
   if (metadata && Object.keys(metadata).length > 0) {

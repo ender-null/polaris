@@ -1,6 +1,7 @@
 import os from 'os';
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
+import { toDateTime } from '../utils';
 
 export class StatusPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -12,19 +13,28 @@ export class StatusPlugin extends PluginBase {
         skipHelp: true,
       },
     ];
+    this.strings = {
+      platform: 'Platform',
+      release: 'Kernel',
+      version: 'Version',
+      hostname: 'Hostname',
+      load: 'Load',
+      uptime: 'Uptime',
+      memory: 'RAM',
+    };
   }
   async run(msg: Message): Promise<void> {
     let text = '';
-    text += `\nRelease: ${os.release()}`;
-    text += `\nPlatform: ${os.platform()}`;
-    text += `\nVersion: ${os.version()}`;
-    text += `\nHostname: ${os.hostname()}`;
-    text += `\nLoad: ${os.loadavg()}`;
-    text += `\nUptime: ${os.uptime()}`;
-    text += `\nCPUs: ${os.cpus()}`;
-    text += `\nRAM: ${os.totalmem() - os.freemem()}/${os.totalmem()} (${
-      (os.totalmem() - os.freemem()) / os.totalmem()
-    })`;
+    const usedmem = (os.totalmem() - os.freemem()) / (1024 * 1024);
+    const totalmem = os.totalmem() / (1024 * 1024);
+    const mem = (usedmem / totalmem) * 100;
+    text += `\n${this.strings.platform}: <code>${os.platform()}</code>`;
+    text += `\n${this.strings.release}: <code>${os.release()}</code>`;
+    text += `\n${this.strings.version}: <code>${os.version()}</code>`;
+    text += `\n${this.strings.hostname}: <code>${os.hostname()}</code>`;
+    text += `\n${this.strings.load}: <code>${os.loadavg()[0]}</code>`;
+    text += `\n${this.strings.uptime}: <code>${toDateTime(os.uptime())}</code>`;
+    text += `\n${this.strings.memory}: <code>${usedmem}/${totalmem} (${mem}%)</code>`;
     this.bot.replyMessage(msg, text);
   }
 }
