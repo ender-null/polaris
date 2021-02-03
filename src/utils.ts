@@ -884,7 +884,23 @@ export function formatTimeInSeconds(seconds: number) {
   seconds = seconds - hours * t.hour;
   const minutes = Math.floor(seconds / t.minute);
   seconds = seconds - minutes * t.minute;
-  return `${days}d ${hours}h ${minutes}m ${seconds}s`;
+  let text = '';
+  if (days > 0 && days <= 9) {
+    text += `${days}d `;
+  }
+  if (hours <= 9) {
+    text += '0';
+  }
+  text += `${hours}:`;
+  if (minutes <= 9) {
+    text += '0';
+  }
+  text += `${minutes}:`;
+  if (seconds <= 9) {
+    text += '0';
+  }
+  text += `${seconds}`;
+  return text;
 }
 
 export const loggerFormat = winstonFormat.printf(({ level, message, timestamp, ...metadata }) => {
