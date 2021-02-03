@@ -25,7 +25,7 @@ export class AboutPlugin extends PluginBase {
     ];
     this.strings = {
       greeting: "Hi! I'm <b>{0}</b>!\nNice to meet you.",
-      version: 'Running <a href="https://git.io/polaris">polaris</a> by @endernull.',
+      version: 'Running <a href="https://git.io/polaris">polaris</a> <code>{0}</code> by @endernull.',
       license:
         '<b>Polaris</b> (including all plugins and documentation) is <b>free software</b>; you are free to redistribute it and/or modify it under the terms of the <b>AGPL-3.0 License</b>.',
       help: 'Write {0}help to know what I can do!',
@@ -43,7 +43,7 @@ export class AboutPlugin extends PluginBase {
     let text;
     if (isCommand(this, 1, msg.content) || isCommand(this, 3, msg.content)) {
       const greeting = format(this.strings.greeting, this.bot.user.firstName);
-      const version = this.strings.version;
+      const version = format(this.strings.version, process.env.npm_package_version);
       const license = this.strings.license;
       const help = format(this.strings.help, this.bot.config.prefix);
       const about = format(this.strings.about, this.bot.config.prefix);

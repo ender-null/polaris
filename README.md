@@ -8,7 +8,7 @@
     <img alt="GitHub issues" src="https://img.shields.io/github/issues/luksireiku/polaris"></a>
 <a href="#">
     <img alt="GitHub top language" src="https://img.shields.io/github/languages/top/luksireiku/polaris"></a>
-<a href="https://discord.gg/sSE7gDA3v6">
+<a href="https://discord.gg/sDkg9qPfJ9">
     <img alt="Discord" src="https://img.shields.io/discord/133155648891256832"></a>
 
 A multiplatform Typescript bot using plugins!
@@ -19,7 +19,7 @@ If you find a bug or have any cool idea feel free to [open an Issue](https://git
 
 Please read the [Wiki](https://github.com/luksireiku/polaris/wiki) to get some help installing and setting it up.
 Support and suggestions at [@PolarisSupport](https://t.me/PolarisSupport).
-You can contact me at [@endernull](https://telegram.me/endernull) and on my [Discord server](https://discord.gg/sSE7gDA3v6).
+You can contact me at [@endernull](https://telegram.me/endernull) and on my [Discord server](https://discord.gg/sDkg9qPfJ9).
 
 **Polaris** (including all plugins and documentation) is free software; you are free to redistribute it and/or modify it under the terms of the [GNU Affero General Public License v3.0](LICENSE).
 

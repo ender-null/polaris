@@ -94,13 +94,13 @@ export class MatrixBindings extends BindingsBase {
           content = content.replace(/(\t)/g, ' ');
           data = {
             body: htmlToText(content, { wordwrap: false }),
-            msgtype: 'm.text',
+            msgtype: 'm.notice',
             format: 'org.matrix.custom.html',
             formatted_body: content,
           };
         } else {
           data = {
-            msgtype: 'm.text',
+            msgtype: 'm.notice',
             body: content,
           };
         }
@@ -145,7 +145,7 @@ export class MatrixBindings extends BindingsBase {
     } else if (type == 'location') {
       return 'm.location';
     }
-    return 'm.text';
+    return 'm.notice';
   }
 
   async stop(): Promise<void> {
