@@ -21,6 +21,8 @@ export class StatusPlugin extends PluginBase {
       load: 'Load',
       uptime: 'Uptime',
       memory: 'RAM',
+      nodeVersion: 'Node.js',
+      arch: 'Arch',
     };
   }
   async run(msg: Message): Promise<void> {
@@ -30,13 +32,15 @@ export class StatusPlugin extends PluginBase {
     const mem = (usedmem / totalmem) * 100;
     text += `\n${this.strings.platform}: <code>${os.platform()}</code>`;
     text += `\n${this.strings.release}: <code>${os.release()}</code>`;
+    text += `\n${this.strings.arch}: <code>${process.arch}</code>`;
     text += `\n${this.strings.version}: <code>${os.version()}</code>`;
     text += `\n${this.strings.hostname}: <code>${os.hostname()}</code>`;
     text += `\n${this.strings.load}: <code>${os.loadavg()[0]}</code>`;
-    text += `\n${this.strings.uptime}: <code>${formatTimeInSeconds(os.uptime())}</code>`;
+    text += `\n${this.strings.uptime}: <code>${formatTimeInSeconds(process.uptime())}</code>`;
     text += `\n${this.strings.memory}: <code>${Math.round(usedmem)}/${Math.round(totalmem)} (${Math.round(
       mem,
     )}%)</code>`;
+    text += `\n${this.strings.nodeVersion}: <code>${process.version}</code>`;
     this.bot.replyMessage(msg, text);
   }
 }
