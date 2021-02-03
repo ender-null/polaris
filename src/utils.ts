@@ -777,7 +777,7 @@ export function formatNumber(number: string | number): string {
   if (typeof number == 'string') {
     number = parseInt(number);
   }
-  return number.toLocaleString(undefined);
+  return number.toLocaleString(null);
 }
 
 export function sortList(list: iString): iString {
@@ -877,12 +877,14 @@ export function formatDate(timestamp: number): string {
   return date.toLocaleString();
 }
 
-export function toDateTime(seconds: number, format?: boolean) {
-  if (format) {
-    return formatDate(seconds * 1000);
-  } else {
-    return new Date(seconds * 1000);
-  }
+export function formatTimeInSeconds(seconds: number) {
+  const days = Math.floor(seconds / t.day);
+  seconds = seconds - days * t.day;
+  const hours = Math.floor(seconds / t.hour);
+  seconds = seconds - hours * t.hour;
+  const minutes = Math.floor(seconds / t.minute);
+  seconds = seconds - minutes * t.minute;
+  return `${days}d ${hours}h ${minutes}m ${seconds}s`;
 }
 
 export const loggerFormat = winstonFormat.printf(({ level, message, timestamp, ...metadata }) => {

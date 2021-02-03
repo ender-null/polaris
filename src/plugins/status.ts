@@ -1,7 +1,7 @@
 import os from 'os';
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
-import { toDateTime } from '../utils';
+import { formatTimeInSeconds } from '../utils';
 
 export class StatusPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -33,8 +33,10 @@ export class StatusPlugin extends PluginBase {
     text += `\n${this.strings.version}: <code>${os.version()}</code>`;
     text += `\n${this.strings.hostname}: <code>${os.hostname()}</code>`;
     text += `\n${this.strings.load}: <code>${os.loadavg()[0]}</code>`;
-    text += `\n${this.strings.uptime}: <code>${toDateTime(os.uptime())}</code>`;
-    text += `\n${this.strings.memory}: <code>${usedmem}/${totalmem} (${mem}%)</code>`;
+    text += `\n${this.strings.uptime}: <code>${formatTimeInSeconds(os.uptime())}</code>`;
+    text += `\n${this.strings.memory}: <code>${Math.round(usedmem)}/${Math.round(totalmem)} (${Math.round(
+      mem,
+    )}%)</code>`;
     this.bot.replyMessage(msg, text);
   }
 }
