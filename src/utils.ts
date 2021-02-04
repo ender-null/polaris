@@ -877,7 +877,7 @@ export function formatDate(timestamp: number): string {
   return date.toLocaleString();
 }
 
-export function formatTimeInSeconds(seconds: number) {
+export function formatTimeInSeconds(seconds: number, dayString = 'day', daysString = 'days') {
   const days = Math.floor(seconds / t.day);
   seconds = seconds - days * t.day;
   const hours = Math.floor(seconds / t.hour);
@@ -886,7 +886,11 @@ export function formatTimeInSeconds(seconds: number) {
   seconds = Math.round(seconds - minutes * t.minute);
   let text = '';
   if (days > 0 && days <= 9) {
-    text += `${days}d `;
+    if (days > 1) {
+      text += `${days} ${daysString}, `;
+    } else {
+      text += `${days} ${dayString}, `;
+    }
   }
   if (hours <= 9) {
     text += '0';
