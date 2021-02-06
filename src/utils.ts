@@ -777,7 +777,7 @@ export function formatNumber(number: string | number): string {
   if (typeof number == 'string') {
     number = parseInt(number);
   }
-  return number.toLocaleString(null);
+  return number.toLocaleString(undefined);
 }
 
 export function sortList(list: iString): iString {
