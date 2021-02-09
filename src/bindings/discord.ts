@@ -1,7 +1,7 @@
 import { Client, Message as DiscordMessage, MessageAttachment, MessageEmbed } from 'discord.js';
 import { BindingsBase, Bot, Conversation, ConversationInfo, Extra, Message, User } from '..';
 import { db } from '../main';
-import { getExtension, htmlToDiscordMarkdown, logger, splitLargeMessage } from '../utils';
+import { getExtension, htmlToDiscordMarkdown, linkRegExp, logger, splitLargeMessage } from '../utils';
 
 export class DiscordBindings extends BindingsBase {
   client: Client;
@@ -125,10 +125,7 @@ export class DiscordBindings extends BindingsBase {
               content = htmlToDiscordMarkdown(content);
             }
             if ('preview' in msg.extra && !msg.extra['preview']) {
-              content = content.replace(
-                new RegExp('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+', 'gim'),
-                '<$&>',
-              );
+              content = content.replace(linkRegExp, '<$&>');
             }
           }
 

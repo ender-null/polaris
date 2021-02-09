@@ -72,10 +72,10 @@ export function getTags(bot: Bot, target: number | string, tagFilter?: string): 
       if (tagFilter && tagFilter.indexOf('?') > -1 && !tag.startsWith(tagFilter.split('?')[0])) {
         continue;
       }
-      const inputMatch = tagForBot.exec(tag);
+      const inputMatch = tagForBotRegExp.exec(tag);
       if (inputMatch) {
         if (inputMatch && (inputMatch[1] === bot.config.name || inputMatch[1] === bot.user.username)) {
-          tags.push(tag.replace(tagForBot, ''));
+          tags.push(tag.replace(tagForBotRegExp, ''));
         }
       } else {
         tags.push(tag);
@@ -160,10 +160,10 @@ export function delTag(bot: Bot, target: number | string, tag: string): void {
   if (db.tags[target]) {
     for (const i of Object.keys(db.tags[target])) {
       let targetTag = db.tags[target][i];
-      const inputMatch = tagForBot.exec(targetTag);
+      const inputMatch = tagForBotRegExp.exec(targetTag);
       if (inputMatch) {
         if (inputMatch && (inputMatch[1] === bot.config.name || inputMatch[1] === bot.user.username)) {
-          targetTag = targetTag.replace(tagForBot, '');
+          targetTag = targetTag.replace(tagForBotRegExp, '');
         }
       }
       if (
@@ -860,7 +860,9 @@ export function catchException(exception: Error, bot: Bot = null, message: Messa
 }
 
 export const telegramLinkRegExp = new RegExp('(?:t|telegram|tlgrm).(?:me|dog)/joinchat/([a-zA-Z0-9-_]+)', 'gim');
-export const tagForBot = new RegExp('@(\\w+):', 'gim');
+export const tagForBotRegExp = /@(\\w+):/gim;
+export const linkRegExpOld = /http[s]?:\/\/(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*(),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+/gim;
+export const linkRegExp = /[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)?/gim;
 
 export const t = {
   second: 1,

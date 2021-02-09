@@ -92,13 +92,13 @@ export class PinPlugin extends PluginBase {
         pinType = msg.reply.type;
       }
       db.pinsSnap.child(tag).ref.set({
-        content: msg.reply.content.replace('<', '&lt;').replace('>', '&gt;'),
+        content: msg.reply.content.replace(/</gim, '&lt;').replace(/>/gim, '&gt;'),
         creator: msg.sender.id,
         type: pinType,
         bot: this.bot.user.id,
       });
       db.pins[tag] = {
-        content: msg.reply.content.replace('<', '&lt;').replace('>', '&gt;'),
+        content: msg.reply.content.replace(/</gim, '&lt;').replace(/>/gim, '&gt;'),
         creator: msg.sender.id,
         type: pinType,
         bot: this.bot.user.id,
