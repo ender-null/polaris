@@ -203,13 +203,13 @@ export class PolePlugin extends PluginBase {
       if (db.poles && db.poles[gid] && db.poles[gid][date]) {
         for (const type of typesToShow) {
           if (db.poles[gid][date][type] != undefined) {
-            text += '\n${format(this.strings[type + "Set"], getFullName(db.poles[gid][date][type])}';
+            text += `\n${format(this.strings[type + 'Set'], getFullName(db.poles[gid][date][type]))}`;
           } else {
-            text += '\n${this.strings[type + "NotSet"]}';
+            text += `\n${this.strings[type + 'NotSet']}`;
           }
         }
       } else {
-        text += '\n${this.strings.poleNotSet}';
+        text += `\n${this.strings.poleNotSet}`;
       }
       return this.bot.replyMessage(msg, text);
     } else if (commandIndex >= 3 && commandIndex <= 8) {
