@@ -31,6 +31,11 @@ export class PolePlugin extends PluginBase {
         skipHelp: true,
       },
       {
+        command: '/poles',
+        description: 'Check the pole status',
+        skipHelp: true,
+      },
+      {
         command: '/pole',
         friendly: '^pole$|oro',
         description: 'Get the pole',
@@ -85,6 +90,19 @@ export class PolePlugin extends PluginBase {
       irons: 'irons',
       canarias: 'poles canarias',
       andaluzas: 'poles andaluzas',
+      today: 'Today',
+      poleSet: 'The user <b>{0}</b> got the pole',
+      subpoleSet: 'The user <b>{0}</b> got the subpole',
+      failSet: 'The user <b>{0}</b> got the fail',
+      ironSet: 'The user <b>{0}</b> got the iron',
+      canariaSet: 'The user <b>{0}</b> got the pole canaria',
+      andaluzaSet: 'The user <b>{0}</b> got the pole andaluza',
+      poleNotSet: 'No one got the pole yet',
+      subpoleNotSet: 'No one got the subpole yet',
+      failNotSet: 'No one got the fail yet',
+      ironNotSet: 'No one got the iron yet',
+      canariaNotSet: 'No one got the pole canaria yet',
+      andaluzaNotSet: 'No one got the pole andaluza yet',
       ranking: 'Ranking',
       points: 'points',
       polereset: 'The pole ranking has been reset',
@@ -171,9 +189,31 @@ export class PolePlugin extends PluginBase {
       } else {
         text = this.bot.errors.disabled;
       }
-      return this.bot.replyMessage(msg, this.bot.errors.notImplemented);
-    } else if (commandIndex >= 2 && commandIndex <= 7) {
-      const type = types[commandIndex - 2];
+      return this.bot.replyMessage(msg, text);
+    } else if (commandIndex == 2) {
+      let text = `${this.strings.today} <b>${date}</b>`;
+      let typesToShow;
+      if (timeInRange(time(1), time(2), now())) {
+        typesToShow = [types[4]];
+      } else if (timeInRange(time(12), time(13), now())) {
+        typesToShow = [types[5]];
+      } else {
+        typesToShow = types.slice(0, 4);
+      }
+      if (db.poles && db.poles[gid] && db.poles[gid][date]) {
+        for (const type of typesToShow) {
+          if (db.poles[gid][date][type] != undefined) {
+            text += '\n${format(this.strings[type + "Set"], getFullName(db.poles[gid][date][type])}';
+          } else {
+            text += '\n${this.strings[type + "NotSet"]}';
+          }
+        }
+      } else {
+        text += '\n${this.strings.poleNotSet}';
+      }
+      return this.bot.replyMessage(msg, text);
+    } else if (commandIndex >= 3 && commandIndex <= 8) {
+      const type = types[commandIndex - 3];
       if (db.poles && db.poles[gid] && db.poles[gid][date]) {
         if (
           ((type == 'subpole' || type == 'fail' || type == 'iron') && db.poles[gid][date].pole == undefined) ||

@@ -81,7 +81,7 @@ export interface Instance {
 }
 
 export abstract class Command {
-  command: string;
+  command?: string;
   friendly?: string;
   shortcut?: string;
   parameters?: Parameter[];
