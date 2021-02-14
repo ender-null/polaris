@@ -70,9 +70,11 @@ export class ReminderPlugin extends PluginBase {
       alarm: alarm,
       chatId: msg.conversation.id,
       firstName: msg.sender['firstName'],
-      username: msg.sender['username'],
       text: text,
     };
+    if (msg.sender['username'] && msg.sender['username'].length > 0) {
+      reminder.username = msg.sender['username'];
+    }
     try {
       let delayText = delay;
       if (
@@ -149,10 +151,10 @@ export class ReminderPlugin extends PluginBase {
 
       if (String(reminder.bot) == String(this.bot.user.id) && reminder.alarm < now()) {
         let chat;
-        if (+reminder.chatId > 0) {
-          chat = new Conversation(reminder.chatId, db.users[reminder.chatId].first_name);
-        } else {
+        if (String(reminder.chatId).startsWith('-')) {
           chat = new Conversation(reminder.chatId, db.groups[reminder.chatId].title);
+        } else {
+          chat = new Conversation(reminder.chatId, db.users[reminder.chatId].first_name);
         }
 
         let text = `<i>${reminder.text}</i>\n - ${reminder.firstName}`;

@@ -203,7 +203,7 @@ export class PolePlugin extends PluginBase {
       if (db.poles && db.poles[gid] && db.poles[gid][date]) {
         for (const type of typesToShow) {
           if (db.poles[gid][date][type] != undefined) {
-            text += `\n${format(this.strings[type + 'Set'], getFullName(db.poles[gid][date][type]))}`;
+            text += `\n${format(this.strings[type + 'Set'], getFullName(db.poles[gid][date][type], false))}`;
           } else {
             text += `\n${this.strings[type + 'NotSet']}`;
           }
