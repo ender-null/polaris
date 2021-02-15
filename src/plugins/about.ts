@@ -53,7 +53,7 @@ export class AboutPlugin extends PluginBase {
       const stats = format(this.strings.stats, Object.keys(db.users).length, Object.keys(db.groups).length);
 
       if (isCommand(this, 1, msg.content)) {
-        text = `${greeting}\n\n${notice}\n${channel}\n\n${help}\n${about}\n\n${version}\n${donations}\n\n${license}\n\n${stats}`;
+        text = `${greeting}\n\n${notice}\n${channel}\n\n${help}\n\n${version}\n${donations}\n\n${license}\n\n${stats}`;
       } else {
         text = `${greeting}\n\n${notice}\n${channel}\n\n${help}\n${about}\n\n${donations}`;
       }

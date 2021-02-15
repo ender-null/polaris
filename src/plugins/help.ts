@@ -20,6 +20,7 @@ export class HelpPlugin extends PluginBase {
       {
         command: '/genhelp',
         description: 'Regenerate command list',
+        keepDefault: true,
         hidden: true,
       },
     ];
