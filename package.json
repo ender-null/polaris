@@ -23,6 +23,7 @@
     "build:watch": "tsc -w -p tsconfig.release.json",
     "start": "NODE_OPTIONS=\"--max_old_space_size=4096\" UV_THREADPOOL_SIZE=128 node build/src/main.js",
     "start:dev": "ENV=\"dev\" node build/src/main.js",
+    "test": "echo \"No tests yet\" && exit 0",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "format": "prettier --write src"
