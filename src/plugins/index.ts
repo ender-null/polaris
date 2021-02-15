@@ -3,6 +3,7 @@ export { AddToDiscordPlugin } from './add-to-discord';
 export { AnimalPlugin } from './animal';
 export { AntiSpamPlugin } from './anti-spam';
 export { AscoDeVidaPlugin } from './asco-de-vida';
+export { CommitPlugin } from './commit';
 export { ConfigPlugin } from './config';
 export { CorePlugin } from './core';
 export { Covid19Plugin } from './covid-19';
