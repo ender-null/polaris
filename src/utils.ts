@@ -538,7 +538,7 @@ export function generateCommandHelp(plugin: PluginBase, text: string, showHidden
   }
 
   if (aliases.length > 0) {
-    doc += `\n\nAlias: <code>${aliases.join(', ')}</code>`;
+    doc += `\n\nAliases: <code>${aliases.join('</code>, <code>')}</code>`;
   }
 
   return doc;
