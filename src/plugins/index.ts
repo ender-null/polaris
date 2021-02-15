@@ -6,6 +6,7 @@ export { AscoDeVidaPlugin } from './asco-de-vida';
 export { ConfigPlugin } from './config';
 export { CorePlugin } from './core';
 export { Covid19Plugin } from './covid-19';
+export { CryptoPlugin } from './crypto';
 export { EchoPlugin } from './echo';
 export { GifPlugin } from './gif';
 export { GitHubPlugin } from './github';
