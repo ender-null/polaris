@@ -43,14 +43,15 @@ export class HelpPlugin extends PluginBase {
             const doc = generateCommandHelp(plugin, command.command, false);
             if (doc) {
               const lines = doc.split('\n');
-              if (showAll) {
-                text += `\n • ${lines[0]}`;
-              } else {
-                if (!command.skipHelp) {
-                  text += `\n • ${lines[0]}\n   <i>${lines[1]}</i>`;
+              if (!isCommand(this, 3, msg.content) || this.bot.config.prefix == '/' || command.keepDefault) {
+                if (showAll) {
+                  text += `\n • ${lines[0]}`;
+                } else {
+                  if (!command.skipHelp) {
+                    text += `\n • ${lines[0]}\n   <i>${lines[1]}</i>`;
+                  }
                 }
-              }
-              if (this.bot.config.prefix == '/' || command.keepDefault) {
+
                 if (lines.length > 1) {
                   commands.push({
                     command: getWord(lines[0], 1).substr(1),
