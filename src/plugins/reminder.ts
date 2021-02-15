@@ -10,6 +10,7 @@ export class ReminderPlugin extends PluginBase {
     this.commands = [
       {
         command: '/remindme',
+        aliases: ['/rm'],
         parameters: [
           {
             name: 'delay',
