@@ -40,7 +40,7 @@ export class HelpPlugin extends PluginBase {
         for (const command of plugin.commands) {
           // If the command is hidden, ignore it
           if (!('hidden' in command) || !command.hidden) {
-            const doc = generateCommandHelp(plugin, command.command, false);
+            const doc = generateCommandHelp(plugin, command.command, false, true);
             if (doc) {
               const lines = doc.split('\n');
               if (!isCommand(this, 3, msg.content) || this.bot.config.prefix == '/' || command.keepDefault) {

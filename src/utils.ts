@@ -499,7 +499,7 @@ export function getCommandIndex(plugin: PluginBase, text: string): number {
   return null;
 }
 
-export function generateCommandHelp(plugin: PluginBase, text: string, showHidden = true): string {
+export function generateCommandHelp(plugin: PluginBase, text: string, showHidden = true, linkCommands = false): string {
   const index = getCommandIndex(plugin, text);
   if (index == null) {
     return null;
@@ -511,6 +511,9 @@ export function generateCommandHelp(plugin: PluginBase, text: string, showHidden
   }
 
   let doc = command['command'].replace('/', plugin.bot.config.prefix);
+  if (!linkCommands) {
+    doc = `<code>${doc}</code>`;
+  }
 
   if ('parameters' in command && command.parameters) {
     for (const i in command.parameters) {
@@ -538,7 +541,11 @@ export function generateCommandHelp(plugin: PluginBase, text: string, showHidden
   }
 
   if (aliases.length > 0) {
-    doc += `\n\nAliases: <code>${aliases.join('</code>, <code>')}</code>`;
+    if (!linkCommands) {
+      doc += `\n\nAliases: <code>${aliases.join('</code>, <code>')}</code>`;
+    } else {
+      doc += `\n\nAliases: ${aliases.join(', ')}`;
+    }
   }
 
   return doc;
