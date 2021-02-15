@@ -33,8 +33,11 @@ export class CryptoPlugin extends PluginBase {
     };
     const resp = await sendRequest(url, params, null, null, false, this.bot);
     const content = await resp.json();
-    if (!content || content['price'] == undefined) {
+    if (!content) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
+    }
+    if (content['price'] == undefined) {
+      return this.bot.replyMessage(msg, this.bot.errors.noResults);
     }
     const text = `<b>${symbol}</b>: <code>${formatNumber(content['price'])}</code>`;
     return this.bot.replyMessage(msg, text);
