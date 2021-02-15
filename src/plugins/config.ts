@@ -9,6 +9,7 @@ export class ConfigPlugin extends PluginBase {
     this.commands = [
       {
         command: '/config',
+        aliases: ['/cfg'],
         parameters: [
           {
             name: 'parameter',

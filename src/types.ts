@@ -84,6 +84,7 @@ export abstract class Command {
   command?: string;
   friendly?: string;
   shortcut?: string;
+  aliases?: string[];
   parameters?: Parameter[];
   hidden?: boolean;
   description?: string;

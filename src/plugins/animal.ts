@@ -7,14 +7,14 @@ export class AnimalPlugin extends PluginBase {
     super(bot);
     this.commands = [
       {
-        command: '/kitten',
+        command: '/cat',
         friendly: '(cat|pussy|kitty|kitten)',
-        description: 'Sends a cute kitten',
+        description: 'Sends a cute cat pic',
       },
       {
-        command: '/doggo',
-        friendly: '(dog|doggo|puppy)',
-        description: 'Sends a cute doggo',
+        command: '/dog',
+        friendly: '(dog|doge|doggo|puppy)',
+        description: 'Sends a cute dog pic',
       },
     ];
   }

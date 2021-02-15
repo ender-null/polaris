@@ -8,8 +8,8 @@ export class LastFMPlugin extends PluginBase {
     super(bot);
     this.commands = [
       {
-        command: '/nowplaying',
-        shortcut: '/np',
+        command: '/lastfm',
+        aliases: ['/np', '/nowplaying'],
         parameters: [
           {
             name: 'username',

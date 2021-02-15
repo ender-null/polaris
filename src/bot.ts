@@ -334,6 +334,20 @@ export class Bot {
                 }
               }
             }
+
+            if ('aliases' in command) {
+              for (const alias of command.aliases) {
+                if (await this.checkTrigger(alias, command.parameters, msg, plugin)) {
+                  break;
+                }
+
+                if ('keepDefault' in command && command.keepDefault) {
+                  if (await this.checkTrigger(alias, command.parameters, msg, plugin, false, true)) {
+                    break;
+                  }
+                }
+              }
+            }
           }
         }
       }

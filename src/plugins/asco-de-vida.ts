@@ -10,7 +10,7 @@ export class AscoDeVidaPlugin extends PluginBase {
       {
         command: '/ascodevida',
         description: 'Random story from Asco de Vida',
-        shortcut: '/adv',
+        aliases: ['/adv'],
         skipHelp: true,
       },
     ];

@@ -9,7 +9,7 @@ export class SearchPlugin extends PluginBase {
     this.commands = [
       {
         command: '/search',
-        shortcut: '/s',
+        aliases: ['/s', '/ddg'],
         friendly: '^Search ',
         parameters: [
           {

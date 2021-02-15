@@ -20,6 +20,7 @@ export class InfoPlugin extends PluginBase {
     this.commands = [
       {
         command: '/info',
+        aliases: ['/who', '/id'],
         parameters: [
           {
             name: 'target',

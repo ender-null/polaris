@@ -8,7 +8,7 @@ export class HelpPlugin extends PluginBase {
     this.commands = [
       {
         command: '/help',
-        shortcut: '/h',
+        aliases: ['/h'],
         description: 'Help about commands.',
         keepDefault: true,
       },

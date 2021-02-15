@@ -26,7 +26,8 @@ export class LeagueOfLegendsPlugin extends PluginBase {
     super(bot);
     this.commands = [
       {
-        command: '/lol',
+        command: '/leagueoflegends',
+        aliases: ['/lol'],
         parameters: [
           {
             name: 'region',

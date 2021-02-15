@@ -8,7 +8,7 @@ export class VoicePlugin extends PluginBase {
     this.commands = [
       {
         command: '/voice',
-        shortcut: '/v',
+        aliases: ['/v', '/tts'],
         parameters: [
           {
             name: 'language',

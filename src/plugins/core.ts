@@ -38,7 +38,8 @@ export class CorePlugin extends PluginBase {
         hidden: true,
       },
       {
-        command: '/msg',
+        command: '/message',
+        aliases: ['/msg', '/pm'],
         description: 'Send message to chat',
         parameters: [
           {
@@ -54,7 +55,7 @@ export class CorePlugin extends PluginBase {
       },
       {
         command: '/shell',
-        shortcut: '/sh',
+        aliases: ['/sh', '/bash'],
         description: 'Runs shell code',
         parameters: [
           {
@@ -65,7 +66,7 @@ export class CorePlugin extends PluginBase {
       },
       {
         command: '/javascript',
-        shortcut: '/js',
+        aliases: ['/js'],
         description: 'Runs JavaScript code',
         parameters: [
           {

@@ -9,7 +9,7 @@ export class YouTubePlugin extends PluginBase {
     this.commands = [
       {
         command: '/youtube',
-        shortcut: '/yt',
+        aliases: ['/yt'],
         parameters: [
           {
             name: 'query',

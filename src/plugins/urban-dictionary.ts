@@ -8,7 +8,7 @@ export class UrbanDictionaryPlugin extends PluginBase {
     this.commands = [
       {
         command: '/urbandictionary',
-        shortcut: '/ud',
+        aliases: ['/ud', '/urban'],
         parameters: [
           {
             name: 'term',

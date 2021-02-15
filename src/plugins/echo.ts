@@ -8,7 +8,7 @@ export class EchoPlugin extends PluginBase {
     this.commands = [
       {
         command: '/echo',
-        shortcut: '/e',
+        aliases: ['/e'],
         parameters: [
           {
             name: 'text',

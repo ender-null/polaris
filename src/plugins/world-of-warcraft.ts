@@ -22,7 +22,8 @@ export class WorldOfWarcraftPlugin extends PluginBase {
     super(bot);
     this.commands = [
       {
-        command: '/wow',
+        command: '/worldofwarcraft',
+        aliases: ['/wow'],
         parameters: [
           {
             name: 'realm',

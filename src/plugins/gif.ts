@@ -8,7 +8,7 @@ export class GifPlugin extends PluginBase {
     this.commands = [
       {
         command: '/gif',
-        shortcut: '/g',
+        aliases: ['/g'],
         parameters: [
           {
             name: 'query',

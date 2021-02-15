@@ -8,7 +8,7 @@ export class ImagePlugin extends PluginBase {
     this.commands = [
       {
         command: '/image',
-        shortcut: '/i',
+        aliases: ['/i', '/img'],
         friendly: '^Image of ',
         parameters: [
           {

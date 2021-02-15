@@ -464,6 +464,22 @@ export function isCommand(plugin: PluginBase, number: number, text: string): boo
       return true;
     }
   }
+  if ('aliases' in plugin.commands[number - 1]) {
+    for (const alias of plugin.commands[number - 1].aliases) {
+      trigger = alias.replace('/', escapeRegExp(plugin.bot.config.prefix)).toLocaleLowerCase();
+
+      if (plugin.commands[number - 1].parameters == null && trigger.startsWith('^')) {
+        trigger += '$';
+      } else if (plugin.commands[number - 1].parameters !== null && text.indexOf(' ') == -1) {
+        trigger += '$';
+      } else if (plugin.commands[number - 1].parameters !== null && text.indexOf(' ') > -1) {
+        trigger += ' ';
+      }
+      if (new RegExp(trigger, 'gim').test(text)) {
+        return true;
+      }
+    }
+  }
   return false;
 }
 
@@ -510,8 +526,19 @@ export function generateCommandHelp(plugin: PluginBase, text: string, showHidden
   if ('description' in command) {
     doc += `\n<i>${command.description}</i>`;
   }
+
+  const aliases = [];
   if ('shortcut' in command) {
-    doc += `\n\nAlias: <code>${command.shortcut.replace('/', plugin.bot.config.prefix)}</code>`;
+    aliases.push(command.shortcut.replace('/', plugin.bot.config.prefix));
+  }
+  if ('aliases' in command) {
+    for (const alias of command.aliases) {
+      aliases.push(alias.replace('/', plugin.bot.config.prefix));
+    }
+  }
+
+  if (aliases.length > 0) {
+    doc += `\n\nAlias: <code>${aliases.join(', ')}</code>`;
   }
 
   return doc;
