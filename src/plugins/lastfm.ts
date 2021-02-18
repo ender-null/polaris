@@ -92,7 +92,7 @@ export class LastFMPlugin extends PluginBase {
       } else {
         text = '⏸ ' + format(this.strings.lastPlayed, `<i>${username}</i>`);
       }
-      text += `:\n\t🎵 <b>${track}</b>\n\t💽 ${artist}`;
+      text += `:\n🎵 <b>${track}</b>\n💽 ${artist}`;
       if (album) {
         text += ` - ${album}`;
       }
@@ -113,7 +113,7 @@ export class LastFMPlugin extends PluginBase {
       }
       const ytContent = await ytResp.json();
       if (!ytContent.error && ytContent.pageInfo.totalResults > 0) {
-        text += `\n\n🎬 ${this.strings.mightBe}:\n\t${ytContent['items'][0].snippet.title}\n\thttps://youtu.be/${ytContent['items'][0].id.videoId}`;
+        text += `\n\n🎬 ${this.strings.mightBe}:\n${ytContent['items'][0].snippet.title}\nhttps://youtu.be/${ytContent['items'][0].id.videoId}`;
       }
       this.bot.replyMessage(msg, text, 'text', null, { preview: false });
     } else if (isCommand(this, 2, msg.content)) {
