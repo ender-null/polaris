@@ -16,6 +16,11 @@ export class AnimalPlugin extends PluginBase {
         friendly: '(dog|doge|doggo|puppy)',
         description: 'Sends a cute dog pic',
       },
+      {
+        command: '/fox',
+        friendly: '(fox|vulpini|vulpine|vulpe|kitsune)',
+        description: 'Sends a cute fox pic',
+      },
     ];
   }
   async run(msg: Message): Promise<void> {
@@ -31,6 +36,8 @@ export class AnimalPlugin extends PluginBase {
       };
     } else if (isCommand(this, 2, msg.content)) {
       url = 'https://dog.ceo/api/breeds/image/random';
+    } else if (isCommand(this, 3, msg.content)) {
+      url = 'https://randomfox.ca/floof/';
     }
 
     const resp = await sendRequest(url, params, null, null, false, this.bot);
@@ -40,8 +47,10 @@ export class AnimalPlugin extends PluginBase {
         let photo;
         if (isCommand(this, 1, msg.content)) {
           photo = content[0].url;
-        } else {
+        } else if (isCommand(this, 2, msg.content)) {
           photo = content.message;
+        } else if (isCommand(this, 3, msg.content)) {
+          photo = content.image;
         }
         return this.bot.replyMessage(msg, photo, 'photo');
       }
