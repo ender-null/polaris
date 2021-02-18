@@ -1,7 +1,6 @@
 import { exec } from 'child_process';
 import fs from 'fs';
 import mime from 'mime-types';
-import AbortController from 'node-abort-controller';
 import fetch, { BodyInit, HeadersInit, RequestInit, Response } from 'node-fetch';
 import os from 'os';
 import querystring, { ParsedUrlQueryInput } from 'querystring';
@@ -563,34 +562,17 @@ export async function sendRequest(
     method: post ? 'POST' : 'GET',
     body: data,
     headers: headers,
-    timeout: 5 * t.minute * 1000,
   };
-  const controller = new AbortController();
-  const timeout = setTimeout(() => {
-    controller.abort();
-  }, options.timeout);
   try {
-    const response = await fetch(`${url}?${querystring.stringify(params)}`, { ...options, signal: controller.signal });
+    const response = await fetch(`${url}?${querystring.stringify(params)}`, options);
     if (!response.ok) {
       const error = response.clone();
-      const json = await error.json().catch((e) => catchException(e));
-      logger.error(JSON.stringify(json, null, 4));
-      if (bot) {
-        bot.sendAlert(JSON.stringify(json, null, 4));
-      }
-
-      // if (error.status == 429) {
-      //   setTimeout(async () => {
-      //     await sendRequest(url, params, headers, data, post, bot);
-      //   }, 10000);
-      // }
+      await error.json().catch((e) => catchException(e, bot));
     }
     return response;
   } catch (error) {
     catchException(error, bot);
     return null;
-  } finally {
-    clearTimeout(timeout);
   }
 }
 
@@ -676,15 +658,9 @@ export async function getCoords(input: string, bot?: Bot): Promise<CoordinatesRe
     region: lang,
     key: key,
   };
-  const res = await sendRequest(url, params);
+  const res = await sendRequest(url, params, null, null, false, bot);
   if (res) {
     const content = await res.json();
-    if (content.status != 'OK') {
-      logger.error(JSON.stringify(content, null, 4));
-      if (bot) {
-        bot.sendAlert(JSON.stringify(content, null, 4));
-      }
-    }
     if (content && content.results.length > 0) {
       const locality = content.results[0].address_components[0].long_name;
       let country;
