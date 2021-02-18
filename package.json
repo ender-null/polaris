@@ -44,7 +44,6 @@
     "html-to-text": "^6.0.0",
     "matrix-bot-sdk": "^0.5.13",
     "mime-types": "^2.1.27",
-    "node-abort-controller": "^1.1.0",
     "node-cron": "^2.0.3",
     "string-format": "^2.0.0",
     "tdl": "^7.0.0",
