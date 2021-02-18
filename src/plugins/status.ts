@@ -1,4 +1,5 @@
 import os from 'os';
+import process from 'process';
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
 import { formatTimeInSeconds } from '../utils';
@@ -25,8 +26,8 @@ export class StatusPlugin extends PluginBase {
   }
   async run(msg: Message): Promise<void> {
     let text = '';
-    const usedmem = (os.totalmem() - os.freemem()) / (1024 * 1024);
-    const totalmem = os.totalmem() / (1024 * 1024);
+    const usedmem = process.memoryUsage().heapUsed / (1024 * 1024);
+    const totalmem = process.memoryUsage().heapTotal / (1024 * 1024);
     const mem = (usedmem / totalmem) * 100;
     text += `\n💻 ${this.strings.running}: <code>${os.platform()} ${os.release()} ${process.arch}</code>`;
     text += `\n⚙️ ${this.strings.memory}: <code>${Math.round(usedmem)}/${Math.round(totalmem)} (${Math.round(
