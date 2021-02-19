@@ -696,8 +696,16 @@ export class TelegramTDlibBindings extends BindingsBase {
       otherError = false;
     }
 
-    if (response['message'].toLowerCase() == 'bad request: file is too big') {
-      logger.info(`File is too big`);
+    if (response['message'].toLowerCase() == 'user_not_participant') {
+      logger.info(`User not participant: ${request['chat_id']}`);
+      otherError = false;
+    }
+
+    if (
+      response['message'].toLowerCase() == 'bad request: file is too big' ||
+      response['message'].toLowerCase() == 'invite_hash_expired'
+    ) {
+      logger.info(response['message']);
       otherError = false;
     }
 

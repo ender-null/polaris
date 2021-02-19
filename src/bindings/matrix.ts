@@ -11,15 +11,10 @@ export class MatrixBindings extends BindingsBase {
   }
 
   async start(): Promise<void> {
-    // We'll want to make sure the bot doesn't have to do an initial sync every
-    // time it restarts, so we need to prepare a storage provider. Here we use
-    // a simple JSON database.
     const storage = new SimpleFsStorageProvider(`data/${this.bot.config.name}.json`);
 
-    // LogLevel has type safe settings via e.g. LogLevel.ERROR
     LogService.setLevel(LogLevel.WARN);
 
-    // Now we can create the client and set it up to automatically join rooms.
     this.client = new MatrixClient(
       this.bot.config.apiKeys.matrixHomeserverUrl,
       this.bot.config.apiKeys.matrixAccessToken,
@@ -32,14 +27,10 @@ export class MatrixBindings extends BindingsBase {
   }
 
   async eventHandler(roomId: string, event) {
-    // Don't handle events that don't have contents (they were probably redacted)
     if (!event.content) return;
 
-    // Don't handle non-text events
     if (event.content.msgtype !== 'm.text') return;
 
-    // We never send `m.text` messages so this isn't required, however this is
-    // how you would filter out events sent by the bot itself.
     if (event.sender === (await this.client.getUserId())) return;
     const msg = await this.convertMessage(roomId, event);
     if (msg) {
@@ -83,11 +74,13 @@ export class MatrixBindings extends BindingsBase {
         } else if (msg.content.startsWith('/') || msg.content.startsWith('C:\\')) {
           url = await this.client.uploadContent(Buffer.from(msg.content));
         }
-        this.client.sendMessage(this.getMatrixUsername(msg.conversation.id), {
-          msgtype: this.getMessageType(msg.type),
-          url: url,
-          body: '',
-        });
+        if (url) {
+          this.client.sendMessage(this.getMatrixUsername(msg.conversation.id), {
+            msgtype: this.getMessageType(msg.type),
+            url: url,
+            body: '',
+          });
+        }
       }
 
       if (content) {
@@ -106,7 +99,9 @@ export class MatrixBindings extends BindingsBase {
             body: content,
           };
         }
-        this.client.sendMessage(this.getMatrixUsername(msg.conversation.id), data);
+        if (Object.keys(data).length > 0) {
+          this.client.sendMessage(this.getMatrixUsername(msg.conversation.id), data);
+        }
       }
     } catch (e) {
       catchException(e, this.bot);
