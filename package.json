@@ -1,7 +1,7 @@
 {
   "name": "polaris",
-  "version": "0.9.4",
-  "description": "A multiplatform Typescript bot using plugins!",
+  "version": "0.9.5",
+  "description": "A multiplatform TypeScript bot using plugins!",
   "license": "AGPL-3.0",
   "author": {
     "name": "luksireiku",
