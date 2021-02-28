@@ -299,15 +299,15 @@ export class Bot {
         if ('always' in plugin) {
           plugin.always(msg);
         }
-        if ('commands' in plugin && !ignoreMessage) {
+        if (plugin.commands != undefined && !ignoreMessage) {
           for (const i in plugin.commands) {
             const command = plugin.commands[i];
-            if ('command' in command) {
+            if (command.command != undefined) {
               if (await this.checkTrigger(command.command, command.parameters, msg, plugin)) {
                 break;
               }
 
-              if ('keepDefault' in command && command.keepDefault) {
+              if (command.keepDefault != undefined && command.keepDefault) {
                 if (await this.checkTrigger(command.command, command.parameters, msg, plugin, false, true)) {
                   break;
                 }
@@ -315,7 +315,7 @@ export class Bot {
             }
 
             if (
-              'friendly' in command &&
+              command.friendly != undefined &&
               !hasTag(this, msg.sender.id, 'noreplies') &&
               !hasTag(this, msg.conversation.id, 'noreplies') &&
               msg.conversation.id != +this.config.alertsConversationId &&
@@ -326,25 +326,25 @@ export class Bot {
               }
             }
 
-            if ('shortcut' in command) {
+            if (command.shortcut != undefined) {
               if (await this.checkTrigger(command.shortcut, command.parameters, msg, plugin)) {
                 break;
               }
 
-              if ('keepDefault' in command && command.keepDefault) {
+              if (command.keepDefault != undefined && command.keepDefault) {
                 if (await this.checkTrigger(command.shortcut, command.parameters, msg, plugin, false, true)) {
                   break;
                 }
               }
             }
 
-            if ('aliases' in command) {
+            if (command.aliases != undefined) {
               for (const alias of command.aliases) {
                 if (await this.checkTrigger(alias, command.parameters, msg, plugin)) {
                   break;
                 }
 
-                if ('keepDefault' in command && command.keepDefault) {
+                if (command.keepDefault != undefined && command.keepDefault) {
                   if (await this.checkTrigger(alias, command.parameters, msg, plugin, false, true)) {
                     break;
                   }
