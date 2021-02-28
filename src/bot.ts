@@ -222,6 +222,9 @@ export class Bot {
                   if ('shortcut' in com) {
                     plugin.commands[commandIndex].shortcut = com.shortcut;
                   }
+                  if ('aliases' in com) {
+                    plugin.commands[commandIndex].aliases = com.aliases;
+                  }
                   if ('friendly' in com) {
                     plugin.commands[commandIndex].friendly = com.friendly;
                   }
