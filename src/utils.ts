@@ -186,7 +186,7 @@ export function isInt(number: number | string): boolean {
   return !isNaN(parseFloat(number));
 }
 
-export function getTarget(bot: Bot, m: Message, input: string): string {
+export function getTarget(bot: Bot, m: Message, input: string, noSearch?: boolean): string {
   if (m.reply) {
     return String(m.reply.sender.id);
   } else if (input) {
@@ -217,7 +217,7 @@ export function getTarget(bot: Bot, m: Message, input: string): string {
       target.replace(new RegExp('<@!?([d]+)>', 'gim'), '$1');
     } else if (target && target == '-g') {
       return String(m.conversation.id);
-    } else {
+    } else if (!noSearch) {
       for (const uid in db.users) {
         let name = '';
         if (db.users[uid].first_name !== undefined) {

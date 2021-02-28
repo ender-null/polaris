@@ -78,17 +78,19 @@ export class AboutPlugin extends PluginBase {
         db.groups = {};
       }
       if (db.groups && db.groups[gid] != undefined) {
-        db.groupsSnap.child(gid).ref.update({
-          title: msg.conversation.title || '',
-        });
-        db.groups[gid]['title'] = msg.conversation.title || '';
+        let update = false;
+        if (db.groups[gid].title != msg.conversation.title) {
+          db.groups[gid].title = msg.conversation.title || '';
+          update = true;
+        }
+        if (update) {
+          db.groupsSnap.child(gid).ref.update(db.groups[gid]);
+        }
       } else {
-        db.groupsSnap.child(gid).ref.set({
-          title: msg.conversation.title || '',
-        });
         db.groups[gid] = {
           title: msg.conversation.title || '',
         };
+        db.groupsSnap.child(gid).ref.set(db.groups[gid]);
       }
     }
 
@@ -101,29 +103,34 @@ export class AboutPlugin extends PluginBase {
       db.users = {};
     }
     if (db.users[uid] != undefined) {
-      db.usersSnap.child(uid).ref.update({
-        first_name: msg.sender['firstName'] || '',
-        last_name: msg.sender['lastName'] || '',
-        username: msg.sender['username'] || '',
-        is_bot: msg.sender['isBot'] || false,
-      });
-      db.users[uid]['first_name'] = msg.sender['firstName'] || '';
-      db.users[uid]['last_name'] = msg.sender['lastName'] || '';
-      db.users[uid]['username'] = msg.sender['username'] || '';
-      db.users[uid]['is_bot'] = msg.sender['isBot'] || false;
+      let update = false;
+      if (db.users[uid].first_name != msg.sender['firstName']) {
+        db.users[uid].first_name = msg.sender['firstName'] || '';
+        update = true;
+      }
+      if (db.users[uid].last_name != msg.sender['lastName']) {
+        db.users[uid].last_name = msg.sender['lastName'] || '';
+        update = true;
+      }
+      if (db.users[uid].username != msg.sender['username']) {
+        db.users[uid].username = msg.sender['username'] || '';
+        update = true;
+      }
+      if (db.users[uid].is_bot != msg.sender['isBot']) {
+        db.users[uid].is_bot = msg.sender['isBot'] || false;
+        update = true;
+      }
+      if (update) {
+        db.usersSnap.child(uid).ref.update(db.users[uid]);
+      }
     } else {
-      db.usersSnap.child(uid).ref.set({
-        first_name: msg.sender['firstName'] || '',
-        last_name: msg.sender['lastName'] || '',
-        username: msg.sender['username'] || '',
-        is_bot: msg.sender['isBot'] || false,
-      });
       db.users[uid] = {
         first_name: msg.sender['firstName'] || '',
         last_name: msg.sender['lastName'] || '',
         username: msg.sender['username'] || '',
         is_bot: msg.sender['isBot'] || false,
       };
+      db.usersSnap.child(uid).ref.set(db.users[uid]);
     }
   }
 }

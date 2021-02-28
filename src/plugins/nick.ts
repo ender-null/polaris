@@ -28,7 +28,7 @@ export class NickPlugin extends PluginBase {
     if (!input) {
       return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
     }
-    const uid = getTarget(this.bot, msg, input);
+    const uid = getTarget(this.bot, msg, null, true);
     const name = getFullName(uid, false);
     if (db.users[uid] !== undefined) {
       db.users[uid].nick = input;
