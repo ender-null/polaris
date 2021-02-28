@@ -216,31 +216,31 @@ export class Bot {
                   if (plugin.commands[commandIndex] == undefined) {
                     plugin.commands[commandIndex] = { ...com };
                   }
-                  if ('command' in com) {
+                  if (com.command != undefined) {
                     plugin.commands[commandIndex].command = com.command;
                   }
-                  if ('shortcut' in com) {
+                  if (com.shortcut != undefined) {
                     plugin.commands[commandIndex].shortcut = com.shortcut;
                   }
-                  if ('aliases' in com) {
+                  if (com.aliases != undefined) {
                     plugin.commands[commandIndex].aliases = com.aliases;
                   }
-                  if ('friendly' in com) {
+                  if (com.friendly != undefined) {
                     plugin.commands[commandIndex].friendly = com.friendly;
                   }
-                  if ('description' in com) {
+                  if (com.description != undefined) {
                     plugin.commands[commandIndex].description = com.description;
                   }
-                  if ('keepDefault' in com) {
+                  if (com.keepDefault != undefined) {
                     plugin.commands[commandIndex].keepDefault = com.keepDefault;
                   }
-                  if ('hidden' in com) {
+                  if (com.hidden != undefined) {
                     plugin.commands[commandIndex].hidden = com.hidden;
                   }
-                  if ('skipHelp' in com) {
+                  if (com.skipHelp != undefined) {
                     plugin.commands[commandIndex].skipHelp = com.skipHelp;
                   }
-                  if ('parameters' in com) {
+                  if (com.parameters != undefined) {
                     plugin.commands[commandIndex].parameters = [];
                     for (const paramIndex in com.parameters) {
                       plugin.commands[commandIndex].parameters[paramIndex] = com.parameters[paramIndex];
