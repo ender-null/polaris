@@ -202,7 +202,7 @@ export class InfoPlugin extends PluginBase {
         text += ` ${user.last_name}`;
       }
       if (user.username && user.username.length > 0) {
-        text += `\n↗️ ${user.username}`;
+        text += `\n↗️ @${user.username}`;
       }
       text += `\n🆔 ${userId}`;
       if (user.nick) {
@@ -227,7 +227,7 @@ export class InfoPlugin extends PluginBase {
     if (Object.keys(group).length > 0) {
       text += `👥 ${group.title}`;
       if (group.username && group.username.length > 0) {
-        text += `\n↗️ ${group.username}`;
+        text += `\n↗️ @${group.username}`;
       }
       text += `\n🆔 ${groupId}`;
       if (group.member_count && group.member_count > 0) {
