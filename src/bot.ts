@@ -223,7 +223,10 @@ export class Bot {
                     plugin.commands[commandIndex].shortcut = com.shortcut;
                   }
                   if (com.aliases != undefined) {
-                    plugin.commands[commandIndex].aliases = com.aliases;
+                    plugin.commands[commandIndex].aliases = [];
+                    for (const aliasIndex in com.aliases) {
+                      plugin.commands[commandIndex].aliases[aliasIndex] = com.aliases[aliasIndex];
+                    }
                   }
                   if (com.friendly != undefined) {
                     plugin.commands[commandIndex].friendly = com.friendly;
