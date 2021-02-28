@@ -20,10 +20,10 @@ export class NickPlugin extends PluginBase {
       },
     ];
     this.strings = {
-      currentNick: '{0}\'s nickname is "{1}"',
-      noNick: '{0} currently has no nickname',
-      nickSet: '{0}\'s nickname has been set to "{1}"',
-      deletedNick: '{0} nickname has been deleted',
+      currentNick: '<b>{0}</b>\'s nickname is "<i>{1}</i>"',
+      noNick: '<b>{0}</b> currently has no nickname',
+      nickSet: '<b>{0}</b>\'s nickname has been set to "<i>{1}</i>"',
+      deletedNick: '<b>{0}</b> nickname has been deleted',
     };
   }
   async run(msg: Message): Promise<void> {

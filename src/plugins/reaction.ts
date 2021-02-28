@@ -1,4 +1,5 @@
 import { Bot, Message } from '..';
+import { db } from '../main';
 import { PluginBase } from '../plugin';
 import { escapeMarkdown, hasTag } from '../utils';
 
@@ -60,11 +61,17 @@ export class ReactionPlugin extends PluginBase {
         );
       }
       if (message) {
+        let name;
         if (+message.sender.id > 0) {
-          text = text.replace(new RegExp('USER', 'gm'), escapeMarkdown(message.sender['firstName']));
+          if (db.users[message.sender.id] != undefined && db.users[message.sender.id].nick) {
+            name = db.users[message.sender.id].nick;
+          } else {
+            name = message.sender['firstName'];
+          }
         } else {
-          text = text.replace(new RegExp('USER', 'gm'), escapeMarkdown(message.sender['title']));
+          name = message.sender['title'];
         }
+        text = text.replace(new RegExp('USER', 'gm'), escapeMarkdown(name));
       }
     }
     return text;
