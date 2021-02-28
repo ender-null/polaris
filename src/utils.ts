@@ -300,13 +300,13 @@ export function allButNWord(text: string, word = 1): string {
   return text.substr(text.indexOf(text.split(' ')[word]));
 }
 
-export function getUsername(uid: number | string): string {
+export function getUsername(uid: number | string, includeNick = true): string {
   if (typeof uid != 'string') {
     uid = String(uid);
   }
   let name = '';
   if (db.users[uid] !== undefined) {
-    if (db.users[uid].nick !== undefined) {
+    if (includeNick && db.users[uid].nick !== undefined) {
       name += db.users[uid].nick;
     } else {
       if (db.users[uid].first_name !== undefined) {
@@ -330,13 +330,13 @@ export function getUsername(uid: number | string): string {
   return name;
 }
 
-export function getFullName(uid: number | string, includeUsername = true): string {
+export function getFullName(uid: number | string, includeUsername = true, includeNick = true): string {
   if (typeof uid != 'string') {
     uid = String(uid);
   }
   let name = '';
   if (db.users[uid] !== undefined) {
-    if (db.users[uid].nick !== undefined) {
+    if (includeNick && db.users[uid].nick !== undefined) {
       name += db.users[uid].nick;
     } else {
       if (db.users[uid].first_name !== undefined) {
