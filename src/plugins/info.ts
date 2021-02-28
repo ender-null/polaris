@@ -55,10 +55,6 @@ export class InfoPlugin extends PluginBase {
       }
     }
 
-    // logger.info(`target: ${target}`);
-    // logger.info(`chat: ${JSON.stringify(chat)}`);
-    // logger.info(`info: ${JSON.stringify(info)}`);
-    // logger.info(`infoFull: ${JSON.stringify(infoFull)}`);
     if (!target || (target && !(db.users[target] || db.groups[target] || !isInt(target) || info || chat))) {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);
     }
@@ -198,17 +194,17 @@ export class InfoPlugin extends PluginBase {
     }
 
     if (Object.keys(user).length > 0) {
-      let name = '';
+      text = '👤 ';
       if (user.first_name) {
-        name += user.first_name;
+        text += user.first_name;
       }
       if (user.last_name) {
-        name += ` ${user.last_name}`;
+        text += ` ${user.last_name}`;
       }
       if (user.username && user.username.length > 0) {
-        name += `\n\t     @${user.username}`;
+        text += `\n↗️ ${user.username}`;
       }
-      text = `👤 ${name}\n🆔 ${userId}`;
+      text += `\n🆔 ${userId}`;
       if (user.nick) {
         text += `\n💬 ${user.nick}`;
       }
@@ -229,11 +225,11 @@ export class InfoPlugin extends PluginBase {
       text += '\n\n';
     }
     if (Object.keys(group).length > 0) {
-      let name = group.title;
+      text += `👥 ${group.title}`;
       if (group.username && group.username.length > 0) {
-        name += `\n\t     @${group.username}`;
+        text += `\n↗️ ${group.username}`;
       }
-      text += `👥 ${name}\n🆔 ${groupId}`;
+      text += `\n🆔 ${groupId}`;
       if (group.member_count && group.member_count > 0) {
         text += `\n👪 ${formatNumber(group.member_count)}`;
       }
