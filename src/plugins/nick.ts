@@ -37,19 +37,20 @@ export class NickPlugin extends PluginBase {
       } else {
         text = format(this.strings.noNick, name);
       }
-    }
-    if (input == '--') {
-      delete db.users[uid].nick;
-      db.usersSnap.child(uid).child('nick').ref.remove();
-      text = format(this.strings.deletedNick, name);
     } else {
-      if (db.users[uid] !== undefined) {
-        db.users[uid].nick = input;
-        db.usersSnap.child(uid).ref.update({
-          nick: db.users[uid].nick,
-        });
+      if (input == '--') {
+        delete db.users[uid].nick;
+        db.usersSnap.child(uid).child('nick').ref.remove();
+        text = format(this.strings.deletedNick, name);
+      } else {
+        if (db.users[uid] !== undefined) {
+          db.users[uid].nick = input;
+          db.usersSnap.child(uid).ref.update({
+            nick: db.users[uid].nick,
+          });
+        }
+        text = format(this.strings.nickSet, name, input);
       }
-      text = format(this.strings.nickSet, name, input);
     }
     this.bot.replyMessage(msg, text);
   }
