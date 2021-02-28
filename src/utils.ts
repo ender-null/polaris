@@ -306,22 +306,26 @@ export function getUsername(uid: number | string): string {
   }
   let name = '';
   if (db.users[uid] !== undefined) {
-    if (db.users[uid]['first_name'] !== undefined) {
-      name += ' ' + db.users[uid].first_name;
+    if (db.users[uid].nick !== undefined) {
+      name += db.users[uid].nick;
+    } else {
+      if (db.users[uid].first_name !== undefined) {
+        name += db.users[uid].first_name;
+      }
+      if (db.users[uid].last_name !== undefined) {
+        name += ' ' + db.users[uid].last_name;
+      }
     }
-    if (db.users[uid]['last_name'] !== undefined) {
-      name += ' ' + db.users[uid].last_name;
-    }
-    if (db.users[uid]['username'] !== undefined && db.users[uid]['username'] !== '') {
+    if (db.users[uid].username !== undefined && db.users[uid].username !== '') {
       name = `@${db.users[uid].username}`;
     }
   } else if (db.groups[uid] !== undefined) {
     name = db.groups[uid].title;
-    if (db.groups[uid]['username'] !== undefined && db.groups[uid]['username'] !== '') {
+    if (db.groups[uid].username !== undefined && db.groups[uid].username !== '') {
       name = `@${db.groups[uid].username}`;
     }
   } else {
-    name = '[not found]';
+    name = '[null]';
   }
   return name;
 }
@@ -332,22 +336,26 @@ export function getFullName(uid: number | string, includeUsername = true): strin
   }
   let name = '';
   if (db.users[uid] !== undefined) {
-    if (db.users[uid]['first_name'] !== undefined) {
-      name += db.users[uid].first_name;
+    if (db.users[uid].nick !== undefined) {
+      name += db.users[uid].nick;
+    } else {
+      if (db.users[uid].first_name !== undefined) {
+        name += db.users[uid].first_name;
+      }
+      if (db.users[uid].last_name !== undefined) {
+        name += ' ' + db.users[uid].last_name;
+      }
     }
-    if (db.users[uid]['last_name'] !== undefined) {
-      name += ' ' + db.users[uid].last_name;
-    }
-    if (includeUsername && db.users[uid]['username'] !== undefined) {
+    if (includeUsername && db.users[uid].username !== undefined) {
       name += ` (@${db.users[uid].username})`;
     }
   } else if (db.groups[uid] !== undefined) {
     name = db.groups[uid].title;
-    if (db.groups[uid]['username'] !== undefined) {
+    if (db.groups[uid].username !== undefined) {
       name += ` (@${db.groups[uid].username})`;
     }
   } else {
-    name = '[not found]';
+    name = '[null]';
   }
   return name;
 }

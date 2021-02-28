@@ -2,17 +2,7 @@ import { Bot, Message } from '..';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
 import { DatabaseConversation, DatabaseUser } from '../types';
-import {
-  formatDate,
-  formatNumber,
-  getFullName,
-  getInput,
-  getTags,
-  getTarget,
-  isInt,
-  logger,
-  telegramShortLink,
-} from '../utils';
+import { formatDate, formatNumber, getInput, getTags, getTarget, isInt, logger, telegramShortLink } from '../utils';
 
 export class InfoPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -77,7 +67,7 @@ export class InfoPlugin extends PluginBase {
       if (!String(target).startsWith('-')) {
         userId = target;
         if (db.users[target]) {
-          const props = ['first_name', 'last_name', 'username', 'description', 'is_bot', 'is_scam'];
+          const props = ['first_name', 'last_name', 'username', 'nick', 'description', 'is_bot', 'is_scam'];
           for (const prop of props) {
             if (db.users[target][prop]) {
               user[prop] = db.users[target][prop];
@@ -208,11 +198,20 @@ export class InfoPlugin extends PluginBase {
     }
 
     if (Object.keys(user).length > 0) {
-      let name = getFullName(userId, false);
+      let name = '';
+      if (user.first_name) {
+        name += user.first_name;
+      }
+      if (user.last_name) {
+        name += ` ${user.last_name}`;
+      }
       if (user.username && user.username.length > 0) {
         name += `\n\t     @${user.username}`;
       }
       text = `👤 ${name}\n🆔 ${userId}`;
+      if (user.nick) {
+        text += `\n💬 ${user.nick}`;
+      }
       if (user.is_scam) {
         text += `\n⚠️ ${this.strings.reported}`;
       }

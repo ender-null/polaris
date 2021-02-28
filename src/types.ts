@@ -204,6 +204,7 @@ export interface DatabaseUser {
   first_name?: string;
   last_name?: string;
   username?: string;
+  nick?: string;
   description?: string;
   is_bot?: boolean;
   is_scam?: boolean;
@@ -225,6 +226,7 @@ export interface DatabaseConversation {
 export interface DatabaseReminder {
   alarm?: number;
   chatId?: number | string;
+  userId?: number | string;
   text?: string;
   firstName?: string;
   username?: string;

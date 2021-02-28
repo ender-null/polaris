@@ -2,7 +2,17 @@ import format from 'string-format';
 import { Bot, Conversation, DatabaseReminder, Message } from '..';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
-import { allButNWord, catchException, generateCommandHelp, getInput, getWord, isInt, now } from '../utils';
+import {
+  allButNWord,
+  catchException,
+  generateCommandHelp,
+  getFullName,
+  getInput,
+  getUsername,
+  getWord,
+  isInt,
+  now,
+} from '../utils';
 
 export class ReminderPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -70,7 +80,7 @@ export class ReminderPlugin extends PluginBase {
       bot: this.bot.user.id,
       alarm: alarm,
       chatId: msg.conversation.id,
-      firstName: msg.sender['firstName'],
+      userId: msg.sender.id,
       text: text,
     };
     if (msg.sender['username'] && msg.sender['username'].length > 0) {
@@ -136,7 +146,7 @@ export class ReminderPlugin extends PluginBase {
       db.remindersSnap.child(String(Math.trunc(alarm))).ref.set(reminder);
       db.reminders[String(Math.trunc(alarm))] = reminder;
 
-      const message = format(this.strings['message'], msg.sender['firstName'], delayText, text);
+      const message = format(this.strings['message'], getFullName(msg.sender.id, false), delayText, text);
       this.bot.replyMessage(msg, message);
     } catch (e) {
       catchException(e, this.bot);
@@ -158,9 +168,15 @@ export class ReminderPlugin extends PluginBase {
           chat = new Conversation(reminder.chatId, db.users[reminder.chatId].first_name);
         }
 
-        let text = `<i>${reminder.text}</i>\n - ${reminder.firstName}`;
-        if (reminder.username && reminder.username.length > 0) {
-          text += ` (@${reminder.username})`;
+        let name = reminder.firstName;
+        let username = reminder.username;
+        if (reminder.userId) {
+          name = getFullName(reminder.userId, false);
+          username = getUsername(reminder.userId).slice(1);
+        }
+        let text = `<i>${reminder.text}</i>\n - ${name}`;
+        if (username && username.length > 0) {
+          text += ` (@${username})`;
         }
         this.bot.sendMessage(chat, text);
         db.remindersSnap.child(index).ref.set(null);
