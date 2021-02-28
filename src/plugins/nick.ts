@@ -2,7 +2,7 @@ import format from 'string-format';
 import { Bot, Message } from '..';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
-import { getFullName, getInput, getTarget } from '../utils';
+import { getFullName, getInput, getTarget, isTrusted } from '../utils';
 
 export class NickPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -29,6 +29,9 @@ export class NickPlugin extends PluginBase {
   async run(msg: Message): Promise<void> {
     const input = getInput(msg);
     const uid = getTarget(this.bot, msg, null, true);
+    if (uid != String(msg.sender.id) && !isTrusted(this.bot, msg.sender.id, msg)) {
+      return this.bot.replyMessage(msg, this.bot.errors.permissionRequired);
+    }
     const name = getFullName(uid, false, false);
     let text;
     if (!input) {
