@@ -27,7 +27,7 @@ export class NickPlugin extends PluginBase {
     };
   }
   async run(msg: Message): Promise<void> {
-    const input = getInput(msg, false);
+    const input = getInput(msg);
     const uid = getTarget(this.bot, msg, null, true);
     const name = getFullName(uid, false, false);
     let text;
