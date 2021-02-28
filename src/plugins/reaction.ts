@@ -62,14 +62,21 @@ export class ReactionPlugin extends PluginBase {
       }
       if (message) {
         let name;
+        let username;
         if (+message.sender.id > 0) {
           if (db.users[message.sender.id] != undefined && db.users[message.sender.id].nick) {
             name = db.users[message.sender.id].nick;
           } else {
             name = message.sender['firstName'];
           }
+          username = '@' + message.sender['username'];
         } else {
           name = message.sender['title'];
+        }
+        if (username) {
+          text = text.replace(new RegExp('USERNAME', 'gm'), escapeMarkdown(username));
+        } else {
+          text = text.replace(new RegExp('USERNAME', 'gm'), escapeMarkdown(name));
         }
         text = text.replace(new RegExp('USER', 'gm'), escapeMarkdown(name));
       }
