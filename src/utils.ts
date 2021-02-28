@@ -333,7 +333,7 @@ export function getFullName(uid: number | string, includeUsername = true): strin
   let name = '';
   if (db.users[uid] !== undefined) {
     if (db.users[uid]['first_name'] !== undefined) {
-      name += ' ' + db.users[uid].first_name;
+      name += db.users[uid].first_name;
     }
     if (db.users[uid]['last_name'] !== undefined) {
       name += ' ' + db.users[uid].last_name;
