@@ -22,6 +22,7 @@ export { PharmacyPlugin } from './pharmacy';
 export { PinPlugin } from './pin';
 export { PingPlugin } from './ping';
 export { PolePlugin } from './pole';
+export { QRPlugin } from './qr';
 export { RAEPlugin } from './rae';
 export { ReactionPlugin } from './reaction';
 export { ReminderPlugin } from './reminder';
