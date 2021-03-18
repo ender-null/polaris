@@ -52,17 +52,15 @@ export class HelpPlugin extends PluginBase {
                   }
                 }
 
+                const commandInfo = {
+                  command: getWord(lines[0], 1).substr(1),
+                  description: this.strings.noDescription,
+                };
+
                 if (lines.length > 1) {
-                  commands.push({
-                    command: getWord(lines[0], 1).substr(1),
-                    description: removeHtml(lines[1]),
-                  });
-                } else {
-                  commands.push({
-                    command: getWord(lines[0], 1).substr(1),
-                    description: this.strings.noDescription,
-                  });
+                  commandInfo.description = removeHtml(lines[1]);
                 }
+                commands.push(command);
               }
             }
           }
@@ -70,10 +68,21 @@ export class HelpPlugin extends PluginBase {
       }
     }
 
-    if (isCommand(this, 3, msg.content) && this.bot.config.bindings == 'TelegramTDlibBindings') {
-      this.bot.replyMessage(msg, 'setMyCommands', 'api', null, {
-        commands: JSON.stringify(commands),
-      });
+    if (isCommand(this, 3, msg.content)) {
+      if (this.bot.config.bindings == 'TelegramTDlibBindings') {
+        this.bot.replyMessage(msg, 'setMyCommands', 'api', null, {
+          commands: JSON.stringify(commands),
+        });
+      } else if (this.bot.config.bindings == 'DiscordBindings') {
+        for (const command of commands) {
+          this.bot.bindings['client']['api'].applications(this.bot.bindings['client'].user.id).commands.post({
+            data: {
+              name: command.command,
+              description: command.description,
+            },
+          });
+        }
+      }
     }
 
     this.bot.replyMessage(msg, text);
