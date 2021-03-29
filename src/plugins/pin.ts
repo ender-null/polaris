@@ -104,6 +104,7 @@ export class PinPlugin extends PluginBase {
         bot: this.bot.user.id,
       };
       this.bot.replyMessage(msg, format(this.strings.pinned, tag));
+      this.updateTriggers();
     } else if (isCommand(this, 3, msg.content)) {
       if (!input) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
@@ -122,6 +123,7 @@ export class PinPlugin extends PluginBase {
       db.pinsSnap.child(tag).ref.set(null);
       delete db.pins[tag];
       this.bot.replyMessage(msg, format(this.strings.unpinned, tag));
+      this.updateTriggers();
     } else {
       // Finds the first 3 pins of the message and sends them.
       const pins = new RegExp('#(\\w+)', 'gim').exec(msg.content);
