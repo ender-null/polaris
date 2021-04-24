@@ -11,7 +11,6 @@ import {
   hasTag,
   isInt,
   logger,
-  now,
   sendRequest,
   splitLargeMessage,
   systemName,
@@ -20,7 +19,6 @@ import {
 
 export class TelegramTDlibBindings extends BindingsBase {
   client: Client;
-  lastChatUpdate: number;
   pendingMessages: { msg: Message; message: message }[];
   constructor(bot: Bot) {
     super(bot);
@@ -238,12 +236,6 @@ export class TelegramTDlibBindings extends BindingsBase {
 
   async updateHandler(update: Update): Promise<void> {
     if (update._ == 'updateNewMessage') {
-      // if (!this.lastChatUpdate) {
-      //   this.lastChatUpdate = 0;
-      // }
-      // if (this.bot.user && !this.bot.user.isBot && this.lastChatUpdate < now() - t.minute * 10) {
-      //   await this.updateChats();
-      // }
       if (update.message.is_outgoing) {
         if (update.message.is_channel_post) {
           if (update.message.content._ == 'messageText') {
@@ -279,58 +271,6 @@ export class TelegramTDlibBindings extends BindingsBase {
           }
         }
       }
-    }
-  }
-
-  async updateChats(loadAll?: boolean) {
-    this.lastChatUpdate = now();
-    const chats = await this.serverRequest('getChats', {
-      chat_list: { _: 'chatListMain' },
-      offset_order: '9223372036854775807',
-      offset_chat_id: 0,
-      limit: 100,
-    });
-
-    if (loadAll) {
-      const openPromises = chats.chat_ids.map((chatId) =>
-        this.serverRequest('openChat', {
-          chat_id: chatId,
-        }),
-      );
-      await Promise.all(openPromises);
-
-      const chatPromises = chats.chat_ids.map((chatId) => {
-        const cid = String(chatId);
-        if (chatId > 0) {
-          if (db.users[cid] == undefined) {
-            const user = this.serverRequest('getUser', {
-              user_id: chatId,
-            });
-            if (user) {
-              db.users[cid] = {
-                first_name: user['first_name'],
-                last_name: user['last_name'],
-                username: user['username'],
-              };
-              db.usersSnap.child(cid).ref.set(db.users[cid]);
-            }
-          }
-        } else {
-          if (db.groups[cid] == undefined) {
-            const group = this.serverRequest('getChat', {
-              chat_id: chatId,
-            });
-            if (group) {
-              db.groups[cid] = {
-                title: group['title'],
-              };
-              db.groupsSnap.child(cid).ref.set(db.groups[cid]);
-            }
-          }
-        }
-      });
-
-      await Promise.all(chatPromises);
     }
   }
 
@@ -542,7 +482,7 @@ export class TelegramTDlibBindings extends BindingsBase {
           data.input_message_content.text = await this.formatTextEntities(msg);
         }
         const message = await this.serverRequest(data._, data, false, true);
-        if (msg.type == 'text' && msg.extra.addPing) {
+        if (message && msg.type == 'text' && msg.extra.addPing) {
           this.pendingMessages.push({ msg, message });
         }
       }
