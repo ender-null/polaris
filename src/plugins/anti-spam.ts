@@ -46,7 +46,14 @@ export class AntiSpamPlugin extends PluginBase {
           const name = getFullName(msg.sender.id);
           const gid = String(msg.conversation.id);
           this.bot.sendAdminAlert(
-            format(this.strings['unmarking'], spamType, name, msg.sender.id, db.groups[gid].title || '[no title]', gid),
+            format(
+              this.strings['unmarking'],
+              spamType,
+              name,
+              msg.sender.id,
+              db.groups[gid] ? db.groups[gid].title : '[no title]',
+              gid,
+            ),
           );
         }
       }
@@ -118,7 +125,7 @@ export class AntiSpamPlugin extends PluginBase {
     if (content == 'name') {
       text = m.sender['first_name'];
     } else if (content == 'title') {
-      text = m.conversation.title || '[no title]';
+      text = m.conversation ? m.conversation.title : '[no title]';
     } else if (content == 'caption') {
       text = m.extra['caption'];
     } else {
@@ -131,7 +138,7 @@ export class AntiSpamPlugin extends PluginBase {
           spamType,
           name,
           m.sender.id,
-          db.groups[gid].title || '[no title]',
+          db.groups[gid] ? db.groups[gid].title : '[no title]',
           gid,
           content,
           text,
@@ -151,7 +158,9 @@ export class AntiSpamPlugin extends PluginBase {
 
       if (db.groups[gid][spamType] >= 10 || String(m.sender.id) == gid) {
         setTag(this.bot, gid, spamType);
-        this.bot.sendAdminAlert(format(this.strings.markedGroup, spamType, db.groups[gid].title || '[no title]', gid));
+        this.bot.sendAdminAlert(
+          format(this.strings.markedGroup, spamType, db.groups[gid] ? db.groups[gid].title : '[no title]', gid),
+        );
         if (
           !hasTag(this.bot, m.conversation.id, 'safe') &&
           !hasTag(this.bot, gid, 'resend:?') &&
@@ -174,7 +183,7 @@ export class AntiSpamPlugin extends PluginBase {
           spamType,
           name,
           m.sender.id,
-          db.groups[gid].title || '[no title]',
+          db.groups[gid] ? db.groups[gid].title : '[no title]',
           gid,
           content,
           text,
@@ -189,9 +198,13 @@ export class AntiSpamPlugin extends PluginBase {
     const res = await this.bot.bindings.leaveConversation(msg.conversation.id);
     const gid = String(msg.conversation.id);
     if (res) {
-      this.bot.sendAdminAlert(format(this.strings.kickedMyself, db.groups[gid].title || '[no title]', gid));
+      this.bot.sendAdminAlert(
+        format(this.strings.kickedMyself, db.groups[gid] ? db.groups[gid].title : '[no title]', gid),
+      );
     } else {
-      this.bot.sendAdminAlert(format(this.strings.cantKickMyself, db.groups[gid].title || '[no title]', gid));
+      this.bot.sendAdminAlert(
+        format(this.strings.cantKickMyself, db.groups[gid] ? db.groups[gid].title : '[no title]', gid),
+      );
     }
   }
 
@@ -213,7 +226,14 @@ export class AntiSpamPlugin extends PluginBase {
         const name = getFullName(m.sender.id);
         const gid = String(m.conversation.id);
         this.bot.sendAdminAlert(
-          format(this.strings.unsafeTelegramLink, name, m.sender.id, db.groups[gid].title || '[no title]', gid, text),
+          format(
+            this.strings.unsafeTelegramLink,
+            name,
+            m.sender.id,
+            db.groups[gid] ? db.groups[gid].title : '[no title]',
+            gid,
+            text,
+          ),
         );
         await this.kickSpammer(m, 'spam', 'link');
       }
