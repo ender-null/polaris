@@ -75,8 +75,7 @@
     "prettier": "^2.1.2",
     "tdlib-types": "^0.1001007.1",
     "typedoc": "^0.20.23",
-    "typescript": "4.0.3",
-    "y18n": ">=4.0.1"
+    "typescript": "4.0.3"
   },
   "keywords": [
     "polaris",
