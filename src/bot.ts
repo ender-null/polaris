@@ -126,7 +126,7 @@ export class Bot {
     await this.onMessageReceive(msg);
   }
 
-  async webhookHandler(req: IncomingMessage, res: ServerResponse, data: any): Promise<void> {
+  async webhookHandler(req: IncomingMessage, res: ServerResponse, data: string): Promise<void> {
     let dataObject;
     try {
       dataObject = JSON.parse(data);

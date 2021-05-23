@@ -14,7 +14,7 @@ export abstract class BindingsBase {
 
   abstract getMe(): Promise<User>;
 
-  abstract webhookHandler(req: IncomingMessage, res: ServerResponse, data: any): Promise<void>;
+  abstract webhookHandler(req: IncomingMessage, res: ServerResponse, data: string): Promise<void>;
 
   abstract getMessage(chatId: string | number, messageId: string | number, ignoreReply?: boolean): Promise<Message>;
 

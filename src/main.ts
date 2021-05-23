@@ -76,7 +76,7 @@ if (process.env.ENV != 'dev') {
   createServer(options, async (req: IncomingMessage, res: ServerResponse) => {
     const path = req.url.split('/');
     let found = false;
-    let content;
+    let content: string;
 
     if (req.method === 'GET') {
       content = null;
