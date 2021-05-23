@@ -137,7 +137,7 @@ export class AntiSpamPlugin extends PluginBase {
     } else {
       text = m.content;
     }
-    if (!hasTag(this.bot, m.sender.id, spamType)) {
+    if (spamType != 'ban' && !hasTag(this.bot, m.sender.id, spamType)) {
       this.bot.sendAdminAlert(
         format(
           this.strings['marked'],
@@ -180,7 +180,7 @@ export class AntiSpamPlugin extends PluginBase {
     if (
       isGroupAdmin(this.bot, this.bot.user.id, m) &&
       !isAdmin(this.bot, m.sender.id) &&
-      hasTag(this.bot, m.conversation.id, 'anti' + spamType)
+      (hasTag(this.bot, m.conversation.id, 'anti' + spamType) || spamType == 'ban')
     ) {
       await this.bot.bindings.kickConversationMember(m.conversation.id, m.sender.id);
       this.bot.sendAdminAlert(
