@@ -14,6 +14,8 @@ RUN npm run build
 
 FROM ghcr.io/ender-null/polaris-base:latest AS release
 
+LABEL org.opencontainers.image.source https://github.com/ender-null/polaris
+
 WORKDIR /usr/src/app
 
 COPY --from=builder /usr/src/app/node_modules ./node_modules
