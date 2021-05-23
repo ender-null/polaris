@@ -244,8 +244,8 @@ export class Bot {
                   }
                   if (com.parameters != undefined) {
                     plugin.commands[commandIndex].parameters = [];
-                    com.parameters.map((param, paramIndex) => {
-                      plugin.commands[commandIndex].parameters[paramIndex] = param;
+                    Object.keys(com.parameters).map((param) => {
+                      plugin.commands[commandIndex].parameters[param] = com.parameters[param];
                     });
                   }
                 }
