@@ -223,8 +223,8 @@ export class Bot {
                   }
                   if (com.aliases != undefined) {
                     plugin.commands[commandIndex].aliases = [];
-                    com.aliases.map((alias, aliasIndex) => {
-                      plugin.commands[commandIndex].aliases[aliasIndex] = alias;
+                    Object.keys(com.aliases).map((alias) => {
+                      plugin.commands[commandIndex].aliases[alias] = com.aliases[alias];
                     });
                   }
                   if (com.friendly != undefined) {
