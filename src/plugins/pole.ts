@@ -141,39 +141,39 @@ export class PolePlugin extends PluginBase {
           rankingTypes = types.slice(0, 4);
         }
         const ranking: DatabasePoleList = {};
-        for (const day in db.poles[gid]) {
-          for (const type of rankingTypes) {
+        Object.keys(db.poles[gid]).map((day) => {
+          rankingTypes.map((type) => {
             if (db.poles[gid][day][type] != undefined) {
               if (ranking[db.poles[gid][day][type]] == undefined) {
                 ranking[db.poles[gid][day][type]] = {};
-                for (const t of rankingTypes) {
+                rankingTypes.map((t) => {
                   ranking[db.poles[gid][day][type]][t] = 0;
-                }
+                });
               }
               ranking[db.poles[gid][day][type]][type] += 1;
             }
-          }
-        }
+          });
+        });
         text = `<b>${this.strings.ranking}:</b>`;
         const rank = this.sortRanking(ranking, 'points');
-        for (const i in rank) {
-          text += `\n • ${getFullName(rank[i].uid, false)}: <b>${rank[i].points}</b> ${this.strings.points}`;
-        }
+        rank.map((user) => {
+          text += `\n • ${getFullName(user.uid, false)}: <b>${user.points}</b> ${this.strings.points}`;
+        });
 
-        for (const type of types) {
+        types.map((type) => {
           let section = `\n\n<b>${capitalize(this.strings[type + 's'])}:</b>`;
           let empty = true;
           const rank = this.sortRanking(ranking, type);
-          for (const i in rank) {
-            if (rank[i][type]) {
+          rank.map((user) => {
+            if (user[type]) {
               empty = false;
-              section += `\n • ${getFullName(rank[i].uid, false)}: <b>${rank[i][type]}</b> ${this.strings[type + 's']}`;
+              section += `\n • ${getFullName(user.uid, false)}: <b>${user[type]}</b> ${this.strings[type + 's']}`;
             }
-          }
+          });
           if (!empty) {
             text += section;
           }
-        }
+        });
       } else {
         this.bot.replyMessage(msg, this.bot.errors.noResults);
       }
@@ -201,13 +201,13 @@ export class PolePlugin extends PluginBase {
         typesToShow = types.slice(0, 4);
       }
       if (db.poles && db.poles[gid] && db.poles[gid][date]) {
-        for (const type of typesToShow) {
+        typesToShow.map((type) => {
           if (db.poles[gid][date][type] != undefined) {
             text += `\n${format(this.strings[type + 'Set'], getFullName(db.poles[gid][date][type], false))}`;
           } else {
             text += `\n${this.strings[type + 'NotSet']}`;
           }
-        }
+        });
       } else {
         text += `\n${this.strings.poleNotSet}`;
       }

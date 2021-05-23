@@ -176,7 +176,7 @@ export class LeagueOfLegendsPlugin extends PluginBase {
       if (masteries) {
         text += `\n${this.strings.masteries}:`;
         let limit = 5;
-        for (const i in Object.keys(masteries)) {
+        Object.keys(masteries).map((i) => {
           const mastery = masteries[i];
           text += format(
             '\n\t{0}: {1} {2} ({3})',
@@ -187,12 +187,12 @@ export class LeagueOfLegendsPlugin extends PluginBase {
           );
           limit -= 1;
           if (limit == 0) {
-            break;
+            return;
           }
-        }
+        });
       }
       if (ranked) {
-        for (const i in ranked) {
+        Object.keys(ranked).map((i) => {
           const queue = ranked[i];
           text += format(
             '\n\n{0}:\n\t{1}: {2} {3} ({4}{5})',
@@ -211,7 +211,7 @@ export class LeagueOfLegendsPlugin extends PluginBase {
             queue['losses'],
             (Math.round((queue['wins'] / (queue['wins'] + queue['losses'])) * 100) * 10) / 10,
           );
-        }
+        });
       }
 
       if (iconUrl) {
@@ -315,9 +315,9 @@ export class LeagueOfLegendsPlugin extends PluginBase {
   generateChampionIds(): iString {
     const championIds = {};
     if (this.champions) {
-      for (const champ of Object.keys(this.champions)) {
+      Object.keys(this.champions).map((champ) => {
         championIds[this.champions[champ]['key']] = this.champions[champ]['name'];
-      }
+      });
     }
     return championIds;
   }

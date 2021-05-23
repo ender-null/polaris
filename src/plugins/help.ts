@@ -35,9 +35,9 @@ export class HelpPlugin extends PluginBase {
     let text = this.strings.commands;
 
     // Iterates the initialized plugin
-    for (const plugin of this.bot.plugins) {
+    this.bot.plugins.map((plugin) => {
       if ('commands' in plugin) {
-        for (const command of plugin.commands) {
+        plugin.commands.map((command) => {
           // If the command is hidden, ignore it
           if (!('hidden' in command) || !command.hidden) {
             const doc = generateCommandHelp(plugin, command.command, false, true);
@@ -48,7 +48,7 @@ export class HelpPlugin extends PluginBase {
                   text += `\n • ${lines[0]}`;
                 } else {
                   if (!command.skipHelp) {
-                    text += `\n • ${lines[0]}\n   <i>${lines[1]}</i>`;
+                    text += `\n • ${lines[0]}\n   ${lines[1]}`;
                   }
                 }
 
@@ -64,9 +64,9 @@ export class HelpPlugin extends PluginBase {
               }
             }
           }
-        }
+        });
       }
-    }
+    });
 
     if (isCommand(this, 3, msg.content)) {
       if (this.bot.config.bindings == 'TelegramTDlibBindings') {
@@ -74,14 +74,15 @@ export class HelpPlugin extends PluginBase {
           commands: JSON.stringify(commands),
         });
       } else if (this.bot.config.bindings == 'DiscordBindings') {
-        for (const command of commands) {
-          this.bot.bindings['client']['api'].applications(this.bot.bindings['client'].user.id).commands.post({
-            data: {
-              name: command.command,
-              description: command.description,
-            },
+        const data = [];
+        commands.map(({ command, description }) => {
+          data.push({
+            name: command,
+            description,
           });
-        }
+        });
+        const slashCommands = await this.bot.bindings['client'].application?.commands.set(data);
+        console.log(slashCommands);
       }
     }
 

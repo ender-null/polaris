@@ -64,12 +64,12 @@ export class YouTubePlugin extends PluginBase {
       this.bot.replyMessage(msg, text, 'text', null, { preview: true });
     } else if (isCommand(this, 2, msg.content)) {
       text = format(`<b>${this.strings.results}</b> <i>{0}</i>:`, input);
-      for (const item of content['items']) {
+      content.items.map((item) => {
         if (item.snippet.title.length > 26) {
           item.snippet.title = item.snippet.title.split(0, 23) + '...';
         }
         text += `\n • <a href="https://youtu.be/${item.id.videoId}">${item.snippet.title}</a>`;
-      }
+      });
       this.bot.replyMessage(msg, text, 'text', null, { preview: false });
     }
   }

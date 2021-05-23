@@ -183,29 +183,29 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       let professionLevels = null;
       if (professions.primaries) {
         professionLevels = '';
-        for (const profession of professions.primaries) {
+        professions.primaries.map((profession) => {
           let highest;
-          for (const tier of profession.tiers) {
+          profession.tiers.map((tier) => {
             if (!highest || tier.tier.id > highest.tier.id) {
               highest = tier;
             }
-          }
+          });
           if (professions.primaries.indexOf(profession) > 0) {
             professionLevels += '\n';
           }
           professionLevels += `${this.strings[profession.profession.name.toLowerCase()]}: ${highest.skill_points}/${
             highest.max_skill_points
           }`;
-        }
+        });
       }
       let raidProgression = null;
       if (raids.expansions) {
         const lastExp = raids.expansions[raids.expansions.length - 1];
         const lastRaid = lastExp.instances[lastExp.instances.length - 1];
         raidProgression = `${lastRaid.instance.name}:`;
-        for (const mode of lastRaid.modes) {
+        lastRaid.modes.map((mode) => {
           raidProgression += `\n\t${mode.difficulty.name}: ${mode.progress.completed_count}/${mode.progress.total_count}`;
-        }
+        });
       }
       let mythicScore = '';
       if (raiderIO.mythic_plus_scores_by_season && raiderIO.mythic_plus_scores_by_season.length > 0) {
@@ -213,12 +213,12 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         mythicScore = `${this.strings['mythicPlusScores']}:`;
         let empty = true;
         const scores = ['dps', 'healer', 'tank'];
-        for (const score of scores) {
+        scores.map((score) => {
           mythicScore += `\n\t${this.strings[score]}: ${lastSeason.scores[score]}`;
           if (lastSeason.scores[score] > 0) {
             empty = false;
           }
-        }
+        });
         if (empty) {
           mythicScore = '';
         }
@@ -227,12 +227,12 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         mythicScore = null;
       }
       let photo = null;
-      for (const asset of media.assets) {
+      media.assets.map((asset) => {
         if (asset.key == 'main') {
           photo = `${asset.value}?update=${Math.trunc(now() / 3600)}`;
-          break;
+          return;
         }
-      }
+      });
       text = `${title ? title + '\n\t' : ''}${name}\n${
         guild ? guild + '\n\n' : ''
       }${characterClass}\n\t${race}\n\n${info}\n\n${stats}\n\n${professionLevels ? professionLevels + '\n\n' : ''}${
@@ -265,7 +265,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       const content = await resp.json();
       if (content) {
         text = `<b>${this.strings.tokenTitle}</b>:`;
-        for (const region in content) {
+        Object.keys(content).map((region) => {
           text += format(
             '\n\t<b>{0}</b>: {1}k💰 {2}k📈{2}k',
             region.toUpperCase(),
@@ -273,7 +273,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
             Math.trunc(content[region]['1_day_low'] / 1000),
             Math.trunc(content[region]['1_day_high'] / 1000),
           );
-        }
+        });
       } else {
         return this.bot.replyMessage(msg, this.bot.errors.connectionError);
       }

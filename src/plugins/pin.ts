@@ -54,18 +54,18 @@ export class PinPlugin extends PluginBase {
     if (isCommand(this, 1, msg.content)) {
       const pins = [];
       if (db.pins) {
-        for (const pin in db.pins) {
+        Object.keys(db.pins).map((pin) => {
           if (db.pins[pin].creator == msg.sender.id && db.pins[pin].bot == this.bot.user.id) {
             pins.push(pin);
           }
-        }
+        });
       }
       let text = '';
       if (pins.length > 0) {
         text = format(this.strings.pins, pins.length);
-        for (const pin of pins) {
+        pins.map((pin) => {
           text += `\n • #${pin}`;
-        }
+        });
       } else {
         text = this.strings.noPins;
       }
@@ -129,8 +129,8 @@ export class PinPlugin extends PluginBase {
       const pins = new RegExp('#(\\w+)', 'gim').exec(msg.content);
       let count = 3;
       if (pins) {
-        for (const pin of pins) {
-          if (pin in db.pins) {
+        pins.map((pin) => {
+          if (pin in db.pins && count > 0) {
             if (
               db.pins[pin].content != undefined &&
               db.pins[pin].type != undefined &&
@@ -147,10 +147,8 @@ export class PinPlugin extends PluginBase {
             }
           }
           count -= 1;
-          if (count == 0) {
-            break;
-          }
-        }
+          return null;
+        });
       }
     }
   }
@@ -158,27 +156,27 @@ export class PinPlugin extends PluginBase {
   updateTriggers(): void {
     if (db.pins) {
       const addedPins = [];
-      for (const command of this.commands) {
+      this.commands.map((command) => {
         if (command.command.startsWith('#')) {
           addedPins.push(command.command.slice(1));
         }
-      }
+      });
 
       // Add new triggers
-      for (const pin in db.pins) {
+      Object.keys(db.pins).map((pin) => {
         if (addedPins.indexOf(pin) == -1)
           this.commands.push({
             command: '#' + pin,
             hidden: true,
           });
-      }
+      });
 
       // Remove unused triggers
-      for (const command of this.commands) {
+      this.commands.map((command, i) => {
         if ('hidden' in command && command.hidden && Object.keys(db.pins).indexOf(command.command.slice(1)) == -1) {
-          this.commands.splice(this.commands.indexOf(command), 1);
+          this.commands.splice(i, 1);
         }
-      }
+      });
     }
   }
 }

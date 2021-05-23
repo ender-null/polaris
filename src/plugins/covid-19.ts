@@ -135,7 +135,7 @@ export class Covid19Plugin extends PluginBase {
     const content = await resp.json();
     const countryGroups = content.result.pageContext.countryGroups;
     this.data = {};
-    for (const country of countryGroups) {
+    countryGroups.map((country) => {
       const code = country.value.toLowerCase();
       const lastEntry = country.data.rows[country.data.rows.length - 1];
       this.data[code] = {};
@@ -155,7 +155,7 @@ export class Covid19Plugin extends PluginBase {
           deathsLast24Hours: lastEntry[2],
         },
       };
-    }
+    });
     this.lastUpdate = now();
     logger.info('Updated COVID-19 data');
     return true;

@@ -1,20 +1,20 @@
 {
   "name": "polaris",
-  "version": "0.9.6",
-  "description": "A multiplatform TypeScript bot using plugins!",
+  "version": "0.9.7",
+  "description": "A multi platform TypeScript bot using plugins!",
   "license": "AGPL-3.0",
   "author": {
-    "name": "luksireiku",
+    "name": "ender-null",
     "email": "endernull@icloud.com",
-    "url": "https://github.com/luksireiku"
+    "url": "https://github.com/ender-null"
   },
-  "homepage": "https://github.com/luksireiku/polaris#readme",
+  "homepage": "https://github.com/ender-null/polaris#readme",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/luksireiku/polaris.git"
+    "url": "git+ssh://git@github.com/ender-null/polaris.git"
   },
   "bugs": {
-    "url": "https://github.com/luksireiku/polaris/issues"
+    "url": "https://github.com/ender-null/polaris/issues"
   },
   "main": "build/src/main.js",
   "scripts": {

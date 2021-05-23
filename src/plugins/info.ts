@@ -64,11 +64,11 @@ export class InfoPlugin extends PluginBase {
         userId = target;
         if (db.users[target]) {
           const props = ['first_name', 'last_name', 'username', 'nick', 'description', 'is_bot', 'is_scam'];
-          for (const prop of props) {
+          props.map((prop) => {
             if (db.users[target][prop]) {
               user[prop] = db.users[target][prop];
             }
-          }
+          });
         }
 
         if (info) {
@@ -96,6 +96,11 @@ export class InfoPlugin extends PluginBase {
         const tags = getTags(this.bot, userId);
         if (tags && tags.length > 0) {
           userTags = tags.join(', ');
+        }
+
+        if (!input) {
+          target = gid;
+          groupId = gid;
         }
       } else {
         showGroup = true;
@@ -125,11 +130,11 @@ export class InfoPlugin extends PluginBase {
           'restriction_reason',
           'linked_chat_id',
         ];
-        for (const prop of props) {
+        props.map((prop) => {
           if (db.groups[target][prop]) {
             group[prop] = db.groups[target][prop];
           }
-        }
+        });
       }
 
       if (target == gid && this.bot.config.bindings == 'TelegramTDlibBindings') {

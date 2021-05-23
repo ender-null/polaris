@@ -85,18 +85,18 @@ export class TagPlugin extends PluginBase {
 
     // Adds a tag to user or group.
     if (isCommand(this, 1, msg.content)) {
-      for (const tag of tags) {
+      tags.map((tag) => {
         if (!hasTag(this.bot, target, tag)) {
           setTag(this.bot, target, tag);
         }
-      }
+      });
       this.bot.replyMessage(msg, `<b>👤 ${name}</b>\n🏷 +${tags}`);
     } else if (isCommand(this, 2, msg.content)) {
-      for (const tag of tags) {
+      tags.map((tag) => {
         if (hasTag(this.bot, target, tag)) {
           delTag(this.bot, target, tag);
         }
-      }
+      });
       this.bot.replyMessage(msg, `<b>👤 ${name}</b>\n🏷 -${tags}`);
     }
   }

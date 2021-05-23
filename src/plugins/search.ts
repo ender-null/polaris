@@ -104,19 +104,16 @@ export class SearchPlugin extends PluginBase {
     } else {
       let text = format(`<b>${this.strings['results']}</b> <i>{0}</i>:`, input);
       let limit = 8;
-      for (const item of content.results) {
-        if (item['t']) {
+      content.results.map((item) => {
+        if (item['t'] && limit >= 0) {
           item['t'] = removeHtml(item['t']);
           if (item['t'].length > 26) {
             item['t'] = item['t'].slice(0, 23) + '...';
           }
           text += `\n • <a href="${item['u']}">${item['t']}</a>`;
           limit -= 1;
-          if (limit <= 0) {
-            break;
-          }
         }
-      }
+      });
       return this.bot.replyMessage(msg, text, 'text', null, { format: 'HTML', preview: false });
     }
   }

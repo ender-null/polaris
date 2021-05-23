@@ -78,27 +78,27 @@ export class MediaForwarderPlugin extends PluginBase {
 
       let text = '';
 
-      for (const gid in db.tags) {
-        for (const tag of getTags(this.bot, gid)) {
+      Object.keys(db.tags).map((gid) => {
+        getTags(this.bot, gid).map((tag) => {
           if (tag.indexOf('resend:') > -1) {
             resends.push(`${gid}:${tag.split(':')[1]}`);
           }
           if (tag.indexOf('fwd:') > -1) {
             forwards.push(`${gid}:${tag.split(':')[1]}`);
           }
-        }
-      }
+        });
+      });
 
       if (clean) {
-        for (const item of resends) {
+        resends.map((item) => {
           const orig = item.split(':')[0];
           const dest = item.split(':')[1];
           if (!db.groups[orig] || !db.groups[dest]) {
             delTag(this.bot, orig, `resend:${dest}`);
             removedResends.push(item);
           }
-        }
-        for (const item of forwards) {
+        });
+        forwards.map((item) => {
           const orig = item.split(':')[0];
           const dest = item.split(':')[1];
 
@@ -106,7 +106,7 @@ export class MediaForwarderPlugin extends PluginBase {
             delTag(this.bot, orig, `fwd:${dest}`);
             removedForwards.push(item);
           }
-        }
+        });
       }
 
       if (!clean) {
@@ -161,7 +161,7 @@ export class MediaForwarderPlugin extends PluginBase {
 
   generateText(items: string[]): string {
     let text = '';
-    for (const item of items) {
+    items.map((item) => {
       const orig = item.split(':')[0];
       const dest = item.split(':')[1];
 
@@ -178,7 +178,7 @@ export class MediaForwarderPlugin extends PluginBase {
       }
 
       text += '\n';
-    }
+    });
 
     return text;
   }
@@ -213,13 +213,13 @@ export class MediaForwarderPlugin extends PluginBase {
     }
 
     if (hasTag(this.bot, gid, 'resend:?') || hasTag(this.bot, gid, 'fwd:?')) {
-      for (const tag of getTags(this.bot, gid)) {
+      getTags(this.bot, gid).map((tag) => {
         let forward = false;
         if (tag.startsWith('resend:') || tag.startsWith('fwd:')) {
           const cid = tag.split(':')[1];
           if (msg.extra.fromChatId) {
             if (String(msg.extra['from_chat_id']) == String(cid)) {
-              break;
+              return;
             } else if (String(msg.extra.fromChatId) != '0') {
               if (hasTag(this.bot, cid, 'resend:?') || hasTag(this.bot, cid, 'fwd:?')) {
                 logger.debug('forward');
@@ -256,7 +256,7 @@ export class MediaForwarderPlugin extends PluginBase {
             }
             r.conversation.title = tag.toUpperCase();
             if (r.extra.urls) {
-              for (let url of r.extra.urls) {
+              r.extra.urls.map((url) => {
                 const inputMatch = telegramLinkRegExp.exec(url);
                 if (inputMatch && inputMatch.length > 0) {
                   logger.debug(`ignoring telegram url: ${url}`);
@@ -266,7 +266,7 @@ export class MediaForwarderPlugin extends PluginBase {
                   }
                   this.bot.replyMessage(r, url, 'text', null, { preview: true });
                 }
-              }
+              });
             } else {
               this.bot.replyMessage(r, msg.content, msg.type, null, { preview: true });
             }
@@ -285,11 +285,11 @@ export class MediaForwarderPlugin extends PluginBase {
             this.bot.forwardMessage(msg, cid);
           }
         }
-      }
+      });
     }
 
     if (hasTag(this.bot, gid, 'discord:?')) {
-      for (const tag of getTags(this.bot, gid, 'discord:?')) {
+      getTags(this.bot, gid, 'discord:?').map(async (tag) => {
         const token = tag.split(':')[1];
         const webhookUrl = `https://discord.com/api/webhooks/${token}`;
         if (
@@ -300,7 +300,7 @@ export class MediaForwarderPlugin extends PluginBase {
           (msg.type == 'text' && msg.extra.urls)
         ) {
           if (msg.extra.urls) {
-            for (let url of msg.extra.urls) {
+            msg.extra.urls.map(async (url) => {
               const inputMatch = telegramLinkRegExp.exec(url);
               if (inputMatch && inputMatch.length > 0) {
                 logger.debug(`ignoring telegram url: ${url}`);
@@ -319,7 +319,7 @@ export class MediaForwarderPlugin extends PluginBase {
                 true,
                 this.bot,
               );
-            }
+            });
           } else {
             if (msg.content.startsWith('http')) {
               await sendRequest(
@@ -350,7 +350,7 @@ export class MediaForwarderPlugin extends PluginBase {
             }
           }
         }
-      }
+      });
     }
   }
 }

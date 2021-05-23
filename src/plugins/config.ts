@@ -42,20 +42,20 @@ export class ConfigPlugin extends PluginBase {
     const enabled = ['reactions', 'roulette', 'replies', 'pole', 'fiesta', 'nsfw'];
     const disabled = ['antispam', 'antiarab', 'antirussian', 'polereset'];
     const config = {};
-    for (const param of enabled) {
+    enabled.map((param) => {
       config[param] = !hasTag(this.bot, msg.conversation.id, 'no' + param);
-    }
+    });
 
-    for (const param of disabled) {
+    disabled.map((param) => {
       config[param] = hasTag(this.bot, msg.conversation.id, param);
-    }
+    });
 
     let text = '';
     if (!input) {
       text = format(this.strings.explanation, this.bot.config.prefix, Object.keys(config).join("', '"));
-      for (const param of Object.keys(config)) {
+      Object.keys(config).map((param) => {
         text += `\n${config[param] ? '✔️' : '❌'} ${this.strings[param]}`;
-      }
+      });
     } else if (enabled.indexOf(input) > -1 || disabled.indexOf(input) > -1) {
       if ((await !isAdmin(this.bot, msg.sender.id, msg)) && !isTrusted(this.bot, msg.sender.id, msg)) {
         return this.bot.replyMessage(msg, this.bot.errors.permissionRequired);

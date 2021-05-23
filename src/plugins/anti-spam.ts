@@ -214,13 +214,13 @@ export class AntiSpamPlugin extends PluginBase {
       let trustedGroup = false;
       if (inputMatch && inputMatch.length > 0) {
         const groupHash = inputMatch[1];
-        for (const gid in db.administration) {
+        Object.keys(db.administration).map((gid) => {
           const group = db.administration[gid];
           if (group && 'link' in group && group.link.indexOf(groupHash) > -1) {
             trustedGroup = true;
-            break;
+            return;
           }
-        }
+        });
       }
       if (trustedGroup && !isAdmin(this.bot, m.sender.id, m)) {
         const name = getFullName(m.sender.id);

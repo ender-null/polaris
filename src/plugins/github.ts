@@ -36,9 +36,9 @@ export class GitHubPlugin extends PluginBase {
         const status = capitalize(data.check_run.status);
         text = `${icon} ${status} check run <a href="${data.check_run.details_url}">${data.check_run.id}</a>`;
       }
-      for (const sub of subs) {
+      subs.map((sub) => {
         this.bot.sendMessage(new Conversation(sub), text);
-      }
+      });
     }
   }
 }

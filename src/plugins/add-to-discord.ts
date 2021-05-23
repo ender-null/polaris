@@ -16,7 +16,7 @@ export class AddToDiscordPlugin extends PluginBase {
     };
   }
   async run(msg: Message): Promise<void> {
-    const permissions = 2146959191;
+    const permissions = 4294967287;
     const url = format(
       'https://discord.com/api/oauth2/authorize?client_id={0}&permissions={1}&scope=bot',
       this.bot.config.apiKeys.discordClientId,

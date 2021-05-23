@@ -161,20 +161,20 @@ export class CorePlugin extends PluginBase {
       }
     }
 
-    for (const url of urls) {
+    urls.map((url) => {
       const inputMatch = telegramLinkRegExp.exec(url);
       if (inputMatch && inputMatch.length > 0) {
         logger.info(`Found Telegram link: ${url}`);
         const fixedUrl = fixTelegramLink(url);
 
         let knownLink = false;
-        for (const gid in db.groups) {
+        Object.keys(db.groups).map((gid) => {
           if (db.groups[gid].invite_link && db.groups[gid].invite_link == fixedUrl) {
             knownLink = true;
             logger.info(`Known link: ${fixedUrl}`);
-            break;
+            return;
           }
-        }
+        });
 
         if (!knownLink) {
           const chat = this.bot.bindings.checkInviteLink(fixedUrl);
@@ -205,6 +205,6 @@ export class CorePlugin extends PluginBase {
           }
         }
       }
-    }
+    });
   }
 }
