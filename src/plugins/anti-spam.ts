@@ -36,8 +36,12 @@ export class AntiSpamPlugin extends PluginBase {
       return;
     }
 
+    if (hasTag(this.bot, msg.sender.id, `ban:${msg.conversation.id}`)) {
+      await this.kickSpammer(msg, 'ban', 'id');
+    }
+
     const spamTypes = ['spam', 'arab', 'russian', 'ethiopic'];
-    for (const spamType of spamTypes) {
+    spamTypes.map(async (spamType) => {
       if (hasTag(this.bot, msg.sender.id, spamType)) {
         if (!isAdmin(this.bot, msg.sender.id, msg)) {
           await this.kickSpammer(msg, spamType, 'tag');
@@ -66,13 +70,13 @@ export class AntiSpamPlugin extends PluginBase {
       ) {
         return await this.kickMyself(msg);
       }
-    }
+    });
 
     if (msg.extra) {
       if ('urls' in msg.extra) {
-        for (const url of msg.extra['urls']) {
+        msg.extra.urls.map((url) => {
           this.checkTrustedTelegramLink(msg, fixTelegramLink(url));
-        }
+        });
       }
       if ('caption' in msg.extra && msg.extra['caption']) {
         if (this.detectArab(msg.extra['caption'])) {
@@ -128,6 +132,8 @@ export class AntiSpamPlugin extends PluginBase {
       text = m.conversation ? m.conversation.title : '[no title]';
     } else if (content == 'caption') {
       text = m.extra['caption'];
+    } else if (content == 'id') {
+      text = m.sender.id;
     } else {
       text = m.content;
     }
