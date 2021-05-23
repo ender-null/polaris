@@ -48,7 +48,7 @@ export class Database {
     ];
     const ready = [];
     let loaded = false;
-    for (const table of tables) {
+    tables.map((table) => {
       this.fb.ref(`db/${table}`).on('value', (snapshot: firebase.database.DataSnapshot) => {
         this[table + 'Snap'] = snapshot;
         if (!this[table] || table == 'configs' || table == 'translations') {
@@ -67,6 +67,6 @@ export class Database {
           }
         }
       });
-    }
+    });
   }
 }

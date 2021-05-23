@@ -55,11 +55,11 @@ export class Config {
     if (!config.instances) {
       configs.push(config);
     } else {
-      for (const instance of Object.keys(config.instances)) {
-        const iconfig = merge(config, config.instances[instance]);
-        delete iconfig['instances'];
-        configs.push(iconfig);
-      }
+      Object.keys(config.instances).map((instance) => {
+        const iConfig = merge(config, config.instances[instance]);
+        delete iConfig['instances'];
+        configs.push(iConfig);
+      });
     }
     return configs;
   }

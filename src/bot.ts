@@ -80,16 +80,16 @@ export class Bot {
 
   async onStopped(): Promise<void> {
     this.started = false;
-    for (const task of this.tasks) {
-      task.stop();
-    }
+    await Promise.all(
+      this.tasks.map((task) => {
+        task.stop();
+      }),
+    );
     this.inbox.removeAllListeners('message');
     this.outbox.removeAllListeners('message');
     this.status.removeAllListeners('started');
     this.status.removeAllListeners('stopped');
-    logger.info(
-      `🔴 Stopped ${this.config.icon} ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`,
-    );
+    logger.info(`🔴 Stopped ${this.config.icon} ${this.user.firstName} (@${this.user.username}) [${this.user.id}]`);
   }
 
   async stop(): Promise<void> {
@@ -139,12 +139,11 @@ export class Bot {
       await this.bindings.webhookHandler(req, res, dataObject);
     } else {
       logger.info(`☁️ ${this.config.icon} [webhook:${req.url}] ${data}`);
-      for (const i in this.plugins) {
-        const plugin = this.plugins[i];
+      this.plugins.map(async (plugin) => {
         if (getPluginSlug(plugin) == path[2] && 'webhook' in plugin) {
           await plugin.webhook(req.url, dataObject);
         }
-      }
+      });
     }
   }
 
@@ -173,13 +172,13 @@ export class Bot {
 
   initPlugins(): void {
     this.plugins = [];
-    for (const i in plugins) {
-      const plugin = new plugins[i](this);
+    Object.keys(plugins).map((name) => {
+      const plugin = new plugins[name](this);
       // Check if plugin works only with certain bindings
       if (plugin.bindings == undefined || plugin.bindings.indexOf(this.config.bindings) > -1) {
         this.plugins.push(plugin);
       }
-    }
+    });
   }
 
   initTranslations(): void {
@@ -199,17 +198,17 @@ export class Bot {
         trans = merge(base, trans);
       }
       this.errors = trans.errors;
-      for (const plugin of this.plugins) {
+      this.plugins.map((plugin) => {
         if (plugin.constructor.name in trans.plugins) {
           if ('commands' in plugin) {
-            let maxlength = plugin.commands.length;
+            let maxLength = plugin.commands.length;
             if (
               'commands' in trans.plugins[plugin.constructor.name] &&
-              Object.keys(trans.plugins[plugin.constructor.name].commands).length > maxlength
+              Object.keys(trans.plugins[plugin.constructor.name].commands).length > maxLength
             ) {
-              maxlength = Object.keys(trans.plugins[plugin.constructor.name].commands).length;
+              maxLength = Object.keys(trans.plugins[plugin.constructor.name].commands).length;
             }
-            for (let commandIndex = 0; commandIndex < maxlength; commandIndex++) {
+            for (let commandIndex = 0; commandIndex < maxLength; commandIndex++) {
               if ('commands' in trans.plugins[plugin.constructor.name]) {
                 if (commandIndex in trans.plugins[plugin.constructor.name].commands) {
                   const com = trans.plugins[plugin.constructor.name].commands[commandIndex];
@@ -224,9 +223,9 @@ export class Bot {
                   }
                   if (com.aliases != undefined) {
                     plugin.commands[commandIndex].aliases = [];
-                    for (const aliasIndex in com.aliases) {
-                      plugin.commands[commandIndex].aliases[aliasIndex] = com.aliases[aliasIndex];
-                    }
+                    com.aliases.map((alias, aliasIndex) => {
+                      plugin.commands[commandIndex].aliases[aliasIndex] = alias;
+                    });
                   }
                   if (com.friendly != undefined) {
                     plugin.commands[commandIndex].friendly = com.friendly;
@@ -245,9 +244,9 @@ export class Bot {
                   }
                   if (com.parameters != undefined) {
                     plugin.commands[commandIndex].parameters = [];
-                    for (const paramIndex in com.parameters) {
-                      plugin.commands[commandIndex].parameters[paramIndex] = com.parameters[paramIndex];
-                    }
+                    com.parameters.map((param, paramIndex) => {
+                      plugin.commands[commandIndex].parameters[paramIndex] = param;
+                    });
                   }
                 }
               }
@@ -261,12 +260,12 @@ export class Bot {
           }
           plugin.afterTranslation();
         }
-      }
+      });
     }
   }
 
   scheduleCronJobs(): void {
-    for (const plugin of this.plugins) {
+    this.plugins.map(async (plugin) => {
       if (plugin.cronExpression && plugin.cron) {
         this.tasks.push(
           cron.schedule(plugin.cronExpression, async () => {
@@ -275,7 +274,7 @@ export class Bot {
           }),
         );
       }
-    }
+    });
   }
 
   async onMessageReceive(msg: Message): Promise<void> {
@@ -297,22 +296,20 @@ export class Bot {
         ignoreMessage = true;
       }
 
-      for (const i in this.plugins) {
-        const plugin = this.plugins[i];
+      this.plugins.map(async (plugin) => {
         if ('always' in plugin) {
-          plugin.always(msg);
+          await plugin.always(msg);
         }
         if (plugin.commands != undefined && !ignoreMessage) {
-          for (const i in plugin.commands) {
-            const command = plugin.commands[i];
+          plugin.commands.map(async (command) => {
             if (command.command != undefined) {
               if (await this.checkTrigger(command.command, command.parameters, msg, plugin)) {
-                break;
+                return;
               }
 
               if (command.keepDefault != undefined && command.keepDefault) {
                 if (await this.checkTrigger(command.command, command.parameters, msg, plugin, false, true)) {
-                  break;
+                  return;
                 }
               }
             }
@@ -325,38 +322,38 @@ export class Bot {
               msg.conversation.id != +this.config.adminConversationId
             ) {
               if (await this.checkTrigger(command.friendly, command.parameters, msg, plugin, true)) {
-                break;
+                return;
               }
             }
 
             if (command.shortcut != undefined) {
               if (await this.checkTrigger(command.shortcut, command.parameters, msg, plugin)) {
-                break;
+                return;
               }
 
               if (command.keepDefault != undefined && command.keepDefault) {
                 if (await this.checkTrigger(command.shortcut, command.parameters, msg, plugin, false, true)) {
-                  break;
+                  return;
                 }
               }
             }
 
             if (command.aliases != undefined) {
-              for (const alias of command.aliases) {
+              command.aliases.map(async (alias) => {
                 if (await this.checkTrigger(alias, command.parameters, msg, plugin)) {
-                  break;
+                  return;
                 }
 
                 if (command.keepDefault != undefined && command.keepDefault) {
                   if (await this.checkTrigger(alias, command.parameters, msg, plugin, false, true)) {
-                    break;
+                    return;
                   }
                 }
-              }
+              });
             }
-          }
+          });
         }
-      }
+      });
     } catch (e) {
       catchException(e, this, msg);
     }
