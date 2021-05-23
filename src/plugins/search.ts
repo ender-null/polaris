@@ -86,7 +86,12 @@ export class SearchPlugin extends PluginBase {
     if (!resp) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
     }
-    const content = await resp.json();
+    let content;
+    try {
+      content = await resp.json();
+    } catch (error) {
+      return this.bot.replyMessage(msg, this.bot.errors.connectionError);
+    }
 
     if (!content || content['results'] == undefined) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
