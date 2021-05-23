@@ -574,8 +574,15 @@ export async function sendRequest(
   try {
     const response = await fetch(`${url}?${querystring.stringify(params)}`, options);
     if (!response.ok) {
+      const resp = response.clone();
+      logger.info(await resp.text());
       const error = response.clone();
-      await error.json().catch((e) => catchException(e, bot));
+      await error.json().catch((e) => {
+        catchException(e, bot);
+      });
+    } else {
+      const resp = response.clone();
+      logger.info(await resp.text());
     }
     return response;
   } catch (error) {

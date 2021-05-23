@@ -37,7 +37,7 @@ export class PolePlugin extends PluginBase {
       },
       {
         command: '/pole',
-        friendly: '^pole$|oro',
+        friendly: '^pole$|oro|m[a|á]stil',
         description: 'Get the pole',
         skipHelp: true,
       },
@@ -78,6 +78,16 @@ export class PolePlugin extends PluginBase {
       },
     ];
     this.strings = {
+      pole: 'the pole',
+      subpole: 'the subpole',
+      fail: 'the fail',
+      iron: 'the iron',
+      canaria: 'the pole canaria',
+      andaluza: 'the pole andaluza',
+      gold: 'the gold',
+      silver: 'the silver',
+      bronze: 'the bronze',
+      mastil: 'the mastil',
       gotPole: '{0} got the pole',
       gotSubpole: '{0} got the subpole',
       gotFail: '{0} got the fail',
