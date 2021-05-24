@@ -66,10 +66,10 @@ export const getTags = (bot: Bot, target: number | string, tagFilter?: string): 
   }
   if (db.tags && db.tags[target] !== undefined) {
     const tags = [];
-    for (const i in db.tags[target]) {
+    Object.keys(db.tags[target]).map((i) => {
       const tag = db.tags[target][i];
       if (tagFilter && tagFilter.indexOf('?') > -1 && !tag.startsWith(tagFilter.split('?')[0])) {
-        continue;
+        return;
       }
       const inputMatch = tagForBotRegExp.exec(tag);
       if (inputMatch) {
@@ -79,7 +79,7 @@ export const getTags = (bot: Bot, target: number | string, tagFilter?: string): 
       } else {
         tags.push(tag);
       }
-    }
+    });
     return tags;
   } else {
     return [];
@@ -261,9 +261,9 @@ export const capitalizeEachWord = (text: string): string => {
     if (text.indexOf(' ') > -1) {
       const words = text.split(' ');
       const capitalized = [];
-      for (const word of words) {
+      words.map((word) => {
         capitalized.push(capitalize(word));
-      }
+      });
       return capitalized.join(' ');
     } else {
       return capitalize(text);
@@ -547,9 +547,9 @@ export const generateCommandHelp = (
     aliases.push(command.shortcut.replace('/', plugin.bot.config.prefix));
   }
   if ('aliases' in command) {
-    for (const alias of command.aliases) {
+    command.aliases.map((alias) => {
       aliases.push(alias.replace('/', plugin.bot.config.prefix));
-    }
+    });
   }
 
   if (aliases.length > 0) {
@@ -677,11 +677,11 @@ export const getCoords = async (input: string, bot?: Bot): Promise<CoordinatesRe
     if (content && content.results.length > 0) {
       const locality = content.results[0].address_components[0].long_name;
       let country;
-      for (const address of content.results[0].address_components) {
+      content.results[0].address_components.map((address) => {
         if (address.types.indexOf('country') > -1) {
           country = address.long_name;
         }
-      }
+      });
       return {
         status: content.status,
         lat: content.results[0].geometry.location.lat,
@@ -748,9 +748,9 @@ export const htmlToMarkdown = (text: string): string => {
       { pattern: '<[/]?code>', sub: '`' },
       { pattern: '<[/]?pre>', sub: '```' },
     ];
-    for (const rep of replacements) {
+    replacements.map((rep) => {
       text = text.replace(new RegExp(rep['pattern'], 'gim'), rep['sub']);
-    }
+    });
     text = text.replace(new RegExp('&lt;', 'gim'), '<');
     text = text.replace(new RegExp('&gt;', 'gim'), '>');
   }
@@ -768,9 +768,9 @@ export const htmlToDiscordMarkdown = (text: string): string => {
       { pattern: '<[/]?code>', sub: '`' },
       { pattern: '<[/]?pre>', sub: '```' },
     ];
-    for (const rep of replacements) {
+    replacements.map((rep) => {
       text = text.replace(new RegExp(rep['pattern'], 'gim'), rep['sub']);
-    }
+    });
     text = text.replace(new RegExp('&lt;', 'gim'), '<');
     text = text.replace(new RegExp('&gt;', 'gim'), '>');
   }
@@ -784,14 +784,14 @@ export const splitLargeMessage = (content: string, maxLength: number): string[] 
     const lines = content.split(lineBreak);
     let text = '';
 
-    for (const line of lines) {
+    lines.map((line) => {
       if (text.length + line.length + lineBreak.length < maxLength) {
         text += line + lineBreak;
       } else {
         texts.push(text);
         text = line + lineBreak;
       }
-    }
+    });
   }
   return texts;
 };
