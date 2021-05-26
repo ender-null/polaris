@@ -57,7 +57,12 @@ export class VoicePlugin extends PluginBase {
         'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.8 Safari/537.36',
     };
 
-    const file = await download(url, params, headers, false, this.bot);
+    let file;
+    try {
+      file = await download(url, params, headers, false, this.bot);
+    } catch (error) {
+      return this.bot.replyMessage(msg, this.bot.errors.connectionError);
+    }
     if (!file) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
     }

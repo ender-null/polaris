@@ -4,7 +4,6 @@ import { createServer } from 'https';
 import { Bot, Config, Database } from '.';
 import { catchException, getBindingsSlug, logger } from './utils';
 
-// global.Promise = require('bluebird');
 process.setMaxListeners(0);
 
 const bots: Bot[] = [];

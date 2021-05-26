@@ -100,11 +100,11 @@ export class Bot {
     }
   }
 
-  messageSender(msg: Message): void {
+  messageSender({ conversation, content }: Message): void {
     logger.info(
-      `💬 ${this.config.icon} [${msg.conversation.id}] ${msg.conversation.title} 🗣️ ${getFullName(this.user.id)} [${
+      `💬 ${this.config.icon} [${conversation.id}] ${conversation.title} 🗣️ ${getFullName(this.user.id)} [${
         this.user.id
-      }]: ${msg.content}`,
+      }]: ${content}`,
     );
   }
 
@@ -140,7 +140,7 @@ export class Bot {
     } else {
       logger.info(`☁️ ${this.config.icon} [webhook:${req.url}] ${data}`);
       this.plugins.map(async (plugin) => {
-        if (getPluginSlug(plugin) == path[2] && 'webhook' in plugin) {
+        if (getPluginSlug(plugin) == path[2] && plugin.webhook) {
           await plugin.webhook(req.url, dataObject);
         }
       });
@@ -182,7 +182,7 @@ export class Bot {
   }
 
   initTranslations(): void {
-    if (db.translations && this.config.translation in db.translations) {
+    if (db.translations && db.translations[this.config.translation]) {
       let trans: Translation = db.translations[this.config.translation];
       if (trans.extends) {
         let base = db.translations[trans.extends];
@@ -199,38 +199,38 @@ export class Bot {
       }
       this.errors = trans.errors;
       this.plugins.map((plugin) => {
-        if (plugin.constructor.name in trans.plugins) {
-          if ('commands' in plugin) {
+        if (trans.plugins[plugin.constructor.name]) {
+          if (plugin.commands) {
             let maxLength = plugin.commands.length;
             if (
-              'commands' in trans.plugins[plugin.constructor.name] &&
+              trans.plugins[plugin.constructor.name].commands &&
               Object.keys(trans.plugins[plugin.constructor.name].commands).length > maxLength
             ) {
               maxLength = Object.keys(trans.plugins[plugin.constructor.name].commands).length;
             }
             for (let commandIndex = 0; commandIndex < maxLength; commandIndex++) {
-              if ('commands' in trans.plugins[plugin.constructor.name]) {
-                if (commandIndex in trans.plugins[plugin.constructor.name].commands) {
+              if (trans.plugins[plugin.constructor.name].commands) {
+                if (trans.plugins[plugin.constructor.name].commands[commandIndex]) {
                   const com = trans.plugins[plugin.constructor.name].commands[commandIndex];
                   if (plugin.commands[commandIndex] == undefined) {
                     plugin.commands[commandIndex] = { ...com };
                   }
-                  if (com.command != undefined) {
+                  if (com.command) {
                     plugin.commands[commandIndex].command = com.command;
                   }
-                  if (com.shortcut != undefined) {
+                  if (com.shortcut) {
                     plugin.commands[commandIndex].shortcut = com.shortcut;
                   }
-                  if (com.aliases != undefined) {
+                  if (com.aliases) {
                     plugin.commands[commandIndex].aliases = [];
                     Object.keys(com.aliases).map((alias) => {
                       plugin.commands[commandIndex].aliases[alias] = com.aliases[alias];
                     });
                   }
-                  if (com.friendly != undefined) {
+                  if (com.friendly) {
                     plugin.commands[commandIndex].friendly = com.friendly;
                   }
-                  if (com.description != undefined) {
+                  if (com.description) {
                     plugin.commands[commandIndex].description = com.description;
                   }
                   if (com.keepDefault != undefined) {
@@ -242,7 +242,7 @@ export class Bot {
                   if (com.skipHelp != undefined) {
                     plugin.commands[commandIndex].skipHelp = com.skipHelp;
                   }
-                  if (com.parameters != undefined) {
+                  if (com.parameters) {
                     plugin.commands[commandIndex].parameters = [];
                     Object.keys(com.parameters).map((param) => {
                       plugin.commands[commandIndex].parameters[param] = com.parameters[param];
@@ -252,10 +252,10 @@ export class Bot {
               }
             }
           }
-          if ('strings' in plugin) {
+          if (plugin.strings) {
             plugin.strings = { ...plugin.strings, ...trans.plugins[plugin.constructor.name].strings };
           }
-          if ('data' in plugin) {
+          if (plugin.data) {
             plugin.data = trans.plugins[plugin.constructor.name].data;
           }
           plugin.afterTranslation();
@@ -296,64 +296,64 @@ export class Bot {
         ignoreMessage = true;
       }
 
-      this.plugins.map(async (plugin) => {
-        if ('always' in plugin) {
+      for (const plugin of this.plugins) {
+        if (plugin.always) {
           await plugin.always(msg);
         }
-        if (plugin.commands != undefined && !ignoreMessage) {
-          plugin.commands.map(async (command) => {
-            if (command.command != undefined) {
+        if (plugin.commands && !ignoreMessage) {
+          for (const command of plugin.commands) {
+            if (command.command) {
               if (await this.checkTrigger(command.command, command.parameters, msg, plugin)) {
-                return;
+                break;
               }
 
               if (command.keepDefault != undefined && command.keepDefault) {
                 if (await this.checkTrigger(command.command, command.parameters, msg, plugin, false, true)) {
-                  return;
+                  break;
                 }
               }
             }
 
             if (
-              command.friendly != undefined &&
+              command.friendly &&
               !hasTag(this, msg.sender.id, 'noreplies') &&
               !hasTag(this, msg.conversation.id, 'noreplies') &&
               msg.conversation.id != +this.config.alertsConversationId &&
               msg.conversation.id != +this.config.adminConversationId
             ) {
               if (await this.checkTrigger(command.friendly, command.parameters, msg, plugin, true)) {
-                return;
+                break;
               }
             }
 
-            if (command.shortcut != undefined) {
+            if (command.shortcut) {
               if (await this.checkTrigger(command.shortcut, command.parameters, msg, plugin)) {
-                return;
+                break;
               }
 
               if (command.keepDefault != undefined && command.keepDefault) {
                 if (await this.checkTrigger(command.shortcut, command.parameters, msg, plugin, false, true)) {
-                  return;
+                  break;
                 }
               }
             }
 
-            if (command.aliases != undefined) {
-              command.aliases.map(async (alias) => {
+            if (command.aliases) {
+              for (const alias of command.aliases) {
                 if (await this.checkTrigger(alias, command.parameters, msg, plugin)) {
-                  return;
+                  break;
                 }
 
                 if (command.keepDefault != undefined && command.keepDefault) {
                   if (await this.checkTrigger(alias, command.parameters, msg, plugin, false, true)) {
-                    return;
+                    break;
                   }
                 }
-              });
+              }
             }
-          });
+          }
         }
-      });
+      }
     } catch (e) {
       catchException(e, this, msg);
     }
@@ -395,15 +395,15 @@ export class Bot {
         if (parameters == null && trigger.startsWith('^')) {
           trigger += '$';
         } else if (
-          parameters != null &&
-          message.content != null &&
+          parameters &&
+          message.content &&
           typeof message.content == 'string' &&
           message.content.indexOf(' ') == -1
         ) {
           trigger += '$';
         } else if (
-          parameters != null &&
-          message.content != null &&
+          parameters &&
+          message.content &&
           typeof message.content == 'string' &&
           message.content.indexOf(' ') > -1
         ) {
@@ -432,7 +432,7 @@ export class Bot {
     if (!extra) {
       extra = {};
     }
-    if (!('format' in extra)) {
+    if (!extra.format) {
       extra.format = 'HTML';
     }
     const message = new Message(null, chat, this.user, content, type, now(), reply, extra);

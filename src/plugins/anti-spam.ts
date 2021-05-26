@@ -73,19 +73,19 @@ export class AntiSpamPlugin extends PluginBase {
     });
 
     if (msg.extra) {
-      if ('urls' in msg.extra) {
+      if (msg.extra.urls) {
         msg.extra.urls.map((url) => {
           this.checkTrustedTelegramLink(msg, fixTelegramLink(url));
         });
       }
-      if ('caption' in msg.extra && msg.extra['caption']) {
-        if (this.detectArab(msg.extra['caption'])) {
+      if (msg.extra.caption && msg.extra.caption) {
+        if (this.detectArab(msg.extra.caption)) {
           await this.kickSpammer(msg, 'arab', 'caption');
         }
-        if (this.detectRussian(msg.extra['caption'])) {
+        if (this.detectRussian(msg.extra.caption)) {
           await this.kickSpammer(msg, 'russian', 'caption');
         }
-        if (this.detectEthiopic(msg.extra['caption'])) {
+        if (this.detectEthiopic(msg.extra.caption)) {
           await this.kickSpammer(msg, 'ethiopic', 'caption');
         }
         await this.checkTrustedTelegramLink(msg, msg.extra.caption);
@@ -131,7 +131,7 @@ export class AntiSpamPlugin extends PluginBase {
     } else if (content == 'title') {
       text = m.conversation ? m.conversation.title : '[no title]';
     } else if (content == 'caption') {
-      text = m.extra['caption'];
+      text = m.extra.caption;
     } else if (content == 'id') {
       text = m.sender.id;
     } else {
@@ -151,7 +151,7 @@ export class AntiSpamPlugin extends PluginBase {
         ),
       );
       setTag(this.bot, m.sender.id, spamType);
-      if (spamType in db.groups[gid]) {
+      if (db.groups[gid][spamType]) {
         db.groups[gid][spamType] = db.groups[gid][spamType] + 1;
         db.groupsSnap
           .child(gid)
@@ -222,7 +222,7 @@ export class AntiSpamPlugin extends PluginBase {
         const groupHash = inputMatch[1];
         Object.keys(db.administration).map((gid) => {
           const group = db.administration[gid];
-          if (group && 'link' in group && group.link.indexOf(groupHash) > -1) {
+          if (group && group.link && group.link.indexOf(groupHash) > -1) {
             trustedGroup = true;
             return;
           }
