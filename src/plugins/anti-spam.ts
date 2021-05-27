@@ -42,33 +42,35 @@ export class AntiSpamPlugin extends PluginBase {
 
     const spamTypes = ['spam', 'arab', 'russian', 'ethiopic'];
     spamTypes.map(async (spamType) => {
-      if (hasTag(this.bot, msg.sender.id, spamType)) {
-        if (!isAdmin(this.bot, msg.sender.id, msg)) {
-          await this.kickSpammer(msg, spamType, 'tag');
-        } else if (isTrusted(this.bot, msg.sender.id, msg)) {
-          delTag(this.bot, msg.sender.id, spamType);
-          const name = getFullName(msg.sender.id);
-          const gid = String(msg.conversation.id);
-          this.bot.sendAdminAlert(
-            format(
-              this.strings['unmarking'],
-              spamType,
-              name,
-              msg.sender.id,
-              db.groups[gid] ? db.groups[gid].title : '[no title]',
-              gid,
-            ),
-          );
+      if (!hasTag(this.bot, msg.sender.id, `allow${spamType}`)) {
+        if (hasTag(this.bot, msg.sender.id, spamType)) {
+          if (!isAdmin(this.bot, msg.sender.id, msg)) {
+            await this.kickSpammer(msg, spamType, 'tag');
+          } else if (isTrusted(this.bot, msg.sender.id, msg)) {
+            delTag(this.bot, msg.sender.id, spamType);
+            const name = getFullName(msg.sender.id);
+            const gid = String(msg.conversation.id);
+            this.bot.sendAdminAlert(
+              format(
+                this.strings['unmarking'],
+                spamType,
+                name,
+                msg.sender.id,
+                db.groups[gid] ? db.groups[gid].title : '[no title]',
+                gid,
+              ),
+            );
+          }
         }
-      }
-      if (
-        msg.conversation.id < 0 &&
-        hasTag(this.bot, msg.conversation.id, spamType) &&
-        !hasTag(this.bot, msg.conversation.id, 'safe') &&
-        !hasTag(this.bot, msg.conversation.id, 'resend:?') &&
-        !hasTag(this.bot, msg.conversation.id, 'fwd:?')
-      ) {
-        return await this.kickMyself(msg);
+        if (
+          msg.conversation.id < 0 &&
+          hasTag(this.bot, msg.conversation.id, spamType) &&
+          !hasTag(this.bot, msg.conversation.id, 'safe') &&
+          !hasTag(this.bot, msg.conversation.id, 'resend:?') &&
+          !hasTag(this.bot, msg.conversation.id, 'fwd:?')
+        ) {
+          return await this.kickMyself(msg);
+        }
       }
     });
 
@@ -137,7 +139,11 @@ export class AntiSpamPlugin extends PluginBase {
     } else {
       text = m.content;
     }
-    if (spamType != 'ban' && !hasTag(this.bot, m.sender.id, spamType)) {
+    if (
+      spamType != 'ban' &&
+      !hasTag(this.bot, m.sender.id, spamType) &&
+      !hasTag(this.bot, m.sender.id, `allow${spamType}`)
+    ) {
       this.bot.sendAdminAlert(
         format(
           this.strings['marked'],
