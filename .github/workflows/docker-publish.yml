@@ -97,7 +97,7 @@ jobs:
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
           script: |
-            docker pull ghcr.io/${{ github.repository_owner }}/polaris:latest
-            docker stop polaris
-            docker rm polaris
-            docker run -v $PWD/logs:/usr/src/app/logs -v $PWD/docs/data:/usr/src/app/data -v $PWD/docs/firebase.json:/usr/src/app/firebase.json -p 1984:1984/tcp -ti -d --restart unless-stopped --name polaris ghcr.io/${{ github.repository_owner }}/polaris
+            docker pull ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}:latest
+            docker stop ${{ env.IMAGE_NAME }}
+            docker rm ${{ env.IMAGE_NAME }}
+            docker run -v $PWD/logs:/usr/src/app/logs -v $PWD/docs/data:/usr/src/app/data -v $PWD/docs/firebase.json:/usr/src/app/firebase.json -p 1984:1984/tcp -ti -d --restart unless-stopped --name ${{ env.IMAGE_NAME }} ghcr.io/${{ github.repository_owner }}/${{ env.IMAGE_NAME }}
