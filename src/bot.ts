@@ -186,7 +186,10 @@ export class Bot {
 
   checkIfPluginIsEnabled(name: string): boolean {
     let enabled = false;
-    if (this.config.plugins === '*' || (Array.isArray(this.config.plugins) && this.config.plugins.includes(name))) {
+    if (typeof this.config.plugins === 'string' && this.config.plugins === '*') {
+      enabled = true;
+    }
+    if (Array.isArray(this.config.plugins) && this.config.plugins.includes(name)) {
       enabled = true;
     }
     if (Array.isArray(this.config.excludedPlugins) && this.config.excludedPlugins.includes(name)) {
