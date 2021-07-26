@@ -25,6 +25,7 @@ export { PolePlugin } from './pole';
 export { QRPlugin } from './qr';
 export { RAEPlugin } from './rae';
 export { ReactionPlugin } from './reaction';
+export { RedditPlugin } from './reddit';
 export { ReminderPlugin } from './reminder';
 export { RussianRoulettePlugin } from './russian-roulette';
 export { SearchPlugin } from './search';
