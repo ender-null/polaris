@@ -173,11 +173,7 @@ export class Bot {
   initPlugins(): void {
     this.plugins = [];
     Object.keys(plugins).map((name) => {
-      if (
-        (this.config.plugins === '*' || (Array.isArray(this.config.plugins) && this.config.plugins.includes(name))) &&
-        (!this.config.excludedPlugins ||
-          (Array.isArray(this.config.plugins) && !this.config.excludedPlugins.includes(name)))
-      ) {
+      if (this.checkIfPluginIsEnabled(name)) {
         const plugin = new plugins[name](this);
         // Check if plugin works only with certain bindings
         if (plugin.bindings == undefined || plugin.bindings.indexOf(this.config.bindings) > -1) {
@@ -185,6 +181,18 @@ export class Bot {
         }
       }
     });
+    logger.info(`✅ Loaded ${this.plugins.length}/${Object.keys(plugins).length} plugins for "${this.config.name}"`);
+  }
+
+  checkIfPluginIsEnabled(name: string): boolean {
+    let enabled = false;
+    if (this.config.plugins === '*' || (Array.isArray(this.config.plugins) && this.config.plugins.includes(name))) {
+      enabled = true;
+    }
+    if (Array.isArray(this.config.plugins) && !this.config.excludedPlugins.includes(name)) {
+      enabled = false;
+    }
+    return enabled;
   }
 
   initTranslations(): void {
