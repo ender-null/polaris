@@ -189,7 +189,7 @@ export class Bot {
     if (this.config.plugins === '*' || (Array.isArray(this.config.plugins) && this.config.plugins.includes(name))) {
       enabled = true;
     }
-    if (Array.isArray(this.config.plugins) && !this.config.excludedPlugins.includes(name)) {
+    if (Array.isArray(this.config.excludedPlugins) && !this.config.excludedPlugins.includes(name)) {
       enabled = false;
     }
     return enabled;
