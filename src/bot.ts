@@ -173,10 +173,16 @@ export class Bot {
   initPlugins(): void {
     this.plugins = [];
     Object.keys(plugins).map((name) => {
-      const plugin = new plugins[name](this);
-      // Check if plugin works only with certain bindings
-      if (plugin.bindings == undefined || plugin.bindings.indexOf(this.config.bindings) > -1) {
-        this.plugins.push(plugin);
+      if (
+        (this.config.plugins === '*' || (Array.isArray(this.config.plugins) && this.config.plugins.includes(name))) &&
+        (!this.config.excludedPlugins ||
+          (Array.isArray(this.config.plugins) && !this.config.excludedPlugins.includes(name)))
+      ) {
+        const plugin = new plugins[name](this);
+        // Check if plugin works only with certain bindings
+        if (plugin.bindings == undefined || plugin.bindings.indexOf(this.config.bindings) > -1) {
+          this.plugins.push(plugin);
+        }
       }
     });
   }
