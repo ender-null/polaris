@@ -259,6 +259,8 @@ export class TelegramTDlibBindings extends BindingsBase {
         const msg = await this.convertMessage(update.message);
         if (msg) {
           this.bot.inbox.emit('message', msg);
+        } else {
+          logger.error(`convertMessage error, original message: ${JSON.stringify(update.message)}`);
         }
       }
     } else if (update._ == 'updateMessageSendSucceeded') {
