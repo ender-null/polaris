@@ -40,6 +40,7 @@ export class PolePlugin extends PluginBase {
         friendly: '^pole$|oro',
         description: 'Get the pole',
         skipHelp: true,
+        alwaysEnabled: true,
       },
       {
         command: '/subpole',
@@ -47,6 +48,7 @@ export class PolePlugin extends PluginBase {
         description: 'Get the subpole',
         hidden: true,
         skipHelp: true,
+        alwaysEnabled: true,
       },
       {
         command: '/fail',
@@ -54,6 +56,7 @@ export class PolePlugin extends PluginBase {
         description: 'Get the fail',
         hidden: true,
         skipHelp: true,
+        alwaysEnabled: true,
       },
       {
         command: '/iron',
@@ -61,6 +64,7 @@ export class PolePlugin extends PluginBase {
         description: 'Get the iron',
         hidden: true,
         skipHelp: true,
+        alwaysEnabled: true,
       },
       {
         command: '/polecanaria',
@@ -68,6 +72,7 @@ export class PolePlugin extends PluginBase {
         description: 'Get the pole canaria',
         hidden: true,
         skipHelp: true,
+        alwaysEnabled: true,
       },
       {
         command: '/poleandaluza',
@@ -75,6 +80,7 @@ export class PolePlugin extends PluginBase {
         description: 'Get the pole andaluza',
         hidden: true,
         skipHelp: true,
+        alwaysEnabled: true,
       },
     ];
     this.strings = {

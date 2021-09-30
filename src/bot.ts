@@ -333,8 +333,8 @@ export class Bot {
 
             if (
               command.friendly &&
-              !hasTag(this, msg.sender.id, 'noreplies') &&
-              !hasTag(this, msg.conversation.id, 'noreplies') &&
+              (command.alwaysEnabled ||
+                (!hasTag(this, msg.sender.id, 'noreplies') && !hasTag(this, msg.conversation.id, 'noreplies'))) &&
               msg.conversation.id != +this.config.alertsConversationId &&
               msg.conversation.id != +this.config.adminConversationId
             ) {

@@ -90,6 +90,7 @@ export abstract class Command {
   description?: string;
   keepDefault?: boolean;
   skipHelp?: boolean;
+  alwaysEnabled?: boolean;
 
   constructor() {
     this.friendly = null;
@@ -98,6 +99,7 @@ export abstract class Command {
     this.hidden = false;
     this.description = null;
     this.keepDefault = false;
+    this.alwaysEnabled = false;
   }
 }
 
