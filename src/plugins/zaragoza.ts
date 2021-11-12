@@ -1,6 +1,6 @@
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
-import { capitalize, generateCommandHelp, getInput, isCommand, isInt, lstrip, sendRequest } from '../utils';
+import { capitalize, generateCommandHelp, getInput, isCommand, lstrip, sendRequest } from '../utils';
 
 export class ZaragozaPlugin extends PluginBase {
   constructor(bot: Bot) {
