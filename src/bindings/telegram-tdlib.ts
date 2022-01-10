@@ -2,7 +2,7 @@ import { Response } from 'node-fetch';
 import { ParsedUrlQueryInput } from 'querystring';
 import { Client } from 'tdl';
 import { TDLib } from 'tdl-tdlib-addon';
-import { chatInviteLink, message, ok, Update, user } from 'tdlib-types';
+import { message, ok, Update, user } from 'tdlib-types';
 import { BindingsBase, Bot, Conversation, ConversationInfo, Extra, Message, User } from '..';
 import { db } from '../main';
 import {
@@ -729,11 +729,7 @@ export class TelegramTDlibBindings extends BindingsBase {
       member_limit: memberLimit || 0,
       creates_join_request: createsJoinRequest || true,
     });
-    if (chatInviteLink) {
-      return chatInviteLink.invite_link;
-    } else {
-      return null;
-    }
+    return chatInviteLink ? chatInviteLink.invite_link : null;
   }
 
   async checkInviteLink(inviteLink: string | number): Promise<boolean> {
