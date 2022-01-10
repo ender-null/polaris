@@ -209,7 +209,7 @@ export class TelegramPlugin extends PluginBase {
       }
     }
 
-    logger.info(ok)
+    logger.info(JSON.stringify(ok))
 
     if (!ok) {
       return this.bot.replyMessage(msg, this.bot.errors.failed);

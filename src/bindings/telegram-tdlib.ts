@@ -763,7 +763,7 @@ export class TelegramTDlibBindings extends BindingsBase {
       revoke_messages: true,
     }
     logger.info('banConversationMember');
-    logger.info(data);
+    logger.info(JSON.stringify(data));
     return await this.serverRequest('banChatMember', data);
   }
 
