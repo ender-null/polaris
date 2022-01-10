@@ -169,7 +169,6 @@ export class TelegramPlugin extends PluginBase {
     } else if (isCommand(this, 7, msg.content)) {
       if (this.checkPermissions(msg)) {
         const target = getTarget(this.bot, msg, input);
-        logger.info(target, input, !isAdmin(this.bot, target))
         if (!isAdmin(this.bot, target)) {
           ok = await this.bot.bindings.banConversationMember(msg.conversation.id, target);
         }
