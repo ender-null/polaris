@@ -250,9 +250,11 @@ export class FacebookBindings extends BindingsBase {
     expirationDate?: number,
     memberLimit?: number,
   ): Promise<boolean> {
-    throw new Error('Method not implemented.');
+    console.debug(conversationId, name, createsJoinRequest, expirationDate, memberLimit);
+    return null;
   }
   createCall(conversationId: string | number, isVideo: boolean): Promise<boolean> {
-    throw new Error('Method not implemented.');
+    console.debug(conversationId, isVideo);
+    return null;
   }
 }
