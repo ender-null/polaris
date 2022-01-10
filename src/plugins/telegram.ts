@@ -265,7 +265,7 @@ export class TelegramPlugin extends PluginBase {
         ok = await this.bot.bindings.createCall(msg.conversation.id, false);
       }
     } else {
-      logger.info('no command match')
+      logger.info('no command match');
     }
 
     if (!ok) {
