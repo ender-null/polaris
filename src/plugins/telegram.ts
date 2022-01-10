@@ -1,6 +1,6 @@
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
-import { generateCommandHelp, getInput, getTarget, isAdmin, isCommand, isGroupAdmin, isMod } from '../utils';
+import { generateCommandHelp, getInput, getTarget, isAdmin, isCommand, isGroupAdmin, isMod, logger } from '../utils';
 
 export class TelegramPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -152,14 +152,23 @@ export class TelegramPlugin extends PluginBase {
       }
       return this.bot.replyMessage(msg, text);
     } else if (isCommand(this, 2, msg.content)) {
+      if (!input && !msg.reply) {
+        return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
+      }
       if (this.checkPermissions(msg)) {
         ok = await this.bot.bindings.renameConversation(msg.conversation.id, input);
       }
     } else if (isCommand(this, 3, msg.content)) {
+      if (!input && !msg.reply) {
+        return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
+      }
       if (this.checkPermissions(msg)) {
         ok = await this.bot.bindings.changeConversationDescription(msg.conversation.id, input);
       }
     } else if (isCommand(this, 4, msg.content)) {
+      if (!msg.reply) {
+        return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
+      }
       if (this.checkPermissions(msg)) {
         if (msg.reply && msg.reply.type == 'photo') {
           const photo = await this.bot.bindings.getFile(msg.reply.content);
@@ -171,11 +180,17 @@ export class TelegramPlugin extends PluginBase {
         }
       }
     } else if (isCommand(this, 5, msg.content)) {
+      if (!input && !msg.reply) {
+        return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
+      }
       if (this.checkPermissions(msg)) {
         const target = getTarget(this.bot, msg, input);
         ok = await this.bot.bindings.promoteConversationMember(msg.conversation.id, target);
       }
     } else if (isCommand(this, 6, msg.content)) {
+      if (!input && !msg.reply) {
+        return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
+      }
       if (this.checkPermissions(msg)) {
         const target = getTarget(this.bot, msg, input);
         if (!isAdmin(this.bot, target)) {
@@ -183,18 +198,30 @@ export class TelegramPlugin extends PluginBase {
         }
       }
     } else if (isCommand(this, 7, msg.content)) {
+      if (!input && !msg.reply) {
+        return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
+      }
       if (this.checkPermissions(msg)) {
+        if (!input && !msg.reply) {
+          return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
+        }
         const target = getTarget(this.bot, msg, input);
         if (!isAdmin(this.bot, target)) {
           ok = await this.bot.bindings.banConversationMember(msg.conversation.id, target);
         }
       }
     } else if (isCommand(this, 8, msg.content)) {
+      if (!input && !msg.reply) {
+        return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
+      }
       if (this.checkPermissions(msg)) {
         const target = getTarget(this.bot, msg, input);
         ok = await this.bot.bindings.unbanConversationMember(msg.conversation.id, target);
       }
     } else if (isCommand(this, 9, msg.content)) {
+      if (!msg.reply) {
+        return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
+      }
       if (this.checkPermissions(msg)) {
         await this.bot.bindings.deleteMessage(msg.conversation.id, msg.id);
         if (msg.reply) {
@@ -202,6 +229,9 @@ export class TelegramPlugin extends PluginBase {
         }
       }
     } else if (isCommand(this, 10, msg.content)) {
+      if (!msg.reply) {
+        return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
+      }
       if (this.checkPermissions(msg)) {
         if (msg.reply) {
           ok = true;
@@ -211,6 +241,9 @@ export class TelegramPlugin extends PluginBase {
         }
       }
     } else if (isCommand(this, 11, msg.content)) {
+      if (!msg.reply) {
+        return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
+      }
       if (this.checkPermissions(msg)) {
         if (msg.reply) {
           ok = true;
@@ -231,6 +264,8 @@ export class TelegramPlugin extends PluginBase {
       if (this.checkPermissions(msg)) {
         ok = await this.bot.bindings.createCall(msg.conversation.id, false);
       }
+    } else {
+      logger.info('no command match')
     }
 
     if (!ok) {

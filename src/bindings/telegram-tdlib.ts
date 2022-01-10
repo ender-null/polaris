@@ -871,6 +871,9 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async createCall(conversationId: string | number, isVideo: boolean): Promise<boolean> {
+    if (this.bot.user.isBot) {
+      return null;
+    }
     return await this.serverRequest('createCall', {
       chat_id: conversationId,
       protocol: {
