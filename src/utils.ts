@@ -194,13 +194,13 @@ export const getTarget = (bot: Bot, m: Message, input: string, noSearch?: boolea
     if (target && isInt(target)) {
       return String(target);
     } else if (target && target.startsWith('@')) {
-      if (bot.user.username.toLowerCase() == target.substr(1).toLowerCase()) {
+      if (bot.user.username.toLowerCase() == target.slice(1).toLowerCase()) {
         return String(bot.user.id);
       }
       for (const uid in db.users) {
         if (
           db.users[uid]['username'] !== undefined &&
-          db.users[uid]['username'].toLowerCase() == target.substr(1).toLowerCase()
+          db.users[uid]['username'].toLowerCase() == target.slice(1).toLowerCase()
         ) {
           return uid;
         }
@@ -208,7 +208,7 @@ export const getTarget = (bot: Bot, m: Message, input: string, noSearch?: boolea
       for (const gid in db.groups) {
         if (
           db.groups[gid]['username'] !== undefined &&
-          db.groups[gid]['username'].toLowerCase() == target.substr(1).toLowerCase()
+          db.groups[gid]['username'].toLowerCase() == target.slice(1).toLowerCase()
         ) {
           return gid;
         }
@@ -297,7 +297,7 @@ export const allButNWord = (text: string, word = 1): string => {
   if (!text || text.indexOf(' ') == -1) {
     return null;
   }
-  return text.substr(text.indexOf(text.split(' ')[word]));
+  return text.slice(text.indexOf(text.split(' ')[word]));
 };
 
 export const getUsername = (uid: number | string, includeNick = true): string => {

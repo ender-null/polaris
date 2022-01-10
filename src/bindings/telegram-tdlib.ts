@@ -754,10 +754,10 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async banConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    return await this.serverRequest('setChatMemberStatus', {
+    return await this.serverRequest('banChatMember', {
       chat_id: conversationId,
-      user_id: userId,
-      status: { _: 'chatMemberStatusBanned' },
+      member_id: userId,
+      revoke_messages: true,
     });
   }
 
