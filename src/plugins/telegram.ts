@@ -257,8 +257,8 @@ export class TelegramPlugin extends PluginBase {
       }
     } else if (isCommand(this, 13, msg.content)) {
       if (this.checkPermissions(msg)) {
-        const chatInviteLink = await this.bot.bindings.createInviteLink(msg.conversation.id, input);
-        !chatInviteLink ? (ok = false) : (text = chatInviteLink);
+        text = await this.bot.bindings.createInviteLink(msg.conversation.id, input);
+        ok = !!text
       }
     } else if (isCommand(this, 14, msg.content)) {
       if (this.checkPermissions(msg)) {
