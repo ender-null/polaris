@@ -51,11 +51,13 @@ export class TelegramTDlibBindings extends BindingsBase {
     params: Record<string, unknown> = {},
     ignoreErrors?: boolean,
     processRequest?: boolean,
+    debug?: boolean,
   ): Promise<any> {
     const query: any = {
       _: method,
       ...params,
     };
+    if (debug) logger.info(debug);
     return await this.client.invoke(query).catch(async (e) => {
       if (!ignoreErrors) {
         this.bot.sendAlert(JSON.stringify(query, null, 4));
@@ -682,11 +684,13 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async deleteMessage(chatId: string | number, messageId: string | number): Promise<boolean> {
-    return await this.serverRequest('deleteMessages', {
-      chat_id: chatId,
-      message_ids: [messageId],
-      revoke: true,
-    });
+    return this.okToBoolean(
+      await this.serverRequest('deleteMessages', {
+        chat_id: chatId,
+        message_ids: [messageId],
+        revoke: true,
+      }),
+    );
   }
 
   async getFile(fileId: string | number, link?: boolean): Promise<string> {
@@ -733,18 +737,22 @@ export class TelegramTDlibBindings extends BindingsBase {
     if (this.bot.user.isBot) {
       return null;
     }
-    return await this.serverRequest('checkChatInviteLink', {
-      invite_link: inviteLink,
-    });
+    return this.okToBoolean(
+      await this.serverRequest('checkChatInviteLink', {
+        invite_link: inviteLink,
+      }),
+    );
   }
 
   async joinByInviteLink(inviteLink: string | number): Promise<boolean> {
     if (this.bot.user.isBot) {
       return null;
     }
-    return await this.serverRequest('joinChatByInviteLink', {
-      invite_link: inviteLink,
-    });
+    return this.okToBoolean(
+      await this.serverRequest('joinChatByInviteLink', {
+        invite_link: inviteLink,
+      }),
+    );
   }
 
   async inviteConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
@@ -761,17 +769,6 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async promoteConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    return await this.serverRequest('setChatMemberStatus', {
-      chat_id: conversationId,
-      member_id: {
-        _: 'messageSenderUser',
-        user_id: userId,
-      },
-      status: { _: 'chatMemberStatusAdministrator' },
-    });
-  }
-
-  async kickConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
     return this.okToBoolean(
       await this.serverRequest('setChatMemberStatus', {
         chat_id: conversationId,
@@ -779,47 +776,68 @@ export class TelegramTDlibBindings extends BindingsBase {
           _: 'messageSenderUser',
           user_id: userId,
         },
-        status: { _: 'chatMemberStatusLeft' },
+        status: { _: 'chatMemberStatusAdministrator' },
       }),
     );
   }
 
+  async kickConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
+    return this.okToBoolean(
+      await this.serverRequest(
+        'setChatMemberStatus',
+        {
+          chat_id: conversationId,
+          member_id: {
+            _: 'messageSenderUser',
+            user_id: userId,
+          },
+          status: { _: 'chatMemberStatusLeft' },
+        },
+        false,
+        false,
+        true,
+      ),
+    );
+  }
+
   async leaveConversation(conversationId: string | number): Promise<boolean> {
-    return await this.serverRequest('leaveChat', {
-      chat_id: conversationId,
-    });
+    return this.okToBoolean(
+      await this.serverRequest('leaveChat', {
+        chat_id: conversationId,
+      }),
+    );
   }
 
   async banConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    logger.info('banConversationMember');
-    const data = {
-      chat_id: conversationId,
-      member_id: {
-        _: 'messageSenderUser',
-        user_id: userId,
-      },
-      revoke_messages: true,
-    };
-    logger.info(JSON.stringify(data));
-    return await this.serverRequest('banChatMember', {
-      chat_id: conversationId,
-      member_id: {
-        _: 'messageSenderUser',
-        user_id: userId,
-      },
-      revoke_messages: true,
-    });
+    return this.okToBoolean(
+      await this.serverRequest(
+        'banChatMember',
+        {
+          chat_id: conversationId,
+          member_id: {
+            _: 'messageSenderUser',
+            user_id: userId,
+          },
+          revoke_messages: true,
+        },
+        false,
+        false,
+        true,
+      ),
+    );
   }
 
   async unbanConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    return await this.serverRequest('setChatMemberStatus', {
-      chat_id: conversationId,
-      member_id: {
-        _: 'messageSenderUser',
-        user_id: userId,
-      },
-      status: { _: 'chatMemberStatusMember' },
-    });
+    return this.okToBoolean(
+      await this.serverRequest('setChatMemberStatus', {
+        chat_id: conversationId,
+        member_id: {
+          _: 'messageSenderUser',
+          user_id: userId,
+        },
+        status: { _: 'chatMemberStatusMember' },
+      }),
+    );
   }
 
   async renameConversation(conversationId: string | number, title: string): Promise<boolean> {
@@ -832,24 +850,28 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async changeConversationDescription(conversationId: string | number, description: string): Promise<boolean> {
-    return await this.serverRequest('setChatDescription', {
-      chat_id: conversationId,
-      description: description,
-    });
+    return this.okToBoolean(
+      await this.serverRequest('setChatDescription', {
+        chat_id: conversationId,
+        description: description,
+      }),
+    );
   }
 
   async changeConversationPhoto(conversationId: string | number, photo: string): Promise<boolean> {
-    return await this.serverRequest('setChatPhoto', {
-      chat_id: conversationId,
-      photo: {
-        _: 'inputChatPhotoStatic',
-        photo: this.getInputFile(photo),
-      },
-    });
+    return this.okToBoolean(
+      await this.serverRequest('setChatPhoto', {
+        chat_id: conversationId,
+        photo: {
+          _: 'inputChatPhotoStatic',
+          photo: this.getInputFile(photo),
+        },
+      }),
+    );
   }
 
   async createCall(conversationId: string | number, isVideo: boolean): Promise<boolean> {
-    return await this.serverRequest('setChatPhoto', {
+    return await this.serverRequest('createCall', {
       chat_id: conversationId,
       protocol: {
         _: 'callProtocol',
