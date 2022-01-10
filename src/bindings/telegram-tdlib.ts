@@ -519,7 +519,7 @@ export class TelegramTDlibBindings extends BindingsBase {
     );
   }
 
-  async addPingToMessage(msg: Message, message: message) {
+  async addPingToMessage(msg: Message, message: message): Promise<void> {
     const ping = message.date - msg.extra.originalMessage.date;
     let parseMode = null;
 

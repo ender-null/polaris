@@ -1,6 +1,6 @@
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
-import { generateCommandHelp, getInput, getTarget, isAdmin, isCommand, isGroupAdmin, isMod } from '../utils';
+import { generateCommandHelp, getInput, getTarget, isAdmin, isCommand, isGroupAdmin, isMod, logger } from '../utils';
 
 export class TelegramPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -169,6 +169,7 @@ export class TelegramPlugin extends PluginBase {
     } else if (isCommand(this, 7, msg.content)) {
       if (this.checkPermissions(msg)) {
         const target = getTarget(this.bot, msg, input);
+        logger.info(target, input, !isAdmin(this.bot, target))
         if (!isAdmin(this.bot, target)) {
           ok = await this.bot.bindings.banConversationMember(msg.conversation.id, target);
         }
@@ -208,6 +209,8 @@ export class TelegramPlugin extends PluginBase {
         ok = await this.bot.bindings.leaveConversation(msg.conversation.id);
       }
     }
+
+    logger.info(ok)
 
     if (!ok) {
       return this.bot.replyMessage(msg, this.bot.errors.failed);
