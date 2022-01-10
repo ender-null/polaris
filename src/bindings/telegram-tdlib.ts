@@ -35,6 +35,7 @@ export class TelegramTDlibBindings extends BindingsBase {
         system_language_code: this.bot.config.locale,
         device_model: systemName(),
         system_version: systemVersion(),
+        enable_storage_optimizer: true,
       },
     });
     this.pendingMessages = [];
@@ -64,6 +65,13 @@ export class TelegramTDlibBindings extends BindingsBase {
         await this.requestProcessing(query, e);
       }
     });
+  }
+
+  async okToBoolean(response): Promise<boolean> {
+    if (response && response._ === 'ok') {
+      return true;
+    }
+    return false;
   }
 
   async start(): Promise<void> {
@@ -548,7 +556,7 @@ export class TelegramTDlibBindings extends BindingsBase {
     await this.serverRequest(data._, data);
   }
 
-  async formatTextEntities(msg: Message, text?: string) {
+  async formatTextEntities(msg: Message, text?: string): Promise<any> {
     if (!text) {
       text = msg.content;
     }
@@ -611,7 +619,7 @@ export class TelegramTDlibBindings extends BindingsBase {
     }
   }
 
-  async requestProcessing(request: any, response: any) {
+  async requestProcessing(request: any, response: any): Promise<any> {
     const leaveList = [
       'no rights',
       'no write access',
@@ -703,6 +711,24 @@ export class TelegramTDlibBindings extends BindingsBase {
     return null;
   }
 
+  async createInviteLink(
+    conversationId: string | number,
+    name?: string,
+    createsJoinRequest?: boolean,
+    expirationDate?: number,
+    memberLimit?: number,
+  ): Promise<boolean> {
+    return this.okToBoolean(
+      await this.serverRequest('createChatInviteLink', {
+        chat_id: conversationId,
+        name: name || 'Polaris',
+        expiration_date: expirationDate || 0,
+        member_limit: memberLimit || 0,
+        creates_join_request: createsJoinRequest || true,
+      }),
+    );
+  }
+
   async checkInviteLink(inviteLink: string | number): Promise<boolean> {
     if (this.bot.user.isBot) {
       return null;
@@ -725,26 +751,37 @@ export class TelegramTDlibBindings extends BindingsBase {
     if (this.bot.user.isBot) {
       return null;
     }
-    return await this.serverRequest('addChatMember', {
-      chat_id: conversationId,
-      user_id: userId,
-    });
+    return this.okToBoolean(
+      await this.serverRequest('addChatMember', {
+        chat_id: conversationId,
+        user_id: userId,
+        forward_limit: 0,
+      }),
+    );
   }
 
   async promoteConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
     return await this.serverRequest('setChatMemberStatus', {
       chat_id: conversationId,
-      user_id: userId,
+      member_id: {
+        _: 'messageSenderUser',
+        user_id: userId,
+      },
       status: { _: 'chatMemberStatusAdministrator' },
     });
   }
 
   async kickConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    return await this.serverRequest('setChatMemberStatus', {
-      chat_id: conversationId,
-      user_id: userId,
-      status: { _: 'chatMemberStatusLeft' },
-    });
+    return this.okToBoolean(
+      await this.serverRequest('setChatMemberStatus', {
+        chat_id: conversationId,
+        member_id: {
+          _: 'messageSenderUser',
+          user_id: userId,
+        },
+        status: { _: 'chatMemberStatusLeft' },
+      }),
+    );
   }
 
   async leaveConversation(conversationId: string | number): Promise<boolean> {
@@ -754,32 +791,44 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async banConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
+    logger.info('banConversationMember');
     const data = {
       chat_id: conversationId,
       member_id: {
         _: 'messageSenderUser',
-        user_id: userId
+        user_id: userId,
       },
       revoke_messages: true,
-    }
-    logger.info('banConversationMember');
+    };
     logger.info(JSON.stringify(data));
-    return await this.serverRequest('banChatMember', data);
+    return await this.serverRequest('banChatMember', {
+      chat_id: conversationId,
+      member_id: {
+        _: 'messageSenderUser',
+        user_id: userId,
+      },
+      revoke_messages: true,
+    });
   }
 
   async unbanConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
     return await this.serverRequest('setChatMemberStatus', {
       chat_id: conversationId,
-      user_id: userId,
+      member_id: {
+        _: 'messageSenderUser',
+        user_id: userId,
+      },
       status: { _: 'chatMemberStatusMember' },
     });
   }
 
   async renameConversation(conversationId: string | number, title: string): Promise<boolean> {
-    return await this.serverRequest('setChatTitle', {
-      chat_id: conversationId,
-      title: title,
-    });
+    return this.okToBoolean(
+      await this.serverRequest('setChatTitle', {
+        chat_id: conversationId,
+        title: title,
+      }),
+    );
   }
 
   async changeConversationDescription(conversationId: string | number, description: string): Promise<boolean> {
@@ -796,6 +845,18 @@ export class TelegramTDlibBindings extends BindingsBase {
         _: 'inputChatPhotoStatic',
         photo: this.getInputFile(photo),
       },
+    });
+  }
+
+  async createCall(conversationId: string | number, isVideo: boolean): Promise<boolean> {
+    return await this.serverRequest('setChatPhoto', {
+      chat_id: conversationId,
+      protocol: {
+        _: 'callProtocol',
+        udp_p2p: true,
+        udp_reflector: true,
+      },
+      is_video: isVideo || false,
     });
   }
 

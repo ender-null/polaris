@@ -101,6 +101,22 @@ export class TelegramPlugin extends PluginBase {
         description: 'Kicks the bot from the group',
         hidden: true,
       },
+      {
+        command: '/createInviteLink',
+        parameters: [
+          {
+            name: 'name',
+            required: false,
+          },
+        ],
+        description: 'Create invite link for the group',
+        hidden: true,
+      },
+      {
+        command: '/call',
+        description: 'Create call',
+        hidden: true,
+      },
     ];
     this.strings = {
       commands: '<b>Commands</b>:',
@@ -207,9 +223,17 @@ export class TelegramPlugin extends PluginBase {
       if (this.checkPermissions(msg)) {
         ok = await this.bot.bindings.leaveConversation(msg.conversation.id);
       }
+    } else if (isCommand(this, 13, msg.content)) {
+      if (this.checkPermissions(msg)) {
+        ok = await this.bot.bindings.createInviteLink(msg.conversation.id, input);
+      }
+    } else if (isCommand(this, 14, msg.content)) {
+      if (this.checkPermissions(msg)) {
+        ok = await this.bot.bindings.createCall(msg.conversation.id, false);
+      }
     }
 
-    logger.info(JSON.stringify(ok))
+    logger.info(JSON.stringify(ok));
 
     if (!ok) {
       return this.bot.replyMessage(msg, this.bot.errors.failed);

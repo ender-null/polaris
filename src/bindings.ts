@@ -22,6 +22,14 @@ export abstract class BindingsBase {
 
   abstract getFile(fileId: string | number, link?: boolean): Promise<string>;
 
+  abstract createInviteLink(
+    conversationId: string | number,
+    name?: string,
+    createsJoinRequest?: boolean,
+    expirationDate?: number,
+    memberLimit?: number,
+  ): Promise<boolean>;
+
   abstract checkInviteLink(inviteLink: string | number): Promise<boolean>;
 
   abstract joinByInviteLink(inviteLink: string | number): Promise<boolean>;
@@ -43,6 +51,8 @@ export abstract class BindingsBase {
   abstract changeConversationDescription(conversationId: string | number, description: string): Promise<boolean>;
 
   abstract changeConversationPhoto(conversationId: string | number, photo: string): Promise<boolean>;
+
+  abstract createCall(conversationId: string | number, isVideo: boolean): Promise<boolean>;
 
   abstract conversationInfo(conversationId: string | number): Promise<ConversationInfo>;
 

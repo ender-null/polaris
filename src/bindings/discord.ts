@@ -338,4 +338,17 @@ export class DiscordBindings extends BindingsBase {
     }
     return admins;
   }
+
+  createInviteLink(
+    conversationId: string | number,
+    name?: string,
+    createsJoinRequest?: boolean,
+    expirationDate?: number,
+    memberLimit?: number,
+  ): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
+  createCall(conversationId: string | number, isVideo: boolean): Promise<boolean> {
+    throw new Error('Method not implemented.');
+  }
 }

@@ -884,7 +884,8 @@ export const catchException = (exception: Error, bot: Bot = null, message: Messa
 
 export const telegramLinkRegExp = new RegExp('(?:t|telegram|tlgrm).(?:me|dog)/joinchat/([a-zA-Z0-9-_]+)', 'gim');
 export const tagForBotRegExp = /@(\\w+):/gim;
-export const linkRegExp = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/gim;
+export const linkRegExp =
+  /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&//=]*)/gim;
 
 export const t = {
   second: 1,
