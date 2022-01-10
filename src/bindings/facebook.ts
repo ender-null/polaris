@@ -249,7 +249,7 @@ export class FacebookBindings extends BindingsBase {
     createsJoinRequest?: boolean,
     expirationDate?: number,
     memberLimit?: number,
-  ): Promise<boolean> {
+  ): Promise<string> {
     console.debug(conversationId, name, createsJoinRequest, expirationDate, memberLimit);
     return null;
   }

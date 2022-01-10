@@ -28,7 +28,7 @@ export abstract class BindingsBase {
     createsJoinRequest?: boolean,
     expirationDate?: number,
     memberLimit?: number,
-  ): Promise<boolean>;
+  ): Promise<string>;
 
   abstract checkInviteLink(inviteLink: string | number): Promise<boolean>;
 

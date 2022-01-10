@@ -102,7 +102,7 @@ export class TelegramPlugin extends PluginBase {
         hidden: true,
       },
       {
-        command: '/createInviteLink',
+        command: '/createLink',
         parameters: [
           {
             name: 'name',
@@ -150,7 +150,6 @@ export class TelegramPlugin extends PluginBase {
           }
         }
       }
-      return this.bot.replyMessage(msg, text);
     } else if (isCommand(this, 2, msg.content)) {
       if (!input && !msg.reply) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
@@ -258,14 +257,17 @@ export class TelegramPlugin extends PluginBase {
       }
     } else if (isCommand(this, 13, msg.content)) {
       if (this.checkPermissions(msg)) {
-        ok = await this.bot.bindings.createInviteLink(msg.conversation.id, input);
+        const chatInviteLink = await this.bot.bindings.createInviteLink(msg.conversation.id, input);
+        !chatInviteLink ? (ok = false) : (text = chatInviteLink);
       }
     } else if (isCommand(this, 14, msg.content)) {
       if (this.checkPermissions(msg)) {
         ok = await this.bot.bindings.createCall(msg.conversation.id, false);
       }
-    } else {
-      logger.info('no command match');
+    }
+
+    if (text) {
+      this.bot.replyMessage(msg, text);
     }
 
     if (!ok) {

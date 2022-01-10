@@ -2,7 +2,7 @@ import { Response } from 'node-fetch';
 import { ParsedUrlQueryInput } from 'querystring';
 import { Client } from 'tdl';
 import { TDLib } from 'tdl-tdlib-addon';
-import { message, ok, Update, user } from 'tdlib-types';
+import { chatInviteLink, message, ok, Update, user } from 'tdlib-types';
 import { BindingsBase, Bot, Conversation, ConversationInfo, Extra, Message, User } from '..';
 import { db } from '../main';
 import {
@@ -721,16 +721,19 @@ export class TelegramTDlibBindings extends BindingsBase {
     createsJoinRequest?: boolean,
     expirationDate?: number,
     memberLimit?: number,
-  ): Promise<boolean> {
-    return this.okToBoolean(
-      await this.serverRequest('createChatInviteLink', {
-        chat_id: conversationId,
-        name: name || 'Polaris',
-        expiration_date: expirationDate || 0,
-        member_limit: memberLimit || 0,
-        creates_join_request: createsJoinRequest || true,
-      }),
-    );
+  ): Promise<string> {
+    const chatInviteLink = await this.serverRequest('createChatInviteLink', {
+      chat_id: conversationId,
+      name: name || 'Polaris',
+      expiration_date: expirationDate || 0,
+      member_limit: memberLimit || 0,
+      creates_join_request: createsJoinRequest || true,
+    });
+    if (chatInviteLink) {
+      return chatInviteLink.invite_link;
+    } else {
+      return null;
+    }
   }
 
   async checkInviteLink(inviteLink: string | number): Promise<boolean> {
