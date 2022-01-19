@@ -10,6 +10,7 @@ export class DiscordBindings extends BindingsBase {
     super(bot);
     this.client = new Client({
       restRequestTimeout: 60000,
+      intents: 0
     });
   }
 
@@ -23,10 +24,11 @@ export class DiscordBindings extends BindingsBase {
         this.client.user.bot,
       );
       this.client.user.setPresence({
-        activity: {
+        status: 'online',
+        activities: [{
           name: `${this.bot.config.prefix}help`,
           type: 'LISTENING',
-        },
+        }]
       });
       this.bot.status.emit('started');
     });
@@ -161,8 +163,7 @@ export class DiscordBindings extends BindingsBase {
             }
           } else {
             if (msg.content.startsWith('/') || msg.content.startsWith('C:\\')) {
-              embed.attachFiles([new MessageAttachment(msg.content, msg.type + getExtension(msg.content))]);
-              await chat.send(embed);
+              await chat.send({ embeds: [embed], files: [new MessageAttachment(msg.content, msg.type + getExtension(msg.content))] })
             } else if (msg.content.startsWith('http')) {
               if (msg.type == 'photo') {
                 embed.setImage(msg.content);

@@ -125,8 +125,8 @@ export class TelegramTDlibBindings extends BindingsBase {
       conversation.title = rawChat.title;
     }
     let userId;
-    if (msg.sender && msg.sender['user_id']) {
-      userId = msg.sender && msg.sender['user_id'];
+    if (msg.sender_id && msg.sender_id['user_id']) {
+      userId = msg.sender_id && msg.sender_id['user_id'];
     }
     if (userId) {
       const rawSender = await this.serverRequest('getUser', { user_id: userId });
