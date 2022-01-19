@@ -1,4 +1,5 @@
 import { exec } from 'child_process';
+import { set } from 'firebase/database';
 import fs from 'fs';
 import mime from 'mime-types';
 import fetch, { BodyInit, HeadersInit, RequestInit, Response } from 'node-fetch';
@@ -147,7 +148,7 @@ export const setTag = (bot: Bot, target: number | string, tag: string): void => 
       }
     }
     db.tags[target] = sortList(db.tags[target]);
-    db.tagsSnap.child(target).ref.set(sortList(db.tags[target]));
+    set(db.tagsSnap.child(target).ref, db.tags[target]);
   }
 };
 
@@ -173,7 +174,7 @@ export const delTag = (bot: Bot, target: number | string, tag: string): void => 
       }
     }
     db.tags[target] = sortList(db.tags[target]);
-    db.tagsSnap.child(target).ref.set(db.tags[target]);
+    set(db.tagsSnap.child(target).ref, db.tags[target]);
   }
 };
 

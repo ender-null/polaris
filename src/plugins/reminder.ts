@@ -1,3 +1,4 @@
+import { set } from 'firebase/database';
 import format from 'string-format';
 import { Bot, Conversation, DatabaseReminder, Message } from '..';
 import { db } from '../main';
@@ -143,7 +144,7 @@ export class ReminderPlugin extends PluginBase {
       } else {
         return this.bot.replyMessage(msg, this.bot.errors.invalidArgument);
       }
-      db.remindersSnap.child(String(Math.trunc(alarm))).ref.set(reminder);
+      set(db.remindersSnap.child(String(Math.trunc(alarm))).ref, reminder);
       db.reminders[String(Math.trunc(alarm))] = reminder;
 
       const message = format(this.strings['message'], getFullName(msg.sender.id, false), delayText, text);
@@ -179,7 +180,7 @@ export class ReminderPlugin extends PluginBase {
           text += ` (@${username})`;
         }
         this.bot.sendMessage(chat, text);
-        db.remindersSnap.child(index).ref.set(null);
+        set(db.remindersSnap.child(index).ref, null);
         delete db.reminders[index];
       }
     }

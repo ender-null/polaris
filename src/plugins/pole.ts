@@ -1,3 +1,4 @@
+import { remove, set, update } from 'firebase/database';
 import format from 'string-format';
 import { Bot, Message } from '..';
 import { db } from '../main';
@@ -188,7 +189,7 @@ export class PolePlugin extends PluginBase {
         if (isTrusted(this.bot, msg.sender.id, msg) || isAdmin(this.bot, msg.sender.id)) {
           text = this.strings.polereset;
           delete db.poles[gid];
-          db.polesSnap.child(gid).ref.remove();
+          remove(db.polesSnap.child(gid).ref);
         } else {
           text = this.bot.errors.adminRequired;
         }
@@ -249,22 +250,16 @@ export class PolePlugin extends PluginBase {
       }
 
       if (!db.poles || !db.poles[gid] || !db.poles[gid][date]) {
-        db.polesSnap
-          .child(gid)
-          .child(date)
-          .ref.set({
-            [type]: uid,
-          });
+        set(db.polesSnap.child(gid).child(date).ref, {
+          [type]: uid,
+        });
         db.poles[gid][date] = {
           [type]: uid,
         };
       } else {
-        db.polesSnap
-          .child(gid)
-          .child(date)
-          .ref.update({
-            [type]: uid,
-          });
+        update(db.polesSnap.child(gid).child(date).ref, {
+          [type]: uid,
+        });
         db.poles[gid][date][type] = uid;
       }
       text = format(this.strings['got' + capitalize(type)], getUsername(uid));

@@ -1,31 +1,31 @@
 import { EventEmitter } from 'events';
-import firebase from 'firebase';
-import 'firebase/database';
 import { readFileSync } from 'fs';
+import { initializeApp } from 'firebase/app';
+import { Database as DB, DataSnapshot, getDatabase, onValue, ref } from 'firebase/database';
 import { iConfig, iConversation, iPin, iPole, iReminder, iTag, iTranslation, iUser } from '.';
 import { iGroupAdministration } from './types';
 import { logger } from './utils';
 
 export class Database {
-  fb: firebase.database.Database;
+  fb: DB;
   events: EventEmitter;
-  configsSnap: firebase.database.DataSnapshot;
+  configsSnap: DataSnapshot;
   configs: iConfig;
-  usersSnap: firebase.database.DataSnapshot;
+  usersSnap: DataSnapshot;
   users: iUser;
-  groupsSnap: firebase.database.DataSnapshot;
+  groupsSnap: DataSnapshot;
   groups: iConversation;
-  pinsSnap: firebase.database.DataSnapshot;
+  pinsSnap: DataSnapshot;
   pins: iPin;
-  polesSnap: firebase.database.DataSnapshot;
+  polesSnap: DataSnapshot;
   poles: iPole;
-  remindersSnap: firebase.database.DataSnapshot;
+  remindersSnap: DataSnapshot;
   reminders: iReminder;
-  tagsSnap: firebase.database.DataSnapshot;
+  tagsSnap: DataSnapshot;
   tags: iTag;
-  administrationSnap: firebase.database.DataSnapshot;
+  administrationSnap: DataSnapshot;
   administration: iGroupAdministration;
-  translationsSnap: firebase.database.DataSnapshot;
+  translationsSnap: DataSnapshot;
   translations: iTranslation;
   constructor() {
     this.events = new EventEmitter();
@@ -33,8 +33,8 @@ export class Database {
 
   init(): void {
     const firebaseConfig = JSON.parse(readFileSync('firebase.json', 'utf-8'));
-    firebase.initializeApp(firebaseConfig);
-    this.fb = firebase.database();
+    initializeApp(firebaseConfig);
+    this.fb = getDatabase();
     const tables = [
       'configs',
       'users',
@@ -49,7 +49,7 @@ export class Database {
     const ready = [];
     let loaded = false;
     tables.map((table) => {
-      this.fb.ref(`db/${table}`).on('value', (snapshot: firebase.database.DataSnapshot) => {
+      onValue(ref(this.fb, `db/${table}`), (snapshot: DataSnapshot) => {
         this[table + 'Snap'] = snapshot;
         if (!this[table] || table == 'configs' || table == 'translations') {
           this[table] = snapshot.toJSON();

@@ -1,3 +1,4 @@
+import { set } from 'firebase/database';
 import { Bot, Message } from '..';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
@@ -92,7 +93,7 @@ export class InfoPlugin extends PluginBase {
         }
         logger.info(`user: ${JSON.stringify(user)}`);
         db.users[target] = user;
-        db.usersSnap.child(target).ref.set(user);
+        set(db.usersSnap.child(target).ref, user);
         const tags = getTags(this.bot, userId);
         if (tags && tags.length > 0) {
           userTags = tags.join(', ');
@@ -191,7 +192,7 @@ export class InfoPlugin extends PluginBase {
       }
       logger.info(`group: ${JSON.stringify(group)}`);
       db.groups[target] = group;
-      db.groupsSnap.child(target).ref.set(group);
+      set(db.groupsSnap.child(target).ref, group);
       const tags = getTags(this.bot, groupId);
       if (tags && tags.length > 0) {
         groupTags = tags.join(', ');

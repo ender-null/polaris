@@ -1,3 +1,4 @@
+import { set, update } from 'firebase/database';
 import { Bot, Message } from '..';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
@@ -189,14 +190,14 @@ export class CorePlugin extends PluginBase {
                   db.groups[cid].invite_link = fixedUrl;
                   db.groups[cid].member_count = chat['member_count'] || 0;
                   db.groups[cid].title = ok['title'];
-                  db.groupsSnap.child(cid).ref.update(db.groups[cid]);
+                  update(db.groupsSnap.child(cid).ref, db.groups[cid]);
                 } else {
                   db.groups[cid] = {
                     invite_link: fixedUrl,
                     member_count: chat['member_count'] || 0,
                     title: ok['title'],
                   };
-                  db.groupsSnap.child(cid).ref.set(db.groups[cid]);
+                  set(db.groupsSnap.child(cid).ref, db.groups[cid]);
                 }
               }
             }

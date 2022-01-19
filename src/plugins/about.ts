@@ -1,3 +1,4 @@
+import { set, update } from 'firebase/database';
 import format from 'string-format';
 import { Bot, Message } from '..';
 import { db } from '../main';
@@ -78,19 +79,19 @@ export class AboutPlugin extends PluginBase {
         db.groups = {};
       }
       if (db.groups && db.groups[gid] != undefined) {
-        let update = false;
+        let doUpdate = false;
         if (db.groups[gid].title != msg.conversation.title) {
           db.groups[gid].title = msg.conversation.title || '';
-          update = true;
+          doUpdate = true;
         }
-        if (update) {
-          db.groupsSnap.child(gid).ref.update(db.groups[gid]);
+        if (doUpdate) {
+          update(db.groupsSnap.child(gid).ref, db.groups[gid]);
         }
       } else {
         db.groups[gid] = {
           title: msg.conversation.title || '',
         };
-        db.groupsSnap.child(gid).ref.set(db.groups[gid]);
+        set(db.groupsSnap.child(gid).ref, db.groups[gid]);
       }
     }
 
@@ -103,25 +104,25 @@ export class AboutPlugin extends PluginBase {
       db.users = {};
     }
     if (db.users[uid] != undefined) {
-      let update = false;
+      let doUpdate = false;
       if (db.users[uid].first_name != msg.sender['firstName']) {
         db.users[uid].first_name = msg.sender['firstName'] || '';
-        update = true;
+        doUpdate = true;
       }
       if (db.users[uid].last_name != msg.sender['lastName']) {
         db.users[uid].last_name = msg.sender['lastName'] || '';
-        update = true;
+        doUpdate = true;
       }
       if (db.users[uid].username != msg.sender['username']) {
         db.users[uid].username = msg.sender['username'] || '';
-        update = true;
+        doUpdate = true;
       }
       if (db.users[uid].is_bot != msg.sender['isBot']) {
         db.users[uid].is_bot = msg.sender['isBot'] || false;
-        update = true;
+        doUpdate = true;
       }
-      if (update) {
-        db.usersSnap.child(uid).ref.update(db.users[uid]);
+      if (doUpdate) {
+        update(db.usersSnap.child(uid).ref, db.users[uid]);
       }
     } else {
       db.users[uid] = {
@@ -130,7 +131,7 @@ export class AboutPlugin extends PluginBase {
         username: msg.sender['username'] || '',
         is_bot: msg.sender['isBot'] || false,
       };
-      db.usersSnap.child(uid).ref.set(db.users[uid]);
+      set(db.usersSnap.child(uid).ref, db.users[uid]);
     }
   }
 }

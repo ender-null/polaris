@@ -1,3 +1,4 @@
+import { remove, update } from 'firebase/database';
 import format from 'string-format';
 import { Bot, Message } from '..';
 import { db } from '../main';
@@ -43,12 +44,12 @@ export class NickPlugin extends PluginBase {
     } else {
       if (input == '--') {
         delete db.users[uid].nick;
-        db.usersSnap.child(uid).child('nick').ref.remove();
+        remove(db.usersSnap.child(uid).child('nick').ref);
         text = format(this.strings.deletedNick, name);
       } else {
         if (db.users[uid] !== undefined) {
           db.users[uid].nick = input;
-          db.usersSnap.child(uid).ref.update({
+          update(db.usersSnap.child(uid).ref, {
             nick: db.users[uid].nick,
           });
         }

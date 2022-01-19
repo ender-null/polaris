@@ -1,3 +1,4 @@
+import { set } from 'firebase/database';
 import format from 'string-format';
 import { Bot, Message } from '..';
 import { db } from '../main';
@@ -159,13 +160,10 @@ export class AntiSpamPlugin extends PluginBase {
       setTag(this.bot, m.sender.id, spamType);
       if (db.groups[gid][spamType]) {
         db.groups[gid][spamType] = db.groups[gid][spamType] + 1;
-        db.groupsSnap
-          .child(gid)
-          .child(spamType)
-          .ref.set(db.groups[gid][spamType] + 1);
+        set(db.groupsSnap.child(gid).child(spamType).ref, db.groups[gid][spamType] + 1);
       } else {
         db.groups[gid][spamType] = 1;
-        db.groupsSnap.child(gid).child(spamType).ref.set(1);
+        set(db.groupsSnap.child(gid).child(spamType).ref, 1);
       }
 
       if (db.groups[gid][spamType] >= 10 || String(m.sender.id) == gid) {

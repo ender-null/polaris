@@ -1,3 +1,4 @@
+import { set } from 'firebase/database';
 import format from 'string-format';
 import { Bot, Message } from '..';
 import { db } from '../main';
@@ -91,7 +92,7 @@ export class PinPlugin extends PluginBase {
       } else {
         pinType = msg.reply.type;
       }
-      db.pinsSnap.child(tag).ref.set({
+      set(db.pinsSnap.child(tag).ref, {
         content: msg.reply.content.replace(/</gim, '&lt;').replace(/>/gim, '&gt;'),
         creator: msg.sender.id,
         type: pinType,
@@ -120,7 +121,7 @@ export class PinPlugin extends PluginBase {
       if (db.pins && msg.sender.id != db.pins[tag].creator) {
         return this.bot.replyMessage(msg, format(this.strings.notCreator, tag));
       }
-      db.pinsSnap.child(tag).ref.set(null);
+      set(db.pinsSnap.child(tag).ref, null);
       delete db.pins[tag];
       this.bot.replyMessage(msg, format(this.strings.unpinned, tag));
       this.updateTriggers();
