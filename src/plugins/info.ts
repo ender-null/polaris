@@ -96,7 +96,7 @@ export class InfoPlugin extends PluginBase {
         set(db.usersSnap.child(target).ref, user);
         const tags = getTags(this.bot, userId);
         if (tags && tags.length > 0) {
-          userTags = tags.join(', ');
+          userTags = tags;
         }
 
         if (!input) {
@@ -195,7 +195,7 @@ export class InfoPlugin extends PluginBase {
       set(db.groupsSnap.child(target).ref, group);
       const tags = getTags(this.bot, groupId);
       if (tags && tags.length > 0) {
-        groupTags = tags.join(', ');
+        groupTags = tags;
       }
     }
 

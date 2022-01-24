@@ -97,7 +97,7 @@ export class TagPlugin extends PluginBase {
           delTag(this.bot, target, tag);
         }
       });
-      this.bot.replyMessage(msg, `<b>👤 ${name}</b>\n🏷 -<code>${tags.join('</code>\n🏷 +<code>')}</code>`);
+      this.bot.replyMessage(msg, `<b>👤 ${name}</b>\n🏷 -<code>${tags.join('</code>\n🏷 -<code>')}</code>`);
     }
   }
 }
