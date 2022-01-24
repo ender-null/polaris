@@ -29,8 +29,10 @@ export class RAEPlugin extends PluginBase {
     if (!resp) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
     }
-
     const content = (await resp.json()) as any;
+    if (content.statusCode || !content.meanings || !content.complexForms || !content.expressions) {
+      return this.bot.replyMessage(msg, this.bot.errors.connectionError);
+    }
 
     let text = `<b>${content.term}</b>\n<i>${content.etymology}</i>\n`;
     content.meanings.forEach((meaning) => {
