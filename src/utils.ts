@@ -565,9 +565,11 @@ export const generateCommandHelp = (
 };
 
 export const queryString = (params: any) => {
-  return Object.keys(params)
-    .map((key) => key + '=' + params[key])
-    .join('&');
+  return params
+    ? Object.keys(params)
+        .map((key) => key + '=' + params[key])
+        .join('&')
+    : null;
 };
 
 export const sendRequest = async (
