@@ -1,4 +1,3 @@
-import * as cheerio from 'cheerio';
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
 import { generateCommandHelp, getInput, sendRequest } from '../utils';
