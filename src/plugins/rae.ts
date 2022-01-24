@@ -34,14 +34,14 @@ export class RAEPlugin extends PluginBase {
 
     let text = `<b>${content.term}</b>\n<i>${content.etymology}</i>\n`;
     content.meanings.forEach((meaning) => {
-      text += `\n${meaning.number} <i>${meaning.type}${meaning.country.length ? '' : ` ${meaning.country}`}</i>: ${
+      text += `\n${meaning.number} ${meaning.type}${meaning.country.length ? '' : ` ${meaning.country}`}: ${
         meaning.definition
       }\n`;
     });
     content.complexForms.forEach((expression) => {
       text += `\n<b>${expression.expression}</b>`;
       expression.meanings.forEach((meaning) => {
-        text += `\n${meaning.number} <i>${meaning.type}${meaning.country.length ? '' : ` ${meaning.country}`}</i>: ${
+        text += `\n${meaning.number} ${meaning.type}${meaning.country.length ? '' : ` ${meaning.country}`}: ${
           meaning.definition
         }\n`;
       });
@@ -50,7 +50,7 @@ export class RAEPlugin extends PluginBase {
     content.expressions.forEach((expression) => {
       text += `\n<b>${expression.expression}</b>`;
       expression.meanings.forEach((meaning) => {
-        text += `\n${meaning.number} <i>${meaning.type}${meaning.country.length ? '' : ` ${meaning.country}`}</i>: ${
+        text += `\n${meaning.number} ${meaning.type}${meaning.country.length ? '' : ` ${meaning.country}`}: ${
           meaning.definition
         }\n`;
       });

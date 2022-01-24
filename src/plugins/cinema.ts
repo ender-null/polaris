@@ -40,13 +40,19 @@ export class CinemaPlugin extends PluginBase {
     if (!input) {
       text = this.strings.cinemas;
       content.forEach((item) => {
-        const address = `https://www.google.es/maps/place/${item.address}/?hl=es`;
-        text += `\n<b>${item.name}</b> (<code>${item.id}</code>)\n<a href="${address}">${item.location}</a>\n`;
+        text += `\n<b>${item.name}</b> (<code>${item.id}</code>)\n${item.address}\n`;
       });
     } else {
       text = this.strings.movies;
       content.movies.forEach((item) => {
-        text += `\n<b>${item.name}</b>\n${item.synopsis}\n<a href="${item.source}">Link</a>\n`;
+        const sessions = item.sessions
+          .map((session) => {
+            let label = session.time;
+            if (session.type) label = `${label} [${session.type}]`;
+            return `<a href="${session.url}">${label}</a>`;
+          })
+          .join(', ');
+        text += `\n<b>${item.name}</b>\n${sessions}\n${this.strings.duration}: ${item.durationReadable}\n<a href="${item.trailer}">Trailer</a>\n<a href="${item.source}">Link</a>\n`;
       });
     }
 
