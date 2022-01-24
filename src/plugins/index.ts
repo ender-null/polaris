@@ -7,6 +7,7 @@ export { CommitPlugin } from './commit';
 export { ConfigPlugin } from './config';
 export { CorePlugin } from './core';
 export { Covid19Plugin } from './covid-19';
+export { CinemaPlugin } from './cinema';
 export { CryptoPlugin } from './crypto';
 export { EchoPlugin } from './echo';
 export { GifPlugin } from './gif';
