@@ -88,7 +88,7 @@ export class SearchPlugin extends PluginBase {
     }
     let content;
     try {
-      content = await resp.json() as any;
+      content = (await resp.json()) as any;
     } catch (error) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
     }

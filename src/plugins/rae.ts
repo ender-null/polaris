@@ -30,25 +30,31 @@ export class RAEPlugin extends PluginBase {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
     }
 
-    const content = await resp.json() as any;
+    const content = (await resp.json()) as any;
 
-    let text = `<b>${content.term}</b>\n<i>{content.etymology}</i>\n`
-    content.meanings.forEach(meaning => {
-      text += `\n${meaning.number} ${meaning.number} <i>${meaning.type} ${meaning.country}</i>: ${meaning.definition}\n`
-    })
-    content.complexForms.forEach(expression => {
-      text += `\n<b>${expression.expression}</b>`
-      expression.meanings.forEach(meaning => {
-        text += `\n${meaning.number} ${meaning.number} <i>${meaning.type} ${meaning.country}</i>: ${meaning.definition}\n`
-      })
-    })
+    let text = `<b>${content.term}</b>\n<i>${content.etymology}</i>\n`;
+    content.meanings.forEach((meaning) => {
+      text += `\n${meaning.number} <i>${meaning.type}${meaning.country.length ? '' : ` ${meaning.country}`}</i>: ${
+        meaning.definition
+      }\n`;
+    });
+    content.complexForms.forEach((expression) => {
+      text += `\n<b>${expression.expression}</b>`;
+      expression.meanings.forEach((meaning) => {
+        text += `\n${meaning.number} <i>${meaning.type}${meaning.country.length ? '' : ` ${meaning.country}`}</i>: ${
+          meaning.definition
+        }\n`;
+      });
+    });
 
-    content.expressions.forEach(expression => {
-      text += `\n<b>${expression.expression}</b>`
-      expression.meanings.forEach(meaning => {
-        text += `\n${meaning.number} ${meaning.number} <i>${meaning.type} ${meaning.country}</i>: ${meaning.definition}\n`
-      })
-    })
+    content.expressions.forEach((expression) => {
+      text += `\n<b>${expression.expression}</b>`;
+      expression.meanings.forEach((meaning) => {
+        text += `\n${meaning.number} <i>${meaning.type}${meaning.country.length ? '' : ` ${meaning.country}`}</i>: ${
+          meaning.definition
+        }\n`;
+      });
+    });
 
     this.bot.replyMessage(msg, text);
   }

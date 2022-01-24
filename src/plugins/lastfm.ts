@@ -65,7 +65,7 @@ export class LastFMPlugin extends PluginBase {
       if (!resp) {
         return this.bot.replyMessage(msg, this.bot.errors.connectionError);
       }
-      const content = await resp.json() as any;
+      const content = (await resp.json()) as any;
       if (content.error == 6) {
         return this.bot.replyMessage(msg, this.bot.errors.noResults);
       }
@@ -111,7 +111,7 @@ export class LastFMPlugin extends PluginBase {
       if (!ytResp) {
         return this.bot.replyMessage(msg, this.bot.errors.connectionError);
       }
-      const ytContent = await ytResp.json() as any;
+      const ytContent = (await ytResp.json()) as any;
       if (!ytContent.error && ytContent.pageInfo.totalResults > 0) {
         text += `\n\n🎬 ${this.strings.mightBe}:\n${ytContent['items'][0].snippet.title}\nhttps://youtu.be/${ytContent['items'][0].id.videoId}`;
       }

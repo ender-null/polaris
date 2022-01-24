@@ -682,7 +682,7 @@ export const getCoords = async (input: string, bot?: Bot): Promise<CoordinatesRe
   };
   const resp = await sendRequest(url, params, null, null, false, bot);
   if (resp) {
-    const content = await resp.json() as any;
+    const content = (await resp.json()) as any;
     if (content && content.results.length > 0) {
       const locality = content.results[0].address_components[0].long_name;
       let country;

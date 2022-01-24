@@ -49,7 +49,7 @@ export class WeatherPlugin extends PluginBase {
     if (!resp) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
     }
-    const content = await resp.json() as any;
+    const content = (await resp.json()) as any;
     if (!content || content.cod != 200) {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);
     }
