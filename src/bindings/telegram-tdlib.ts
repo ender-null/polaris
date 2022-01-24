@@ -700,7 +700,7 @@ export class TelegramTDlibBindings extends BindingsBase {
       };
       const resp = await this.apiRequest('getFile', params);
       if (resp) {
-        const result = await resp.json();
+        const result = await resp.json() as any;
         if ('result' in result) {
           if (link) {
             return `https://api.telegram.org/file/bot${this.bot.config.apiKeys.telegramBotToken}/${result.result.file_path}`;

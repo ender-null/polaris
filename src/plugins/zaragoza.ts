@@ -62,7 +62,7 @@ export class ZaragozaPlugin extends PluginBase {
       if (!resp) {
         return this.bot.replyMessage(msg, this.bot.errors.connectionError);
       }
-      const content = await resp.json();
+      const content = await resp.json() as any;
       if (!content || content.errors) {
         if (content && content.errors && content.errors.status == 404) {
           return this.bot.replyMessage(msg, this.bot.errors.noResults);
@@ -97,7 +97,7 @@ export class ZaragozaPlugin extends PluginBase {
       if (!resp) {
         return this.bot.replyMessage(msg, this.bot.errors.connectionError);
       }
-      const content = await resp.json();
+      const content = await resp.json() as any;
 
       if (!content || content.error) {
         if (content && content.error == 'Parametros incorrectos') {

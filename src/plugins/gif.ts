@@ -31,7 +31,7 @@ export class GifPlugin extends PluginBase {
       key: this.bot.config.apiKeys.tenor,
     };
     const resp = await sendRequest(url, params, null, null, false, this.bot);
-    const content = await resp.json();
+    const content = await resp.json() as any;
     if (!content || content['results'] == undefined) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
     }

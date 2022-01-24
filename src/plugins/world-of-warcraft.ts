@@ -262,7 +262,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       if (!resp) {
         return this.bot.replyMessage(msg, this.bot.errors.connectionError);
       }
-      const content = await resp.json();
+      const content = await resp.json() as any;
       if (content) {
         text = `<b>${this.strings.tokenTitle}</b>:`;
         Object.keys(content).map((region) => {
@@ -293,7 +293,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
     if (!resp) {
       return null;
     } else {
-      const content = await resp.json();
+      const content = await resp.json() as any;
       return content.access_token;
     }
   }
@@ -350,6 +350,6 @@ export class WorldOfWarcraftPlugin extends PluginBase {
     if (!resp) {
       return null;
     }
-    return await resp.json();
+    return await resp.json() as any;
   }
 }

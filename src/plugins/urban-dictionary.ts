@@ -33,7 +33,7 @@ export class UrbanDictionaryPlugin extends PluginBase {
     if (!resp) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
     }
-    const content = await resp.json();
+    const content = await resp.json() as any;
 
     if (!content.list || content.list.length == 0) {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);

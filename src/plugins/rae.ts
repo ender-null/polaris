@@ -25,40 +25,32 @@ export class RAEPlugin extends PluginBase {
     if (!input) {
       return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
     }
-    const url = 'https://dle.rae.es/srv/search';
-    const params = {
-      w: input,
-    };
-    const resp = await sendRequest(url, params, null, null, false, this.bot);
+    const url = `https://api.drk.cat/rae/search/${input}`;
+    const resp = await sendRequest(url, null, null, null, false, this.bot);
     if (!resp) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
     }
-    const html = await resp.text();
-    const $ = cheerio.load(html);
-    let text = `<b>${input}</b>`;
-    const definitions = $('#resultados article').first();
-    const lines = definitions.find('p');
-    if (lines.length == 0) {
-      return this.bot.replyMessage(msg, this.bot.errors.noResults);
-    }
-    lines.each((index) => {
-      const line = lines.eq(index);
-      if (line.hasClass('n2')) {
-        text += `\n<i>${line.text()}</i>`;
-      } else if (line.hasClass('j') || line.hasClass('j2') || line.hasClass('m')) {
-        const num = line.find('span').first().text().trim();
-        const type = line.find('abbr').first().text().trim();
-        const words = line.find('mark');
-        let def = '';
-        words.each((index) => {
-          def += words.eq(index).text() + ' ';
-        });
-        def = def.trim();
-        text += `\n<b>${num}</b> <i>${type}</i> ${def}.`;
-      } else if (line.hasClass('k6')) {
-        text += `\n<b>${line.text()}</b>`;
-      }
-    });
+
+    const content = await resp.json() as any;
+
+    let text = `<b>${content.term}</b>\n<i>{content.etymology}</i>\n`
+    content.meanings.forEach(meaning => {
+      text += `\n${meaning.number} ${meaning.number} <i>${meaning.type} ${meaning.country}</i>: ${meaning.definition}\n`
+    })
+    content.complexForms.forEach(expression => {
+      text += `\n<b>${expression.expression}</b>`
+      expression.meanings.forEach(meaning => {
+        text += `\n${meaning.number} ${meaning.number} <i>${meaning.type} ${meaning.country}</i>: ${meaning.definition}\n`
+      })
+    })
+
+    content.expressions.forEach(expression => {
+      text += `\n<b>${expression.expression}</b>`
+      expression.meanings.forEach(meaning => {
+        text += `\n${meaning.number} ${meaning.number} <i>${meaning.type} ${meaning.country}</i>: ${meaning.definition}\n`
+      })
+    })
+
     this.bot.replyMessage(msg, text);
   }
 }

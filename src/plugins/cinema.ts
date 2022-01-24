@@ -32,7 +32,7 @@ export class CinemaPlugin extends PluginBase {
     }
 
     const resp = await sendRequest(url, null, null, null, false, this.bot);
-    const content = await resp.text();
+    const content = await resp.json() as any;
     if (!content) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
     }

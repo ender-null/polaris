@@ -42,7 +42,7 @@ export class AnimalPlugin extends PluginBase {
 
     const resp = await sendRequest(url, params, null, null, false, this.bot);
     if (resp) {
-      const content = await resp.json();
+      const content = await resp.json() as any;
       if (content) {
         let photo;
         if (isCommand(this, 1, msg.content)) {

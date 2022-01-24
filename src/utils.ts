@@ -589,7 +589,7 @@ export const sendRequest = async (
     const response = await fetch(`${url}?${queryString(params)}`, options);
     if (!response.ok) {
       const error = response.clone();
-      await error.json().catch((e) => catchException(e, bot));
+      await (error.json() as any).catch((e) => catchException(e, bot));
     }
     return response;
   } catch (error) {
@@ -680,9 +680,9 @@ export const getCoords = async (input: string, bot?: Bot): Promise<CoordinatesRe
     region: lang,
     key: key,
   };
-  const res = await sendRequest(url, params, null, null, false, bot);
-  if (res) {
-    const content = await res.json();
+  const resp = await sendRequest(url, params, null, null, false, bot);
+  if (resp) {
+    const content = await resp.json() as any;
     if (content && content.results.length > 0) {
       const locality = content.results[0].address_components[0].long_name;
       let country;

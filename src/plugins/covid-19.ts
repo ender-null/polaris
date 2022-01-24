@@ -132,7 +132,7 @@ export class Covid19Plugin extends PluginBase {
     if (!resp) {
       return false;
     }
-    const content = await resp.json();
+    const content = await resp.json() as any;
     const countryGroups = content.result.pageContext.countryGroups;
     this.data = {};
     countryGroups.map((country) => {
