@@ -221,7 +221,7 @@ export class InfoPlugin extends PluginBase {
         text += `\n🤖 ${this.strings.bot}`;
       }
       if (userTags && userTags.length > 0) {
-        text += `\n🏷 ${userTags}`;
+        text += `\n🏷 <code>${userTags.join('</code>\n🏷 <code>')}</code>`;
       }
       if (user.description && user.description.length > 0) {
         text += `\nℹ️ ${user.description}`;
@@ -257,7 +257,7 @@ export class InfoPlugin extends PluginBase {
         text += `\n🔗 ${telegramShortLink(group.invite_link)}`;
       }
       if (groupTags && groupTags.length > 0) {
-        text += `\n🏷 ${groupTags}`;
+        text += `\n🏷 <code>${groupTags.join('</code>\n🏷 <code>')}</code>`;
       }
       if (group.is_channel) {
         text += `\n📢 ${this.strings.channel}`;

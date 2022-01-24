@@ -41,9 +41,9 @@ export class YouTubePlugin extends PluginBase {
     let text;
     const url = 'https://www.googleapis.com/youtube/v3/search';
     const params = {
-      type: 'video',
       part: 'snippet',
-      maxResults: '8',
+      type: 'video',
+      maxResults: '10',
       q: input,
       regionCode: this.bot.config.locale.slice(0, 2),
       key: this.bot.config.apiKeys.googleDeveloperConsole,
@@ -56,7 +56,7 @@ export class YouTubePlugin extends PluginBase {
     if (content.error != undefined && content.error.code == '403') {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
     }
-    if (content.pageInfo.totalResults == 0 || content.items.length == 0) {
+    if (!content.pageInfo || content.pageInfo.totalResults == 0 || content.items.length == 0) {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);
     }
     if (isCommand(this, 1, msg.content)) {
