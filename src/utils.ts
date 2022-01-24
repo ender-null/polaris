@@ -4,7 +4,7 @@ import fs from 'fs';
 import mime from 'mime-types';
 import fetch, { BodyInit, HeadersInit, RequestInit, Response } from 'node-fetch';
 import os from 'os';
-import querystring, { ParsedUrlQueryInput } from 'querystring';
+import { ParsedUrlQueryInput } from 'querystring';
 import { pipeline } from 'stream';
 import tmp from 'tmp';
 import util from 'util';
