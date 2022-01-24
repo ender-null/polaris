@@ -17,10 +17,6 @@ export class CinemaPlugin extends PluginBase {
         description: 'Returns the films available at cinema',
       },
     ];
-    this.strings = {
-      cinemas: '<b>Cinemas</b>:',
-      movies: '<b>Movies</b>:',
-    };
   }
   async run(msg: Message): Promise<void> {
     const input = getInput(msg, false);
@@ -38,12 +34,12 @@ export class CinemaPlugin extends PluginBase {
     }
 
     if (!input) {
-      text = this.strings.cinemas;
+      text = '';
       content.forEach((item) => {
         text += `\n<b>${item.name}</b> (<code>${item.id}</code>)\n${item.address}\n`;
       });
     } else {
-      text = this.strings.movies;
+      text = '';
       content.movies.forEach((item) => {
         const sessions = item.sessions
           .map((session) => {
@@ -52,7 +48,7 @@ export class CinemaPlugin extends PluginBase {
             return `<a href="${session.url}">${label}</a>`;
           })
           .join(', ');
-        text += `\n<b>${item.name}</b>\n${sessions}\n${this.strings.duration}: ${item.durationReadable}\n<a href="${item.trailer}">Trailer</a>\n<a href="${item.source}">Link</a>\n`;
+        text += `\n<b>${item.name}</b>\n<a href="${item.source}">🔗</a> <a href="${item.trailer}">🎬</a> ⌛ ${item.durationReadable}\n🎫 ${sessions}\n`;
       });
     }
 

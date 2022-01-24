@@ -474,6 +474,9 @@ export class Bot {
     if (msg.extra.originalMessage) {
       extra.originalMessage = msg.extra.originalMessage;
     }
+    if (!reply) {
+      reply = msg;
+    }
     this.sendMessage(msg.conversation, content, type, reply, extra);
   }
 
