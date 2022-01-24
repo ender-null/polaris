@@ -46,7 +46,7 @@
     "matrix-bot-sdk": "^0.5.18",
     "mime-types": "^2.1.30",
     "node-cron": "^3.0.0",
-    "node-fetch": "2.6.7",
+    "node-fetch": "^2.6.7",
     "string-format": "^2.0.0",
     "tdl": "^7.0.0",
     "tdl-tdlib-addon": "^1.0.1",
