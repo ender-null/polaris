@@ -564,6 +564,12 @@ export const generateCommandHelp = (
   return doc;
 };
 
+export const queryString = (params: any) => {
+  return Object.keys(params)
+    .map((key) => key + '=' + params[key])
+    .join('&');
+};
+
 export const sendRequest = async (
   url: string,
   params?: ParsedUrlQueryInput,
@@ -578,7 +584,7 @@ export const sendRequest = async (
     headers: headers,
   };
   try {
-    const response = await fetch(`${url}?${querystring.stringify(params)}`, options);
+    const response = await fetch(`${url}?${queryString(params)}`, options);
     if (!response.ok) {
       const error = response.clone();
       await error.json().catch((e) => catchException(e, bot));
