@@ -45,7 +45,7 @@ export class YouTubePlugin extends PluginBase {
       type: 'video',
       maxResults: '10',
       q: input,
-      regionCode: this.bot.config.locale.slice(0, 2),
+      regionCode: this.bot.config.locale.slice(2, 2),
       key: this.bot.config.apiKeys.googleDeveloperConsole,
     };
     const resp = await sendRequest(url, params, null, null, false, this.bot);
