@@ -35,7 +35,7 @@ export class DiscordBindings extends BindingsBase {
       this.bot.status.emit('started');
     });
 
-    this.client.on('message', (message: DiscordMessage) => this.messageEventHandler(message));
+    this.client.on('messageCreate', (message: DiscordMessage) => this.messageEventHandler(message));
     this.client.login(this.bot.config.apiKeys.discordBotToken).then(
       (tok) => {
         logger.debug(`Bot logged in successfully!\n\n${tok}\n\n`);
@@ -51,7 +51,7 @@ export class DiscordBindings extends BindingsBase {
   async stop(): Promise<void> {
     this.client.destroy();
     this.client.removeAllListeners('ready');
-    this.client.removeAllListeners('message');
+    this.client.removeAllListeners('messageCreate');
     this.bot.outbox.removeAllListeners('message');
     this.bot.status.emit('stopped');
   }
