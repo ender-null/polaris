@@ -9,6 +9,7 @@ export class WeatherPlugin extends PluginBase {
     this.commands = [
       {
         command: '/weather',
+        friendly: '^weather for ',
         aliases: ['/w'],
         parameters: [
           {

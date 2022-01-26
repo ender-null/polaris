@@ -9,6 +9,7 @@ export class AscoDeVidaPlugin extends PluginBase {
     this.commands = [
       {
         command: '/ascodevida',
+        friendly: '^adv$',
         description: 'Random story from Asco de Vida',
         aliases: ['/adv'],
         skipHelp: true,

@@ -8,6 +8,7 @@ export class GifPlugin extends PluginBase {
     this.commands = [
       {
         command: '/gif',
+        friendly: '^gif of ',
         aliases: ['/g'],
         parameters: [
           {

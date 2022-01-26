@@ -8,6 +8,7 @@ export class CinemaPlugin extends PluginBase {
     this.commands = [
       {
         command: '/cinema',
+        friendly: '^cinema',
         parameters: [
           {
             name: 'cinema id',

@@ -9,6 +9,7 @@ export class YouTubePlugin extends PluginBase {
     this.commands = [
       {
         command: '/youtube',
+        friendly: '^video of ',
         aliases: ['/yt'],
         parameters: [
           {

@@ -9,6 +9,7 @@ export class RussianRoulettePlugin extends PluginBase {
     this.commands = [
       {
         command: '/roulette',
+        friendly: '^roulette$',
         description: 'Russian roulette, if you lose you will be kicked and banned',
       },
     ];
