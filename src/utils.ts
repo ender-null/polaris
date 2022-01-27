@@ -881,7 +881,7 @@ export const catchException = (exception: Error, bot: Bot = null, message: Messa
   if (bot) {
     if (exception['response']) {
       (exception as HTTPResponseError).response
-        .text()
+        .json()
         .then((text) => bot.sendAlert(JSON.stringify(text, null, 4), 'json'));
     } else if (exception['stack']) {
       bot.sendAlert(replaceHtml(exception['stack']), 'javascript');

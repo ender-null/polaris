@@ -49,6 +49,7 @@ export class YouTubePlugin extends PluginBase {
       regionCode: this.bot.config.locale.slice(2, 2),
       key: this.bot.config.apiKeys.googleDeveloperConsole,
     };
+    console.log(params)
     const resp = await sendRequest(url, params, null, null, false, this.bot);
     if (!resp) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
