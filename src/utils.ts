@@ -48,16 +48,12 @@ export const isGroupAdmin = async (bot: Bot, uid: number | string, msg: Message 
     uid = String(uid);
   }
   if (msg && +msg.conversation.id < 0) {
-    logger.info('msg && +msg.conversation.id < 0')
     const chatAdmins = await bot.getChatAdmins(msg.conversation.id);
     for (const admin of chatAdmins) {
-      logger.info(JSON.stringify(admin))
       if (uid == String(admin.id)) {
-        logger.info(`${uid}==${String(admin.id)} ${uid == String(admin.id)}`)
         return true;}
     }
   }
-  logger.info('return false')
   return false;
 };
 

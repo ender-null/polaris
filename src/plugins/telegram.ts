@@ -193,8 +193,7 @@ export class TelegramPlugin extends PluginBase {
       }
       if (await this.checkPermissions(msg)) {
         const target = getTarget(this.bot, msg, input);
-        logger.info(`target: ${target}`)
-        if (!(await isGroupAdmin(this.bot, target))) {
+        if (!(await isGroupAdmin(this.bot, target, msg))) {
           ok = await this.bot.bindings.kickConversationMember(msg.conversation.id, target);
         } else {
           return this.bot.replyMessage(msg, this.bot.errors.unableDoActionToAdmin);
@@ -209,7 +208,7 @@ export class TelegramPlugin extends PluginBase {
           return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
         }
         const target = getTarget(this.bot, msg, input);
-        if (!(await isGroupAdmin(this.bot, target))) {
+        if (!(await isGroupAdmin(this.bot, target, msg))) {
           ok = await this.bot.bindings.banConversationMember(msg.conversation.id, target);
         } else {
           return this.bot.replyMessage(msg, this.bot.errors.unableDoActionToAdmin);
