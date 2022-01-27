@@ -1,6 +1,6 @@
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
-import { generateCommandHelp, getInput, getTarget, isAdmin, isCommand, isGroupAdmin, isMod, logger } from '../utils';
+import { generateCommandHelp, getInput, getTarget, isAdmin, isCommand, isGroupAdmin, isMod } from '../utils';
 
 export class TelegramPlugin extends PluginBase {
   constructor(bot: Bot) {
