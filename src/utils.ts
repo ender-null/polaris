@@ -879,12 +879,12 @@ export const merge = (base: any, extension: any): any => {
 export const catchException = (exception: Error, bot: Bot = null, message: Message = null): Error => {
   logger.error(`Catch exception: ${exception.message}`);
   if (bot) {
-    if (exception['stack']) {
-      bot.sendAlert(JSON.stringify(replaceHtml(exception['stack']), null, 4), 'javascript');
-    } else if (exception['response']) {
+    if (exception['response']) {
       (exception as HTTPResponseError).response
         .text()
         .then((text) => bot.sendAlert(JSON.stringify(text, null, 4), 'json'));
+    } else if (exception['stack']) {
+      bot.sendAlert(replaceHtml(exception['stack']), 'javascript');
     } else if (exception['_'] == 'error') {
       bot.sendAlert(JSON.stringify(exception, null, 4), 'json');
     } else {
