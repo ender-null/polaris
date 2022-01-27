@@ -4,7 +4,7 @@ import { createServer } from 'https';
 import { Bot, Config, Database } from '.';
 import { catchException, getBindingsSlug, logger } from './utils';
 
-process.setMaxListeners(0);
+process.setMaxListeners(16);
 
 const bots: Bot[] = [];
 
