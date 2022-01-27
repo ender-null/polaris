@@ -247,6 +247,8 @@ export const getTarget = (bot: Bot, m: Message, input: string, noSearch?: boolea
     return target;
   } else if (!ignoreSelf){
     return String(m.sender.id);
+  } else {
+    return '0';
   }
 };
 
