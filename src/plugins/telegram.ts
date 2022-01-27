@@ -121,7 +121,6 @@ export class TelegramPlugin extends PluginBase {
     this.strings = {
       commands: '<b>Commands</b>:',
       noDescription: 'No description',
-
     };
     this.bindings = ['TelegramTDlibBindings'];
   }
@@ -286,7 +285,7 @@ export class TelegramPlugin extends PluginBase {
       return false;
     }
 
-    if (await !isAdmin(this.bot, msg.sender.id) && !isMod(this.bot, msg.sender.id, msg.conversation.id)) {
+    if ((await !isAdmin(this.bot, msg.sender.id)) && !isMod(this.bot, msg.sender.id, msg.conversation.id)) {
       this.bot.replyMessage(msg, this.bot.errors.permissionRequired);
       return false;
     }

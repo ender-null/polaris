@@ -40,7 +40,7 @@ export class ErrorMessages {
     this.permissionRequired = 'Permission required';
     this.privateOnly = 'Only works in <b>private</b>';
     this.spammerDetected = 'Spammer detected, proceed to commit death';
-    this.unableDoActionToAdmin = 'Unable to do action to <b>admin</b>'
+    this.unableDoActionToAdmin = 'Unable to do action to <b>admin</b>';
   }
 }
 

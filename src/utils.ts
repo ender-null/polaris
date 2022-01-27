@@ -51,7 +51,8 @@ export const isGroupAdmin = async (bot: Bot, uid: number | string, msg: Message 
     const chatAdmins = await bot.getChatAdmins(msg.conversation.id);
     for (const admin of chatAdmins) {
       if (uid == String(admin.id)) {
-        return true;}
+        return true;
+      }
     }
   }
   return false;
@@ -241,7 +242,7 @@ export const getTarget = (bot: Bot, m: Message, input: string, noSearch?: boolea
       return '0';
     }
     return target;
-  } else if (!ignoreSelf){
+  } else if (!ignoreSelf) {
     return String(m.sender.id);
   } else {
     return '0';
@@ -591,7 +592,9 @@ export const sendRequest = async (
     const response = await fetch(`${url}?${queryString(params)}`, options);
     if (!response.ok) {
       const error = response.clone();
-      error.json().then(resp => catchException(resp, bot)).catch((e) => catchException(e, bot));
+      const errorBody = error.text().catch((e) => catchException(e, bot));
+      logger.error(`Failed HTTP request to '${url}':\n${JSON.stringify(errorBody, null, 4)}`);
+      bot.sendAlert(JSON.stringify(errorBody, null, 4));
     }
     return response;
   } catch (error) {

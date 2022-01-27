@@ -55,7 +55,7 @@ export class HelpPlugin extends PluginBase {
                 const commandInfo = {
                   command: getWord(lines[0], 1).slice(1),
                   description: this.strings.noDescription,
-                  type: command.parameters ? 'string' : null
+                  type: command.parameters ? 'string' : null,
                 };
 
                 if (lines.length > 1) {
@@ -81,7 +81,7 @@ export class HelpPlugin extends PluginBase {
             name: command,
             description,
             type: type ? 3 : null,
-            required: !!type
+            required: !!type,
           });
         });
         const slashCommands = await this.bot.bindings['client'].application?.commands.set(data);
