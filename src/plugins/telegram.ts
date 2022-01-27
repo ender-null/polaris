@@ -155,21 +155,21 @@ export class TelegramPlugin extends PluginBase {
       if (!input && !msg.reply) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       }
-      if (this.checkPermissions(msg)) {
+      if (await this.checkPermissions(msg)) {
         ok = await this.bot.bindings.renameConversation(msg.conversation.id, input);
       }
     } else if (isCommand(this, 3, msg.content)) {
       if (!input && !msg.reply) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       }
-      if (this.checkPermissions(msg)) {
+      if (await this.checkPermissions(msg)) {
         ok = await this.bot.bindings.changeConversationDescription(msg.conversation.id, input);
       }
     } else if (isCommand(this, 4, msg.content)) {
       if (!msg.reply) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       }
-      if (this.checkPermissions(msg)) {
+      if (await this.checkPermissions(msg)) {
         if (msg.reply && msg.reply.type == 'photo') {
           const photo = await this.bot.bindings.getFile(msg.reply.content);
           if (photo) {
@@ -183,7 +183,7 @@ export class TelegramPlugin extends PluginBase {
       if (!input && !msg.reply) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       }
-      if (this.checkPermissions(msg)) {
+      if (await this.checkPermissions(msg)) {
         const target = getTarget(this.bot, msg, input);
         ok = await this.bot.bindings.promoteConversationMember(msg.conversation.id, target);
       }
@@ -191,9 +191,9 @@ export class TelegramPlugin extends PluginBase {
       if (!input && !msg.reply) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       }
-      if (this.checkPermissions(msg)) {
+      if (await this.checkPermissions(msg)) {
         const target = getTarget(this.bot, msg, input);
-        if (!isGroupAdmin(this.bot, target)) {
+        if (await !isGroupAdmin(this.bot, target)) {
           ok = await this.bot.bindings.kickConversationMember(msg.conversation.id, target);
         } else {
           return this.bot.replyMessage(msg, this.bot.errors.unableDoActionToAdmin);
@@ -203,12 +203,12 @@ export class TelegramPlugin extends PluginBase {
       if (!input && !msg.reply) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       }
-      if (this.checkPermissions(msg)) {
+      if (await this.checkPermissions(msg)) {
         if (!input && !msg.reply) {
           return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
         }
         const target = getTarget(this.bot, msg, input);
-        if (!isGroupAdmin(this.bot, target)) {
+        if (await !isGroupAdmin(this.bot, target)) {
           ok = await this.bot.bindings.banConversationMember(msg.conversation.id, target);
         } else {
           return this.bot.replyMessage(msg, this.bot.errors.unableDoActionToAdmin);
@@ -218,7 +218,7 @@ export class TelegramPlugin extends PluginBase {
       if (!input && !msg.reply) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       }
-      if (this.checkPermissions(msg)) {
+      if (await this.checkPermissions(msg)) {
         const target = getTarget(this.bot, msg, input);
         ok = await this.bot.bindings.unbanConversationMember(msg.conversation.id, target);
       }
@@ -226,7 +226,7 @@ export class TelegramPlugin extends PluginBase {
       if (!msg.reply) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       }
-      if (this.checkPermissions(msg)) {
+      if (await this.checkPermissions(msg)) {
         await this.bot.bindings.deleteMessage(msg.conversation.id, msg.id);
         if (msg.reply) {
           ok = await this.bot.bindings.deleteMessage(msg.conversation.id, msg.reply.id);
@@ -236,7 +236,7 @@ export class TelegramPlugin extends PluginBase {
       if (!msg.reply) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       }
-      if (this.checkPermissions(msg)) {
+      if (await this.checkPermissions(msg)) {
         if (msg.reply) {
           ok = true;
           this.bot.replyMessage(msg, 'pinChatMessage', 'native', null, {
@@ -248,7 +248,7 @@ export class TelegramPlugin extends PluginBase {
       if (!msg.reply) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       }
-      if (this.checkPermissions(msg)) {
+      if (await this.checkPermissions(msg)) {
         if (msg.reply) {
           ok = true;
           this.bot.replyMessage(msg, 'unpinChatMessage', 'native', null, {
@@ -257,16 +257,16 @@ export class TelegramPlugin extends PluginBase {
         }
       }
     } else if (isCommand(this, 12, msg.content)) {
-      if (this.checkPermissions(msg)) {
+      if (await this.checkPermissions(msg)) {
         ok = await this.bot.bindings.leaveConversation(msg.conversation.id);
       }
     } else if (isCommand(this, 13, msg.content)) {
-      if (this.checkPermissions(msg)) {
+      if (await this.checkPermissions(msg)) {
         text = await this.bot.bindings.createInviteLink(msg.conversation.id, input);
         ok = !!text;
       }
     } else if (isCommand(this, 14, msg.content)) {
-      if (this.checkPermissions(msg)) {
+      if (await this.checkPermissions(msg)) {
         ok = await this.bot.bindings.createCall(msg.conversation.id, false);
       }
     }
@@ -280,13 +280,13 @@ export class TelegramPlugin extends PluginBase {
     }
   }
 
-  checkPermissions(msg: Message): boolean {
+  async checkPermissions(msg: Message): Promise<boolean> {
     if (!isGroupAdmin(this.bot, this.bot.user.id, msg)) {
       this.bot.replyMessage(msg, this.bot.errors.adminRequired);
       return false;
     }
 
-    if (!isAdmin(this.bot, msg.sender.id) && !isMod(this.bot, msg.sender.id, msg.conversation.id)) {
+    if (await !isAdmin(this.bot, msg.sender.id) && !isMod(this.bot, msg.sender.id, msg.conversation.id)) {
       this.bot.replyMessage(msg, this.bot.errors.permissionRequired);
       return false;
     }
