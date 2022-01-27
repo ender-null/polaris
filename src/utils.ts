@@ -191,7 +191,7 @@ export const isInt = (number: number | string): boolean => {
   return !isNaN(parseFloat(number));
 };
 
-export const getTarget = (bot: Bot, m: Message, input: string, noSearch?: boolean): string => {
+export const getTarget = (bot: Bot, m: Message, input: string, noSearch?: boolean, ignoreSelf?: boolean): string => {
   if (m.reply) {
     return String(m.reply.sender.id);
   } else if (input) {
@@ -245,7 +245,7 @@ export const getTarget = (bot: Bot, m: Message, input: string, noSearch?: boolea
       return '0';
     }
     return target;
-  } else {
+  } else if (!ignoreSelf){
     return String(m.sender.id);
   }
 };
