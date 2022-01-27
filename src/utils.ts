@@ -594,7 +594,7 @@ export const sendRequest = async (
       const error = response.clone();
       const errorBody = error.text().catch((e) => catchException(e, bot));
       logger.error(`Failed HTTP request to '${url}':\n${JSON.stringify(errorBody, null, 4)}`);
-      bot.sendAlert(JSON.stringify(errorBody, null, 4));
+      if (bot) bot.sendAlert(JSON.stringify(errorBody, null, 4));
     }
     return response;
   } catch (error) {
