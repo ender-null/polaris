@@ -19,6 +19,7 @@ export class ErrorMessages {
   permissionRequired?: string;
   privateOnly?: string;
   spammerDetected?: string;
+  unableDoActionToAdmin?: string;
 
   constructor() {
     this.adminRequired = 'Only works with <b>admin privileges</b>';
@@ -39,6 +40,7 @@ export class ErrorMessages {
     this.permissionRequired = 'Permission required';
     this.privateOnly = 'Only works in <b>private</b>';
     this.spammerDetected = 'Spammer detected, proceed to commit death';
+    this.unableDoActionToAdmin = 'Unable to do action to <b>admin</b>'
   }
 }
 

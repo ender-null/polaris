@@ -121,6 +121,7 @@ export class TelegramPlugin extends PluginBase {
     this.strings = {
       commands: '<b>Commands</b>:',
       noDescription: 'No description',
+
     };
     this.bindings = ['TelegramTDlibBindings'];
   }
@@ -192,8 +193,10 @@ export class TelegramPlugin extends PluginBase {
       }
       if (this.checkPermissions(msg)) {
         const target = getTarget(this.bot, msg, input);
-        if (!isAdmin(this.bot, target)) {
+        if (!isGroupAdmin(this.bot, target)) {
           ok = await this.bot.bindings.kickConversationMember(msg.conversation.id, target);
+        } else {
+          return this.bot.replyMessage(msg, this.bot.errors.unableDoActionToAdmin);
         }
       }
     } else if (isCommand(this, 7, msg.content)) {
@@ -205,8 +208,10 @@ export class TelegramPlugin extends PluginBase {
           return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
         }
         const target = getTarget(this.bot, msg, input);
-        if (!isAdmin(this.bot, target)) {
+        if (!isGroupAdmin(this.bot, target)) {
           ok = await this.bot.bindings.banConversationMember(msg.conversation.id, target);
+        } else {
+          return this.bot.replyMessage(msg, this.bot.errors.unableDoActionToAdmin);
         }
       }
     } else if (isCommand(this, 8, msg.content)) {
