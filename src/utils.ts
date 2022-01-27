@@ -48,12 +48,16 @@ export const isGroupAdmin = async (bot: Bot, uid: number | string, msg: Message 
     uid = String(uid);
   }
   if (msg && +msg.conversation.id < 0) {
+    logger.info('msg && +msg.conversation.id < 0')
     const chatAdmins = await bot.getChatAdmins(msg.conversation.id);
     for (const admin of chatAdmins) {
-      if (uid == String(admin.id)) return true;
+      logger.info(JSON.stringify(admin))
+      if (uid == String(admin.id)) {
+        logger.info(`${uid}==${String(admin.id)} ${uid == String(admin.id)}`)
+        return true;}
     }
   }
-
+  logger.info('return false')
   return false;
 };
 
@@ -589,7 +593,7 @@ export const sendRequest = async (
     const response = await fetch(`${url}?${queryString(params)}`, options);
     if (!response.ok) {
       const error = response.clone();
-      return error.json().then(data => data).catch((e) => catchException(e, bot));
+      error.json().then(resp => catchException(resp, bot)).catch((e) => catchException(e, bot));
     }
     return response;
   } catch (error) {
