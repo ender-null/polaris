@@ -13,7 +13,7 @@ import 'winston-daily-rotate-file';
 import { Bot, Message, PluginBase } from '.';
 import { BindingsBase } from './bindings';
 import { db } from './main';
-import { CoordinatesResult, iString } from './types';
+import { CoordinatesResult, HTTPResponseError, iString } from './types';
 
 export const getPluginSlug = (plugin: PluginBase): string => {
   return plugin.constructor.name.replace('Plugin', '').toLowerCase();
@@ -591,10 +591,7 @@ export const sendRequest = async (
   try {
     const response = await fetch(`${url}?${queryString(params)}`, options);
     if (!response.ok) {
-      const error = response.clone();
-      const errorBody = error.text().catch((e) => catchException(e, bot));
-      logger.error(`Failed HTTP request to '${url}':\n${JSON.stringify(errorBody, null, 4)}`);
-      if (bot) bot.sendAlert(JSON.stringify(errorBody, null, 4));
+      throw new HTTPResponseError(response);
     }
     return response;
   } catch (error) {
@@ -883,9 +880,13 @@ export const catchException = (exception: Error, bot: Bot = null, message: Messa
   logger.error(`Catch exception: ${exception.message}`);
   if (bot) {
     if (exception['stack']) {
-      bot.sendAlert(JSON.stringify(replaceHtml(exception['stack']), null, 4));
+      bot.sendAlert(JSON.stringify(replaceHtml(exception['stack']), null, 4), 'javascript');
+    } else if (exception['response']) {
+      (exception as HTTPResponseError).response
+        .text()
+        .then((text) => bot.sendAlert(JSON.stringify(text, null, 4), 'json'));
     } else if (exception['_'] == 'error') {
-      bot.sendAlert(JSON.stringify(exception, null, 4));
+      bot.sendAlert(JSON.stringify(exception, null, 4), 'json');
     } else {
       bot.sendAlert(exception.message);
     }

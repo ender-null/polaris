@@ -169,6 +169,14 @@ export class Message {
   }
 }
 
+export class HTTPResponseError extends Error {
+  response: Response;
+  constructor(response: Response) {
+    super(`Failed HTTP request to '${response.url}' with status ${response.status} (${response.statusText})`);
+    this.response = response;
+  }
+}
+
 export interface Extra {
   originalMessage?: any;
   input?: string;
