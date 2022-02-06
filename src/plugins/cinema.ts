@@ -23,9 +23,9 @@ export class CinemaPlugin extends PluginBase {
     const input = getInput(msg, false);
     let url, text;
     if (!input) {
-      url = `https://api.drk.cat/zine/cinema`;
+      url = `https://canopus.end.works/zine/cinema`;
     } else {
-      url = `https://api.drk.cat/zine/cinema/${input}`;
+      url = `https://canopus.end.works/zine/cinema/${input}`;
     }
 
     const resp = await sendRequest(url, null, null, null, false, this.bot);

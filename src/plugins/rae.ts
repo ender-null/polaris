@@ -24,7 +24,7 @@ export class RAEPlugin extends PluginBase {
     if (!input) {
       return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
     }
-    const url = `https://api.drk.cat/rae/search/${input}`;
+    const url = `https://canopus.end.works/rae/search/${input}`;
     const resp = await sendRequest(url, null, null, null, false, this.bot);
     if (!resp) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);

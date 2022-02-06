@@ -54,9 +54,9 @@ export class ZaragozaPlugin extends PluginBase {
     }
     let text;
     if (isCommand(this, 1, msg.content) || isCommand(this, 2, msg.content)) {
-      let url = `https://api.drk.cat/zgz/bus/stations/${input}`;
+      let url = `https://canopus.end.works/zgz/bus/stations/${input}`;
       if (isCommand(this, 2, msg.content)) {
-        url = `https://api.drk.cat/zgz/tram/stations/${input}`;
+        url = `https://canopus.end.works/zgz/tram/stations/${input}`;
       }
       const resp = await sendRequest(url, null, null, null, false, this.bot);
       if (!resp) {
