@@ -266,9 +266,9 @@ export class MediaForwarderPlugin extends PluginBase {
                     const tweetIdPattern = new RegExp('status/(\\d+)', 'gim');
                     const twInputMatch = tweetIdPattern.exec(url);
                     if (twInputMatch && twInputMatch.length > 0) {
-                      logger.info(`tweet id: ${twInputMatch[0]}`);
+                      logger.info(`tweet id: ${twInputMatch[1]}`);
                       const tweetResp = await sendRequest(
-                        `https://canopus.end.works/twdl/getMediaUrls/${twInputMatch[0]}`,
+                        `https://canopus.end.works/twdl/getMediaUrls/${twInputMatch[1]}`,
                         null,
                         null,
                         null,
