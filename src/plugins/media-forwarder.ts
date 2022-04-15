@@ -262,11 +262,11 @@ export class MediaForwarderPlugin extends PluginBase {
                   logger.debug(`ignoring telegram url: ${url}`);
                 } else {
                   if (url.indexOf('twitter.com') > -1) {
-                    logger.info(`tweet url: ${url}`);
+                    logger.debug(`tweet url: ${url}`);
                     const tweetIdPattern = new RegExp('status/(\\d+)', 'gim');
                     const twInputMatch = tweetIdPattern.exec(url);
                     if (twInputMatch && twInputMatch.length > 0) {
-                      logger.info(`tweet id: ${twInputMatch[1]}`);
+                      logger.debug(`tweet id: ${twInputMatch[1]}`);
                       const tweetResp = await sendRequest(
                         `https://canopus.end.works/twdl/getMediaUrls/${twInputMatch[1]}`,
                         null,
@@ -277,9 +277,13 @@ export class MediaForwarderPlugin extends PluginBase {
                       );
                       if (tweetResp) {
                         const tweetContent = await tweetResp.json();
-                        tweetContent.mediaUrls.forEach((mediaUrl) => {
-                          logger.info(`tweet media url: ${mediaUrl}`);
-                          this.bot.replyMessage(r, mediaUrl, 'text', null, { preview: true });
+                        tweetContent.mediaUrls.forEach((mediaUrl: string) => {
+                          logger.debug(`tweet media url: ${mediaUrl}`);
+                          if (mediaUrl.includes('.mp4')) {
+                            this.bot.replyMessage(r, mediaUrl, 'video');
+                          } else {
+                            this.bot.replyMessage(r, mediaUrl, 'photo');
+                          }
                         });
                       }
                     }
