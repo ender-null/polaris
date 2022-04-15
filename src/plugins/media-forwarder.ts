@@ -272,7 +272,7 @@ export class MediaForwarderPlugin extends PluginBase {
                         null,
                         null,
                         null,
-                        true,
+                        false,
                         this.bot,
                       );
                       tweetMedia.mediaUrls.forEach((mediaUrl) => {
