@@ -589,7 +589,8 @@ export const sendRequest = async (
     headers: headers,
   };
   try {
-    const response = await fetch(`${url}?${queryString(params)}`, options);
+    const urlWithParams = params ? `${url}?${queryString(params)}` : url;
+    const response = await fetch(urlWithParams, options);
     if (!response.ok) {
       throw new HTTPResponseError(response);
     }
