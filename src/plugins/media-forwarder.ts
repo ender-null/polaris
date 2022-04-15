@@ -263,11 +263,11 @@ export class MediaForwarderPlugin extends PluginBase {
                 } else {
                   if (url.indexOf('twitter.com') > -1) {
                     logger.info(`tweet url: ${url}`);
-                    const tweetIdPattern =  new RegExp('status/(\\d+)', 'gim');
+                    const tweetIdPattern = new RegExp('status/(\\d+)', 'gim');
                     const twInputMatch = tweetIdPattern.exec(url);
                     if (twInputMatch && twInputMatch.length > 0) {
                       logger.info(`tweet id: ${twInputMatch[0]}`);
-                      const tweetMedia = await sendRequest(
+                      const tweetResp = await sendRequest(
                         `https://canopus.end.works/twdl/getMediaUrls/${twInputMatch[0]}`,
                         null,
                         null,
@@ -275,10 +275,13 @@ export class MediaForwarderPlugin extends PluginBase {
                         false,
                         this.bot,
                       );
-                      tweetMedia.mediaUrls.forEach((mediaUrl) => {
-                        logger.info(`tweet media url: ${mediaUrl}`);
-                        this.bot.replyMessage(r, mediaUrl, 'text', null, { preview: true });
-                      });
+                      if (tweetResp) {
+                        const tweetContent = await tweetResp.json();
+                        tweetContent.mediaUrls.forEach((mediaUrl) => {
+                          logger.info(`tweet media url: ${mediaUrl}`);
+                          this.bot.replyMessage(r, mediaUrl, 'text', null, { preview: true });
+                        });
+                      }
                     }
                   } else {
                     if (url.indexOf('instagram') > -1) {
