@@ -256,15 +256,35 @@ export class MediaForwarderPlugin extends PluginBase {
             }
             r.conversation.title = tag.toUpperCase();
             if (r.extra.urls) {
-              r.extra.urls.map((url) => {
+              r.extra.urls.map(async (url) => {
                 const inputMatch = telegramLinkRegExp.exec(url);
                 if (inputMatch && inputMatch.length > 0) {
                   logger.debug(`ignoring telegram url: ${url}`);
                 } else {
-                  if (url.indexOf('instagram') > -1) {
-                    url = url.split('?')[0];
+                  if (url.indexOf('twitter.com') > -1) {
+                    const tweetIdPattern = /https?:\/\/twitter.com\/\w+\/status\/(\d+)/gim;
+                    const twInputMatch = tweetIdPattern.exec(url);
+                    if (twInputMatch && twInputMatch.length > 0) {
+                      logger.info(`tweet id: ${twInputMatch[0]}`);
+                      const tweetMedia = await sendRequest(
+                        `https://canopus.end.works/twdl/getMediaUrls/${twInputMatch[0]}`,
+                        null,
+                        null,
+                        null,
+                        true,
+                        this.bot,
+                      );
+                      tweetMedia.mediaUrls.forEach((mediaUrl) => {
+                        logger.info(`tweet media url: ${mediaUrl}`);
+                        this.bot.replyMessage(r, mediaUrl, 'text', null, { preview: true });
+                      });
+                    }
+                  } else {
+                    if (url.indexOf('instagram') > -1) {
+                      url = url.split('?')[0];
+                    }
+                    this.bot.replyMessage(r, url, 'text', null, { preview: true });
                   }
-                  this.bot.replyMessage(r, url, 'text', null, { preview: true });
                 }
               });
             } else {
