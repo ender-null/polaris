@@ -1,13 +1,13 @@
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
-import { generateCommandHelp, getInput, sendRequest } from '../utils';
+import { generateCommandHelp, getInput, isCommand, sendRequest } from '../utils';
 
 export class TwitterDownloaderPlugin extends PluginBase {
   constructor(bot: Bot) {
     super(bot);
     this.commands = [
       {
-        command: '/twitter-downloader',
+        command: '/twitterdownloader',
         aliases: ['/twdl'],
         parameters: [
           {
@@ -17,6 +17,18 @@ export class TwitterDownloaderPlugin extends PluginBase {
         ],
         description: 'Download media from tweets',
         skipHelp: false,
+      },
+      {
+        command: '/twitterdownloaderhd',
+        aliases: ['/twdlhd'],
+        parameters: [
+          {
+            name: 'tweet url',
+            required: true,
+          },
+        ],
+        description: 'Download media from tweets and send as files',
+        skipHelp: true,
       },
     ];
   }
@@ -45,7 +57,11 @@ export class TwitterDownloaderPlugin extends PluginBase {
 
     content.mediaUrls.forEach((mediaUrl: string) => {
       const isVideo = mediaUrl.includes('.mp4');
-      this.bot.replyMessage(msg, mediaUrl, isVideo ? 'video' : 'photo');
+      if (isCommand(this, 1, msg.content)) {
+        this.bot.replyMessage(msg, mediaUrl, isVideo ? 'video' : 'photo');
+      } else {
+        this.bot.replyMessage(msg, mediaUrl, 'document');
+      }
     });
   }
 }
