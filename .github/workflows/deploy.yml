@@ -14,9 +14,6 @@ env:
 
 jobs:
   deploy:
-    # Ensure push job passes before updating image.
-    needs: push
-
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
