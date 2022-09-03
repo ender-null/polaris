@@ -1,4 +1,4 @@
-FROM ghcr.io/ender-null/polaris-base:latest as builder
+FROM ghcr.io/ender-null/polaris-base:debian as builder
 
 RUN mkdir -p /usr/src/app
 
@@ -13,7 +13,7 @@ COPY . .
 
 RUN yarn run build
 
-FROM ghcr.io/ender-null/polaris-base:latest AS release
+FROM ghcr.io/ender-null/polaris-base:debian AS release
 
 LABEL org.opencontainers.image.source https://github.com/ender-null/polaris
 
