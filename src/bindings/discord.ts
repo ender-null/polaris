@@ -121,7 +121,7 @@ export class DiscordBindings extends BindingsBase {
         return;
       }
       if (chat) {
-        chat.startTyping();
+        // chat.startTyping();
         if (msg.type == 'text') {
           let content = this.addDiscordMentions(msg.content);
           if (msg.extra) {
