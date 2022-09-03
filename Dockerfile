@@ -1,4 +1,4 @@
-FROM ghcr.io/ender-null/polaris-base:debian as builder
+FROM ghcr.io/ender-null/polaris-base:latest as builder
 
 RUN mkdir -p /usr/src/app
 
