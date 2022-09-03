@@ -261,14 +261,14 @@ export class MediaForwarderPlugin extends PluginBase {
                 if (inputMatch && inputMatch.length > 0) {
                   logger.debug(`ignoring telegram url: ${url}`);
                 } else {
-                  if (url.indexOf('twitter.com') > -1) {
+                  if (url.startsWith('https://twitter.com')) {
                     logger.debug(`tweet url: ${url}`);
                     const tweetIdPattern = new RegExp('status/(\\d+)', 'gim');
                     const twInputMatch = tweetIdPattern.exec(url);
                     if (twInputMatch && twInputMatch.length > 0) {
                       logger.debug(`tweet id: ${twInputMatch[1]}`);
                       const tweetResp = await sendRequest(
-                        `https://canopus.end.works/twdl/getMediaUrls/${twInputMatch[1]}`,
+                        `https://on.my.end.works/twdl/getMediaUrls/${twInputMatch[1]}`,
                         null,
                         null,
                         null,

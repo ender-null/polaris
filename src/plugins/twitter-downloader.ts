@@ -45,7 +45,7 @@ export class TwitterDownloaderPlugin extends PluginBase {
     } else {
       return this.bot.replyMessage(msg, this.bot.errors.missingParameter);
     }
-    const url = `https://canopus.end.works/twdl/getMediaUrls/${tweetId}`;
+    const url = `https://on.my.end.works/twdl/getMediaUrls/${tweetId}`;
     const resp = await sendRequest(url, null, null, null, false, this.bot);
     if (!resp) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
