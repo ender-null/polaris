@@ -13,7 +13,7 @@ COPY . .
 
 RUN yarn run build
 
-FROM ghcr.io/ender-null/polaris-base:debian AS release
+FROM ghcr.io/ender-null/polaris-base:latest AS release
 
 LABEL org.opencontainers.image.source https://github.com/ender-null/polaris
 
