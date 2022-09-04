@@ -481,7 +481,7 @@ export class Bot {
   }
 
   sendAlert(text: string, language = 'javascript'): void {
-    if (this.config.alertsConversationId) {
+    if (this.config.alertsConversationId && !text.includes(this.config.alertsConversationId)) {
       const message = new Message(
         null,
         new Conversation(this.config.alertsConversationId, 'Alerts'),
@@ -497,7 +497,7 @@ export class Bot {
   }
 
   sendAdminAlert(text: string): void {
-    if (this.config.adminConversationId) {
+    if (this.config.adminConversationId && !text.includes(this.config.adminConversationId)) {
       const message = new Message(
         null,
         new Conversation(this.config.adminConversationId, 'Admin'),
