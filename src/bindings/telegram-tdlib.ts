@@ -23,6 +23,7 @@ export class TelegramTDlibBindings extends BindingsBase {
   pendingMessages: { msg: Message; message: message }[];
   constructor(bot: Bot) {
     super(bot);
+    logger.info(getTdjson())
     this.client = new Client(new TDLib(getTdjson()), {
       apiId: this.bot.config.apiKeys.telegramAppId,
       apiHash: this.bot.config.apiKeys.telegramApiHash,
