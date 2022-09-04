@@ -23,6 +23,6 @@ COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/build ./build
 COPY --from=builder /usr/src/app/package.json ./
 
-RUN apk add gcc gcompat alpine-sdk coreutils ld
+RUN apk add gcc gcompat alpine-sdk coreutils
 
 CMD ["yarn", "start"]
