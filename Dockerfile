@@ -23,6 +23,7 @@ COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/build ./build
 COPY --from=builder /usr/src/app/package.json ./
 
-RUN apk add gcc gcompat alpine-sdk coreutils
+RUN apk add gcc gcompat coreutils
+RUN apk add --update alpine-sdk linux-headers git zlib-dev openssl-dev gperf php cmake
 
 CMD ["yarn", "start"]
