@@ -23,6 +23,6 @@ COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/build ./build
 COPY --from=builder /usr/src/app/package.json ./
 
-RUN apk add --update gcompat musl
+RUN apk add gcompat
 
 CMD ["yarn", "start"]
