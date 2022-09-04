@@ -1,5 +1,12 @@
 import { htmlToText } from 'html-to-text';
-import { AutojoinRoomsMixin, LogLevel, LogService, MatrixClient, RustSdkCryptoStorageProvider, SimpleFsStorageProvider } from 'matrix-bot-sdk';
+import {
+  AutojoinRoomsMixin,
+  LogLevel,
+  LogService,
+  MatrixClient,
+  RustSdkCryptoStorageProvider,
+  SimpleFsStorageProvider,
+} from 'matrix-bot-sdk';
 import { BindingsBase, Bot, Conversation, ConversationInfo, Extra, Message, User } from '..';
 import { catchException, logger } from '../utils';
 
@@ -18,7 +25,7 @@ export class MatrixBindings extends BindingsBase {
       this.bot.config.apiKeys.matrixHomeserverUrl,
       this.bot.config.apiKeys.matrixAccessToken,
       storage,
-      cryptoProvider
+      cryptoProvider,
     );
     AutojoinRoomsMixin.setupOnClient(this.client);
     this.client.on('room.message', (roomId: string, event) => this.eventHandler(roomId, event));
