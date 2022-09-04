@@ -7,6 +7,9 @@ WORKDIR /usr/src/app
 COPY package.json ./
 COPY yarn.lock ./
 
+RUN apk add gcc gcompat coreutils
+RUN apk add --update alpine-sdk linux-headers git zlib-dev openssl-dev gperf php cmake
+
 RUN yarn install
 
 COPY . .
