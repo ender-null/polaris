@@ -1,4 +1,4 @@
-FROM ghcr.io/ender-null/polaris-base@sha256:62f6d9ba31697a63fba28a501336b3d1247a0b8ebb700724c4992312f269cc8c as builder
+FROM ghcr.io/ender-null/polaris-base:latest as builder
 
 RUN mkdir -p /usr/src/app
 
@@ -13,7 +13,7 @@ COPY . .
 
 RUN yarn run build
 
-FROM ghcr.io/ender-null/polaris-base@sha256:62f6d9ba31697a63fba28a501336b3d1247a0b8ebb700724c4992312f269cc8c as release
+FROM ghcr.io/ender-null/polaris-base:latest as release
 
 LABEL org.opencontainers.image.source https://github.com/ender-null/polaris
 
