@@ -1,6 +1,6 @@
 {
   "name": "polaris",
-  "version": "0.9.15",
+  "version": "0.9.16",
   "description": "A multi platform TypeScript bot using plugins!",
   "license": "AGPL-3.0",
   "author": {
@@ -47,9 +47,10 @@
     "mime-types": "^2.1.30",
     "node-cron": "^3.0.0",
     "node-fetch": "^2.6.7",
+    "prebuilt-tdlib": "^0.1008000.0",
     "string-format": "^2.0.0",
     "tdl": "^7.0.0",
-    "tdl-tdlib-addon": "^1.0.1",
+    "tdl-tdlib-addon": "^1.2.1",
     "tmp": "^0.2.1",
     "winston": "^3.3.3",
     "winston-daily-rotate-file": "^4.6.0"
@@ -73,7 +74,7 @@
     "fluture": "^14.0.0",
     "husky": "^7.0.4",
     "prettier": "^2.3.0",
-    "tdlib-types": "^0.1001008.1",
+    "tdlib-types": "^1",
     "typedoc": "^0.22.11",
     "typescript": "^4.5.5"
   },

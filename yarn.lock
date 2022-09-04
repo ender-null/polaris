@@ -1171,6 +1171,13 @@ debug@^4.1.1, debug@^4.3.1, debug@^4.3.2:
   dependencies:
     ms "2.1.2"
 
+debug@^4.3.4:
+  version "4.3.4"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.4.tgz#1319f6579357f2338d3337d2cdd4914bb5dcc865"
+  integrity sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==
+  dependencies:
+    ms "2.1.2"
+
 deep-is@^0.1.3:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/deep-is/-/deep-is-0.1.4.tgz#a6f2dce612fadd2ef1f519b73551f17e85199831"
@@ -2656,10 +2663,10 @@ negotiator@0.6.3:
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-0.6.3.tgz#58e323a72fedc0d6f9cd4d31fe49f51479590ccd"
   integrity sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==
 
-node-addon-api@^3.0.2:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-3.2.1.tgz#81325e0a2117789c0128dab65e7e38f07ceba161"
-  integrity sha512-mmcei9JghVNDYydghQmeDX8KoAm0FAiYyIcUt/N4nhyAipB17pllZQDOJD2fotxABnt4Mdz+dKTO7eftLg4d0A==
+node-addon-api@^4.3.0:
+  version "4.3.0"
+  resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-4.3.0.tgz#52a1a0b475193e0928e98e0426a0d1254782b77f"
+  integrity sha512-73sE9+3UaLYYFmDsFZnqCInzPyh3MqIwZO9cw58yIqAZhONrrabrYyYe3TuIqtIiOuTXVhsGau8hcrhhwSsDIQ==
 
 node-cron@^3.0.0:
   version "3.0.0"
@@ -2925,6 +2932,11 @@ postcss@^8.3.11:
     nanoid "^3.3.1"
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
+
+prebuilt-tdlib@^0.1008000.0:
+  version "0.1008000.0"
+  resolved "https://registry.yarnpkg.com/prebuilt-tdlib/-/prebuilt-tdlib-0.1008000.0.tgz#c434a43a415454e6238da2be64124debfa101438"
+  integrity sha512-KW0UWGSGtYdiN8S+QjZpjK1rDDCNCoUnfAzZBDNF0DQLxzne9K6hzXXa5Z+THvJQKvTW4sVs3Fl1q8HLg+lZ2Q==
 
 prelude-ls@^1.2.1:
   version "1.2.1"
@@ -3448,13 +3460,13 @@ tdl-shared@^0.10.0:
   resolved "https://registry.yarnpkg.com/tdl-shared/-/tdl-shared-0.10.0.tgz#28d019f8e546bcecb7ecd69ff739dbdce5fbf9a6"
   integrity sha512-MWkHaB4zp1NjuDQFSjB6SiDqesCjQPXhHwdP+V5G5AWijnNlDUYOatEUagn4pOaulBm+7VDZsGfof8HUZIgeag==
 
-tdl-tdlib-addon@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/tdl-tdlib-addon/-/tdl-tdlib-addon-1.0.1.tgz#c26492aa5124722ce53e9e2ab2b991f8ada9d7c0"
-  integrity sha512-MhjiC8p1CqJ1cN1CLLjBtH0+SrcjwWcDT9rBWdj6dL3WD0+urPUF7mfvjniyDCLBkPw1Gpl0uNaBlpSrJfnhhw==
+tdl-tdlib-addon@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/tdl-tdlib-addon/-/tdl-tdlib-addon-1.2.1.tgz#2458e2f6c5710224059949f1562149058ee03f9b"
+  integrity sha512-XsK5i/JBXhJbLTjpxGA7Phg/O6MXRslel7gZxfOQf5R5F2ooFwKtPH8hZgJ3CfBXzOV8u7d0Edy1cm9yWH7u4Q==
   dependencies:
-    debug "^4.3.1"
-    node-addon-api "^3.0.2"
+    debug "^4.3.4"
+    node-addon-api "^4.3.0"
     tdl-shared "^0.10.0"
 
 tdl@^7.0.0:
@@ -3467,7 +3479,7 @@ tdl@^7.0.0:
     promptly "^3.2.0"
     tdl-shared "^0.10.0"
 
-tdlib-types@^0.1001008.1:
+tdlib-types@^1:
   version "0.1001008.1"
   resolved "https://registry.yarnpkg.com/tdlib-types/-/tdlib-types-0.1001008.1.tgz#026e03c52abe3a9af807e4c955d918622bf99033"
   integrity sha512-wg297vXj9nwvLpjfdLP8VTOTNxqFxn0b+doYOu5565j0CUt6ueUJjNxvm1/K4lMx77YMCQmVDqIpe0kEfUQrtg==
