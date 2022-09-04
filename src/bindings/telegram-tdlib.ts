@@ -1,4 +1,5 @@
 import { Response } from 'node-fetch';
+import { getTdjson } from 'prebuilt-tdlib';
 import { ParsedUrlQueryInput } from 'querystring';
 import { Client } from 'tdl';
 import { TDLib } from 'tdl-tdlib-addon';
@@ -22,7 +23,7 @@ export class TelegramTDlibBindings extends BindingsBase {
   pendingMessages: { msg: Message; message: message }[];
   constructor(bot: Bot) {
     super(bot);
-    this.client = new Client(new TDLib(), {
+    this.client = new Client(new TDLib(getTdjson()), {
       apiId: this.bot.config.apiKeys.telegramAppId,
       apiHash: this.bot.config.apiKeys.telegramApiHash,
       databaseDirectory: `${process.cwd()}/data/${this.bot.config.name}/database`,
