@@ -181,7 +181,7 @@ export class DiscordBindings extends BindingsBase {
             await chat.send(embed);
           }
         }
-        chat.stopTyping(true);
+        // chat.stopTyping(true);
       }
     }
   }

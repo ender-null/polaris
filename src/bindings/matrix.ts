@@ -20,13 +20,15 @@ export class MatrixBindings extends BindingsBase {
   async start(): Promise<void> {
     const storage = new SimpleFsStorageProvider(`data/${this.bot.config.name}.json`);
     const cryptoProvider = new RustSdkCryptoStorageProvider(`data/${this.bot.config.name}/crypto`);
-    LogService.setLevel(LogLevel.WARN);
+    LogService.setLevel(LogLevel.INFO);
     this.client = new MatrixClient(
       this.bot.config.apiKeys.matrixHomeserverUrl,
       this.bot.config.apiKeys.matrixAccessToken,
       storage,
       cryptoProvider,
     );
+    const joinedRooms = await this.client.getJoinedRooms();
+    await this.client.crypto.prepare(joinedRooms); // init crypto because we're doing things before the client is started
     AutojoinRoomsMixin.setupOnClient(this.client);
     this.client.on('room.message', (roomId: string, event) => this.eventHandler(roomId, event));
     this.bot.outbox.on('message', (msg: Message) => this.sendMessage(msg));
