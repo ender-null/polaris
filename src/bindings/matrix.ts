@@ -30,6 +30,7 @@ export class MatrixBindings extends BindingsBase {
     const joinedRooms = await this.client.getJoinedRooms();
     await this.client.crypto.prepare(joinedRooms); // init crypto because we're doing things before the client is started
     AutojoinRoomsMixin.setupOnClient(this.client);
+    this.client.setPresenceStatus("online", `Listening to ${this.bot.config.prefix}help`)
     this.client.on('room.message', (roomId: string, event) => this.eventHandler(roomId, event));
     this.bot.outbox.on('message', (msg: Message) => this.sendMessage(msg));
     this.client.start().then(() => this.bot.status.emit('started'));
@@ -155,6 +156,7 @@ export class MatrixBindings extends BindingsBase {
   }
 
   async stop(): Promise<void> {
+    this.client.setPresenceStatus("offline")
     this.client.removeAllListeners('room.message');
     this.bot.outbox.removeAllListeners('message');
     this.bot.status.emit('stopped');
