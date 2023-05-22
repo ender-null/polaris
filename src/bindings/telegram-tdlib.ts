@@ -79,14 +79,9 @@ export class TelegramTDlibBindings extends BindingsBase {
 
   async start(): Promise<void> {
     if (this.bot.config.apiKeys.telegramBotToken) {
-      await this.client.connectAndLogin(() => ({
-        type: 'bot',
-        getToken: (retry) =>
-          retry ? Promise.reject('Token is not valid') : Promise.resolve(this.bot.config.apiKeys.telegramBotToken),
-      }));
+      await this.client.loginAsBot(this.bot.config.apiKeys.telegramBotToken);
     } else if (this.bot.config.apiKeys.telegramPhoneNumber) {
-      await this.client.connectAndLogin(() => ({
-        type: 'user',
+      await this.client.login(() => ({
         getPhoneNumber: (retry) =>
           retry ? Promise.reject('Invalid phone number') : Promise.resolve(this.bot.config.apiKeys.telegramPhoneNumber),
       }));
@@ -106,6 +101,7 @@ export class TelegramTDlibBindings extends BindingsBase {
 
   async getMe(): Promise<User> {
     const me: user = await this.serverRequest('getMe');
+    logger.info(me);
     return new User(me.id, me.first_name, me.last_name, me.username, me.type['_'] == 'userTypeBot');
   }
 
