@@ -3,7 +3,7 @@ import { getTdjson } from 'prebuilt-tdlib';
 import { ParsedUrlQueryInput } from 'querystring';
 import { Client } from 'tdl';
 import { TDLib } from 'tdl-tdlib-addon';
-import { message, ok, Update, user } from 'tdlib-types';
+import { message, ok, Update } from 'tdlib-types';
 import { BindingsBase, Bot, Conversation, ConversationInfo, Extra, Message, User } from '..';
 import { db } from '../main';
 import {
@@ -100,9 +100,8 @@ export class TelegramTDlibBindings extends BindingsBase {
   }
 
   async getMe(): Promise<User> {
-    const me: user = await this.serverRequest('getMe');
-    logger.info(JSON.stringify(me, null, 4));
-    return new User(me.id, me.first_name, me.last_name, me.username, me.type['_'] == 'userTypeBot');
+    const me: any = await this.serverRequest('getMe');
+    return new User(me.id, me.first_name, me.last_name, me.usernames.editable_username, me.type['_'] == 'userTypeBot');
   }
 
   async webhookHandler(data: any): Promise<void> {
