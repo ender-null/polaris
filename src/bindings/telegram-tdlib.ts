@@ -101,7 +101,7 @@ export class TelegramTDlibBindings extends BindingsBase {
 
   async getMe(): Promise<User> {
     const me: user = await this.serverRequest('getMe');
-    logger.info(me);
+    logger.info(JSON.stringify(me, null, 4));
     return new User(me.id, me.first_name, me.last_name, me.username, me.type['_'] == 'userTypeBot');
   }
 
