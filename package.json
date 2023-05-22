@@ -39,7 +39,7 @@
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
-    "discord.js": "^14.11.0",
+    "discord.js": "^13.6.0",
     "firebase": "^9.6.4",
     "form-data": "^4.0.0",
     "html-to-text": "^8.1.0",
@@ -74,7 +74,7 @@
     "fluture": "^14.0.0",
     "husky": "^7.0.4",
     "prettier": "^2.3.0",
-    "tdlib-types": "td-1.8.12",
+    "tdlib-types": "^0.1001008.1",
     "typedoc": "^0.22.11",
     "typescript": "^4.5.5"
   },
