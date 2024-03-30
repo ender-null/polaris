@@ -276,7 +276,7 @@ export class MediaForwarderPlugin extends PluginBase {
                         this.bot,
                       );
                       if (tweetResp) {
-                        const tweetContent = await tweetResp.json();
+                        const tweetContent: any = await tweetResp.json();
                         tweetContent.mediaUrls.forEach((mediaUrl: string) => {
                           logger.debug(`tweet media url: ${mediaUrl}`);
                           if (mediaUrl.includes('.mp4')) {

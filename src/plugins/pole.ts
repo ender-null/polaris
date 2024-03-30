@@ -122,7 +122,7 @@ export class PolePlugin extends PluginBase {
     if (String(msg.sender.id).startsWith('-100')) {
       return;
     }
-    if (msg.conversation.id > 0) {
+    if (!String(msg.conversation.id).startsWith('-')) {
       return this.bot.replyMessage(msg, this.bot.errors.groupOnly);
     }
     if (hasTag(this.bot, msg.conversation.id, 'nopole')) {

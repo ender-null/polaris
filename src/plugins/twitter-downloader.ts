@@ -50,7 +50,7 @@ export class TwitterDownloaderPlugin extends PluginBase {
     if (!resp) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
     }
-    const content = await resp.json();
+    const content: any = await resp.json();
     if (!content.mediaUrls) {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);
     }

@@ -139,7 +139,7 @@ export class CorePlugin extends PluginBase {
       return;
     }
 
-    if (msg.sender.id == 777000 && msg.conversation.id > 0) {
+    if (msg.sender.id == 777000 && !String(msg.conversation.id).startsWith('-')) {
       const inputMatch = new RegExp('\\d{5}').exec(msg.content);
       if (inputMatch && inputMatch.length > 0) {
         const code = inputMatch[0].split('').join('\u200c');

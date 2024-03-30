@@ -1,3 +1,4 @@
+import { REST, Routes } from 'discord.js';
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
 import { generateCommandHelp, getWord, isCommand, removeHtml } from '../utils';
@@ -76,16 +77,14 @@ export class HelpPlugin extends PluginBase {
         });
       } else if (this.bot.config.bindings == 'DiscordBindings') {
         const data = [];
-        commands.map(({ command, description, type }) => {
+        commands.map(({ command, description }) => {
           data.push({
-            name: command,
+            name: command.slice(1),
             description,
-            type: type ? 3 : null,
-            required: !!type,
           });
         });
-        const slashCommands = await this.bot.bindings['client'].application?.commands.set(data);
-        console.log(slashCommands);
+        const rest = new REST({ version: '10' }).setToken(this.bot.config.apiKeys.discordBotToken);
+        await rest.put(Routes.applicationCommands(String(this.bot.config.apiKeys.discordClientId)), { body: data });
       }
     }
 

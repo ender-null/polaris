@@ -1,7 +1,18 @@
-import { Client, Message as DiscordMessage, MessageAttachment, MessageEmbed } from 'discord.js';
+import {
+  ActivityType,
+  AttachmentBuilder,
+  CacheType,
+  ChatInputCommandInteraction,
+  Client,
+  Message as DiscordMessage,
+  EmbedBuilder,
+  GatewayIntentBits,
+  Interaction,
+  Partials,
+} from 'discord.js';
 import { BindingsBase, Bot, Conversation, ConversationInfo, Extra, Message, User } from '..';
 import { db } from '../main';
-import { getExtension, htmlToDiscordMarkdown, linkRegExp, logger, splitLargeMessage } from '../utils';
+import { htmlToDiscordMarkdown, linkRegExp, logger, splitLargeMessage } from '../utils';
 
 export class DiscordBindings extends BindingsBase {
   client: Client;
@@ -9,8 +20,17 @@ export class DiscordBindings extends BindingsBase {
   constructor(bot: Bot) {
     super(bot);
     this.client = new Client({
-      restRequestTimeout: 60000,
-      intents: 0,
+      intents: [
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.GuildMessageReactions,
+        GatewayIntentBits.GuildMessageTyping,
+        GatewayIntentBits.DirectMessages,
+        GatewayIntentBits.DirectMessageReactions,
+        GatewayIntentBits.DirectMessageTyping,
+      ],
+      partials: [Partials.Message, Partials.Channel],
     });
   }
 
@@ -28,13 +48,15 @@ export class DiscordBindings extends BindingsBase {
         activities: [
           {
             name: `${this.bot.config.prefix}help`,
-            type: 'LISTENING',
+            type: ActivityType.Listening,
           },
         ],
       });
       this.bot.status.emit('started');
     });
-
+    this.client.on('interactionCreate', (interaction: Interaction<CacheType>) =>
+      this.interactionEventHandler(interaction),
+    );
     this.client.on('messageCreate', (message: DiscordMessage) => this.messageEventHandler(message));
     this.client.login(this.bot.config.apiKeys.discordBotToken).then(
       (tok) => {
@@ -97,6 +119,32 @@ export class DiscordBindings extends BindingsBase {
     return new Message(id, conversation, sender, content, type, date, reply, extra);
   }
 
+  async convertInteraction(msg: ChatInputCommandInteraction<CacheType>): Promise<Message> {
+    const id = msg.id;
+    const extra: Extra = {
+      originalMessage: msg,
+    };
+    const content = msg.commandName;
+    const type = 'text';
+    const date = msg.createdTimestamp;
+    const reply = null;
+    const sender = new User(msg.user.id, msg.user.username, `#${msg.user.discriminator}`, msg.user.tag, msg.user.bot);
+    const conversation = new Conversation('-' + msg.channel.id);
+    const channel = await this.client.channels.fetch(msg.channel.id);
+    if (channel.constructor.name == 'DMChannel') {
+      conversation.id = channel['recipient']['id'];
+      conversation.title = channel['recipient']['username'];
+    } else {
+      conversation.title = channel['name'];
+    }
+    return new Message(id, conversation, sender, content, type, date, reply, extra);
+  }
+
+  async interactionEventHandler(interaction: Interaction<CacheType>): Promise<void> {
+    if (!interaction.isChatInputCommand()) return;
+    this.bot.inbox.emit('message', await this.convertInteraction(interaction));
+  }
+
   async messageEventHandler(message: DiscordMessage): Promise<void> {
     // // don't respond to ourselves
     if (+message.author.id == this.bot.user.id) {
@@ -147,28 +195,27 @@ export class DiscordBindings extends BindingsBase {
           }
         } else if (msg.type == 'photo' || msg.type == 'document' || msg.type == 'video' || msg.type == 'voice') {
           let sendContent = true;
-          const embed = new MessageEmbed();
+          const embed = new EmbedBuilder();
 
           if (msg.extra && 'caption' in msg.extra && msg.extra['caption']) {
             const lines = msg.extra['caption'].split('\n');
-            embed.title = lines[0];
+            embed.setTitle(lines[0]);
             lines.splice(0, 1);
-            embed.description = lines.join('\n');
+            embed.setDescription(lines.join('\n'));
             sendContent = false;
           }
 
           if (sendContent) {
             if (msg.content.startsWith('/') || msg.content.startsWith('C:\\')) {
-              await chat.send(new MessageAttachment(msg.content, msg.type + getExtension(msg.content)));
+              const file = new AttachmentBuilder(msg.content);
+              await chat.send({ files: [file] });
             } else {
               await chat.send(msg.content);
             }
           } else {
             if (msg.content.startsWith('/') || msg.content.startsWith('C:\\')) {
-              await chat.send({
-                embeds: [embed],
-                files: [new MessageAttachment(msg.content, msg.type + getExtension(msg.content))],
-              });
+              const file = new AttachmentBuilder(msg.content);
+              await chat.send({ embeds: [embed], files: [file] });
             } else if (msg.content.startsWith('http')) {
               if (msg.type == 'photo') {
                 embed.setImage(msg.content);

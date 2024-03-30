@@ -48,7 +48,7 @@ export class Bot {
     this.outbox = new EventEmitter();
     this.status = new EventEmitter();
     this.config = config;
-    this.bindings = new bindings[this.config.bindings](this);
+    this.bindings = new bindings[config.bindings](this);
     this.plugins = [];
     this.tasks = [];
     this.errors = new ErrorMessages();

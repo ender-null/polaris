@@ -129,7 +129,7 @@ export class TelegramPlugin extends PluginBase {
     let ok = false;
     let text;
 
-    if (msg.conversation.id > 0) {
+    if (!String(msg.conversation.id).startsWith('-')) {
       return this.bot.replyMessage(msg, this.bot.errors.groupOnly);
     }
 

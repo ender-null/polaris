@@ -8,7 +8,7 @@ import { ParsedUrlQueryInput } from 'querystring';
 import { pipeline } from 'stream';
 import tmp from 'tmp';
 import util from 'util';
-import winston, { createLogger, format as winstonFormat, transports } from 'winston';
+import winston, { createLogger, transports, format as winstonFormat } from 'winston';
 import 'winston-daily-rotate-file';
 import { Bot, Message, PluginBase } from '.';
 import { BindingsBase } from './bindings';
@@ -590,7 +590,7 @@ export const sendRequest = async (
   };
   try {
     const urlWithParams = params ? `${url}?${queryString(params)}` : url;
-    const response = await fetch(urlWithParams, options);
+    const response: any = await fetch(urlWithParams, options);
     if (!response.ok) {
       throw new HTTPResponseError(response);
     }

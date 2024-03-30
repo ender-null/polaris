@@ -9,24 +9,29 @@ process.setMaxListeners(16);
 const bots: Bot[] = [];
 
 export const stop = async (exit?: boolean): Promise<void> => {
-  logger.info(`🟡 Stopping ${bots.length} bot(s)...`);
-  bots.map(async (bot, i) => {
-    try {
-      await bot.stop();
-      bots.splice(i, 1);
-    } catch (e) {
-      logger.error(e.message);
-    }
-
-    if (bots.length == 0) {
-      logger.info('✅ Closed all bot(s)');
-      if (exit) {
-        process.exit();
+  if (bots.length === 0) {
+    logger.info(`🟡 No bots to stop!`);
+    process.exit();
+  } else {
+    logger.info(`🟡 Stopping ${bots.length} bot(s)...`);
+    bots.map(async (bot, i) => {
+      try {
+        await bot.stop();
+        bots.splice(i, 1);
+      } catch (e) {
+        logger.error(e.message);
       }
-    } else {
-      logger.info(`⏳ Pending ${bots.length} bot(s)...`);
-    }
-  });
+
+      if (bots.length == 0) {
+        logger.info('✅ Closed all bot(s)');
+        if (exit) {
+          process.exit();
+        }
+      } else {
+        logger.info(`⏳ Pending ${bots.length} bot(s)...`);
+      }
+    });
+  }
 };
 
 export const start = async (): Promise<void> => {

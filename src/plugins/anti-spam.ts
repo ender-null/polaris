@@ -64,7 +64,7 @@ export class AntiSpamPlugin extends PluginBase {
           }
         }
         if (
-          msg.conversation.id < 0 &&
+          String(msg.conversation.id).startsWith('-') &&
           hasTag(this.bot, msg.conversation.id, spamType) &&
           !hasTag(this.bot, msg.conversation.id, 'safe') &&
           !hasTag(this.bot, msg.conversation.id, 'resend:?') &&

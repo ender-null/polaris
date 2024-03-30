@@ -2,7 +2,6 @@ import { Response } from 'node-fetch';
 import { getTdjson } from 'prebuilt-tdlib';
 import { ParsedUrlQueryInput } from 'querystring';
 import { Client } from 'tdl';
-import { TDLib } from 'tdl-tdlib-addon';
 import { message, ok, Update } from 'tdlib-types';
 import { BindingsBase, Bot, Conversation, ConversationInfo, Extra, Message, User } from '..';
 import { db } from '../main';
@@ -17,13 +16,15 @@ import {
   systemName,
   systemVersion,
 } from '../utils';
+const tdl = require('tdl');
 
 export class TelegramTDlibBindings extends BindingsBase {
   client: Client;
   pendingMessages: { msg: Message; message: message }[];
   constructor(bot: Bot) {
     super(bot);
-    this.client = new Client(new TDLib(getTdjson()), {
+    tdl.configure({ tdjson: getTdjson() });
+    this.client = tdl.createClient({
       apiId: this.bot.config.apiKeys.telegramAppId,
       apiHash: this.bot.config.apiKeys.telegramApiHash,
       databaseDirectory: `${process.cwd()}/data/${this.bot.config.name}/database`,
