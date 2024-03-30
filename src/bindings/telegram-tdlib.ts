@@ -2,7 +2,7 @@ import { Response } from 'node-fetch';
 import { getTdjson } from 'prebuilt-tdlib';
 import { ParsedUrlQueryInput } from 'querystring';
 import { Client } from 'tdl';
-import { message, ok, Update } from 'tdlib-types';
+import { Update, message, ok } from 'tdlib-types';
 import { BindingsBase, Bot, Conversation, ConversationInfo, Extra, Message, User } from '..';
 import { db } from '../main';
 import {
@@ -23,11 +23,9 @@ export class TelegramTDlibBindings extends BindingsBase {
   pendingMessages: { msg: Message; message: message }[];
   constructor(bot: Bot) {
     super(bot);
-    var configured = false;
-    if (!configured) {
+    try {
       tdl.configure({ tdjson: getTdjson() });
-      configured = true;
-    }
+    } catch (e) {}
     this.client = tdl.createClient({
       apiId: this.bot.config.apiKeys.telegramAppId,
       apiHash: this.bot.config.apiKeys.telegramApiHash,
