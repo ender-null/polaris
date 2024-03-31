@@ -64,6 +64,8 @@ export interface ApiKeys {
   wolframAlpha?: string;
   matrixAccessToken?: string;
   matrixHomeserverUrl?: string;
+  matrixUsername?: string;
+  matrixPassword?: string;
   facebookPageAccessToken?: string;
   facebookVerifyToken?: string;
   twitterConsumerKey?: string;

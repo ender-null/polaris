@@ -71,7 +71,7 @@ process.on('exit', () => {
   logger.info('❎ Exit process');
 });
 
-if (process.env.ENV != 'dev') {
+if (process.env.ENV !== 'dev') {
   const options = {
     key: readFileSync('data/key.pem'),
     cert: readFileSync('data/cert.pem'),

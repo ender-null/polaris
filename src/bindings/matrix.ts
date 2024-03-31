@@ -3,6 +3,7 @@ import {
   AutojoinRoomsMixin,
   LogLevel,
   LogService,
+  MatrixAuth,
   MatrixClient,
   RustSdkCryptoStorageProvider,
   SimpleFsStorageProvider,
@@ -19,14 +20,21 @@ export class MatrixBindings extends BindingsBase {
 
   async start(): Promise<void> {
     const storage = new SimpleFsStorageProvider(`data/${this.bot.config.name}.json`);
-    const cryptoProvider = new RustSdkCryptoStorageProvider(`data/${this.bot.config.name}/crypto`);
+    const crypto = new RustSdkCryptoStorageProvider(`data/${this.bot.config.name}/crypto`);
     LogService.setLevel(LogLevel.INFO);
-    this.client = new MatrixClient(
-      this.bot.config.apiKeys.matrixHomeserverUrl,
-      this.bot.config.apiKeys.matrixAccessToken,
-      storage,
-      cryptoProvider,
-    );
+    if  (!this.bot.config.apiKeys.matrixAccessToken || !this.bot.config.apiKeys.matrixAccessToken.length) {
+        const auth = new MatrixAuth(this.bot.config.apiKeys.matrixHomeserverUrl);
+        this.client = await auth.passwordLogin(this.bot.config.apiKeys.matrixUsername, this.bot.config.apiKeys.matrixPassword)
+        logger.info(`Generated Matrix access token: ${this.client.accessToken}`)
+        this.bot.config.apiKeys.matrixAccessToken = this.client.accessToken
+    } else {
+      this.client = new MatrixClient(
+        this.bot.config.apiKeys.matrixHomeserverUrl,
+        this.bot.config.apiKeys.matrixAccessToken,
+        storage,
+        crypto,
+      );
+    }
     const joinedRooms = await this.client.getJoinedRooms();
     await this.client.crypto.prepare(joinedRooms); // init crypto because we're doing things before the client is started
     AutojoinRoomsMixin.setupOnClient(this.client);
@@ -63,8 +71,8 @@ export class MatrixBindings extends BindingsBase {
     const reply = null;
     const senderRaw = await this.client.getUserProfile(msg.sender);
     const sender = new User(this.getSafeUsername(msg.sender), senderRaw.displayname, null, msg.sender.slice(1));
-    const name = await this.client.getRoomStateEvent(roomId, 'm.room.name', '');
-    const conversation = new Conversation('-' + this.getSafeUsername(roomId), name.name);
+    const name = roomId;
+    const conversation = new Conversation('-' + this.getSafeUsername(roomId), name);
     return new Message(id, conversation, sender, content, type, date, reply, extra);
   }
 
