@@ -129,7 +129,7 @@ jobs:
           CONTAINER_NAME="${REPO#$OWNER}"
           CONTAINER_NAME="${CONTAINER_NAME#/}"
 
-          TAG=$(echo "${{github.sha}}" | cut -c1-8)
+          TAG=$(echo "${{github.sha}}" | cut -c1-9)
           TAG="sha-$TAG"
           VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
 
