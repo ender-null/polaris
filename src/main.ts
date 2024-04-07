@@ -1,129 +1,83 @@
-import { readFileSync } from 'fs';
-import { IncomingMessage, ServerResponse } from 'http';
-import { createServer } from 'https';
-import { Bot, Config, Database } from '.';
-import { catchException, getBindingsSlug, logger } from './utils';
+import { WebSocketServer, WebSocket } from 'ws';
+import {  WSInit, WSMessage } from './types';
+import { logger } from './utils';
+import { Bot } from './bot';
+import os from 'os';
+import { Database } from './database';
 
-process.setMaxListeners(16);
 
-const bots: Bot[] = [];
 
-export const stop = async (exit?: boolean): Promise<void> => {
-  if (bots.length === 0) {
-    logger.info(`🟡 No bots to stop!`);
-    process.exit();
-  } else {
-    logger.info(`🟡 Stopping ${bots.length} bot(s)...`);
-    bots.map(async (bot, i) => {
-      try {
-        await bot.stop();
-        bots.splice(i, 1);
-      } catch (e) {
-        logger.error(e.message);
-      }
+const wss: WebSocketServer = new WebSocketServer({ port: 8080 });
 
-      if (bots.length == 0) {
-        logger.info('✅ Closed all bot(s)');
-        if (exit) {
-          process.exit();
-        }
-      } else {
-        logger.info(`⏳ Pending ${bots.length} bot(s)...`);
-      }
+const close = () => {
+  logger.info(`🟡 Closing connection for ${wss.clients.size} client(s)...`);
+
+    if (!wss.clients.size) {
+        process.exit()
+    }
+
+    wss.clients.forEach((socket) => {
+        socket.close();
     });
-  }
-};
 
-export const start = async (): Promise<void> => {
-  if (Array.isArray(bots) && bots.length > 0) {
-    await stop();
-  }
-  const config = Config.loadFromFile('config.json');
-  const configs = [];
-  if (config) {
-    configs.push(config);
-  } else {
-    Object.keys(db.configs).map((name) => {
-      configs.push(...Config.loadInstancesFromJSON(db.configs[name]));
-    });
-  }
-
-  await Promise.all(
-    configs.map(async (config) => {
-      if (config.enabled) {
-        const bot = new Bot(config);
-        process.on('unhandledRejection', (exception: Error) => {
-          catchException(exception, bot);
+    setTimeout(() => {
+        wss.clients.forEach((socket) => {
+            if (socket.readyState === socket.OPEN || socket.readyState ===  socket.CLOSING) {
+                socket.terminate();
+            }
         });
-        await bot.start();
-        bots.push(bot);
-      } else {
-        logger.info(`🔴 Bot is disabled: ${config.icon} ${config.name} [${config.bindings}]`);
-      }
-    }),
-  );
-  logger.info(`✅ Started ${bots.length}/${configs.length} bot(s)`);
-};
+        process.exit()
+    }, 10000);
+}
 
-process.on('SIGINT', () => stop(true));
-process.on('SIGTERM', () => stop(true));
+process.on('SIGINT', () => close());
+process.on('SIGTERM', () => close());
 process.on('exit', () => {
   logger.info('❎ Exit process');
 });
 
-if (process.env.ENV !== 'dev') {
-  const options = {
-    key: readFileSync('data/key.pem'),
-    cert: readFileSync('data/cert.pem'),
-  };
+const bots = []
 
-  createServer(options, async (req: IncomingMessage, res: ServerResponse) => {
-    const path = req.url.split('/');
-    let found = false;
-    let content: string;
+const start = ()=> {
+  logger.info('🟡 WebSocket server waiting for connections...');
+wss.on('connection', (ws: WebSocket) =>{
+  logger.info('🟢 Connected');
+    let bot: Bot
 
-    if (req.method === 'GET') {
-      content = null;
-    } else if (req.method === 'POST') {
-      content = await new Promise((resolve) => {
-        const chunks = [];
-        req.on('data', (chunk) => {
-          chunks.push(chunk);
-        });
-        req.on('end', () => {
-          resolve(JSON.stringify(JSON.parse(Buffer.concat(chunks).toString()), null, 4));
-        });
-      });
-    }
+    ws.on('error', console.error);
 
-    await Promise.all(
-      bots.map(async (bot) => {
-        let name = path[1];
-        let bindings = null;
-        if (name.indexOf(':') > -1) {
-          name = path[1].split(':')[0];
-          bindings = path[1].split(':')[1];
+    ws.on('close', (code: number) =>{
+        if (code === 1005) {
+            logger.info('🔴 Disconnected');
+        } else if (code === 1006) {
+            logger.info('🔴 Terminated');
         }
-        const slug = getBindingsSlug(bot.bindings);
-        if (bot.config.name == name) {
-          found = true;
-          if (bindings) {
-            if (bindings == slug) {
-              await bot.webhookHandler(req, res, content);
-            }
-          } else {
-            await bot.webhookHandler(req, res, content);
-          }
-        }
-      }),
-    );
+    })
 
-    if (!res.writableEnded) {
-      res.statusCode = found ? 200 : 404;
-      res.writeHead(found ? 200 : 404);
-      res.end(found ? 'OK' : 'Not Found');
-    }
-  }).listen(1984);
+    ws.on('open',  (code: number) => {
+        console.log('open: %s', code);
+    })
+
+    ws.on('message',  (data: string) => {
+        const json = JSON.parse(data)
+        if (json.type === 'init') {
+          const init: WSInit = json
+            bot = new Bot(ws, init.config, init.user)
+            bot.initPlugins();
+            bots.push(bot)
+            logger.info(
+              `🟢 Connected as ${bot.config.icon} ${bot.user.firstName} (@${bot.user.username}) [${bot.user.id}] from ${os.hostname}`,
+            );
+
+        } else if (json.type === 'message') {
+            const msg: WSMessage = json
+            bot.messagesHandler(msg.message)
+
+        } else {
+            console.log('received: %s', data);
+        }
+    });
+});
 }
 
 export const db = new Database();

@@ -41,7 +41,7 @@ export class InfoPlugin extends PluginBase {
     let showGroup = false;
     let chat, info, infoFull, userId, groupId, userTags, groupTags;
 
-    if (this.bot.config.bindings == 'TelegramTDlibBindings') {
+    if (this.bot.config.platform == 'telegram') {
       chat = await this.bot.bindings['serverRequest']('getChat', { chat_id: target }, true);
       if (target && isInt(target) && !String(target).startsWith('-')) {
         info = await this.bot.bindings['serverRequest']('getUser', { user_id: target }, true);
@@ -138,7 +138,7 @@ export class InfoPlugin extends PluginBase {
         });
       }
 
-      if (target == gid && this.bot.config.bindings == 'TelegramTDlibBindings') {
+      if (target == gid && this.bot.config.platform == 'telegram') {
         chat = await this.bot.bindings['serverRequest']('getChat', { chat_id: target }, true);
         info = await this.bot.bindings['serverRequest']('getSupergroup', { supergroup_id: target.slice(4) }, true);
         infoFull = await this.bot.bindings['serverRequest'](

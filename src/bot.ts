@@ -1,103 +1,31 @@
-import { EventEmitter } from 'events';
-import { IncomingMessage, ServerResponse } from 'http';
-import * as cron from 'node-cron';
-import os from 'os';
-import {
-  BindingsBase,
-  Config,
-  Conversation,
-  ErrorMessages,
-  Extra,
-  Message,
-  Parameter,
-  PluginBase,
-  Translation,
-  User,
-} from '.';
-import * as bindings from './bindings/index';
-import { db } from './main';
+import { Config } from "./config";
+import { PluginBase } from "./plugin";
+import { Conversation, ErrorMessages, Extra, Message, Parameter, Translation, User, WSMessage } from "./types";
+import { catchException, escapeRegExp, getFullName, getMessageIcon, hasTag, isTrusted, logger, merge, now, setInput, t } from "./utils";
+import { WebSocket } from 'ws';
 import * as plugins from './plugins/index';
-import {
-  catchException,
-  escapeRegExp,
-  getFullName,
-  getPluginSlug,
-  hasTag,
-  isTrusted,
-  logger,
-  merge,
-  now,
-  setInput,
-  t,
-} from './utils';
+import * as cron from 'node-cron';
+import { Actions } from "./actions";
+import { db } from "./main";
 
 export class Bot {
-  config: Config;
-  bindings: BindingsBase;
-  inbox: EventEmitter;
-  outbox: EventEmitter;
-  status: EventEmitter;
+  websocket: WebSocket
   started: boolean;
+  config: Config
+  user: User
   plugins: PluginBase[];
   tasks: cron.Task[];
-  user: User;
   errors: ErrorMessages;
+  bindings: Actions
 
-  constructor(config: Config) {
-    this.inbox = new EventEmitter();
-    this.outbox = new EventEmitter();
-    this.status = new EventEmitter();
+  constructor(websocket: WebSocket, config: Config, user: User) {
+    this.websocket = websocket
     this.config = config;
-    this.bindings = new bindings[config.bindings](this);
+    this.user = user;
     this.plugins = [];
     this.tasks = [];
     this.errors = new ErrorMessages();
-  }
-
-  async start(): Promise<void> {
-    this.inbox.on('message', (msg: Message) => this.messagesHandler(msg));
-    this.outbox.on('message', (msg: Message) => this.messageSender(msg));
-    this.initPlugins();
-    db.events.on('update:translations', () => this.initTranslations());
-    this.status.on('started', () => this.onStarted());
-    this.status.on('stopped', () => this.onStopped());
-    try {
-      await this.bindings.start();
-    } catch (e) {
-      catchException(e, this);
-    }
-  }
-
-  async onStarted(): Promise<void> {
-    this.started = true;
-    this.user = await this.bindings.getMe();
-    this.initTranslations();
-    logger.info(
-      `🟢 Connected as ${this.config.icon} ${this.user.firstName} (@${this.user.username}) [${this.user.id}] from ${os.hostname}`,
-    );
-    this.scheduleCronJobs();
-  }
-
-  async onStopped(): Promise<void> {
-    this.started = false;
-    await Promise.all(
-      this.tasks.map((task) => {
-        task.stop();
-      }),
-    );
-    this.inbox.removeAllListeners('message');
-    this.outbox.removeAllListeners('message');
-    this.status.removeAllListeners('started');
-    this.status.removeAllListeners('stopped');
-    logger.info(`🔴 Stopped ${this.config.icon} ${this.user.firstName} (@${this.user.username}) [${this.user.id}]`);
-  }
-
-  async stop(): Promise<void> {
-    try {
-      await this.bindings.stop();
-    } catch (e) {
-      catchException(e, this);
-    }
+    this.bindings = new Actions()
   }
 
   messageSender({ conversation, content }: Message): void {
@@ -109,16 +37,16 @@ export class Bot {
   }
 
   async messagesHandler(msg: Message): Promise<void> {
-    if (msg.sender instanceof User) {
+    if (!msg.conversation.title) {
       logger.info(
-        `${this.getMessageIcon(msg.type)} ${this.config.icon} [${msg.conversation.id}] ${
+        `${getMessageIcon(msg.type)} ${this.config.icon} [${msg.conversation.id}] ${
           msg.conversation.title
         } 👤 ${getFullName(msg.sender.id)} [${msg.sender.id}]: ${msg.content}`,
       );
     } else {
       logger.info(
-        `${this.getMessageIcon(msg.type)} ${this.config.icon} [${msg.conversation.id}] ${msg.conversation.title} 👤 ${
-          msg.sender.title
+        `${getMessageIcon(msg.type)} ${this.config.icon} [${msg.conversation.id}] ${msg.conversation.title} 👤 ${
+          (msg.sender as Conversation).title
         } [${msg.conversation.id}]: ${msg.content}`,
       );
     }
@@ -126,57 +54,13 @@ export class Bot {
     await this.onMessageReceive(msg);
   }
 
-  async webhookHandler(req: IncomingMessage, res: ServerResponse, data: string): Promise<void> {
-    let dataObject;
-    try {
-      dataObject = JSON.parse(data);
-    } catch (e) {
-      dataObject = null;
-      logger.error(e.message);
-    }
-    const path = req.url.split('/');
-    if (path[2].startsWith('webhook')) {
-      await this.bindings.webhookHandler(req, res, dataObject);
-    } else {
-      logger.info(`☁️ ${this.config.icon} [webhook:${req.url}] ${data}`);
-      this.plugins.map(async (plugin) => {
-        if (getPluginSlug(plugin) == path[2] && plugin.webhook) {
-          await plugin.webhook(req.url, dataObject);
-        }
-      });
-    }
-  }
-
-  getMessageIcon(type: string): string {
-    if (type == 'text') {
-      return '🗨️';
-    } else if (type == 'photo') {
-      return '🖼️';
-    } else if (type == 'voice') {
-      return '🎵';
-    } else if (type == 'audio') {
-      return '🎶';
-    } else if (type == 'video') {
-      return '🎥';
-    } else if (type == 'animation') {
-      return '🎬';
-    } else if (type == 'document') {
-      return '📦';
-    } else if (type == 'sticker') {
-      return '🎭';
-    } else if (type == 'unsupported') {
-      return '⚠️';
-    }
-    return type;
-  }
-
   initPlugins(): void {
     this.plugins = [];
     Object.keys(plugins).map((name) => {
       if (this.checkIfPluginIsEnabled(name)) {
-        const plugin = new plugins[name](this);
+        const plugin: PluginBase = new plugins[name](this);
         // Check if plugin works only with certain bindings
-        if (plugin.bindings == undefined || plugin.bindings.indexOf(this.config.bindings) > -1) {
+        if (plugin.bindings == undefined || plugin.bindings.indexOf(this.config.platform) > -1) {
           this.plugins.push(plugin);
         }
       }
@@ -441,8 +325,15 @@ export class Bot {
     return false;
   }
 
-  async getChatAdmins(conversationId: string | number): Promise<User[]> {
-    return await this.bindings.getChatAdministrators(conversationId);
+  send(msg: Message) {
+    this.messageSender(msg)
+    const message: WSMessage= {
+      bot: this.config.name,
+      platform: this.config.platform,
+      type: 'message',
+      message: msg
+    }
+    this.websocket.send(JSON.stringify(message))
   }
 
   sendMessage(chat: Conversation, content: string, type = 'text', reply?: Message, extra?: Extra): void {
@@ -453,7 +344,7 @@ export class Bot {
       extra.format = 'HTML';
     }
     const message = new Message(null, chat, this.user, content, type, now(), reply, extra);
-    this.outbox.emit('message', message);
+    this.send(message)
   }
 
   forwardMessage(msg: Message, chatId: number | string): void {
@@ -461,7 +352,7 @@ export class Bot {
       message: msg.id,
       conversation: chatId,
     });
-    this.outbox.emit('message', message);
+    this.send(message)
   }
 
   replyMessage(msg: Message, content: string, type = 'text', reply?: Message, extra?: Extra): void {
@@ -495,7 +386,7 @@ export class Bot {
         null,
         { format: 'HTML', preview: false },
       );
-      this.outbox.emit('message', message);
+      this.send(message)
     }
   }
 
@@ -514,7 +405,7 @@ export class Bot {
         null,
         { format: 'HTML', preview: false },
       );
-      this.outbox.emit('message', message);
+      this.send(message)
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "polaris",
-  "version": "0.10.1",
+  "version": "1.0.0",
   "description": "A multi platform TypeScript bot using plugins!",
   "license": "AGPL-3.0",
   "author": {
@@ -22,7 +22,7 @@
     "build": "tsc -p tsconfig.release.json",
     "build:watch": "tsc -w -p tsconfig.release.json",
     "start": "NODE_OPTIONS=\"--max_old_space_size=4096\" UV_THREADPOOL_SIZE=128 node build/src/main.js",
-    "start:dev": "ENV=\"dev\" node build/src/main.js",
+    "start:dev": "node build/src/main.js",
     "test": "echo \"No tests yet\" && exit 0",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
@@ -39,27 +39,24 @@
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
-    "discord.js": "^14.14.1",
     "firebase": "^10.10.0",
     "form-data": "^4.0.0",
     "html-to-text": "^9.0.5",
-    "matrix-bot-sdk": "^0.7.1",
     "mime-types": "^2.1.35",
     "node-cron": "^3.0.3",
     "node-fetch": "^2",
-    "prebuilt-tdlib": "^0.1008026.0",
     "string-format": "^2.0.0",
-    "tdl": "v7.4.1",
-    "tdl-tdlib-addon": "^1.2.2",
     "tmp": "^0.2.3",
     "winston": "^3.13.0",
-    "winston-daily-rotate-file": "^5.0.0"
+    "winston-daily-rotate-file": "^5.0.0",
+    "ws": "^8.16.0"
   },
   "devDependencies": {
     "@types/mime-types": "^2.1.4",
     "@types/node": "^20.12.2",
     "@types/node-fetch": "^3.0.3",
     "@types/tmp": "^0.2.6",
+    "@types/ws": "^8.5.10",
     "@typescript-eslint/eslint-plugin": "^7.4.0",
     "@typescript-eslint/parser": "^7.4.0",
     "eslint": "^8.57.0",
@@ -71,10 +68,8 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^5.1.3",
     "eslint-plugin-promise": "^6.1.1",
-    "fluture": "^14.0.0",
     "husky": "^9.0.11",
     "prettier": "^3.2.5",
-    "tdlib-types": "td-1.8.14",
     "typedoc": "^0.25.12",
     "typescript": "^5.4.3"
   },
@@ -82,8 +77,6 @@
     "polaris",
     "polaris js",
     "polaris.js",
-    "telegram",
-    "telegram bot api",
     "bot",
     "botapi",
     "bot framework"

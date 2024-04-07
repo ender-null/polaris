@@ -161,7 +161,7 @@ jobs:
             docker pull ghcr.io/${{ github.repository }}:${{ env.TAG }}
             docker stop ${{ env.CONTAINER_NAME }}
             docker rm ${{ env.CONTAINER_NAME }}
-            docker run -v $PWD/logs:/usr/src/app/logs -v $PWD/docs/data:/usr/src/app/data -v $PWD/docs/firebase.json:/usr/src/app/firebase.json -p 1984:1984/tcp -ti -d --restart unless-stopped --name ${{ env.CONTAINER_NAME }} ghcr.io/${{ github.repository }}:${{ env.TAG }}
+            docker run -v $PWD/logs:/usr/src/app/logs -v $PWD/docs/data:/usr/src/app/data -v $PWD/docs/firebase.json:/usr/src/app/firebase.json -ti -d --restart unless-stopped --name ${{ env.CONTAINER_NAME }} ghcr.io/${{ github.repository }}:${{ env.TAG }}
 
       - name: Generate summary
         id: generate-summary

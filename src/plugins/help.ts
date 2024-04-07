@@ -1,4 +1,3 @@
-import { REST, Routes } from 'discord.js';
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
 import { generateCommandHelp, getWord, isCommand, removeHtml } from '../utils';
@@ -71,11 +70,11 @@ export class HelpPlugin extends PluginBase {
     });
 
     if (isCommand(this, 3, msg.content)) {
-      if (this.bot.config.bindings == 'TelegramTDlibBindings') {
+      if (this.bot.config.platform == 'TelegramTDlibBindings') {
         this.bot.replyMessage(msg, 'setMyCommands', 'api', null, {
           commands: JSON.stringify(commands),
         });
-      } else if (this.bot.config.bindings == 'DiscordBindings') {
+      } else if (this.bot.config.platform == 'DiscordBindings') {
         const data = [];
         commands.map(({ command, description }) => {
           data.push({
@@ -83,8 +82,8 @@ export class HelpPlugin extends PluginBase {
             description,
           });
         });
-        const rest = new REST({ version: '10' }).setToken(this.bot.config.apiKeys.discordBotToken);
-        await rest.put(Routes.applicationCommands(String(this.bot.config.apiKeys.discordClientId)), { body: data });
+        //const rest = new REST({ version: '10' }).setToken(this.bot.config.apiKeys.discordBotToken);
+        //await rest.put(Routes.applicationCommands(String(this.bot.config.apiKeys.discordClientId)), { body: data });
       }
     }
 

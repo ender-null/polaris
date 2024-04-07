@@ -48,7 +48,7 @@ export const isGroupAdmin = async (bot: Bot, uid: number | string, msg: Message 
     uid = String(uid);
   }
   if (msg && +msg.conversation.id < 0) {
-    const chatAdmins = await bot.getChatAdmins(msg.conversation.id);
+    const chatAdmins = await bot.bindings.getChatAdministrators(msg.conversation.id);
     for (const admin of chatAdmins) {
       if (uid == String(admin.id)) {
         return true;
@@ -1000,3 +1000,26 @@ export const systemName = (): string => {
 export const systemVersion = (): string => {
   return os.version();
 };
+
+export const getMessageIcon = (type: string): string => {
+  if (type == 'text') {
+    return '🗨️';
+  } else if (type == 'photo') {
+    return '🖼️';
+  } else if (type == 'voice') {
+    return '🎵';
+  } else if (type == 'audio') {
+    return '🎶';
+  } else if (type == 'video') {
+    return '🎥';
+  } else if (type == 'animation') {
+    return '🎬';
+  } else if (type == 'document') {
+    return '📦';
+  } else if (type == 'sticker') {
+    return '🎭';
+  } else if (type == 'unsupported') {
+    return '⚠️';
+  }
+  return type;
+}
