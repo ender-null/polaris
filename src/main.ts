@@ -7,17 +7,6 @@ import { Database } from './database';
 
 const wss: WebSocketServer = new WebSocketServer({ port: 8080 });
 
-const forceClose = () => {
-  logger.info(`🟡 Force close...`);
-
-  wss.clients.forEach((socket) => {
-    if (socket.readyState === socket.OPEN || socket.readyState === socket.CLOSING) {
-      socket.terminate();
-    }
-  });
-  process.exit();
-};
-
 const close = () => {
   logger.info(`🟡 Closing connection for ${wss.clients.size} client(s)...`);
 
@@ -30,11 +19,15 @@ const close = () => {
   });
 
   setTimeout(() => {
-    forceClose();
+    wss.clients.forEach((socket) => {
+      if (socket.readyState === socket.OPEN || socket.readyState === socket.CLOSING) {
+        socket.terminate();
+      }
+    });
+    process.exit();
   }, 10000);
 };
 
-process.on('SIGKILL', () => forceClose());
 process.on('SIGINT', () => close());
 process.on('SIGTERM', () => close());
 process.on('exit', () => {
