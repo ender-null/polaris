@@ -33,10 +33,10 @@ export class AboutPlugin extends PluginBase {
       about: 'Use {0}about to know more about me',
       channel: 'Support & suggestions at <a href="https://t.me/PolarisSupport">@PolarisSupport</a>',
       notice:
-        'You can try my other bots: <a href="https://t.me/PolarisChan">@PolarisChan</a> and <a href="https://t.me/PetoBot">@PetoBot</a>',
-      donations: 'You can make {0}donations at https://paypal.me/luksireiku',
+        'You can try my other bots: <a href="https://t.me/Sakubo">@Sakubo</a> and <a href="https://t.me/PetoBot">@PetoBot</a>',
+      donations: 'You can make {0}donations at https://revolut.me/endernull',
       stats: '👤 {0} users\n👥 {1} groups',
-      donationsExplanation: 'You can make donations at https://paypal.me/luksireiku',
+      donationsExplanation: 'You can make donations at https://revolut.me/endernull',
       supportersTitle: '<b>Supporters:</b>',
     };
   }

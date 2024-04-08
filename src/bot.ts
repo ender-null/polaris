@@ -1,6 +1,17 @@
 import { Config } from './config';
 import { PluginBase } from './plugin';
-import { Conversation, ErrorMessages, Extra, Message, Parameter, Translation, User, WSMessage } from './types';
+import {
+  Conversation,
+  ErrorMessages,
+  Extra,
+  Message,
+  Parameter,
+  Translation,
+  User,
+  WSCommand,
+  WSCommandPayload,
+  WSMessage,
+} from './types';
 import {
   catchException,
   escapeRegExp,
@@ -37,7 +48,7 @@ export class Bot {
     this.plugins = [];
     this.tasks = [];
     this.errors = new ErrorMessages();
-    this.bindings = new Actions();
+    this.bindings = new Actions(this);
   }
 
   messageSender({ conversation, content }: Message): void {
@@ -46,6 +57,10 @@ export class Bot {
         this.user.id
       }]: ${content}`,
     );
+  }
+
+  commandSender(method: string, payload: WSCommandPayload): void {
+    logger.info(`💬 ${this.config.icon} [${method}]: ${payload}`);
   }
 
   async messagesHandler(msg: Message): Promise<void> {
@@ -344,6 +359,18 @@ export class Bot {
       platform: this.config.platform,
       type: 'message',
       message: msg,
+    };
+    this.websocket.send(JSON.stringify(message));
+  }
+
+  sendCommand(method: string, payload: WSCommandPayload) {
+    this.commandSender(method, payload);
+    const message: WSCommand = {
+      bot: this.config.name,
+      platform: this.config.platform,
+      type: 'command',
+      method,
+      payload,
     };
     this.websocket.send(JSON.stringify(message));
   }

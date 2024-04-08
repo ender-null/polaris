@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { exec } from 'child_process';
 import { set } from 'firebase/database';
 import fs from 'fs';
@@ -11,16 +12,11 @@ import util from 'util';
 import winston, { createLogger, transports, format as winstonFormat } from 'winston';
 import 'winston-daily-rotate-file';
 import { Bot, Message, PluginBase } from '.';
-import { BindingsBase } from './bindings';
 import { db } from './main';
 import { CoordinatesResult, HTTPResponseError, iString } from './types';
 
 export const getPluginSlug = (plugin: PluginBase): string => {
   return plugin.constructor.name.replace('Plugin', '').toLowerCase();
-};
-
-export const getBindingsSlug = (plugin: BindingsBase): string => {
-  return plugin.constructor.name.replace('Bindings', '').toLowerCase();
 };
 
 export const isOwner = (bot: Bot, uid: number | string, msg: Message = null): boolean => {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Config } from '.';
 
 export class ErrorMessages {
@@ -231,8 +232,18 @@ export interface WSMessage extends WSData {
   message: Message;
 }
 
+export interface WSCommand extends WSData {
+  type: 'command';
+  method: string;
+  payload: WSCommandPayload;
+}
+
 export interface WSPing extends WSData {
   type: 'ping';
+}
+
+export interface WSCommandPayload {
+  [id: string]: string | number | boolean;
 }
 
 export interface DatabaseUser {

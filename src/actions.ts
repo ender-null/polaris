@@ -1,16 +1,33 @@
+import { Bot } from './bot';
 import { ConversationInfo, Message, User } from './types';
 
 export class Actions {
+  bot: Bot;
+
+  constructor(bot: Bot) {
+    this.bot = bot;
+  }
+
   async getMessage(chatId: string | number, messageId: string | number, ignoreReply?: boolean): Promise<Message> {
-    console.log(chatId, messageId, ignoreReply);
+    this.bot.sendCommand('getMessage', {
+      chatId,
+      messageId,
+      ignoreReply,
+    });
     return null;
   }
   async deleteMessage(chatId: string | number, messageId: string | number): Promise<boolean> {
-    console.log(chatId, messageId);
+    this.bot.sendCommand('deleteMessage', {
+      chatId,
+      messageId,
+    });
     return null;
   }
   async getFile(fileId: string | number, link?: boolean): Promise<string> {
-    console.log(fileId, link);
+    this.bot.sendCommand('getFile', {
+      fileId,
+      link,
+    });
     return null;
   }
   async createInviteLink(
@@ -20,63 +37,106 @@ export class Actions {
     expirationDate?: number,
     memberLimit?: number,
   ): Promise<string> {
-    console.log(conversationId, name, createsJoinRequest, expirationDate, memberLimit);
+    this.bot.sendCommand('createInviteLink', {
+      conversationId,
+      name,
+      createsJoinRequest,
+      expirationDate,
+      memberLimit,
+    });
     return null;
   }
   async checkInviteLink(inviteLink: string | number): Promise<boolean> {
-    console.log(inviteLink);
+    this.bot.sendCommand('checkInviteLink', {
+      inviteLink,
+    });
     return null;
   }
   async joinByInviteLink(inviteLink: string | number): Promise<boolean> {
-    console.log(inviteLink);
+    this.bot.sendCommand('joinByInviteLink', {
+      inviteLink,
+    });
     return null;
   }
   async inviteConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    console.log(conversationId, userId);
+    this.bot.sendCommand('inviteConversationMember', {
+      conversationId,
+      userId,
+    });
     return null;
   }
   async promoteConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    console.log(conversationId, userId);
+    this.bot.sendCommand('promoteConversationMember', {
+      conversationId,
+      userId,
+    });
     return null;
   }
   async kickConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    console.log(conversationId, userId);
+    this.bot.sendCommand('kickConversationMember', {
+      conversationId,
+      userId,
+    });
     return null;
   }
   async leaveConversation(conversationId: string | number): Promise<boolean> {
-    console.log(conversationId);
+    this.bot.sendCommand('leaveConversation', {
+      conversationId,
+    });
     return null;
   }
   async banConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    console.log(conversationId, userId);
+    this.bot.sendCommand('banConversationMember', {
+      conversationId,
+      userId,
+    });
     return null;
   }
   async unbanConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    console.log(conversationId, userId);
+    this.bot.sendCommand('unbanConversationMember', {
+      conversationId,
+      userId,
+    });
     return null;
   }
   async renameConversation(conversationId: string | number, title: string): Promise<boolean> {
-    console.log(conversationId, title);
+    this.bot.sendCommand('renameConversation', {
+      conversationId,
+      title,
+    });
     return null;
   }
   async changeConversationDescription(conversationId: string | number, description: string): Promise<boolean> {
-    console.log(conversationId, description);
+    this.bot.sendCommand('changeConversationDescription', {
+      conversationId,
+      description,
+    });
     return null;
   }
   async changeConversationPhoto(conversationId: string | number, photo: string): Promise<boolean> {
-    console.log(conversationId, photo);
+    this.bot.sendCommand('changeConversationPhoto', {
+      conversationId,
+      photo,
+    });
     return null;
   }
   async createCall(conversationId: string | number, isVideo: boolean): Promise<boolean> {
-    console.log(conversationId, isVideo);
+    this.bot.sendCommand('createCall', {
+      conversationId,
+      isVideo,
+    });
     return null;
   }
   async conversationInfo(conversationId: string | number): Promise<ConversationInfo> {
-    console.log(conversationId);
+    this.bot.sendCommand('conversationInfo', {
+      conversationId,
+    });
     return null;
   }
   async getChatAdministrators(conversationId: string | number): Promise<User[]> {
-    console.log(conversationId);
+    this.bot.sendCommand('getChatAdministrators', {
+      conversationId,
+    });
     return null;
   }
 }

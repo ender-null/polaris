@@ -122,7 +122,7 @@ export class TelegramPlugin extends PluginBase {
       commands: '<b>Commands</b>:',
       noDescription: 'No description',
     };
-    this.bindings = ['TelegramTDlibBindings'];
+    this.bindings = ['telegram'];
   }
   async run(msg: Message): Promise<void> {
     const input = getInput(msg);
