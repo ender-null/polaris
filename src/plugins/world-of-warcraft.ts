@@ -302,7 +302,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
     const url = `https://${region}.api.blizzard.com/profile/wow/character/${realm}/${characterName}${method}`;
     const params = {
       namespace: `profile-${region}`,
-      locale: this.bot.config.locale,
+      locale: this.bot.config.locale || 'en_US',
       access_token: this.accessToken,
     };
     const resp = await sendRequest(url, params, null, null, false, this.bot);

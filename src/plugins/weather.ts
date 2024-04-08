@@ -44,7 +44,7 @@ export class WeatherPlugin extends PluginBase {
       lon: coords.lng,
       lat: coords.lat,
       units: 'metric',
-      lang: this.bot.config.locale.slice(0, 2),
+      lang: (this.bot.config.locale || 'en_US').slice(0, 2),
     };
     const resp = await sendRequest(url, params, null, null, false, this.bot);
     if (!resp) {

@@ -104,7 +104,7 @@ export class LastFMPlugin extends PluginBase {
         part: 'snippet',
         maxResults: '8',
         q: `${track} ${artist}`,
-        regionCode: this.bot.config.locale.slice(2, 2),
+        regionCode: (this.bot.config.locale || 'en_US').slice(3),
         key: this.bot.config.apiKeys.googleDeveloperConsole,
       };
       const ytResp = await sendRequest(ytUrl, ytParams, null, null, false, this.bot);

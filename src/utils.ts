@@ -668,7 +668,7 @@ export const getCoords = async (input: string, bot?: Bot): Promise<CoordinatesRe
   let lang = 'en';
   let key = null;
   if (bot) {
-    lang = bot.config.locale.slice(0, 2);
+    lang = bot.config.locale || 'en_US';
     key = bot.config.apiKeys.googleDeveloperConsole;
   }
 

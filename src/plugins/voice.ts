@@ -42,7 +42,7 @@ export class VoicePlugin extends PluginBase {
       input = input.replace(langRegExp, '');
     }
 
-    const url = 'http://translate.google.com/translate_tts';
+    const url = 'https://translate.google.com/translate_tts';
     const params = {
       tl: language,
       q: input,
@@ -55,7 +55,7 @@ export class VoicePlugin extends PluginBase {
     const headers = {
       Referer: 'https://translate.google.com/',
       'User-Agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/47.0.2526.8 Safari/537.36',
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
     };
 
     let file;

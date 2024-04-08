@@ -63,13 +63,13 @@ export class SearchPlugin extends PluginBase {
       'sec-fetch-site': 'same-origin',
       'sec-fetch-mode': 'cors',
       referer: 'https://duckduckgo.com/',
-      'accept-language': this.bot.config.locale + ';q=0.9',
+      'accept-language': (this.bot.config.locale || 'en_US') + ';q=0.9',
     };
     const params = {
-      l: this.bot.config.locale,
-      dl: this.bot.config.locale.slice(0, 2),
-      ct: this.bot.config.locale.slice(0, 2).toUpperCase(),
-      ss_mkt: this.bot.config.locale.slice(0, 2),
+      l: this.bot.config.locale || 'en_US',
+      dl: (this.bot.config.locale || 'en_US').slice(0, 2),
+      ct: (this.bot.config.locale || 'en_US').slice(0, 2).toUpperCase(),
+      ss_mkt: (this.bot.config.locale || 'en_US').slice(0, 2),
       o: 'json',
       q: input,
       vqd: searchObj[1],
