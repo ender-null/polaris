@@ -146,9 +146,9 @@ jobs:
           export-env: true
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
-          HOST: op://end.works/end.works/URL
-          PORT: op://end.works/end.works/port
-          USERNAME: op://end.works/end.works/username
+          HOST: op://end.works/wired/URL
+          PORT: op://end.works/wired/port
+          USERNAME: op://end.works/wired/username
           KEY: op://end.works/SSH Key/private key
           FINGERPRINT: op://end.works/SSH Key/fingerprint
 
