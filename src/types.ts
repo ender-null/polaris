@@ -215,20 +215,20 @@ export interface CoordinatesResult {
 }
 
 export interface WSData {
-  bot: string,
-  platform: string,
-  type: string,
+  bot: string;
+  platform: string;
+  type: string;
 }
 
-export interface WSInit extends WSData{
-  type: 'init',
-  user: User
-  config: Config
+export interface WSInit extends WSData {
+  type: 'init';
+  user: User;
+  config: Config;
 }
 
-export interface WSMessage extends WSData{
-  type: 'message',
-  message: Message
+export interface WSMessage extends WSData {
+  type: 'message';
+  message: Message;
 }
 
 export interface DatabaseUser {

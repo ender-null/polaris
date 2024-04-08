@@ -1,31 +1,43 @@
-import { Config } from "./config";
-import { PluginBase } from "./plugin";
-import { Conversation, ErrorMessages, Extra, Message, Parameter, Translation, User, WSMessage } from "./types";
-import { catchException, escapeRegExp, getFullName, getMessageIcon, hasTag, isTrusted, logger, merge, now, setInput, t } from "./utils";
+import { Config } from './config';
+import { PluginBase } from './plugin';
+import { Conversation, ErrorMessages, Extra, Message, Parameter, Translation, User, WSMessage } from './types';
+import {
+  catchException,
+  escapeRegExp,
+  getFullName,
+  getMessageIcon,
+  hasTag,
+  isTrusted,
+  logger,
+  merge,
+  now,
+  setInput,
+  t,
+} from './utils';
 import { WebSocket } from 'ws';
 import * as plugins from './plugins/index';
 import * as cron from 'node-cron';
-import { Actions } from "./actions";
-import { db } from "./main";
+import { Actions } from './actions';
+import { db } from './main';
 
 export class Bot {
-  websocket: WebSocket
+  websocket: WebSocket;
   started: boolean;
-  config: Config
-  user: User
+  config: Config;
+  user: User;
   plugins: PluginBase[];
   tasks: cron.Task[];
   errors: ErrorMessages;
-  bindings: Actions
+  bindings: Actions;
 
   constructor(websocket: WebSocket, config: Config, user: User) {
-    this.websocket = websocket
+    this.websocket = websocket;
     this.config = config;
     this.user = user;
     this.plugins = [];
     this.tasks = [];
     this.errors = new ErrorMessages();
-    this.bindings = new Actions()
+    this.bindings = new Actions();
   }
 
   messageSender({ conversation, content }: Message): void {
@@ -326,14 +338,14 @@ export class Bot {
   }
 
   send(msg: Message) {
-    this.messageSender(msg)
-    const message: WSMessage= {
+    this.messageSender(msg);
+    const message: WSMessage = {
       bot: this.config.name,
       platform: this.config.platform,
       type: 'message',
-      message: msg
-    }
-    this.websocket.send(JSON.stringify(message))
+      message: msg,
+    };
+    this.websocket.send(JSON.stringify(message));
   }
 
   sendMessage(chat: Conversation, content: string, type = 'text', reply?: Message, extra?: Extra): void {
@@ -344,7 +356,7 @@ export class Bot {
       extra.format = 'HTML';
     }
     const message = new Message(null, chat, this.user, content, type, now(), reply, extra);
-    this.send(message)
+    this.send(message);
   }
 
   forwardMessage(msg: Message, chatId: number | string): void {
@@ -352,7 +364,7 @@ export class Bot {
       message: msg.id,
       conversation: chatId,
     });
-    this.send(message)
+    this.send(message);
   }
 
   replyMessage(msg: Message, content: string, type = 'text', reply?: Message, extra?: Extra): void {
@@ -386,7 +398,7 @@ export class Bot {
         null,
         { format: 'HTML', preview: false },
       );
-      this.send(message)
+      this.send(message);
     }
   }
 
@@ -405,7 +417,7 @@ export class Bot {
         null,
         { format: 'HTML', preview: false },
       );
-      this.send(message)
+      this.send(message);
     }
   }
 }

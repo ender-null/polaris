@@ -1,4 +1,4 @@
-import { ApiKeys } from "./types";
+import { ApiKeys } from './types';
 
 export class Config {
   icon?: string;

@@ -15,7 +15,7 @@ RUN yarn run build
 
 FROM ghcr.io/ender-null/polaris-base:latest as release
 
-LABEL org.opencontainers.image.source https://github.com/ender-null/denebola
+LABEL org.opencontainers.image.source https://github.com/ender-null/polaris
 
 WORKDIR /usr/src/app
 

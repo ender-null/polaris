@@ -1022,4 +1022,4 @@ export const getMessageIcon = (type: string): string => {
     return '⚠️';
   }
   return type;
-}
+};
