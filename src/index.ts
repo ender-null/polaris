@@ -1,4 +1,3 @@
-export { BindingsBase } from './bindings';
 export { Bot } from './bot';
 export { Config } from './config';
 export { Database } from './database';
