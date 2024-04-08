@@ -1,11 +1,22 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import { WSInit, WSMessage } from './types';
-import { logger } from './utils';
+import { catchException, logger } from './utils';
 import { Bot } from './bot';
 import os from 'os';
 import { Database } from './database';
 
 const wss: WebSocketServer = new WebSocketServer({ port: 8080 });
+
+const forceClose = () => {
+  logger.info(`🟡 Force close...`);
+
+  wss.clients.forEach((socket) => {
+    if (socket.readyState === socket.OPEN || socket.readyState === socket.CLOSING) {
+      socket.terminate();
+    }
+  });
+  process.exit();
+};
 
 const close = () => {
   logger.info(`🟡 Closing connection for ${wss.clients.size} client(s)...`);
@@ -19,15 +30,11 @@ const close = () => {
   });
 
   setTimeout(() => {
-    wss.clients.forEach((socket) => {
-      if (socket.readyState === socket.OPEN || socket.readyState === socket.CLOSING) {
-        socket.terminate();
-      }
-    });
-    process.exit();
+    forceClose();
   }, 10000);
 };
 
+process.on('SIGKILL', () => forceClose());
 process.on('SIGINT', () => close());
 process.on('SIGTERM', () => close());
 process.on('exit', () => {
@@ -57,20 +64,26 @@ const start = () => {
     });
 
     ws.on('message', (data: string) => {
-      const json = JSON.parse(data);
-      if (json.type === 'init') {
-        const init: WSInit = json;
-        bot = new Bot(ws, init.config, init.user);
-        bot.initPlugins();
-        bots.push(bot);
-        logger.info(
-          `🟢 Connected as ${bot.config.icon} ${bot.user.firstName} (@${bot.user.username}) [${bot.user.id}] from ${os.hostname}`,
-        );
-      } else if (json.type === 'message') {
-        const msg: WSMessage = json;
-        bot.messagesHandler(msg.message);
-      } else {
-        console.log('received: %s', data);
+      try {
+        const json = JSON.parse(data);
+        if (json.type === 'init') {
+          const init: WSInit = json;
+          bot = new Bot(ws, init.config, init.user);
+          bot.initPlugins();
+          bots.push(bot);
+          logger.info(
+            `🟢 Connected as ${bot.config.icon} ${bot.user.firstName} (@${bot.user.username}) [${bot.user.id}] from ${os.hostname}`,
+          );
+        } else if (json.type === 'message') {
+          const msg: WSMessage = json;
+          bot.messagesHandler(msg.message);
+        } else if (json.type === 'ping') {
+          logger.debug('Ping');
+        } else {
+          logger.warning(`Unsupported data: ${data}`);
+        }
+      } catch (error) {
+        catchException(error);
       }
     });
   });

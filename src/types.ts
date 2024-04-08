@@ -231,6 +231,10 @@ export interface WSMessage extends WSData {
   message: Message;
 }
 
+export interface WSPing extends WSData {
+  type: 'ping';
+}
+
 export interface DatabaseUser {
   first_name?: string;
   last_name?: string;
