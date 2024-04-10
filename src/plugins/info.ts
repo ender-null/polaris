@@ -41,7 +41,7 @@ export class InfoPlugin extends PluginBase {
     let showGroup = false;
     let chat, info, infoFull, userId, groupId, userTags, groupTags;
 
-    if (this.bot.config.platform == 'telegram') {
+    /*if (this.bot.platform == 'telegram') {
       chat = await this.bot.bindings['serverRequest']('getChat', { chat_id: target }, true);
       if (target && isInt(target) && !String(target).startsWith('-')) {
         info = await this.bot.bindings['serverRequest']('getUser', { user_id: target }, true);
@@ -54,7 +54,7 @@ export class InfoPlugin extends PluginBase {
           true,
         );
       }
-    }
+    }*/
 
     if (!target || (target && !(db.users[target] || db.groups[target] || !isInt(target) || info || chat))) {
       return this.bot.replyMessage(msg, this.bot.errors.noResults);
@@ -138,7 +138,7 @@ export class InfoPlugin extends PluginBase {
         });
       }
 
-      if (target == gid && this.bot.config.platform == 'telegram') {
+      /*if (target == gid && this.bot.platform == 'telegram') {
         chat = await this.bot.bindings['serverRequest']('getChat', { chat_id: target }, true);
         info = await this.bot.bindings['serverRequest']('getSupergroup', { supergroup_id: target.slice(4) }, true);
         infoFull = await this.bot.bindings['serverRequest'](
@@ -151,7 +151,7 @@ export class InfoPlugin extends PluginBase {
         logger.info(`chat: ${JSON.stringify(chat)}`);
         logger.info(`info: ${JSON.stringify(info)}`);
         logger.info(`infoFull: ${JSON.stringify(infoFull)}`);
-      }
+      }*/
 
       if (chat) {
         if (chat.title && chat.title.length > 0) {

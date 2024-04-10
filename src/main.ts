@@ -63,9 +63,11 @@ const start = () => {
           bot = new Bot(ws, init.config, init.user, init.platform);
           bot.initPlugins();
           bots.push(bot);
+          bot.initTranslations();
           logger.info(
             `🟢 Connected as ${bot.config.icon} ${bot.user.firstName} (@${bot.user.username}) [${bot.user.id}] on platform '${init.platform}'`,
           );
+          bot.scheduleCronJobs();
         } else if (json.type === 'message') {
           const msg: WSMessage = json;
           bot.messagesHandler(msg.message);
