@@ -2,7 +2,6 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { WSInit, WSMessage } from './types';
 import { catchException, logger } from './utils';
 import { Bot } from './bot';
-import os from 'os';
 import { Database } from './database';
 
 const wss: WebSocketServer = new WebSocketServer({ port: 8080 });
@@ -61,11 +60,11 @@ const start = () => {
         const json = JSON.parse(data);
         if (json.type === 'init') {
           const init: WSInit = json;
-          bot = new Bot(ws, init.config, init.user);
+          bot = new Bot(ws, init.config, init.user, init.platform);
           bot.initPlugins();
           bots.push(bot);
           logger.info(
-            `🟢 Connected as ${bot.config.icon} ${bot.user.firstName} (@${bot.user.username}) [${bot.user.id}] from ${os.hostname}`,
+            `🟢 Connected as ${bot.config.icon} ${bot.user.firstName} (@${bot.user.username}) [${bot.user.id}] on platform '${init.platform}'`,
           );
         } else if (json.type === 'message') {
           const msg: WSMessage = json;

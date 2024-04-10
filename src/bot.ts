@@ -32,6 +32,7 @@ import { Actions } from './actions';
 import { db } from './main';
 
 export class Bot {
+  platform: string;
   websocket: WebSocket;
   started: boolean;
   config: Config;
@@ -41,7 +42,8 @@ export class Bot {
   errors: ErrorMessages;
   bindings: Actions;
 
-  constructor(websocket: WebSocket, config: Config, user: User) {
+  constructor(websocket: WebSocket, config: Config, user: User, platform: string) {
+    this.platform = platform;
     this.websocket = websocket;
     this.config = config;
     this.user = user;
@@ -356,7 +358,7 @@ export class Bot {
     this.messageSender(msg);
     const message: WSMessage = {
       bot: this.config.name,
-      platform: this.config.platform,
+      platform: this.platform,
       type: 'message',
       message: msg,
     };
@@ -367,7 +369,7 @@ export class Bot {
     this.commandSender(method, payload);
     const message: WSCommand = {
       bot: this.config.name,
-      platform: this.config.platform,
+      platform: this.platform,
       type: 'command',
       method,
       payload,
