@@ -1,6 +1,6 @@
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
-import { download, generateCommandHelp, getInput, getWord, logger, mp3ToOgg } from '../utils';
+import { download, generateCommandHelp, getInput, getWord, logger, mp3ToOgg, queryString } from '../utils';
 
 export class VoicePlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -60,7 +60,7 @@ export class VoicePlugin extends PluginBase {
 
     let file;
     try {
-      logger.info(url);
+      logger.info(`${url}?${queryString(params)}`);
       file = await download(url, params, headers, false, this.bot);
     } catch (error) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
