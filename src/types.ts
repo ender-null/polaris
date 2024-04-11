@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { WebSocket } from 'ws';
 import { Config } from '.';
 
 export class ErrorMessages {
@@ -172,6 +173,24 @@ export class Message {
   }
 }
 
+export interface BotSocket {
+  [id: string]: WebSocket;
+}
+
+export class BroadcastMessage {
+  conversation: Conversation;
+  content: string;
+  type: string;
+  extra: Extra;
+
+  constructor(conversation: Conversation, content: string, type?: string, extra?: Extra) {
+    this.conversation = conversation;
+    this.content = content;
+    this.type = type;
+    this.extra = extra;
+  }
+}
+
 export class HTTPResponseError extends Error {
   response: Response;
   constructor(response: Response) {
@@ -240,6 +259,12 @@ export interface WSCommand extends WSData {
 
 export interface WSPing extends WSData {
   type: 'ping';
+}
+
+export interface WSBroadcast extends WSData {
+  type: 'broadcast';
+  target: string | string[];
+  message: BroadcastMessage;
 }
 
 export interface WSCommandPayload {

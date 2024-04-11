@@ -1,6 +1,7 @@
 import { Config } from './config';
 import { PluginBase } from './plugin';
 import {
+  BroadcastMessage,
   Conversation,
   ErrorMessages,
   Extra,
@@ -81,6 +82,20 @@ export class Bot {
     }
 
     await this.onMessageReceive(msg);
+  }
+
+  async broadcastHandler(msg: BroadcastMessage): Promise<void> {
+    if (!msg.conversation.title) {
+      logger.info(
+        `${getMessageIcon(msg.type)} ${this.config.icon} [${msg.conversation.id}] ${
+          msg.conversation.title
+        } 👤 ${getFullName(this.user.id)} [${this.user.id}]: ${msg.content}`,
+      );
+    } else {
+      logger.info(
+        `${getMessageIcon(msg.type)} ${this.config.icon} [${msg.conversation.id}] ${msg.conversation.title} 👤 ${getFullName(this.user.id)} [${this.user.id}]: ${msg.content}`,
+      );
+    }
   }
 
   initPlugins(): void {

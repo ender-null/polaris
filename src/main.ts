@@ -1,6 +1,6 @@
 import { WebSocketServer, WebSocket } from 'ws';
-import { WSInit, WSMessage } from './types';
-import { catchException, logger } from './utils';
+import { BotSocket, Conversation, Message, WSBroadcast, WSInit, WSMessage } from './types';
+import { catchException, logger, now } from './utils';
 import { Bot } from './bot';
 import { Database } from './database';
 
@@ -33,7 +33,7 @@ process.on('exit', () => {
   logger.info('❎ Exit process');
 });
 
-const bots = [];
+const bots: BotSocket = {};
 
 const start = () => {
   logger.info('🟡 WebSocket server waiting for connections...');
@@ -62,7 +62,7 @@ const start = () => {
           const init: WSInit = json;
           bot = new Bot(ws, init.config, init.user, init.platform);
           bot.initPlugins();
-          bots.push(bot);
+          bots[bot.user.id] = ws;
           bot.initTranslations();
           logger.info(
             `🟢 Connected as ${bot.config.icon} ${bot.user.firstName} (@${bot.user.username}) [${bot.user.id}] on platform '${init.platform}'`,
@@ -73,6 +73,37 @@ const start = () => {
           bot.messagesHandler(msg.message);
         } else if (json.type === 'ping') {
           logger.debug('Ping');
+        } else if (json.type === 'broadcast') {
+          const broadcast: WSBroadcast = json;
+          const message: WSMessage = {
+            bot: broadcast.bot,
+            platform: broadcast.platform,
+            type: 'message',
+            message: new Message(
+              null,
+              broadcast.message.conversation,
+              bot.user,
+              broadcast.message.content,
+              broadcast.message.type,
+              now(),
+              null,
+              broadcast.message.extra,
+            ),
+          };
+          if (Array.isArray(broadcast.target)) {
+            bot.broadcastHandler(broadcast.message);
+            broadcast.target.forEach((target) => bots[target].send(JSON.stringify(message)));
+          } else if (broadcast.target === '*' || broadcast.target === 'all') {
+            wss.clients.forEach((client) => {
+              if (client !== ws) {
+                bot.broadcastHandler(broadcast.message);
+                client.send(JSON.stringify(message));
+              }
+            });
+          } else {
+            bot.broadcastHandler(broadcast.message);
+            bots[broadcast.target].send(JSON.stringify(message));
+          }
         } else {
           logger.warning(`Unsupported data: ${data}`);
         }
