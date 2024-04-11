@@ -45,9 +45,11 @@ export const isGroupAdmin = async (bot: Bot, uid: number | string, msg: Message 
   }
   if (msg && +msg.conversation.id < 0) {
     const chatAdmins = await bot.bindings.getChatAdministrators(msg.conversation.id);
-    for (const admin of chatAdmins) {
-      if (uid == String(admin.id)) {
-        return true;
+    if (chatAdmins) {
+      for (const admin of chatAdmins) {
+        if (uid == String(admin.id)) {
+          return true;
+        }
       }
     }
   }
