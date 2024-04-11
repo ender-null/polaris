@@ -1,5 +1,5 @@
 import { WebSocketServer, WebSocket } from 'ws';
-import { BotSocket, Conversation, Message, WSBroadcast, WSInit, WSMessage } from './types';
+import { BotSocket, Message, WSBroadcast, WSInit, WSMessage } from './types';
 import { catchException, logger, now } from './utils';
 import { Bot } from './bot';
 import { Database } from './database';
