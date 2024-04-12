@@ -105,9 +105,9 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       if (!input) {
         const tags = getTags(this.bot, uid, 'wow:?');
         if (tags && tags.length > 0) {
-          const summonerInfo = tags[0].split(':')[1];
-          if (summonerInfo.indexOf('/') > -1) {
-            const split = summonerInfo.split('/');
+          const characterInfo = tags[0].split(':')[1];
+          if (characterInfo.indexOf('/') > -1) {
+            const split = characterInfo.split('/');
             realm = split[0];
             characterName = split[1];
             if (split.length > 2) {
@@ -120,7 +120,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         }
       } else {
         const words = input.split(' ');
-        characterName = words.pop();
+        characterName = words.pop().toLowerCase();
         realm = words.join('-').toLowerCase();
       }
       const [character, media, raids, pvp, professions, statistics, raiderIO] = await Promise.all([
@@ -208,7 +208,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         });
       }
       let mythicScore = '';
-      if (raiderIO.mythic_plus_scores_by_season && raiderIO.mythic_plus_scores_by_season.length > 0) {
+      if (raiderIO && raiderIO.mythic_plus_scores_by_season && raiderIO.mythic_plus_scores_by_season.length > 0) {
         const lastSeason = raiderIO.mythic_plus_scores_by_season[0];
         mythicScore = `${this.strings['mythicPlusScores']}:`;
         let empty = true;
