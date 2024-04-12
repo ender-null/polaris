@@ -5,12 +5,13 @@ import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
 import { generateCommandHelp, getInput } from '../utils';
 
-export class EchoPlugin extends PluginBase {
+export class ChatGPTPlugin extends PluginBase {
   constructor(bot: Bot) {
     super(bot);
     this.commands = [
       {
         command: `/chatgpt`,
+        aliases: ['/ai', '/gpt'],
         parameters: [
           {
             name: 'text',
