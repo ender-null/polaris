@@ -226,13 +226,14 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       if (mythicScore.length == 0) {
         mythicScore = null;
       }
-      let photo = null;
-      media.assets.map((asset) => {
-        if (asset.key == 'main') {
-          photo = `${asset.value}?update=${Math.trunc(now() / 3600)}`;
-          return;
-        }
-      });
+      let asset = media.assets.find((asset) => asset.key === 'main');
+      if (!asset) {
+        asset = media.assets.find((asset) => asset.key === 'inset');
+      }
+      if (!asset) {
+        asset = media.assets.find((asset) => asset.key === 'avatar');
+      }
+      const photo = `${asset.value}?update=${Math.trunc(now() / 3600)}`;
       text = `${title ? title + '\n\t' : ''}${name}\n${
         guild ? guild + '\n\n' : ''
       }${characterClass}\n\t${race}\n\n${info}\n\n${stats}\n\n${professionLevels ? professionLevels + '\n\n' : ''}${
