@@ -335,6 +335,10 @@ export class Bot {
         trigger = command.replace('/', `^${escapeRegExp(this.config.prefix)}`);
       }
 
+      if (command.startsWith('@')) {
+        trigger = command.replace('@', '^@');
+      }
+
       if (!friendly) {
         if (parameters == null && trigger.startsWith('^')) {
           trigger += '$';
@@ -355,6 +359,9 @@ export class Bot {
         }
       }
     }
+    logger.info(`trigger: ${trigger}`);
+    logger.info(`content: ${message.content}`);
+    logger.info(`test: ${new RegExp(trigger, 'gim').test(message.content)}`);
     if (message.content && typeof message.content == 'string' && new RegExp(trigger, 'gim').test(message.content)) {
       message = setInput(message, trigger);
       try {

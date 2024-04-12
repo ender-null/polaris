@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Bot } from '..';
 import { PluginBase } from '../plugin';
 import { Conversation } from '../types';

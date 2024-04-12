@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
 import { capitalize, generateCommandHelp, getInput, isCommand, lstrip, sendRequest } from '../utils';

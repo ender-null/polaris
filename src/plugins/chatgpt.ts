@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import OpenAI from 'openai';
 import crypto from 'crypto';
 import { Bot, Message } from '..';

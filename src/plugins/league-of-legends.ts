@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Response } from 'node-fetch';
 import format from 'string-format';
 import { Bot, iString, iStringNested, Message } from '..';
