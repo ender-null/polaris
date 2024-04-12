@@ -207,7 +207,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
           raidProgression += `\n\t${mode.difficulty.name}: ${mode.progress.completed_count}/${mode.progress.total_count}`;
         });
       }
-      let mythicScore = '';
+      let mythicScore = null;
       if (raiderIO && raiderIO.mythic_plus_scores_by_season && raiderIO.mythic_plus_scores_by_season.length > 0) {
         const lastSeason = raiderIO.mythic_plus_scores_by_season[0];
         mythicScore = `${this.strings['mythicPlusScores']}:`;
