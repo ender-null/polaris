@@ -35,8 +35,10 @@ export class ChatGPTPlugin extends PluginBase {
       { role: 'user', content: input },
     ];
 
-    logger.info('openAIPrompt', this.bot.config.apiKeys.openAIPrompt);
-    logger.info('openAIKey', this.bot.config.apiKeys.openAIKey);
+    logger.info(`openAIPrompt: ${this.bot.config.apiKeys.openAIPrompt}`);
+    logger.info(`openAIKey: ${this.bot.config.apiKeys.openAIKey}`);
+    logger.info(`input: ${input}`, input);
+    logger.info(`config: ${JSON.stringify(this.bot.config, null, 4)}`);
 
     const openai = new OpenAI({ apiKey: this.bot.config.apiKeys.openAIKey });
     const completion = await openai.chat.completions.create({
