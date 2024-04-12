@@ -61,6 +61,8 @@ export interface ApiKeys {
   googleDeveloperConsole?: string;
   lastfm?: string;
   openWeather?: string;
+  openAIKey?: string;
+  openAIPrompt?: string;
   tenor?: string;
   riotApi?: string;
   wolframAlpha?: string;

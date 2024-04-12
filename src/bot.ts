@@ -103,7 +103,6 @@ export class Bot {
     Object.keys(plugins).map((name) => {
       if (this.checkIfPluginIsEnabled(name)) {
         const plugin: PluginBase = new plugins[name](this);
-        // Check if plugin works only with certain bindings
         if (plugin.bindings == undefined || plugin.bindings.indexOf(this.config.platform) > -1) {
           this.plugins.push(plugin);
         }
