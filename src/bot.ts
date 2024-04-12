@@ -335,10 +335,6 @@ export class Bot {
         trigger = command.replace('/', `^${escapeRegExp(this.config.prefix)}`);
       }
 
-      if (command.startsWith('@')) {
-        trigger = command.replace('@', '^@');
-      }
-
       if (!friendly) {
         if (parameters == null && trigger.startsWith('^')) {
           trigger += '$';

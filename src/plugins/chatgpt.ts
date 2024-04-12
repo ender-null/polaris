@@ -10,15 +10,15 @@ export class EchoPlugin extends PluginBase {
     super(bot);
     this.commands = [
       {
-        command: `@${this.bot.user.username}`,
+        command: `/chatgpt`,
         parameters: [
           {
             name: 'text',
-            required: false,
+            required: true,
           },
         ],
+        friendly: `^@${this.bot.user.username}`,
         description: 'Use ChatGPT to provide text outputs in response to inputs',
-        skipHelp: true,
       },
     ];
   }
