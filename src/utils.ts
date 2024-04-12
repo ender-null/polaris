@@ -887,7 +887,7 @@ export const catchException = (exception: Error, bot: Bot = null, message: Messa
     } else if (exception['_'] == 'error') {
       bot.sendAlert(JSON.stringify(exception, null, 4), 'json');
     } else {
-      bot.sendAlert(exception.message);
+      bot.sendAlert(exception.message, 'json');
     }
     if (message) {
       bot.replyMessage(message, bot.errors.exceptionFound);

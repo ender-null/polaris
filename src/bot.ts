@@ -355,11 +355,6 @@ export class Bot {
         }
       }
     }
-    if (command.indexOf('@') > -1) {
-      logger.info(`trigger: ${trigger}`);
-      logger.info(`content: ${message.content}`);
-      logger.info(`test: ${new RegExp(trigger, 'gim').test(message.content)}`);
-    }
     if (message.content && typeof message.content == 'string' && new RegExp(trigger, 'gim').test(message.content)) {
       message = setInput(message, trigger);
       try {
