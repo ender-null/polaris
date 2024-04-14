@@ -25,6 +25,7 @@ import {
   now,
   setInput,
   t,
+  toBase64,
 } from './utils';
 import { WebSocket } from 'ws';
 import * as plugins from './plugins/index';
@@ -398,8 +399,15 @@ export class Bot {
     if (!extra.format) {
       extra.format = 'HTML';
     }
-    const message = new Message(null, chat, this.user, content, type, now(), reply, extra);
-    this.send(message);
+    if (content.startsWith('/') && type !== 'text') {
+      toBase64(content).then((base64String) => {
+        const message = new Message(null, chat, this.user, base64String, type, now(), reply, extra);
+        this.send(message);
+      });
+    } else {
+      const message = new Message(null, chat, this.user, content, type, now(), reply, extra);
+      this.send(message);
+    }
   }
 
   forwardMessage(msg: Message, chatId: number | string): void {

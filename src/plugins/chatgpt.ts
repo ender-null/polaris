@@ -58,7 +58,7 @@ export class ChatGPTPlugin extends PluginBase {
         message = message.reply;
       }
       messages.push({ role: 'user', content: input });
-      logger.info(JSON.stringify(messages, null, 4))
+      logger.info(JSON.stringify(messages, null, 4));
 
       const completion = await openai.chat.completions.create({
         model: 'gpt-3.5-turbo',

@@ -7,7 +7,7 @@ import fetch, { BodyInit, HeadersInit, RequestInit, Response } from 'node-fetch'
 import os from 'os';
 import { ParsedUrlQueryInput } from 'querystring';
 import { pipeline } from 'stream';
-import tmp from 'tmp';
+import tmp, { FileResult } from 'tmp';
 import util from 'util';
 import winston, { createLogger, transports, format as winstonFormat } from 'winston';
 import 'winston-daily-rotate-file';
@@ -665,6 +665,29 @@ export const mp3ToOgg = async (input: string): Promise<string> => {
     return null;
   }
 };
+
+export const toBase64 = (filePath: string): Promise<string> =>
+  new Promise((resolve, reject) => {
+    fs.readFile(filePath, (err, data) => {
+      if (err) {
+        reject(err);
+      }
+      const base64String = data.toString('base64');
+      resolve(base64String);
+    });
+  });
+
+export const fromBase64 = (base64String): Promise<FileResult> =>
+  new Promise((resolve, reject) => {
+    const bufferData = Buffer.from(base64String, 'base64');
+    const file: FileResult = tmp.fileSync({ mode: 0o644 });
+    fs.writeFile(file.name, bufferData, (err) => {
+      if (err) {
+        reject(err);
+      }
+      resolve(file);
+    });
+  });
 
 export const getCoords = async (input: string, bot?: Bot): Promise<CoordinatesResult> => {
   let lang = 'en';
