@@ -7,7 +7,7 @@ import fetch, { BodyInit, HeadersInit, RequestInit, Response } from 'node-fetch'
 import os from 'os';
 import { ParsedUrlQueryInput } from 'querystring';
 import { pipeline } from 'stream';
-import tmp, { FileResult } from 'tmp';
+import { FileResult, fileSync } from 'tmp';
 import util from 'util';
 import winston, { createLogger, transports, format as winstonFormat } from 'winston';
 import 'winston-daily-rotate-file';
@@ -626,7 +626,7 @@ export const download = async (
   const contentType =
     response.headers.get('content-type') || response.headers.get('Content-Type') || 'application/octet-stream';
   const contentLength = response.headers.get('content-length') || response.headers.get('Content-Length') || '0';
-  const tempfile = tmp.fileSync({ mode: 0o644, postfix: `.${mime.extension(contentType)}` });
+  const tempfile = fileSync({ mode: 0o644, postfix: `.${mime.extension(contentType)}` });
   if (response.ok == undefined) {
     logger.error(`Unexpected response: ${response.statusText}`);
     return null;
@@ -652,7 +652,7 @@ export const getExtension = (url: string): string => {
 
 export const mp3ToOgg = async (input: string): Promise<string> => {
   try {
-    const output = tmp.fileSync({ mode: 0o644, postfix: `.ogg` });
+    const output = fileSync({ mode: 0o644, postfix: `.ogg` });
     const command = `ffmpeg -i ${input} -ac 1 -c:a libopus -b:a 16k -y ${output.name}`;
     const result = await execResult(command);
     if (result != null) {
@@ -666,28 +666,32 @@ export const mp3ToOgg = async (input: string): Promise<string> => {
   }
 };
 
-export const toBase64 = (filePath: string): Promise<string> =>
-  new Promise((resolve, reject) => {
+export const toBase64 = (filePath): Promise<string> => {
+  return new Promise((resolve, reject) => {
     fs.readFile(filePath, (err, data) => {
       if (err) {
         reject(err);
+        return;
       }
       const base64String = data.toString('base64');
       resolve(base64String);
     });
   });
+};
 
-export const fromBase64 = (base64String): Promise<FileResult> =>
-  new Promise((resolve, reject) => {
+export const fromBase64 = (base64String): Promise<FileResult> => {
+  return new Promise((resolve, reject) => {
     const bufferData = Buffer.from(base64String, 'base64');
-    const file: FileResult = tmp.fileSync({ mode: 0o644 });
+    const file: FileResult = fileSync({ mode: 0o644 });
     fs.writeFile(file.name, bufferData, (err) => {
       if (err) {
         reject(err);
+        return;
       }
       resolve(file);
     });
   });
+};
 
 export const getCoords = async (input: string, bot?: Bot): Promise<CoordinatesResult> => {
   let lang = 'en';
