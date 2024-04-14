@@ -3,7 +3,7 @@ import OpenAI from 'openai';
 import crypto from 'crypto';
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
-import { generateCommandHelp, getInput, logger } from '../utils';
+import { generateCommandHelp, getInput } from '../utils';
 
 export class ChatGPTPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -39,8 +39,6 @@ export class ChatGPTPlugin extends PluginBase {
       message = message.reply;
     }
     messages.push({ role: 'user', content: input });
-    logger.info(JSON.stringify(messages, null, 4));
-
     const completion = await client.chat.completions.create({
       model: 'gpt-3.5-turbo',
       user: crypto.createHash('md5').update(String(msg.sender.id)).digest('hex'),
