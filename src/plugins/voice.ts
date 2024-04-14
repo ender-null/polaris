@@ -1,6 +1,9 @@
 import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
-import { download, generateCommandHelp, getInput, getWord, logger, mp3ToOgg, queryString } from '../utils';
+import { generateCommandHelp, getInput } from '../utils';
+import { fileSync } from 'tmp';
+import fs from 'fs';
+import OpenAI from 'openai';
 
 export class VoicePlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -12,10 +15,6 @@ export class VoicePlugin extends PluginBase {
         aliases: ['/v', '/tts'],
         parameters: [
           {
-            name: 'language',
-            required: false,
-          },
-          {
             name: 'text',
             required: true,
           },
@@ -25,56 +24,20 @@ export class VoicePlugin extends PluginBase {
     ];
   }
   async run(msg: Message): Promise<void> {
-    let input = getInput(msg);
+    const input = getInput(msg);
     if (!input) {
       return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
     }
 
-    if (encodeURI(input).length > 200) {
-      return this.bot.replyMessage(msg, this.bot.errors.failed);
-    }
-
-    let language = this.bot.config.locale || 'en_UK';
-    const langRegExp = new RegExp('\\[(\\S+)\\]', 'gim');
-    const inputMatch = langRegExp.exec(getWord(input, 1));
-    if (inputMatch && inputMatch.length > 0 && inputMatch[1]) {
-      language = inputMatch[1];
-      input = input.replace(langRegExp, '');
-    }
-
-    const url = 'https://translate.google.com/translate_tts';
-    const params = {
-      tl: language,
-      q: input,
-      ie: 'UTF-8',
-      total: input.length,
-      idx: 0,
-      client: 'tw-ob',
-      key: this.bot.config.apiKeys.googleDeveloperConsole,
-    };
-    const headers = {
-      Referer: 'https://translate.google.com/',
-      'User-Agent':
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
-    };
-
-    let file;
-    try {
-      logger.info(`${url}?${queryString(params)}`);
-      file = await download(url, params, headers, false, this.bot);
-    } catch (error) {
-      return this.bot.replyMessage(msg, this.bot.errors.connectionError);
-    }
-    if (!file) {
-      return this.bot.replyMessage(msg, this.bot.errors.connectionError);
-    }
-    const voice = await mp3ToOgg(file);
-    if (voice) {
-      this.bot.replyMessage(msg, voice, 'voice');
-    } else if (file) {
-      this.bot.replyMessage(msg, file, 'voice');
-    } else {
-      this.bot.replyMessage(msg, this.bot.errors.downloadFailed);
-    }
+    const client = new OpenAI({ apiKey: this.bot.config.apiKeys.openAIKey });
+    const speechFile = fileSync({ mode: 0o644, postfix: `.ogg` });
+    const opus = await client.audio.speech.create({
+      model: 'tts-1',
+      voice: 'nova',
+      input,
+    });
+    const buffer = Buffer.from(await opus.arrayBuffer());
+    await fs.promises.writeFile(speechFile.name, buffer);
+    this.bot.replyMessage(msg, speechFile.name, 'voice');
   }
 }
