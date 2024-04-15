@@ -1,5 +1,5 @@
 import { WebSocketServer, WebSocket } from 'ws';
-import { BotSocket, Message, WSBroadcast, WSInit, WSMessage } from './types';
+import { BotSocket, Message, WSBroadcast, WSInit, WSMessage, WSPong } from './types';
 import { catchException, logger, now } from './utils';
 import { Bot } from './bot';
 import { Database } from './database';
@@ -18,17 +18,25 @@ const close = () => {
   });
 
   setTimeout(() => {
-    wss.clients.forEach((socket) => {
-      if (socket.readyState === socket.OPEN || socket.readyState === socket.CLOSING) {
-        socket.terminate();
-      }
-    });
-    process.exit();
+    forceClose();
   }, 10000);
 };
 
+const forceClose = () => {
+  logger.info(`🔴 Force close connections...`);
+
+  wss.clients.forEach((socket) => {
+    if (socket.readyState === socket.OPEN || socket.readyState === socket.CLOSING) {
+      socket.terminate();
+    }
+  });
+  process.exit();
+};
+
 process.on('SIGINT', () => close());
-process.on('SIGTERM', () => close());
+process.on('SIGTERM', () => forceClose());
+process.on('SIGUSR1', () => forceClose());
+process.on('SIGUSR2', () => forceClose());
 process.on('exit', () => {
   logger.info('❎ Exit process');
 });
@@ -73,6 +81,12 @@ const start = () => {
           bot.messagesHandler(msg.message);
         } else if (json.type === 'ping') {
           logger.debug('Ping');
+          const pong: WSPong = {
+            bot: bot.config.name,
+            platform: bot.platform,
+            type: 'pong',
+          };
+          ws.send(JSON.stringify(pong));
         } else if (json.type === 'broadcast') {
           const broadcast: WSBroadcast = json;
           const message: WSMessage = {

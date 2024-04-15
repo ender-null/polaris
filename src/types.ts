@@ -263,6 +263,10 @@ export interface WSPing extends WSData {
   type: 'ping';
 }
 
+export interface WSPong extends WSData {
+  type: 'pong';
+}
+
 export interface WSBroadcast extends WSData {
   type: 'broadcast';
   target: string | string[];
