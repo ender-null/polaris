@@ -52,7 +52,13 @@ export class CinemaPlugin extends PluginBase {
             return `<a href="${session.url}">${label}</a>`;
           })
           .join(', ');
-        text += `\n<b>${item.name}</b>\n<a href="${item.source}">🔗</a> <a href="${item.trailer}">🎬</a> ⌛ ${item.durationReadable}\n🎫 ${sessions}\n`;
+        text += `\n<b>${item.name}</b>\n`;
+        text += `<a href="${item.source}">🔗</a>`;
+        if (item.trailer) {
+          text += `<a href="${item.trailer}">🎬</a>`;
+        }
+        text += `⌛ ${item.durationReadable}`;
+        text += `\n🎫 ${sessions}\n`;
       });
     }
 
