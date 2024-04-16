@@ -102,7 +102,7 @@ export class Bot {
         }
       }
     });
-    logger.info(`✅ Loaded ${this.plugins.length}/${Object.keys(plugins).length} plugins for "${this.config.name}"`);
+    logger.info(`❇️ Loaded ${this.plugins.length}/${Object.keys(plugins).length} plugins for "${this.config.name}"`);
   }
 
   checkIfPluginIsEnabled(name: string): boolean {

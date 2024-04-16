@@ -153,7 +153,7 @@ export class PolePlugin extends PluginBase {
         groupPoles.forEach((entry) => {
           rankingTypes.map((type) => {
             if (entry[type] != undefined) {
-              if (ranking[entry[type]] == undefined) {
+              if (!ranking[entry[type]]) {
                 ranking[entry[type]] = {};
                 rankingTypes.map((t) => {
                   ranking[entry[type]][t] = 0;
@@ -169,20 +169,24 @@ export class PolePlugin extends PluginBase {
           text += `\n • ${await getFullName(this.bot, user.uid, false)}: <b>${user.points}</b> ${this.strings.points}`;
         });
 
-        types.map((type) => {
-          let section = `\n\n<b>${capitalize(this.strings[type + 's'])}:</b>`;
-          let empty = true;
-          const rank = this.sortRanking(ranking, type);
-          rank.map(async (user) => {
-            if (user[type]) {
-              empty = false;
-              section += `\n • ${await getFullName(this.bot, user.uid, false)}: <b>${user[type]}</b> ${this.strings[type + 's']}`;
+        await Promise.all(
+          types.map(async (type) => {
+            let section = `\n\n<b>${capitalize(this.strings[type + 's'])}:</b>`;
+            let empty = true;
+            const rank = this.sortRanking(ranking, type);
+            await Promise.all(
+              rank.map(async (user) => {
+                if (user[type]) {
+                  empty = false;
+                  section += `\n • ${await getFullName(this.bot, user.uid, false)}: <b>${user[type]}</b> ${this.strings[type + 's']}`;
+                }
+              }),
+            );
+            if (!empty) {
+              text += section;
             }
-          });
-          if (!empty) {
-            text += section;
-          }
-        });
+          }),
+        );
       } else {
         this.bot.replyMessage(msg, this.bot.errors.noResults);
       }
@@ -210,13 +214,16 @@ export class PolePlugin extends PluginBase {
       }
       const todaysPoles = await poles.findOne({ gid, date: date });
       if (todaysPoles) {
-        typesToShow.map(async (type) => {
-          if (todaysPoles[type] != undefined) {
-            text += `\n${format(this.strings[type + 'Set'], await getFullName(this.bot, todaysPoles[type], false))}`;
-          } else {
-            text += `\n${this.strings[type + 'NotSet']}`;
-          }
-        });
+        const result = await Promise.all(
+          typesToShow.map(async (type) => {
+            if (todaysPoles[type]) {
+              return `\n${format(this.strings[type + 'Set'], await getFullName(this.bot, todaysPoles[type], false))}`;
+            } else {
+              return `\n${this.strings[type + 'NotSet']}`;
+            }
+          }),
+        );
+        text += result.join();
       } else {
         text += `\n${this.strings.poleNotSet}`;
       }
@@ -232,6 +239,8 @@ export class PolePlugin extends PluginBase {
         ) {
           return this.bot.replyMessage(msg, format(this.strings.tooSoon, await getUsername(this.bot, uid)));
         }
+      } else if (type !== 'pole') {
+        return this.bot.replyMessage(msg, format(this.strings.tooSoon, await getUsername(this.bot, uid)));
       }
       if (type == 'canaria' && !timeInRange(time(1), time(2), now())) {
         return this.bot.replyMessage(msg, format(this.strings.tooSoonCanaria, await getUsername(this.bot, uid)));

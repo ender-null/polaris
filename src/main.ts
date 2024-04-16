@@ -36,7 +36,7 @@ export const db: MongoDatabases = {};
 const start = () => {
   logger.info('🟡 WebSocket server waiting for connections...');
   wss.on('connection', (ws: WebSocket) => {
-    logger.info('🟢 Connected');
+    logger.info('🟢 Client connected');
     let bot: Bot;
 
     ws.on('error', console.error);
@@ -66,7 +66,7 @@ const start = () => {
           bots[bot.user.id] = ws;
           await bot.initTranslations();
           logger.info(
-            `🟢 Connected as ${bot.config.icon} ${bot.user.firstName} (@${bot.user.username}) [${bot.user.id}] on platform '${init.platform}'`,
+            `✅ Connected as ${bot.config.icon} ${bot.user.firstName} (@${bot.user.username}) [${bot.user.id}] on platform '${init.platform}'`,
           );
           bot.scheduleCronJobs();
         } else if (json.type === 'message') {

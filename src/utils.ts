@@ -793,6 +793,21 @@ export const escapeRegExp = (text: string): string => {
 
 export const htmlToMarkdown = (text: string): string => {
   if (text) {
+    text = text.replace(new RegExp('<a href="(.*?)">(.*?)</a>', 'gim'), '[$2]($1)');
+    text = text.replace(new RegExp('<i>(.*?)</i>', 'gim'), '_$1_');
+    text = text.replace(new RegExp('<b>(.*?)</b>', 'gim'), '*$1*');
+    text = text.replace(new RegExp('<u>(.*?)</u>', 'gim'), '~$1~');
+    text = text.replace(new RegExp('<code>(.*?)</code>', 'gim'), '`$1`');
+    text = text.replace(new RegExp('<pre>(.*?)</pre>', 'gim'), '```$1```');
+
+    text = text.replace(new RegExp('&lt;', 'gim'), '<');
+    text = text.replace(new RegExp('&gt;', 'gim'), '>');
+  }
+  return text;
+};
+
+export const htmlToMarkdownLegacy = (text: string): string => {
+  if (text) {
     const replacements = [
       { pattern: '<code class="language-([\\w]+)">([\\S\\s]+)</code>', sub: '```$1\n$2```' },
       { pattern: '<a href="(.[^<]+)">(.[^<]+)</a>', sub: '$1' },
