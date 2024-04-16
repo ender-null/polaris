@@ -25,7 +25,7 @@ export class AnimalPlugin extends PluginBase {
     ];
   }
   async run(msg: Message): Promise<void> {
-    if (hasTag(this.bot, msg.conversation.id, 'noanimals')) {
+    if (await hasTag(this.bot, msg.conversation.id, 'noanimals')) {
       return;
     }
     let url;

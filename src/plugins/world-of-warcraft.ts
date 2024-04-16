@@ -104,7 +104,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       let characterName = null;
 
       if (!input) {
-        const tags = getTags(this.bot, uid, 'wow:?');
+        const tags = await getTags(this.bot, uid, 'wow:?');
         if (tags && tags.length > 0) {
           const characterInfo = tags[0].split(':')[1];
           if (characterInfo.indexOf('/') > -1) {

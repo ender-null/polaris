@@ -55,33 +55,25 @@ export class Bot {
     this.bindings = new Actions(this);
   }
 
-  messageSender({ conversation, content }: Message): void {
+  async messageSender({ conversation, content }: Message): Promise<void> {
     logger.info(
-      `💬 ${this.config.icon} [${conversation.id}] ${conversation.title} 🗣️ ${getFullName(this.user.id)} [${
+      `💬 ${this.config.icon} [${conversation.id}] ${await getFullName(this, conversation.id)} 🗣️ ${await getFullName(this, this.user.id)} [${
         this.user.id
       }]: ${content}`,
     );
   }
 
   commandSender(method: string, payload: WSCommandPayload): void {
-    logger.info(`💬 ${this.config.icon} [${method}]: ${payload}`);
+    logger.info(`💬 ${this.config.icon} <${method}>: ${JSON.stringify(payload)}`);
   }
 
   async messagesHandler(msg: Message): Promise<void> {
-    if (!msg.conversation.title) {
-      logger.info(
-        `${getMessageIcon(msg.type)} ${this.config.icon} [${msg.conversation.id}] ${
-          msg.conversation.title
-        } 👤 ${getFullName(msg.sender.id)} [${msg.sender.id}]: ${msg.content}`,
-      );
-    } else {
-      logger.info(
-        `${getMessageIcon(msg.type)} ${this.config.icon} [${msg.conversation.id}] ${msg.conversation.title} 👤 ${
-          (msg.sender as Conversation).title
-        } [${msg.conversation.id}]: ${msg.content}`,
-      );
+    let logMessage = `${getMessageIcon(msg.type)} ${this.config.icon} [${msg.conversation.id}] ${await getFullName(this, msg.conversation.id)}`;
+    if (msg.conversation.id !== msg.sender.id) {
+      logMessage += ` 👤 ${await getFullName(this, msg.sender.id)} [${msg.sender.id}]`;
     }
-
+    logMessage += `: ${msg.content}`;
+    logger.info(logMessage);
     await this.onMessageReceive(msg);
   }
 
@@ -90,11 +82,11 @@ export class Bot {
       logger.info(
         `${getMessageIcon(msg.type)} ${this.config.icon} [${msg.conversation.id}] ${
           msg.conversation.title
-        } 👤 ${getFullName(this.user.id)} [${this.user.id}]: ${msg.content}`,
+        } 👤 ${await getFullName(this, this.user.id)} [${this.user.id}]: ${msg.content}`,
       );
     } else {
       logger.info(
-        `${getMessageIcon(msg.type)} ${this.config.icon} [${msg.conversation.id}] ${msg.conversation.title} 👤 ${getFullName(this.user.id)} [${this.user.id}]: ${msg.content}`,
+        `${getMessageIcon(msg.type)} ${this.config.icon} [${msg.conversation.id}] ${msg.conversation.title} 👤 ${await getFullName(this, this.user.id)} [${this.user.id}]: ${msg.content}`,
       );
     }
   }
@@ -127,85 +119,88 @@ export class Bot {
   }
 
   initTranslations(): void {
-    if (db.translations && db.translations[this.config.translation]) {
-      let trans: Translation = db.translations[this.config.translation];
-      if (trans.extends) {
-        let base = db.translations[trans.extends];
-        while (base.extends) {
-          const inherit = db.translations[base.extends];
-          base = merge(inherit, base);
-          if (inherit.extends) {
-            base.extends = inherit.extends;
-          } else {
-            delete base.extends;
-          }
-        }
-        trans = merge(base, trans);
-      }
-      this.errors = trans.errors;
-      this.plugins.map((plugin) => {
-        if (trans.plugins[plugin.constructor.name]) {
-          if (plugin.commands) {
-            let maxLength = plugin.commands.length;
-            if (
-              trans.plugins[plugin.constructor.name].commands &&
-              Object.keys(trans.plugins[plugin.constructor.name].commands).length > maxLength
-            ) {
-              maxLength = Object.keys(trans.plugins[plugin.constructor.name].commands).length;
+    if (db.polaris) {
+      const translations = db.polaris.collection('translations');
+      if (translations && translations[this.config.translation]) {
+        let trans: Translation = translations[this.config.translation];
+        if (trans.extends) {
+          let base = translations[trans.extends];
+          while (base.extends) {
+            const inherit = translations[base.extends];
+            base = merge(inherit, base);
+            if (inherit.extends) {
+              base.extends = inherit.extends;
+            } else {
+              delete base.extends;
             }
-            for (let commandIndex = 0; commandIndex < maxLength; commandIndex++) {
-              if (trans.plugins[plugin.constructor.name].commands) {
-                if (trans.plugins[plugin.constructor.name].commands[commandIndex]) {
-                  const com = trans.plugins[plugin.constructor.name].commands[commandIndex];
-                  if (plugin.commands[commandIndex] == undefined) {
-                    plugin.commands[commandIndex] = { ...com };
-                  }
-                  if (com.command) {
-                    plugin.commands[commandIndex].command = com.command;
-                  }
-                  if (com.shortcut) {
-                    plugin.commands[commandIndex].shortcut = com.shortcut;
-                  }
-                  if (com.aliases) {
-                    plugin.commands[commandIndex].aliases = [];
-                    Object.keys(com.aliases).map((alias) => {
-                      plugin.commands[commandIndex].aliases[alias] = com.aliases[alias];
-                    });
-                  }
-                  if (com.friendly) {
-                    plugin.commands[commandIndex].friendly = com.friendly;
-                  }
-                  if (com.description) {
-                    plugin.commands[commandIndex].description = com.description;
-                  }
-                  if (com.keepDefault != undefined) {
-                    plugin.commands[commandIndex].keepDefault = com.keepDefault;
-                  }
-                  if (com.hidden != undefined) {
-                    plugin.commands[commandIndex].hidden = com.hidden;
-                  }
-                  if (com.skipHelp != undefined) {
-                    plugin.commands[commandIndex].skipHelp = com.skipHelp;
-                  }
-                  if (com.parameters) {
-                    plugin.commands[commandIndex].parameters = [];
-                    Object.keys(com.parameters).map((param) => {
-                      plugin.commands[commandIndex].parameters[param] = com.parameters[param];
-                    });
+          }
+          trans = merge(base, trans);
+        }
+        this.errors = trans.errors;
+        this.plugins.map((plugin) => {
+          if (trans.plugins[plugin.constructor.name]) {
+            if (plugin.commands) {
+              let maxLength = plugin.commands.length;
+              if (
+                trans.plugins[plugin.constructor.name].commands &&
+                Object.keys(trans.plugins[plugin.constructor.name].commands).length > maxLength
+              ) {
+                maxLength = Object.keys(trans.plugins[plugin.constructor.name].commands).length;
+              }
+              for (let commandIndex = 0; commandIndex < maxLength; commandIndex++) {
+                if (trans.plugins[plugin.constructor.name].commands) {
+                  if (trans.plugins[plugin.constructor.name].commands[commandIndex]) {
+                    const com = trans.plugins[plugin.constructor.name].commands[commandIndex];
+                    if (plugin.commands[commandIndex] == undefined) {
+                      plugin.commands[commandIndex] = { ...com };
+                    }
+                    if (com.command) {
+                      plugin.commands[commandIndex].command = com.command;
+                    }
+                    if (com.shortcut) {
+                      plugin.commands[commandIndex].shortcut = com.shortcut;
+                    }
+                    if (com.aliases) {
+                      plugin.commands[commandIndex].aliases = [];
+                      Object.keys(com.aliases).map((alias) => {
+                        plugin.commands[commandIndex].aliases[alias] = com.aliases[alias];
+                      });
+                    }
+                    if (com.friendly) {
+                      plugin.commands[commandIndex].friendly = com.friendly;
+                    }
+                    if (com.description) {
+                      plugin.commands[commandIndex].description = com.description;
+                    }
+                    if (com.keepDefault != undefined) {
+                      plugin.commands[commandIndex].keepDefault = com.keepDefault;
+                    }
+                    if (com.hidden != undefined) {
+                      plugin.commands[commandIndex].hidden = com.hidden;
+                    }
+                    if (com.skipHelp != undefined) {
+                      plugin.commands[commandIndex].skipHelp = com.skipHelp;
+                    }
+                    if (com.parameters) {
+                      plugin.commands[commandIndex].parameters = [];
+                      Object.keys(com.parameters).map((param) => {
+                        plugin.commands[commandIndex].parameters[param] = com.parameters[param];
+                      });
+                    }
                   }
                 }
               }
             }
+            if (plugin.strings) {
+              plugin.strings = { ...plugin.strings, ...trans.plugins[plugin.constructor.name].strings };
+            }
+            if (plugin.data) {
+              plugin.data = trans.plugins[plugin.constructor.name].data;
+            }
+            plugin.afterTranslation();
           }
-          if (plugin.strings) {
-            plugin.strings = { ...plugin.strings, ...trans.plugins[plugin.constructor.name].strings };
-          }
-          if (plugin.data) {
-            plugin.data = trans.plugins[plugin.constructor.name].data;
-          }
-          plugin.afterTranslation();
-        }
-      });
+        });
+      }
     }
   }
 
@@ -236,7 +231,7 @@ export class Bot {
       if (
         msg.sender.id != +this.config.owner &&
         !isTrusted(this, msg.sender.id, msg) &&
-        (hasTag(this, msg.conversation.id, 'muted') || hasTag(this, msg.sender.id, 'muted'))
+        ((await hasTag(this, msg.conversation.id, 'muted')) || (await hasTag(this, msg.sender.id, 'muted')))
       ) {
         ignoreMessage = true;
       }
@@ -262,7 +257,8 @@ export class Bot {
             if (
               command.friendly &&
               (command.alwaysEnabled ||
-                (!hasTag(this, msg.sender.id, 'noreplies') && !hasTag(this, msg.conversation.id, 'noreplies'))) &&
+                (!(await hasTag(this, msg.sender.id, 'noreplies')) &&
+                  !(await hasTag(this, msg.conversation.id, 'noreplies')))) &&
               msg.conversation.id != +this.config.alertsConversationId &&
               msg.conversation.id != +this.config.adminConversationId
             ) {

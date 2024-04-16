@@ -1,4 +1,3 @@
-import { set } from 'firebase/database';
 import format from 'string-format';
 import { Bot, Conversation, DatabaseReminder, Message } from '..';
 import { db } from '../main';
@@ -144,10 +143,15 @@ export class ReminderPlugin extends PluginBase {
       } else {
         return this.bot.replyMessage(msg, this.bot.errors.invalidArgument);
       }
-      set(db.remindersSnap.child(String(Math.trunc(alarm))).ref, reminder);
-      db.reminders[String(Math.trunc(alarm))] = reminder;
+      const reminders = db[this.bot.platform].collection('reminders');
+      reminders.insertOne(reminder);
 
-      const message = format(this.strings['message'], getFullName(msg.sender.id, false), delayText, text);
+      const message = format(
+        this.strings['message'],
+        await getFullName(this.bot, msg.sender.id, false),
+        delayText,
+        text,
+      );
       this.bot.replyMessage(msg, message);
     } catch (e) {
       catchException(e, this.bot);
@@ -156,32 +160,37 @@ export class ReminderPlugin extends PluginBase {
   }
 
   async cron(): Promise<void> {
-    if (db.reminders && Object.keys(db.reminders).length > 0) {
-      // Reminders are indexed by alarm time so there os no need to check more than one
-      const index = Object.keys(db.reminders)[0];
-      const reminder = db.reminders[index];
+    const groups = db[this.bot.platform].collection('groups');
+    const users = db[this.bot.platform].collection('users');
+    const reminders = db[this.bot.platform].collection('reminders');
+    const expired = reminders.find({ alarm: { $lt: now() } });
 
-      if (String(reminder.bot) == String(this.bot.user.id) && reminder.alarm < now()) {
+    let reminder = await expired.next();
+
+    while (reminder) {
+      if (String(reminder.bot) == String(this.bot.user.id)) {
         let chat;
+        const group = await groups.findOne({ id: reminder.chatId });
+        const user = await users.findOne({ id: reminder.chatId });
         if (String(reminder.chatId).startsWith('-')) {
-          chat = new Conversation(reminder.chatId, db.groups[reminder.chatId].title);
+          chat = new Conversation(reminder.chatId, group.title);
         } else {
-          chat = new Conversation(reminder.chatId, db.users[reminder.chatId].first_name);
+          chat = new Conversation(reminder.chatId, user.first_name);
         }
 
         let name = reminder.firstName;
         let username = reminder.username;
         if (reminder.userId) {
-          name = getFullName(reminder.userId, false);
-          username = getUsername(reminder.userId).slice(1);
+          name = await getFullName(this.bot, reminder.userId, false);
+          username = (await getUsername(this.bot, reminder.userId)).slice(1);
         }
         let text = `<i>${reminder.text}</i>\n - ${name}`;
         if (username && username.length > 0) {
           text += ` (@${username})`;
         }
         this.bot.sendMessage(chat, text);
-        set(db.remindersSnap.child(index).ref, null);
-        delete db.reminders[index];
+        await reminders.deleteOne({ _id: reminder._id });
+        reminder = await expired.next();
       }
     }
   }

@@ -1,4 +1,3 @@
-import { remove, set, update } from 'firebase/database';
 import format from 'string-format';
 import { Bot, Message } from '..';
 import { db } from '../main';
@@ -125,7 +124,7 @@ export class PolePlugin extends PluginBase {
     if (!String(msg.conversation.id).startsWith('-')) {
       return this.bot.replyMessage(msg, this.bot.errors.groupOnly);
     }
-    if (hasTag(this.bot, msg.conversation.id, 'nopole')) {
+    if (await hasTag(this.bot, msg.conversation.id, 'nopole')) {
       return;
     }
 
@@ -137,8 +136,10 @@ export class PolePlugin extends PluginBase {
     const commandIndex = getCommandIndex(this, msg.content);
     const types = ['pole', 'subpole', 'fail', 'iron', 'canaria', 'andaluza'];
 
+    const poles = db[this.bot.platform].collection('poles');
     if (commandIndex == 0) {
-      if (db.poles && db.poles[gid] != undefined) {
+      const groupPoles = await poles.find({ gid }).toArray();
+      if (groupPoles?.length) {
         let rankingTypes;
         if (timeInRange(time(1), time(2), now())) {
           rankingTypes = [types[4]];
@@ -148,33 +149,33 @@ export class PolePlugin extends PluginBase {
           rankingTypes = types.slice(0, 4);
         }
         const ranking: DatabasePoleList = {};
-        Object.keys(db.poles[gid]).map((day) => {
+        groupPoles.forEach((entry) => {
           rankingTypes.map((type) => {
-            if (db.poles[gid][day][type] != undefined) {
-              if (ranking[db.poles[gid][day][type]] == undefined) {
-                ranking[db.poles[gid][day][type]] = {};
+            if (entry[type] != undefined) {
+              if (ranking[entry[type]] == undefined) {
+                ranking[entry[type]] = {};
                 rankingTypes.map((t) => {
-                  ranking[db.poles[gid][day][type]][t] = 0;
+                  ranking[entry[type]][t] = 0;
                 });
               }
-              ranking[db.poles[gid][day][type]][type] += 1;
+              ranking[entry[type]][type] += 1;
             }
           });
         });
         text = `<b>${this.strings.ranking}:</b>`;
         const rank = this.sortRanking(ranking, 'points');
-        rank.map((user) => {
-          text += `\n • ${getFullName(user.uid, false)}: <b>${user.points}</b> ${this.strings.points}`;
+        rank.map(async (user) => {
+          text += `\n • ${await getFullName(this.bot, user.uid, false)}: <b>${user.points}</b> ${this.strings.points}`;
         });
 
         types.map((type) => {
           let section = `\n\n<b>${capitalize(this.strings[type + 's'])}:</b>`;
           let empty = true;
           const rank = this.sortRanking(ranking, type);
-          rank.map((user) => {
+          rank.map(async (user) => {
             if (user[type]) {
               empty = false;
-              section += `\n • ${getFullName(user.uid, false)}: <b>${user[type]}</b> ${this.strings[type + 's']}`;
+              section += `\n • ${await getFullName(this.bot, user.uid, false)}: <b>${user[type]}</b> ${this.strings[type + 's']}`;
             }
           });
           if (!empty) {
@@ -185,11 +186,10 @@ export class PolePlugin extends PluginBase {
         this.bot.replyMessage(msg, this.bot.errors.noResults);
       }
     } else if (commandIndex == 1) {
-      if (hasTag(this.bot, msg.conversation.id, 'polereset')) {
+      if (await hasTag(this.bot, msg.conversation.id, 'polereset')) {
         if (isTrusted(this.bot, msg.sender.id, msg) || isAdmin(this.bot, msg.sender.id)) {
           text = this.strings.polereset;
-          delete db.poles[gid];
-          remove(db.polesSnap.child(gid).ref);
+          await poles.deleteMany({ gid });
         } else {
           text = this.bot.errors.adminRequired;
         }
@@ -207,10 +207,11 @@ export class PolePlugin extends PluginBase {
       } else {
         typesToShow = types.slice(0, 4);
       }
-      if (db.poles && db.poles[gid] && db.poles[gid][date]) {
-        typesToShow.map((type) => {
-          if (db.poles[gid][date][type] != undefined) {
-            text += `\n${format(this.strings[type + 'Set'], getFullName(db.poles[gid][date][type], false))}`;
+      const todaysPoles = await poles.findOne({ gid, date: date });
+      if (todaysPoles) {
+        typesToShow.map(async (type) => {
+          if (todaysPoles[type] != undefined) {
+            text += `\n${format(this.strings[type + 'Set'], await getFullName(this.bot, todaysPoles[type], false))}`;
           } else {
             text += `\n${this.strings[type + 'NotSet']}`;
           }
@@ -221,57 +222,56 @@ export class PolePlugin extends PluginBase {
       return this.bot.replyMessage(msg, text);
     } else if (commandIndex >= 3 && commandIndex <= 8) {
       const type = types[commandIndex - 3];
-      if (db.poles && db.poles[gid] && db.poles[gid][date]) {
+      const todaysPoles = await poles.findOne({ gid, date: date });
+      if (todaysPoles) {
         if (
-          ((type == 'subpole' || type == 'fail' || type == 'iron') && db.poles[gid][date].pole == undefined) ||
-          ((type == 'fail' || type == 'iron') && db.poles[gid][date].subpole == undefined) ||
-          (type == 'iron' && db.poles[gid][date].fail == undefined)
+          ((type == 'subpole' || type == 'fail' || type == 'iron') && !todaysPoles.pole) ||
+          ((type == 'fail' || type == 'iron') && !todaysPoles.subpole) ||
+          (type == 'iron' && !todaysPoles.fail)
         ) {
-          return this.bot.replyMessage(msg, format(this.strings.tooSoon, getUsername(uid)));
+          return this.bot.replyMessage(msg, format(this.strings.tooSoon, await getUsername(this.bot, uid)));
         }
       }
       if (type == 'canaria' && !timeInRange(time(1), time(2), now())) {
-        return this.bot.replyMessage(msg, format(this.strings.tooSoonCanaria, getUsername(uid)));
+        return this.bot.replyMessage(msg, format(this.strings.tooSoonCanaria, await getUsername(this.bot, uid)));
       } else if (type == 'andaluza' && !timeInRange(time(12), time(13), now())) {
-        return this.bot.replyMessage(msg, format(this.strings.tooSoonAndaluza, getUsername(uid)));
+        return this.bot.replyMessage(msg, format(this.strings.tooSoonAndaluza, await getUsername(this.bot, uid)));
       }
-      if (this.hasPole(gid, uid, date) && type != 'canaria' && type != 'andaluza') {
+      if ((await this.hasPole(gid, uid, date)) && type != 'canaria' && type != 'andaluza') {
         return;
       }
-      if (db.poles && db.poles[gid] && db.poles[gid][date] && db.poles[gid][date][type] != undefined) {
+      if (todaysPoles && todaysPoles[type] != undefined) {
         return;
       }
 
-      if (!db.poles) {
-        db.poles = {};
-      }
-      if (db.poles[gid] == undefined) {
-        db.poles[gid] = {};
-      }
-
-      if (!db.poles || !db.poles[gid] || !db.poles[gid][date]) {
-        set(db.polesSnap.child(gid).child(date).ref, {
+      if (!todaysPoles) {
+        await poles.insertOne({
+          gid,
+          date: date,
           [type]: uid,
         });
-        db.poles[gid][date] = {
-          [type]: uid,
-        };
       } else {
-        update(db.polesSnap.child(gid).child(date).ref, {
-          [type]: uid,
-        });
-        db.poles[gid][date][type] = uid;
+        poles.updateOne(
+          { gid, date: date },
+          {
+            $set: {
+              [type]: uid,
+            },
+          },
+        );
       }
-      text = format(this.strings['got' + capitalize(type)], getUsername(uid));
+      text = format(this.strings['got' + capitalize(type)], await getUsername(this.bot, uid));
     }
     this.bot.replyMessage(msg, text);
   }
 
-  hasPole(gid: number | string, uid: number | string, date: string): boolean {
-    if (db.poles && db.poles[gid] != undefined && db.poles[gid][date] != undefined) {
+  async hasPole(gid: number | string, uid: number | string, date: string): Promise<boolean> {
+    const poles = db[this.bot.platform].collection('poles');
+    const todaysPoles = await poles.findOne({ gid, date: date });
+    if (todaysPoles != undefined) {
       const types = ['pole', 'subpole', 'fail', 'iron'];
       for (const type of types) {
-        if (db.poles[gid][date][type] != undefined && db.poles[gid][date][type] == uid) {
+        if (todaysPoles[type] != undefined && todaysPoles[type] == uid) {
           return true;
         }
       }

@@ -1,4 +1,3 @@
-import { set, update } from 'firebase/database';
 import format from 'string-format';
 import { Bot, Message } from '..';
 import { db } from '../main';
@@ -43,6 +42,10 @@ export class AboutPlugin extends PluginBase {
   async run(msg: Message): Promise<void> {
     let text;
     if (isCommand(this, 1, msg.content) || isCommand(this, 3, msg.content)) {
+      const users = db[this.bot.platform].collection('users');
+      const userCount = await users.countDocuments();
+      const groups = db[this.bot.platform].collection('groups');
+      const groupCount = await groups.countDocuments();
       const greeting = format(this.strings.greeting, this.bot.user.firstName);
       const version = format(this.strings.version, process.env.npm_package_version);
       const license = this.strings.license;
@@ -51,7 +54,7 @@ export class AboutPlugin extends PluginBase {
       const notice = this.strings.notice;
       const channel = this.strings.channel;
       const donations = format(this.strings.donations, this.bot.config.prefix);
-      const stats = format(this.strings.stats, Object.keys(db.users).length, Object.keys(db.groups).length);
+      const stats = format(this.strings.stats, userCount, groupCount);
 
       if (isCommand(this, 1, msg.content)) {
         text = `${greeting}\n\n${notice}\n${channel}\n\n${help}\n\n${version}\n${donations}\n\n${license}\n\n${stats}`;
@@ -72,66 +75,105 @@ export class AboutPlugin extends PluginBase {
   }
 
   async always(msg: Message): Promise<void> {
-    // Update group data
+    const groups = db[this.bot.platform].collection('groups');
     const gid = String(msg.conversation.id);
-    if (String(msg.conversation.id).startsWith('-')) {
-      if (!db.groups) {
-        db.groups = {};
-      }
-      if (db.groups && db.groups[gid] != undefined) {
-        let doUpdate = false;
-        if (db.groups[gid].title != msg.conversation.title) {
-          db.groups[gid].title = msg.conversation.title || '';
-          doUpdate = true;
-        }
-        if (doUpdate) {
-          update(db.groupsSnap.child(gid).ref, db.groups[gid]);
+    if (gid.startsWith('-')) {
+      const group = await groups.findOne({ id: gid });
+      if (group) {
+        if (group.title != msg.conversation.title) {
+          const document = {
+            id: gid,
+            title: msg.conversation.title || '',
+          };
+
+          await groups.updateOne({ id: gid }, { $set: document });
         }
       } else {
-        db.groups[gid] = {
+        const document = {
+          id: gid,
           title: msg.conversation.title || '',
         };
-        set(db.groupsSnap.child(gid).ref, db.groups[gid]);
+        await groups.insertOne(document);
       }
     }
 
-    const uid = String(msg.sender.id);
-    if (uid.startsWith('-100')) {
+    if (String(msg.sender.id).startsWith('-100')) {
       return;
     }
+    const users = db[this.bot.platform].collection('users');
+    const uid = String(msg.sender.id);
+    const user = await users.findOne({ id: uid });
 
-    if (!db.users) {
-      db.users = {};
-    }
-    if (db.users[uid] != undefined) {
+    if (user) {
       let doUpdate = false;
-      if (db.users[uid].first_name != msg.sender['firstName']) {
-        db.users[uid].first_name = msg.sender['firstName'] || '';
+      const document = {
+        id: uid,
+      };
+      if (user.first_name != msg.sender['firstName']) {
+        document['first_name'] = msg.sender['firstName'] || '';
         doUpdate = true;
       }
-      if (db.users[uid].last_name != msg.sender['lastName']) {
-        db.users[uid].last_name = msg.sender['lastName'] || '';
+      if (user.last_name != msg.sender['lastName']) {
+        document['last_name'] = msg.sender['lastName'] || '';
         doUpdate = true;
       }
-      if (db.users[uid].username != msg.sender['username']) {
-        db.users[uid].username = msg.sender['username'] || '';
+      if (user.username != msg.sender['username']) {
+        document['username'] = msg.sender['username'] || '';
         doUpdate = true;
       }
-      if (db.users[uid].is_bot != msg.sender['isBot']) {
-        db.users[uid].is_bot = msg.sender['isBot'] || false;
+      if (user.is_bot != msg.sender['isBot']) {
+        document['is_bot'] = msg.sender['isBot'] || false;
         doUpdate = true;
       }
       if (doUpdate) {
-        update(db.usersSnap.child(uid).ref, db.users[uid]);
+        await users.updateOne({ id: uid }, { $set: document });
       }
     } else {
-      db.users[uid] = {
+      const document = {
+        id: uid,
         first_name: msg.sender['firstName'] || '',
         last_name: msg.sender['lastName'] || '',
         username: msg.sender['username'] || '',
         is_bot: msg.sender['isBot'] || false,
       };
-      set(db.usersSnap.child(uid).ref, db.users[uid]);
+      await users.insertOne(document);
+    }
+
+    const bid = String(this.bot.user.id);
+    const myself = await users.findOne({ id: bid });
+    if (myself) {
+      let doUpdate = false;
+      const document = {
+        id: bid,
+      };
+      if (myself.first_name != this.bot.user.firstName) {
+        document['first_name'] = this.bot.user.firstName || '';
+        doUpdate = true;
+      }
+      if (myself.last_name != this.bot.user.lastName) {
+        document['last_name'] = this.bot.user.lastName || '';
+        doUpdate = true;
+      }
+      if (myself.username != this.bot.user.username) {
+        document['username'] = this.bot.user.username || '';
+        doUpdate = true;
+      }
+      if (myself.is_bot != this.bot.user.isBot) {
+        document['is_bot'] = this.bot.user.isBot || false;
+        doUpdate = true;
+      }
+      if (doUpdate) {
+        await users.updateOne({ id: bid }, { $set: document });
+      }
+    } else {
+      const document = {
+        id: bid,
+        first_name: this.bot.user.firstName || '',
+        last_name: this.bot.user.lastName || '',
+        username: this.bot.user.username || '',
+        is_bot: this.bot.user.isBot || false,
+      };
+      await users.insertOne(document);
     }
   }
 }

@@ -1,9 +1,10 @@
 import { WebSocketServer, WebSocket } from 'ws';
-import { BotSocket, Message, WSBroadcast, WSInit, WSMessage, WSPong } from './types';
+import { BotSocket, Message, MongoDatabases, WSBroadcast, WSInit, WSMessage, WSPong } from './types';
 import { catchException, logger, now } from './utils';
 import { Bot } from './bot';
-import { Database } from './database';
+import { MongoClient } from 'mongodb';
 
+let mongo: MongoClient;
 const wss: WebSocketServer = new WebSocketServer({ port: 8080 });
 
 const close = () => {
@@ -14,34 +15,23 @@ const close = () => {
   }
 
   wss.clients.forEach((socket) => {
-    socket.close();
+    socket.terminate();
   });
 
-  setTimeout(() => {
-    forceClose();
-  }, 10000);
-};
-
-const forceClose = () => {
-  logger.info(`🔴 Force close connections...`);
-
-  wss.clients.forEach((socket) => {
-    if (socket.readyState === socket.OPEN || socket.readyState === socket.CLOSING) {
-      socket.terminate();
-    }
-  });
+  mongo.close();
   process.exit();
 };
 
 process.on('SIGINT', () => close());
-process.on('SIGTERM', () => forceClose());
-process.on('SIGUSR1', () => forceClose());
-process.on('SIGUSR2', () => forceClose());
+process.on('SIGTERM', () => close());
+process.on('SIGUSR1', () => close());
+process.on('SIGUSR2', () => close());
 process.on('exit', () => {
   logger.info('❎ Exit process');
 });
 
 const bots: BotSocket = {};
+export const db: MongoDatabases = {};
 
 const start = () => {
   logger.info('🟡 WebSocket server waiting for connections...');
@@ -69,6 +59,9 @@ const start = () => {
         if (json.type === 'init') {
           const init: WSInit = json;
           bot = new Bot(ws, init.config, init.user, init.platform);
+          if (!db[init.platform]) {
+            db[init.platform] = mongo.db(init.platform);
+          }
           bot.initPlugins();
           bots[bot.user.id] = ws;
           bot.initTranslations();
@@ -78,12 +71,14 @@ const start = () => {
           bot.scheduleCronJobs();
         } else if (json.type === 'message') {
           const msg: WSMessage = json;
-          bot.messagesHandler(msg.message);
+          if (bot) {
+            bot.messagesHandler(msg.message);
+          }
         } else if (json.type === 'ping') {
           logger.debug('Ping');
           const pong: WSPong = {
-            bot: bot.config.name,
-            platform: bot.platform,
+            bot: bot ? bot.config.name : '?',
+            platform: bot ? bot.platform : '?',
             type: 'pong',
           };
           ws.send(JSON.stringify(pong));
@@ -128,7 +123,18 @@ const start = () => {
   });
 };
 
-export const db = new Database();
+MongoClient.connect(process.env.MONGODB_URI, {
+  appName: 'polaris',
+}).then(async (client: MongoClient) => {
+  logger.info(`✅ Connected successfully to database`);
+
+  db['polaris'] = client.db('polaris');
+  mongo = client;
+
+  await start();
+});
+
+/*export const db = new Database();
 db.events.once('loaded', async () => {
   await start();
   db.events.on('update:configs', async () => {
@@ -136,3 +142,4 @@ db.events.once('loaded', async () => {
   });
 });
 db.init();
+*/

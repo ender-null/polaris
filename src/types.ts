@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { WebSocket } from 'ws';
 import { Config } from '.';
+import { Db } from 'mongodb';
 
 export class ErrorMessages {
   adminRequired?: string;
@@ -177,6 +178,10 @@ export class Message {
 
 export interface BotSocket {
   [id: string]: WebSocket;
+}
+
+export interface MongoDatabases {
+  [id: string]: Db;
 }
 
 export class BroadcastMessage {

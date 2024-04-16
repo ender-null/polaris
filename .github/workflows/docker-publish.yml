@@ -151,6 +151,7 @@ jobs:
           USERNAME: op://end.works/wired/username
           KEY: op://end.works/SSH Key/private key
           FINGERPRINT: op://end.works/SSH Key/fingerprint
+          MONGODB_URI: op://end.works/Polaris Config/mongodb uri
 
       - name: Run container on host
         uses: appleboy/ssh-action@v1.0.3
@@ -163,7 +164,7 @@ jobs:
             docker pull ghcr.io/${{ github.repository }}:${{ env.TAG }}
             docker stop ${{ env.CONTAINER_NAME }}
             docker rm ${{ env.CONTAINER_NAME }}
-            docker run -v $PWD/logs:/usr/src/app/logs -v $PWD/docs/data:/usr/src/app/data -v $PWD/docs/firebase.json:/usr/src/app/firebase.json -p 8080:8080 -ti -d --restart unless-stopped --name ${{ env.CONTAINER_NAME }} ghcr.io/${{ github.repository }}:${{ env.TAG }}
+            docker run -e MONGODB_URI=${{ env.MONGODB_URI }} -v $PWD/logs:/usr/src/app/logs -p 8080:8080 -ti -d --restart unless-stopped --name ${{ env.CONTAINER_NAME }} ghcr.io/${{ github.repository }}:${{ env.TAG }}
 
       - name: Generate summary
         id: generate-summary

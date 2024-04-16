@@ -1,5 +1,4 @@
 import { Bot, Message } from '..';
-import { db } from '../main';
 import { PluginBase } from '../plugin';
 import { escapeMarkdown, hasTag } from '../utils';
 
@@ -20,7 +19,10 @@ export class ReactionPlugin extends PluginBase {
   }
 
   async run(msg: Message): Promise<void> {
-    if (hasTag(this.bot, msg.conversation.id, 'noreactions') || hasTag(this.bot, msg.sender.id, 'noreactions')) {
+    if (
+      (await hasTag(this.bot, msg.conversation.id, 'noreactions')) ||
+      (await hasTag(this.bot, msg.sender.id, 'noreactions'))
+    ) {
       return;
     }
     for (const reaction in this.data) {
@@ -64,11 +66,7 @@ export class ReactionPlugin extends PluginBase {
         let name;
         let username;
         if (+message.sender.id > 0) {
-          if (db.users[message.sender.id] != undefined && db.users[message.sender.id].nick) {
-            name = db.users[message.sender.id].nick;
-          } else {
-            name = message.sender['firstName'];
-          }
+          name = message.sender['firstName'];
           username = '@' + message.sender['username'];
         } else {
           name = message.sender['title'];

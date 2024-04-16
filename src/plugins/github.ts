@@ -14,7 +14,7 @@ export class GitHubPlugin extends PluginBase {
 
     if (data) {
       let text;
-      const subs = getTaggedWith(this.bot, `sub:github/${data.repository.name}`);
+      const subs = await getTaggedWith(this.bot, `sub:github/${data.repository.name}`);
       if (data.head_commit) {
         text = `<a href="${data.compare}">${data.commits.length} new commit</a> to <b>${
           data.repository.name

@@ -64,7 +64,7 @@ export class ImagePlugin extends PluginBase {
       p: '1',
       v7exp: 'a',
     };
-    if (!hasTag(this.bot, msg.conversation.id, 'nonsfw')) {
+    if (!(await hasTag(this.bot, msg.conversation.id, 'nonsfw'))) {
       params['kp'] = -2;
     }
 

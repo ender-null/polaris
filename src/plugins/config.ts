@@ -42,12 +42,12 @@ export class ConfigPlugin extends PluginBase {
     const enabled = ['reactions', 'roulette', 'replies', 'pole', 'fiesta', 'nsfw'];
     const disabled = ['antispam', 'antiarab', 'antirussian', 'polereset'];
     const config = {};
-    enabled.map((param) => {
-      config[param] = !hasTag(this.bot, msg.conversation.id, 'no' + param);
+    enabled.map(async (param) => {
+      config[param] = !(await hasTag(this.bot, msg.conversation.id, 'no' + param));
     });
 
-    disabled.map((param) => {
-      config[param] = hasTag(this.bot, msg.conversation.id, param);
+    disabled.map(async (param) => {
+      config[param] = await hasTag(this.bot, msg.conversation.id, param);
     });
 
     let text = '';

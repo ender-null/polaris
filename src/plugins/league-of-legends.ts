@@ -137,7 +137,7 @@ export class LeagueOfLegendsPlugin extends PluginBase {
       this.region = this.regions['euw'];
 
       if (!input) {
-        const tags = getTags(this.bot, uid, 'riot:?');
+        const tags = await getTags(this.bot, uid, 'riot:?');
         if (tags && tags.length > 0) {
           const summonerInfo = tags[0].split(':')[1];
           if (summonerInfo.indexOf('/') > -1) {
