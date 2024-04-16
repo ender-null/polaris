@@ -1,6 +1,8 @@
 import format from 'string-format';
-import { Bot, Message } from '..';
+
 import { PluginBase } from '../plugin';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class AddToDiscordPlugin extends PluginBase {
   constructor(bot: Bot) {

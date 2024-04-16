@@ -1,5 +1,6 @@
-import { Bot, Message } from '..';
+import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
+import { Message } from '../types';
 import { escapeMarkdown, hasTag } from '../utils';
 
 export class ReactionPlugin extends PluginBase {

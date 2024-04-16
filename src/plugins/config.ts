@@ -1,7 +1,9 @@
 import format from 'string-format';
-import { Bot, Message } from '..';
+
 import { PluginBase } from '../plugin';
 import { delTag, getInput, hasTag, isAdmin, isTrusted, setTag } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class ConfigPlugin extends PluginBase {
   constructor(bot: Bot) {

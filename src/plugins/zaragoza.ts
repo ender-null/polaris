@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Bot, Message } from '..';
+
+import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
+import { Message } from '../types';
 import { capitalize, generateCommandHelp, getInput, isCommand, lstrip, sendRequest } from '../utils';
 
 export class ZaragozaPlugin extends PluginBase {

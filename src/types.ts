@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { WebSocket } from 'ws';
-import { Config } from '.';
 import { Db } from 'mongodb';
+import { Config } from './config';
 
 export class ErrorMessages {
   adminRequired?: string;

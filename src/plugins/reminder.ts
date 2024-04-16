@@ -1,5 +1,5 @@
 import format from 'string-format';
-import { Bot, Conversation, DatabaseReminder, Message } from '..';
+
 import { db } from '../main';
 import { PluginBase } from '../plugin';
 import {
@@ -13,6 +13,8 @@ import {
   isInt,
   now,
 } from '../utils';
+import { Bot } from '../bot';
+import { Message, DatabaseReminder, Conversation } from '../types';
 
 export class ReminderPlugin extends PluginBase {
   constructor(bot: Bot) {

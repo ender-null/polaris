@@ -1,7 +1,9 @@
 import format from 'string-format';
-import { Bot, Message } from '..';
+
 import { PluginBase } from '../plugin';
 import { delTag, getTags, getUsername, hasTag, isAdmin, isGroupAdmin, now, random, setTag } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class RussianRoulettePlugin extends PluginBase {
   constructor(bot: Bot) {

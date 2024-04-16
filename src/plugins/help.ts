@@ -1,5 +1,6 @@
-import { Bot, Message } from '..';
+import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
+import { Message } from '../types';
 import { generateCommandHelp, getWord, isCommand, removeHtml } from '../utils';
 
 export class HelpPlugin extends PluginBase {

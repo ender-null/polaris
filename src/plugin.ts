@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Bot, Command, iString, Message } from '.';
+import { Bot } from './bot';
+import { Command, iString, Message } from './types';
 import { logger } from './utils';
 
 export abstract class PluginBase {

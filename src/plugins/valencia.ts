@@ -1,8 +1,9 @@
 import * as cheerio from 'cheerio';
 import { URLSearchParams } from 'url';
-import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
 import { generateCommandHelp, getInput, sendRequest } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class ValenciaPlugin extends PluginBase {
   constructor(bot: Bot) {

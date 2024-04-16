@@ -1,7 +1,9 @@
 import * as cheerio from 'cheerio';
-import { Bot, Message } from '..';
+
 import { PluginBase } from '../plugin';
 import { generateCommandHelp, getInput, sendRequest } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class PharmacyPlugin extends PluginBase {
   constructor(bot: Bot) {

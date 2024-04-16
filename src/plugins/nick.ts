@@ -1,8 +1,10 @@
 import format from 'string-format';
-import { Bot, Message } from '..';
+
 import { db } from '../main';
 import { PluginBase } from '../plugin';
 import { getFullName, getInput, getTarget, isTrusted } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class NickPlugin extends PluginBase {
   constructor(bot: Bot) {

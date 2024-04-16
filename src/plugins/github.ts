@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Bot } from '..';
+
+import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
 import { Conversation } from '../types';
 import { capitalize, getTaggedWith, logger } from '../utils';

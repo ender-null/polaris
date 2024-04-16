@@ -1,8 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import format from 'string-format';
-import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
 import { generateCommandHelp, getInput, isCommand, sendRequest } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class YouTubePlugin extends PluginBase {
   constructor(bot: Bot) {

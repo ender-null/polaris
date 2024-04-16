@@ -1,5 +1,6 @@
-import { Bot, Message } from '..';
+import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
+import { Message } from '../types';
 import { capitalize, generateCommandHelp, getInput } from '../utils';
 
 export class EchoPlugin extends PluginBase {

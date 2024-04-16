@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import format from 'string-format';
-import { Bot, Message } from '..';
+
 import { PluginBase } from '../plugin';
 import { generateCommandHelp, getInput, getTags, isCommand, sendRequest, setTag } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class LastFMPlugin extends PluginBase {
   constructor(bot: Bot) {

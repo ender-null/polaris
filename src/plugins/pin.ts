@@ -1,8 +1,10 @@
 import format from 'string-format';
-import { Bot, Message } from '..';
+
 import { db } from '../main';
 import { PluginBase } from '../plugin';
 import { generateCommandHelp, getInput, isCommand } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class PinPlugin extends PluginBase {
   constructor(bot: Bot) {

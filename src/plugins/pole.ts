@@ -1,8 +1,8 @@
 import format from 'string-format';
-import { Bot, Message } from '..';
+
 import { db } from '../main';
 import { PluginBase } from '../plugin';
-import { DatabasePoleList, SortedPole } from '../types';
+import { DatabasePoleList, Message, SortedPole } from '../types';
 import {
   capitalize,
   getCommandIndex,
@@ -15,6 +15,7 @@ import {
   time,
   timeInRange,
 } from '../utils';
+import { Bot } from '../bot';
 
 export class PolePlugin extends PluginBase {
   constructor(bot: Bot) {

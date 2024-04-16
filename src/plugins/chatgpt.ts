@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import OpenAI from 'openai';
 import crypto from 'crypto';
-import { Bot, Message } from '..';
+
 import { PluginBase } from '../plugin';
 import { generateCommandHelp, getInput } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class ChatGPTPlugin extends PluginBase {
   constructor(bot: Bot) {

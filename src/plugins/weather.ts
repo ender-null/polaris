@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import format from 'string-format';
-import { Bot, Message } from '..';
+
 import { PluginBase } from '../plugin';
 import { capitalize, generateCommandHelp, getCoords, getInput, sendRequest } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class WeatherPlugin extends PluginBase {
   constructor(bot: Bot) {

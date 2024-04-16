@@ -1,8 +1,8 @@
-import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
-import { DatabaseConversation, DatabaseUser } from '../types';
+import { DatabaseConversation, DatabaseUser, Message } from '../types';
 import { formatDate, formatNumber, getInput, getTags, getTarget, isInt, logger, telegramShortLink } from '../utils';
 import { db } from '../main';
+import { Bot } from '../bot';
 
 export class InfoPlugin extends PluginBase {
   constructor(bot: Bot) {

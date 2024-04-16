@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Bot, Message } from '..';
+
+import { Bot } from '../bot';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
+import { Message } from '../types';
 import {
   delTag,
   generateCommandHelp,

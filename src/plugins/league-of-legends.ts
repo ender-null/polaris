@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Response } from 'node-fetch';
 import format from 'string-format';
-import { Bot, iString, iStringNested, Message } from '..';
+
 import { PluginBase } from '../plugin';
 import {
   allButNWord,
@@ -15,6 +15,8 @@ import {
   sendRequest,
   setTag,
 } from '../utils';
+import { Bot } from '../bot';
+import { iStringNested, iString, Message } from '../types';
 
 export class LeagueOfLegendsPlugin extends PluginBase {
   baseUrl: string;

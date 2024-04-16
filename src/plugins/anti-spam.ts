@@ -1,5 +1,5 @@
 import format from 'string-format';
-import { Bot, Message } from '..';
+
 import { db } from '../main';
 import { PluginBase } from '../plugin';
 import {
@@ -13,6 +13,8 @@ import {
   setTag,
   telegramLinkRegExp,
 } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class AntiSpamPlugin extends PluginBase {
   constructor(bot: Bot) {

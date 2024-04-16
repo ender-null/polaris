@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import FormData from 'form-data';
 import format from 'string-format';
-import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
 import {
   btoa,
@@ -16,6 +15,8 @@ import {
   sendRequest,
   setTag,
 } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class WorldOfWarcraftPlugin extends PluginBase {
   accessToken: string;

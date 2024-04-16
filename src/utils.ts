@@ -10,9 +10,10 @@ import { FileResult, fileSync } from 'tmp';
 import util from 'util';
 import winston, { createLogger, transports, format as winstonFormat } from 'winston';
 import 'winston-daily-rotate-file';
-import { Bot, Message, PluginBase } from '.';
 import { db } from './main';
-import { CoordinatesResult, HTTPResponseError, iString } from './types';
+import { CoordinatesResult, HTTPResponseError, Message, iString } from './types';
+import { Bot } from './bot';
+import { PluginBase } from './plugin';
 
 export const getPluginSlug = (plugin: PluginBase): string => {
   return plugin.constructor.name.replace('Plugin', '').toLowerCase();

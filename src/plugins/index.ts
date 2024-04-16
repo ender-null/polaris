@@ -8,7 +8,6 @@ export { CinemaPlugin } from './cinema';
 export { CommitPlugin } from './commit';
 export { ConfigPlugin } from './config';
 export { CorePlugin } from './core';
-export { Covid19Plugin } from './covid-19';
 export { TwitterDownloaderPlugin } from './twitter-downloader';
 export { CryptoPlugin } from './crypto';
 export { EchoPlugin } from './echo';

@@ -1,9 +1,10 @@
-import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
 import { generateCommandHelp, getInput, mp3ToOgg } from '../utils';
 import { fileSync } from 'tmp';
 import fs from 'fs';
 import OpenAI from 'openai';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class VoicePlugin extends PluginBase {
   constructor(bot: Bot) {
