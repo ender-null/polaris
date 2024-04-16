@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Config } from './config';
 import { PluginBase } from './plugin';
 import {
@@ -118,15 +119,17 @@ export class Bot {
     return enabled;
   }
 
-  initTranslations(): void {
+  async initTranslations(): Promise<void> {
     if (db.polaris) {
       const translations = db.polaris.collection('translations');
-      if (translations && translations[this.config.translation]) {
-        let trans: Translation = translations[this.config.translation];
+      const translation = await translations.findOne({ name: this.config.translation });
+      if (translation) {
+        let trans: Translation = translation as any;
         if (trans.extends) {
-          let base = translations[trans.extends];
+          const baseExtension = await translations.findOne({ name: trans.extends });
+          let base = baseExtension;
           while (base.extends) {
-            const inherit = translations[base.extends];
+            const inherit = baseExtension;
             base = merge(inherit, base);
             if (inherit.extends) {
               base.extends = inherit.extends;

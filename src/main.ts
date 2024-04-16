@@ -53,7 +53,7 @@ const start = () => {
       console.log('open: %s', code);
     });
 
-    ws.on('message', (data: string) => {
+    ws.on('message', async (data: string) => {
       try {
         const json = JSON.parse(data);
         if (json.type === 'init') {
@@ -64,7 +64,7 @@ const start = () => {
           }
           bot.initPlugins();
           bots[bot.user.id] = ws;
-          bot.initTranslations();
+          await bot.initTranslations();
           logger.info(
             `🟢 Connected as ${bot.config.icon} ${bot.user.firstName} (@${bot.user.username}) [${bot.user.id}] on platform '${init.platform}'`,
           );

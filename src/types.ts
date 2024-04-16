@@ -399,6 +399,7 @@ export interface iGroupAdministration {
 }
 
 export interface Translation {
+  name: string;
   extends?: string;
   errors?: ErrorMessages;
   plugins?: iPluginTranslation;
