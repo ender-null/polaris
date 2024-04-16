@@ -149,9 +149,9 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       let guild = null;
       if ('guild' in character) {
         if (character.realm.name == character.guild.realm.name) {
-          guild = `<${character.guild.name}>`;
+          guild = `-${character.guild.name}-`;
         } else {
-          guild = `<${character.guild.name}-${character.guild.realm.name}>`;
+          guild = `-${character.guild.name}-${character.guild.realm.name}-`;
         }
       }
       let mainStat = 'strength';
