@@ -861,6 +861,7 @@ export const splitLargeMessage = (content: string, maxLength: number): string[] 
         text = line + lineBreak;
       }
     });
+    texts.push(text);
   }
   return texts;
 };
