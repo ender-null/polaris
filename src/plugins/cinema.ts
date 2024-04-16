@@ -48,7 +48,7 @@ export class CinemaPlugin extends PluginBase {
         const sessions = item.sessions
           .map((session) => {
             let label = session.time;
-            if (session.type) label = `${label} [${session.type}]`;
+            if (session.type) label = `${label} ${session.type}`;
             return `<a href="${session.url}">${label}</a>`;
           })
           .join(', ');
