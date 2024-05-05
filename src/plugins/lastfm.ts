@@ -88,6 +88,7 @@ export class LastFMPlugin extends PluginBase {
       const artist = last.artist['#text'];
       const track = last.name;
       const album = last.album['#text'];
+      const albumArt = last.image[3]['#text'];
       const nowplaying = !!(last['@attr'] && last['@attr'].nowplaying);
 
       if (nowplaying) {
@@ -117,7 +118,11 @@ export class LastFMPlugin extends PluginBase {
           text += `\n\n🎬 ${this.strings.mightBe}:\n${ytContent['items'][0].snippet.title}\nhttps://youtu.be/${ytContent['items'][0].id.videoId}`;
         }
       }
-      this.bot.replyMessage(msg, text, 'text', null, { preview: false });
+      if (albumArt) {
+        return this.bot.replyMessage(msg, albumArt, 'photo', null, { caption: text, preview: false });
+      } else {
+        this.bot.replyMessage(msg, text, 'text', null, { preview: false });
+      }
     } else if (isCommand(this, 2, msg.content)) {
       if (!input) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
