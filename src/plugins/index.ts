@@ -9,7 +9,6 @@ export { CommitPlugin } from './commit';
 export { ConfigPlugin } from './config';
 export { CorePlugin } from './core';
 export { TwitterDownloaderPlugin } from './twitter-downloader';
-export { CryptoPlugin } from './crypto';
 export { EchoPlugin } from './echo';
 export { GifPlugin } from './gif';
 export { GitHubPlugin } from './github';
