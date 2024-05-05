@@ -62,7 +62,7 @@ export class PinPlugin extends PluginBase {
       if (ownPins.length > 0) {
         text = format(this.strings.pins, ownPins.length);
         ownPins.map((pin) => {
-          text += `\n • #${pin.tag}`;
+          text += `\n- #${pin.tag}`;
         });
       } else {
         text = this.strings.noPins;

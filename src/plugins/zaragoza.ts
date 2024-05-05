@@ -82,7 +82,7 @@ export class ZaragozaPlugin extends PluginBase {
 
       if (content.times && Array.isArray(content.times)) {
         content.times.map((bus) => {
-          text += `\n • <b>${bus.time}</b>  ${bus.line} <i>${bus.destination}</i>`;
+          text += `\n- <b>${bus.time}</b>  ${bus.line} <i>${bus.destination}</i>`;
         });
       } else {
         return this.bot.replyMessage(msg, this.bot.errors.noResults);
@@ -111,7 +111,7 @@ export class ZaragozaPlugin extends PluginBase {
       }
       text = `<b>${capitalize(content.title)}</b>\n   ${this.strings.station}: <b>${
         content.id
-      }</b>\n\n • Bicis Disponibles: <b>${content.bicisDisponibles}</b>\n • Anclajes Disponibles: <b>${
+      }</b>\n\n- Bicis Disponibles: <b>${content.bicisDisponibles}</b>\n- Anclajes Disponibles: <b>${
         content.anclajesDisponibles
       }</b>`;
     }

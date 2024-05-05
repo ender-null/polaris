@@ -71,7 +71,7 @@ export class YouTubePlugin extends PluginBase {
         if (item.snippet.title.length > 26) {
           item.snippet.title = item.snippet.title.split(0, 23) + '...';
         }
-        text += `\n • <a href="https://youtu.be/${item.id.videoId}">${item.snippet.title}</a>`;
+        text += `\n- <a href="https://youtu.be/${item.id.videoId}">${item.snippet.title}</a>`;
       });
       this.bot.replyMessage(msg, text, 'text', null, { preview: false });
     }

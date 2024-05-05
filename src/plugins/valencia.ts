@@ -57,7 +57,7 @@ export class ValenciaPlugin extends PluginBase {
       line = $('img').eq(i).attr('title');
       const show = $(elem).text().replace('.', '. ').trim();
       const showSplit = show.split(' - ');
-      text += ` • <b>${showSplit[1]}</b>  ${line} <i>${showSplit[0]}</i>\n`;
+      text += `- <b>${showSplit[1]}</b>  ${line} <i>${showSplit[0]}</i>\n`;
     });
 
     if (line == '') {

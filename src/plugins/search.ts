@@ -113,7 +113,7 @@ export class SearchPlugin extends PluginBase {
           if (item['t'].length > 26) {
             item['t'] = item['t'].slice(0, 23) + '...';
           }
-          text += `\n • <a href="${item['u']}">${item['t']}</a>`;
+          text += `\n- <a href="${item['u']}">${item['t']}</a>`;
           limit -= 1;
         }
       });

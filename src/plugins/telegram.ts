@@ -142,7 +142,7 @@ export class TelegramPlugin extends PluginBase {
         if (doc) {
           const lines = doc.split('\n');
 
-          text += `\n • ${lines[0]}`;
+          text += `\n- ${lines[0]}`;
 
           if (lines.length > 1) {
             text += `\n   ${lines[1]}`;
