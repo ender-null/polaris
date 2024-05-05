@@ -267,7 +267,7 @@ export class MediaForwarderPlugin extends PluginBase {
                   if (inputMatch && inputMatch.length > 0) {
                     logger.debug(`ignoring telegram url: ${url}`);
                   } else {
-                    if (url.startsWith('https://twitter.com')) {
+                    if (url.startsWith('https://x.com') || url.startsWith('https://twitter.com')) {
                       logger.debug(`tweet url: ${url}`);
                       const tweetIdPattern = new RegExp('status/(\\d+)', 'gim');
                       const twInputMatch = tweetIdPattern.exec(url);
