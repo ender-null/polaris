@@ -165,28 +165,26 @@ export class PolePlugin extends PluginBase {
         });
         text = `<b>${this.strings.ranking}:</b>`;
         const rank = this.sortRanking(ranking, 'points');
-        rank.map(async (user) => {
-          text += `\n • ${await getFullName(this.bot, user.uid, false)}: <b>${user.points}</b> ${this.strings.points}`;
-        });
+        for (const user of rank) {
+          const name = await getFullName(this.bot, user.uid, false);
+          text += `\n - ${name}: <b>${user.points}</b> ${this.strings.points}`;
+        }
 
-        await Promise.all(
-          types.map(async (type) => {
-            let section = `\n\n<b>${capitalize(this.strings[type + 's'])}:</b>`;
-            let empty = true;
-            const rank = this.sortRanking(ranking, type);
-            await Promise.all(
-              rank.map(async (user) => {
-                if (user[type]) {
-                  empty = false;
-                  section += `\n • ${await getFullName(this.bot, user.uid, false)}: <b>${user[type]}</b> ${this.strings[type + 's']}`;
-                }
-              }),
-            );
-            if (!empty) {
-              text += section;
+        for (const type of types) {
+          let section = `\n\n<b>${capitalize(this.strings[type + 's'])}:</b>`;
+          let empty = true;
+          const rank = this.sortRanking(ranking, type);
+          for (const user of rank) {
+            if (user[type]) {
+              empty = false;
+              const name = await getFullName(this.bot, user.uid, false);
+              section += `\n - ${name}: <b>${user[type]}</b> ${this.strings[type + 's']}`;
             }
-          }),
-        );
+          }
+          if (!empty) {
+            text += section;
+          }
+        }
       } else {
         this.bot.replyMessage(msg, this.bot.errors.noResults);
       }
