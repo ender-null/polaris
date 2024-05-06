@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import FormData from 'form-data';
 import format from 'string-format';
+import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
+import { Message } from '../types';
 import {
   btoa,
   capitalize,
@@ -15,8 +17,6 @@ import {
   sendRequest,
   setTag,
 } from '../utils';
-import { Bot } from '../bot';
-import { Message } from '../types';
 
 export class WorldOfWarcraftPlugin extends PluginBase {
   accessToken: string;
@@ -134,7 +134,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         this.getCharacterStatistics(region, realm, characterName),
         this.getRaiderIO(region, realm, characterName),
       ]);
-      if (!character || !media || !raids || !pvp || !professions) {
+      if (!character || !raids || !pvp || !professions) {
         this.accessToken = await this.retrievingAccessToken();
         return this.bot.replyMessage(msg, this.bot.errors.connectionError);
       }
@@ -228,14 +228,17 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       if (mythicScore.length == 0) {
         mythicScore = null;
       }
-      let asset = media.assets.find((asset) => asset.key === 'main');
-      if (!asset) {
-        asset = media.assets.find((asset) => asset.key === 'inset');
+      let photo = null;
+      if (media) {
+        let asset = media.assets.find((asset) => asset.key === 'main');
+        if (!asset) {
+          asset = media.assets.find((asset) => asset.key === 'inset');
+        }
+        if (!asset) {
+          asset = media.assets.find((asset) => asset.key === 'avatar');
+        }
+        photo = `${asset.value}?update=${Math.trunc(now() / 3600)}`;
       }
-      if (!asset) {
-        asset = media.assets.find((asset) => asset.key === 'avatar');
-      }
-      const photo = `${asset.value}?update=${Math.trunc(now() / 3600)}`;
       text = `${title ? title + '\n\t' : ''}${name}\n${
         guild ? guild + '\n\n' : ''
       }${characterClass}\n\t${race}\n\n${info}\n\n${stats}\n\n${professionLevels ? professionLevels + '\n\n' : ''}${
@@ -243,6 +246,8 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       }${raidProgression ? raidProgression + '\n\n' : ''}`;
       if (photo) {
         return this.bot.replyMessage(msg, photo, 'photo', null, { caption: text });
+      } else {
+        return this.bot.replyMessage(msg, text, 'text', null);
       }
     } else if (isCommand(this, 2, msg.content)) {
       if (!input) {
