@@ -83,7 +83,7 @@ const start = () => {
           };
           ws.send(JSON.stringify(pong));
         } else if (json.type === 'broadcast') {
-          bot.sendBroadcast(json);
+          bot.sendBroadcast(json).then();
         } else {
           logger.warning(`Unsupported data: ${data}`);
         }

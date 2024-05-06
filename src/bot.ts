@@ -369,13 +369,29 @@ export class Bot {
     return false;
   }
 
-  send(msg: Message) {
+  async send(msg: Message) {
     this.messageSender(msg);
+    const conversation = msg.conversation;
+    if (conversation.id === 'alerts') {
+      conversation.id = this.config.alertsConversationId;
+      conversation.title = await getFullName(this, this.config.alertsConversationId);
+    } else if (conversation.id === 'admin') {
+      conversation.id = this.config.adminConversationId;
+      conversation.title = await getFullName(this, this.config.adminConversationId);
+    } else if (conversation.id === 'owner') {
+      conversation.id = this.config.owner;
+      conversation.title = await getFullName(this, this.config.owner);
+    } else {
+      conversation.title = await getFullName(this, conversation.id);
+    }
     const message: WSMessage = {
       bot: this.config.name,
       platform: this.platform,
       type: 'message',
-      message: msg,
+      message: {
+        ...msg,
+        conversation,
+      },
     };
     this.websocket.send(JSON.stringify(message));
   }
@@ -402,11 +418,11 @@ export class Bot {
     if (content.startsWith('/') && type !== 'text') {
       toBase64(content).then((base64String) => {
         const message = new Message(null, chat, this.user, base64String, type, now(), reply, extra);
-        this.send(message);
+        this.send(message).then();
       });
     } else {
       const message = new Message(null, chat, this.user, content, type, now(), reply, extra);
-      this.send(message);
+      this.send(message).then();
     }
   }
 
@@ -415,7 +431,7 @@ export class Bot {
       message: msg.id,
       conversation: chatId,
     });
-    this.send(message);
+    this.send(message).then();
   }
 
   replyMessage(msg: Message, content: string, type = 'text', reply?: Message, extra?: Extra): void {
@@ -434,18 +450,20 @@ export class Bot {
     this.sendMessage(msg.conversation, content, type, reply, extra);
   }
 
-  sendBroadcast(json: WSBroadcast): void {
+  async sendBroadcast(json: WSBroadcast): Promise<void> {
     const broadcast: WSBroadcast = json;
     const conversation = broadcast.message.conversation;
     if (conversation.id === 'alerts') {
       conversation.id = this.config.alertsConversationId;
-      conversation.title = 'Alerts';
+      conversation.title = await getFullName(this, this.config.alertsConversationId);
     } else if (conversation.id === 'admin') {
       conversation.id = this.config.adminConversationId;
-      conversation.title = 'Admin';
+      conversation.title = await getFullName(this, this.config.adminConversationId);
     } else if (conversation.id === 'owner') {
       conversation.id = this.config.owner;
-      conversation.title = 'Owner';
+      conversation.title = await getFullName(this, this.config.owner);
+    } else {
+      conversation.title = await getFullName(this, conversation.id);
     }
     const message: WSMessage = {
       bot: broadcast.bot,
@@ -471,10 +489,8 @@ export class Bot {
       });
     } else if (broadcast.target === '*' || broadcast.target === 'all') {
       wss.clients.forEach((client) => {
-        //if (client !== ws) {
         this.broadcastHandler(broadcast.message);
         client.send(JSON.stringify(message));
-        //}
       });
     } else {
       this.broadcastHandler(broadcast.message);
@@ -508,7 +524,7 @@ export class Bot {
       };
 
       //this.send(message);
-      this.sendBroadcast(broadcast);
+      this.sendBroadcast(broadcast).then();
     }
   }
 
@@ -539,7 +555,7 @@ export class Bot {
       };
 
       //this.send(message);
-      this.sendBroadcast(broadcast);
+      this.sendBroadcast(broadcast).then();
     }
   }
 }
