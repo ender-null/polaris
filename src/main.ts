@@ -101,7 +101,11 @@ const start = () => {
           };
           if (Array.isArray(broadcast.target)) {
             bot.broadcastHandler(broadcast.message);
-            broadcast.target.forEach((target) => bots[target].send(JSON.stringify(message)));
+            broadcast.target.forEach((target) => {
+              if (bots[target]) {
+                bots[target].send(JSON.stringify(message));
+              }
+            });
           } else if (broadcast.target === '*' || broadcast.target === 'all') {
             wss.clients.forEach((client) => {
               if (client !== ws) {
@@ -111,7 +115,9 @@ const start = () => {
             });
           } else {
             bot.broadcastHandler(broadcast.message);
-            bots[broadcast.target].send(JSON.stringify(message));
+            if (bots[broadcast.target]) {
+              bots[broadcast.target].send(JSON.stringify(message));
+            }
           }
         } else {
           logger.warning(`Unsupported data: ${data}`);
