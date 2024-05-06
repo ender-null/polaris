@@ -358,20 +358,20 @@ export const getFullName = async (bot: Bot, uid: number | string, includeUsernam
   const group = await groups.findOne({ id: uid });
   let name = '';
   if (user) {
-    if (user['first_name'] !== undefined) {
-      name += user['first_name'];
+    if (user.first_name && user.first_name.length) {
+      name += user.first_name;
     }
-    if (user['last_name'] !== undefined) {
-      name += ' ' + user['last_name'];
+    if (user.last_name && user.last_name.length) {
+      name += ' ' + user.last_name;
     }
 
-    if (includeUsername && user['username']) {
-      name += ` (@${user['username']})`;
+    if (includeUsername && user.username && user.username.length) {
+      name += ` (@${user.username})`;
     }
   } else if (group) {
-    name = group['title'];
-    if (group['username']) {
-      name += ` (@${group['username']})`;
+    name = group.title;
+    if (group.username && group.username.length) {
+      name += ` (@${group.username})`;
     }
   } else {
     name = '[null]';
