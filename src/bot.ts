@@ -10,6 +10,7 @@ import {
   Parameter,
   Translation,
   User,
+  WSBroadcast,
   WSCommand,
   WSCommandPayload,
   WSMessage,
@@ -32,7 +33,7 @@ import { WebSocket } from 'ws';
 import * as plugins from './plugins/index';
 import * as cron from 'node-cron';
 import { Actions } from './actions';
-import { db } from './main';
+import { bots, db, wss } from './main';
 
 export class Bot {
   platform: string;
@@ -433,6 +434,56 @@ export class Bot {
     this.sendMessage(msg.conversation, content, type, reply, extra);
   }
 
+  sendBroadcast(json: WSBroadcast): void {
+    const broadcast: WSBroadcast = json;
+    const conversation = broadcast.message.conversation;
+    if (conversation.id === 'alerts') {
+      conversation.id = this.config.alertsConversationId;
+      conversation.title = 'Alerts';
+    } else if (conversation.id === 'admin') {
+      conversation.id = this.config.adminConversationId;
+      conversation.title = 'Admin';
+    } else if (conversation.id === 'owner') {
+      conversation.id = this.config.owner;
+      conversation.title = 'Owner';
+    }
+    const message: WSMessage = {
+      bot: broadcast.bot,
+      platform: broadcast.platform,
+      type: 'message',
+      message: new Message(
+        null,
+        conversation,
+        this.user,
+        broadcast.message.content,
+        broadcast.message.type,
+        now(),
+        null,
+        broadcast.message.extra,
+      ),
+    };
+    if (Array.isArray(broadcast.target)) {
+      this.broadcastHandler(broadcast.message);
+      broadcast.target.forEach((target) => {
+        if (bots[target]) {
+          bots[target].send(JSON.stringify(message));
+        }
+      });
+    } else if (broadcast.target === '*' || broadcast.target === 'all') {
+      wss.clients.forEach((client) => {
+        //if (client !== ws) {
+        this.broadcastHandler(broadcast.message);
+        client.send(JSON.stringify(message));
+        //}
+      });
+    } else {
+      this.broadcastHandler(broadcast.message);
+      if (bots[broadcast.target]) {
+        bots[broadcast.target].send(JSON.stringify(message));
+      }
+    }
+  }
+
   sendAlert(text: string, language = 'javascript'): void {
     if (
       this.config.alertsConversationId &&
@@ -440,15 +491,24 @@ export class Bot {
     ) {
       const message = new Message(
         null,
-        new Conversation(this.config.alertsConversationId, 'Alerts'),
+        new Conversation('alerts'),
         this.user,
-        `<code class="language-${language}">${text}</code>`,
+        `${this.user.firstName} (@${this.user.username}) [${this.user.id}]\n<code class="language-${language}">${text}</code>`,
         'text',
         null,
         null,
         { format: 'HTML', preview: false },
       );
-      this.send(message);
+      const broadcast: WSBroadcast = {
+        bot: this.config.name,
+        target: this.config.alertsTarget,
+        platform: this.config.alertsPlatform,
+        type: 'broadcast',
+        message,
+      };
+
+      //this.send(message);
+      this.sendBroadcast(broadcast);
     }
   }
 
@@ -459,15 +519,27 @@ export class Bot {
     ) {
       const message = new Message(
         null,
-        new Conversation(this.config.adminConversationId, 'Admin'),
+        new Conversation('admin'),
         this.user,
-        text,
+        `${this.user.firstName} (@${this.user.username}) [${this.user.id}]\n${text}`,
         'text',
         null,
         null,
-        { format: 'HTML', preview: false },
+        {
+          format: 'HTML',
+          preview: false,
+        },
       );
-      this.send(message);
+      const broadcast: WSBroadcast = {
+        bot: this.config.name,
+        target: this.config.alertsTarget,
+        platform: this.config.alertsPlatform,
+        type: 'broadcast',
+        message,
+      };
+
+      //this.send(message);
+      this.sendBroadcast(broadcast);
     }
   }
 }

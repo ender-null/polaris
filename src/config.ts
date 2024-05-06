@@ -11,8 +11,10 @@ export class Config {
   plugins?: string | string[];
   excludedPlugins?: string[];
   translation?: string;
-  adminConversationId?: string;
+  alertsPlatform?: string;
+  alertsTarget?: string;
   alertsConversationId?: string;
+  adminConversationId?: string;
   apiKeys?: ApiKeys;
 
   constructor() {
@@ -24,8 +26,10 @@ export class Config {
     this.plugins = '*';
     this.excludedPlugins = [];
     this.translation = 'default';
-    this.adminConversationId = null;
+    this.alertsPlatform = null;
+    this.alertsTarget = null;
     this.alertsConversationId = null;
+    this.adminConversationId = null;
     this.apiKeys = {
       telegramBotToken: null,
       telegramPhoneNumber: null,

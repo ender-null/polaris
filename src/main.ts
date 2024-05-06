@@ -1,11 +1,11 @@
 import { WebSocketServer, WebSocket } from 'ws';
-import { BotSocket, Message, MongoDatabases, WSBroadcast, WSInit, WSMessage, WSPong } from './types';
-import { catchException, logger, now } from './utils';
+import { BotSocket, MongoDatabases, WSInit, WSMessage, WSPong } from './types';
+import { catchException, logger } from './utils';
 import { Bot } from './bot';
 import { MongoClient } from 'mongodb';
 
 let mongo: MongoClient;
-const wss: WebSocketServer = new WebSocketServer({ port: 8080 });
+export const wss: WebSocketServer = new WebSocketServer({ port: 8080 });
 
 const close = () => {
   logger.info(`🟡 Closing connection for ${wss.clients.size} client(s)...`);
@@ -30,7 +30,7 @@ process.on('exit', () => {
   logger.info('❎ Exit process');
 });
 
-const bots: BotSocket = {};
+export const bots: BotSocket = {};
 export const db: MongoDatabases = {};
 
 const start = () => {
@@ -83,42 +83,7 @@ const start = () => {
           };
           ws.send(JSON.stringify(pong));
         } else if (json.type === 'broadcast') {
-          const broadcast: WSBroadcast = json;
-          const message: WSMessage = {
-            bot: broadcast.bot,
-            platform: broadcast.platform,
-            type: 'message',
-            message: new Message(
-              null,
-              broadcast.message.conversation,
-              bot.user,
-              broadcast.message.content,
-              broadcast.message.type,
-              now(),
-              null,
-              broadcast.message.extra,
-            ),
-          };
-          if (Array.isArray(broadcast.target)) {
-            bot.broadcastHandler(broadcast.message);
-            broadcast.target.forEach((target) => {
-              if (bots[target]) {
-                bots[target].send(JSON.stringify(message));
-              }
-            });
-          } else if (broadcast.target === '*' || broadcast.target === 'all') {
-            wss.clients.forEach((client) => {
-              if (client !== ws) {
-                bot.broadcastHandler(broadcast.message);
-                client.send(JSON.stringify(message));
-              }
-            });
-          } else {
-            bot.broadcastHandler(broadcast.message);
-            if (bots[broadcast.target]) {
-              bots[broadcast.target].send(JSON.stringify(message));
-            }
-          }
+          bot.sendBroadcast(json);
         } else {
           logger.warning(`Unsupported data: ${data}`);
         }
@@ -139,13 +104,3 @@ MongoClient.connect(process.env.MONGODB_URI, {
 
   await start();
 });
-
-/*export const db = new Database();
-db.events.once('loaded', async () => {
-  await start();
-  db.events.on('update:configs', async () => {
-    await start();
-  });
-});
-db.init();
-*/
