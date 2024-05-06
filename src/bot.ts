@@ -1,6 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import * as cron from 'node-cron';
+import { WebSocket } from 'ws';
+import { Actions } from './actions';
 import { Config } from './config';
+import { bots, configs, db, wss } from './main';
 import { PluginBase } from './plugin';
+import * as plugins from './plugins/index';
 import {
   BroadcastMessage,
   Conversation,
@@ -29,11 +34,6 @@ import {
   t,
   toBase64,
 } from './utils';
-import { WebSocket } from 'ws';
-import * as plugins from './plugins/index';
-import * as cron from 'node-cron';
-import { Actions } from './actions';
-import { bots, db, wss } from './main';
 
 export class Bot {
   platform: string;
@@ -453,15 +453,19 @@ export class Bot {
   async sendBroadcast(json: WSBroadcast): Promise<void> {
     const broadcast: WSBroadcast = json;
     const conversation = broadcast.message.conversation;
+    let config = this.config;
+    if (!Array.isArray(broadcast.target)) {
+      config = configs[broadcast.target];
+    }
     if (conversation.id === 'alerts') {
-      conversation.id = this.config.alertsConversationId;
-      conversation.title = await getFullName(this, this.config.alertsConversationId);
+      conversation.id = config.alertsConversationId;
+      conversation.title = await getFullName(this, config.alertsConversationId);
     } else if (conversation.id === 'admin') {
-      conversation.id = this.config.adminConversationId;
-      conversation.title = await getFullName(this, this.config.adminConversationId);
+      conversation.id = config.adminConversationId;
+      conversation.title = await getFullName(this, config.adminConversationId);
     } else if (conversation.id === 'owner') {
-      conversation.id = this.config.owner;
-      conversation.title = await getFullName(this, this.config.owner);
+      conversation.id = config.owner;
+      conversation.title = await getFullName(this, config.owner);
     } else {
       conversation.title = await getFullName(this, conversation.id);
     }
