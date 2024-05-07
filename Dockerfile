@@ -1,4 +1,4 @@
-FROM debian:latest as builder
+FROM node:slim as builder
 
 RUN npm install yarn@latest -g --force
 
@@ -15,7 +15,7 @@ COPY . .
 
 RUN yarn run build
 
-FROM debian:latest as release
+FROM node:slim as release
 
 LABEL org.opencontainers.image.source https://github.com/ender-null/polaris
 
