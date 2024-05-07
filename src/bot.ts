@@ -457,6 +457,7 @@ export class Bot {
     if (!Array.isArray(broadcast.target)) {
       config = bots[broadcast.target].config;
     }
+    const ownerName = await getFullName(this, config.owner);
     if (conversation.id === 'alerts') {
       conversation.id = config.alertsConversationId;
       conversation.title = await getFullName(this, config.alertsConversationId);
@@ -465,10 +466,11 @@ export class Bot {
       conversation.title = await getFullName(this, config.adminConversationId);
     } else if (conversation.id === 'owner') {
       conversation.id = config.owner;
-      conversation.title = await getFullName(this, config.owner);
+      conversation.title = ownerName;
     } else {
       conversation.title = await getFullName(this, conversation.id);
     }
+    const owner = new User(config.owner, ownerName);
     const message: WSMessage = {
       bot: broadcast.bot,
       platform: broadcast.platform,
@@ -476,7 +478,7 @@ export class Bot {
       message: new Message(
         null,
         conversation,
-        this.user,
+        json.type === 'broadcast' ? this.user : owner,
         broadcast.message.content,
         broadcast.message.type,
         now(),
