@@ -791,20 +791,20 @@ export const escapeRegExp = (text: string): string => {
   return text;
 };
 
-export const htmlToMarkdown = (text: string): string => {
+export const htmlToMarkdown = (text) => {
   if (text) {
-    text = text.replace(new RegExp('<a href="(.*?)">(.*?)</a>', 'gim'), '[$2]($1)');
-    text = text.replace(new RegExp('<i>(.*?)</i>', 'gim'), '_$1_');
-    text = text.replace(new RegExp('<b>(.*?)</b>', 'gim'), '*$1*');
-    text = text.replace(new RegExp('<u>(.*?)</u>', 'gim'), '~$1~');
-    text = text.replace(new RegExp('<code>(.*?)</code>', 'gim'), '`$1`');
-    text = text.replace(new RegExp('<pre>(.*?)</pre>', 'gim'), '```$1```');
-    text = text.replace(new RegExp('<blockquote>(.*?)</blockquote>', 'gim'), (p1) => {
-      return '> ' + p1.replace(/\n/g, '\n> ');
-    });
+      text = text.replace(/<a href="(.*?)">(.*?)<\/a>/gim, '[$2]($1)');
+      text = text.replace(/<i>(.*?)<\/i>/gim, '_$1_');
+      text = text.replace(/<b>(.*?)<\/b>/gim, '*$1*');
+      text = text.replace(/<u>(.*?)<\/u>/gim, '~$1~');
+      text = text.replace(/<code>(.*?)<\/code>/gim, '`$1`');
+      text = text.replace(/<pre>(.*?)<\/pre>/gim, '```$1```');
+      text = text.replace(/<blockquote>([\s\S]*?)<\/blockquote>/gim, (_, p1) => {
+          return "> " + p1.replace(/\r?\n/g, "\n> ").trim();
+      });
 
-    text = text.replace(new RegExp('&lt;', 'gim'), '<');
-    text = text.replace(new RegExp('&gt;', 'gim'), '>');
+      text = text.replace(/&lt;/gim, '<');
+      text = text.replace(/&gt;/gim, '>');
   }
   return text;
 };
