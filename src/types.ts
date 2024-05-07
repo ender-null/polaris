@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Db } from 'mongodb';
-import { WebSocket } from 'ws';
+import { Bot } from './bot';
 import { Config } from './config';
 
 export class ErrorMessages {
@@ -176,12 +176,8 @@ export class Message {
   }
 }
 
-export interface BotSocket {
-  [id: string]: WebSocket;
-}
-
-export interface BotConfig {
-  [id: string]: Config;
+export interface BotSet {
+  [id: string]: Bot;
 }
 
 export interface MongoDatabases {
@@ -277,7 +273,7 @@ export interface WSPong extends WSData {
 }
 
 export interface WSBroadcast extends WSData {
-  type: 'broadcast';
+  type: 'broadcast' | 'redirect';
   target: string | string[];
   message: BroadcastMessage;
 }

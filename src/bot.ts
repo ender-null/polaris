@@ -3,7 +3,7 @@ import * as cron from 'node-cron';
 import { WebSocket } from 'ws';
 import { Actions } from './actions';
 import { Config } from './config';
-import { bots, configs, db, wss } from './main';
+import { bots, db, wss } from './main';
 import { PluginBase } from './plugin';
 import * as plugins from './plugins/index';
 import {
@@ -455,7 +455,7 @@ export class Bot {
     const conversation = broadcast.message.conversation;
     let config = this.config;
     if (!Array.isArray(broadcast.target)) {
-      config = configs[broadcast.target];
+      config = bots[broadcast.target].config;
     }
     if (conversation.id === 'alerts') {
       conversation.id = config.alertsConversationId;
@@ -488,48 +488,51 @@ export class Bot {
       this.broadcastHandler(broadcast.message);
       broadcast.target.forEach((target) => {
         if (bots[target]) {
-          bots[target].send(JSON.stringify(message));
+          if (json.type === 'broadcast') {
+            bots[target].websocket.send(JSON.stringify(message));
+          } else if (json.type === 'redirect') {
+            bots[target].onMessageReceive(message.message);
+          }
         }
       });
     } else if (broadcast.target === '*' || broadcast.target === 'all') {
       wss.clients.forEach((client) => {
         this.broadcastHandler(broadcast.message);
-        client.send(JSON.stringify(message));
+        if (json.type === 'broadcast') {
+          client.send(JSON.stringify(message));
+        }
       });
     } else {
       this.broadcastHandler(broadcast.message);
       if (bots[broadcast.target]) {
-        bots[broadcast.target].send(JSON.stringify(message));
+        if (json.type === 'broadcast') {
+          bots[broadcast.target].websocket.send(JSON.stringify(message));
+        } else if (json.type === 'redirect') {
+          bots[broadcast.target].onMessageReceive(message.message);
+        }
       }
     }
   }
 
   sendAlert(text: string, language = 'javascript'): void {
-    if (
-      this.config.alertsConversationId &&
-      !(text.includes(this.config.alertsConversationId) || text.includes('Chat not found'))
-    ) {
-      const message = new Message(
-        null,
-        new Conversation('alerts'),
-        this.user,
-        `${this.user.firstName} (@${this.user.username}) [${this.user.id}]\n<code class="language-${language}">${text}</code>`,
-        'text',
-        null,
-        null,
-        { format: 'HTML', preview: false },
-      );
-      const broadcast: WSBroadcast = {
-        bot: this.config.name,
-        target: this.config.alertsTarget,
-        platform: this.config.alertsPlatform,
-        type: 'broadcast',
-        message,
-      };
-
-      //this.send(message);
-      this.sendBroadcast(broadcast).then();
-    }
+    const message = new Message(
+      null,
+      new Conversation('alerts'),
+      this.user,
+      `${this.user.firstName} (@${this.user.username}) [<pre>${this.user.id}</pre>]\n<code class="language-${language}">${text}</code>`,
+      'text',
+      null,
+      null,
+      { format: 'HTML', preview: false },
+    );
+    const broadcast: WSBroadcast = {
+      bot: this.config.name,
+      target: this.config.alertsTarget,
+      platform: this.config.alertsPlatform,
+      type: 'broadcast',
+      message,
+    };
+    this.sendBroadcast(broadcast).then();
   }
 
   sendAdminAlert(text: string): void {

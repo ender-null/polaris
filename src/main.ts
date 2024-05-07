@@ -1,7 +1,7 @@
 import { MongoClient } from 'mongodb';
 import { WebSocket, WebSocketServer } from 'ws';
 import { Bot } from './bot';
-import { BotConfig, BotSocket, MongoDatabases, WSInit, WSMessage, WSPong } from './types';
+import { BotSet, MongoDatabases, WSInit, WSMessage, WSPong } from './types';
 import { catchException, logger } from './utils';
 
 let mongo: MongoClient;
@@ -30,8 +30,7 @@ process.on('exit', () => {
   logger.info('❎ Exit process');
 });
 
-export const bots: BotSocket = {};
-export const configs: BotConfig = {};
+export const bots: BotSet = {};
 export const db: MongoDatabases = {};
 
 const start = () => {
@@ -64,8 +63,7 @@ const start = () => {
             db[init.platform] = mongo.db(init.platform);
           }
           bot.initPlugins();
-          bots[bot.user.id] = ws;
-          configs[bot.user.id] = init.config;
+          bots[bot.user.id] = bot;
           await bot.initTranslations();
           logger.info(
             `✅ Connected as ${bot.config.icon} ${bot.user.firstName} (@${bot.user.username}) [${bot.user.id}] on platform '${init.platform}'`,
