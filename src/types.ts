@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { WebSocket } from 'ws';
 import { Db } from 'mongodb';
+import { WebSocket } from 'ws';
 import { Config } from './config';
 
 export class ErrorMessages {
@@ -178,6 +178,10 @@ export class Message {
 
 export interface BotSocket {
   [id: string]: WebSocket;
+}
+
+export interface BotConfig {
+  [id: string]: Config;
 }
 
 export interface MongoDatabases {
