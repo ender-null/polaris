@@ -82,7 +82,7 @@ const start = () => {
             type: 'pong',
           };
           ws.send(JSON.stringify(pong));
-        } else if (json.type === 'broadcast') {
+        } else if (json.type === 'broadcast' || json.type === 'redirect') {
           bot.sendBroadcast(json).then();
         } else {
           logger.warning(`Unsupported data: ${data}`);
