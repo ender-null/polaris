@@ -45,7 +45,7 @@
     "mime-types": "^2.1.35",
     "mongodb": "^6.6.1",
     "node-cron": "^3.0.3",
-    "node-fetch": "^3",
+    "node-fetch": "^2.7.0",
     "openai": "^4.42.0",
     "string-format": "^2.0.0",
     "tmp": "^0.2.3",
