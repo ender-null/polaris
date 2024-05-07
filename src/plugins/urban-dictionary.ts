@@ -43,9 +43,9 @@ export class UrbanDictionaryPlugin extends PluginBase {
     }
 
     const entry = content.list[0];
-    let text = `<blockquote>${entry.definition}</blockquote>`;
+    let text = `<b>${term}</b>\n\n${entry.definition}`;
     if (entry.example) {
-      text += `\n\n<i>${entry.example}</i>`;
+      text += `\n\n<blockquote>${entry.example}</blockquote>`;
     }
     this.bot.replyMessage(msg, text);
   }
