@@ -11,7 +11,6 @@ export { CorePlugin } from './core';
 export { TwitterDownloaderPlugin } from './twitter-downloader';
 export { EchoPlugin } from './echo';
 export { GifPlugin } from './gif';
-export { GitHubPlugin } from './github';
 export { HelpPlugin } from './help';
 export { ImagePlugin } from './image';
 export { InfoPlugin } from './info';
