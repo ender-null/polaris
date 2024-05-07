@@ -186,7 +186,7 @@ export class ReminderPlugin extends PluginBase {
           name = await getFullName(this.bot, reminder.userId, false);
           username = (await getUsername(this.bot, reminder.userId)).slice(1);
         }
-        let text = `<i>${reminder.text}</i>\n - ${name}`;
+        let text = `<blockquote>${reminder.text}</blockquote>\n - ${name}`;
         if (username && username.length > 0) {
           text += ` (@${username})`;
         }

@@ -49,13 +49,21 @@ export class CinemaPlugin extends PluginBase {
           .map((session) => {
             let label = session.time;
             if (session.type) label = `${label} ${session.type}`;
-            return `<a href="${session.url}">${label}</a>`;
+            if (this.bot.platform === 'telegram') {
+              return `<a href="${session.url}">${label}</a>`;
+            } else {
+              return label;
+            }
           })
           .join(', ');
         text += `\n<b>${item.name}</b>\n`;
-        text += `<a href="${item.source}">🔗</a>`;
-        if (item.trailer) {
-          text += `<a href="${item.trailer}">🎬</a>`;
+        if (this.bot.platform === 'telegram') {
+          text += `<a href="${item.source}">🔗</a>`;
+          if (item.trailer) {
+            text += `<a href="${item.trailer}">🎬</a>`;
+          }
+        } else {
+          text += `<a href="${item.source}">🔗</a>\n`;
         }
         text += `⌛ ${item.durationReadable}`;
         text += `\n🎫 ${sessions}\n`;

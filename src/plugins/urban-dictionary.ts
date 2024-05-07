@@ -43,7 +43,7 @@ export class UrbanDictionaryPlugin extends PluginBase {
     }
 
     const entry = content.list[0];
-    let text = `<b>${term}</b>\n\n${entry.definition}`;
+    let text = `<b>${term}</b>\n\n<blockquote>${entry.definition}</blockquote>`;
     if (entry.example) {
       text += `\n\n<i>${entry.example}</i>`;
     }

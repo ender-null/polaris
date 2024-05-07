@@ -14,12 +14,13 @@ export class CommitPlugin extends PluginBase {
     ];
   }
   async run(msg: Message): Promise<void> {
-    const url = 'http://whatthecommit.com/index.txt';
+    const url = 'https://whatthecommit.com/index.txt';
     const resp = await sendRequest(url, null, null, null, false, this.bot);
-    const content = await resp.text();
-    if (!content) {
+    const commit = await resp.text();
+    if (!commit) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
     }
+    const content = `<blockquote>${commit}</blockquote>`;
     return this.bot.replyMessage(msg, content);
   }
 }

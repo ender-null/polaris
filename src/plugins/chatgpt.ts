@@ -21,7 +21,7 @@ export class ChatGPTPlugin extends PluginBase {
           },
         ],
         friendly: `^@${this.bot.user.username}`,
-        description: 'Use ChatGPT to provide text outputs in response to inputs',
+        description: 'Use ChatGPT to provide response to an input',
       },
     ];
   }

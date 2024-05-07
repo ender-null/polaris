@@ -343,7 +343,7 @@ export const getUsername = async (bot: Bot, uid: number | string, includeNick = 
       name = `@${group.username}`;
     }
   } else {
-    name = '[null]';
+    name = '<null>';
   }
   return name;
 };
@@ -374,7 +374,7 @@ export const getFullName = async (bot: Bot, uid: number | string, includeUsernam
       name += ` (@${group.username})`;
     }
   } else {
-    name = '[null]';
+    name = '<null>';
   }
   return name;
 };
@@ -799,6 +799,7 @@ export const htmlToMarkdown = (text: string): string => {
     text = text.replace(new RegExp('<u>(.*?)</u>', 'gim'), '~$1~');
     text = text.replace(new RegExp('<code>(.*?)</code>', 'gim'), '`$1`');
     text = text.replace(new RegExp('<pre>(.*?)</pre>', 'gim'), '```$1```');
+    text = text.replace(new RegExp('<blockquote>(.*?)</blockquote>', 'gim'), '> $1');
 
     text = text.replace(new RegExp('&lt;', 'gim'), '<');
     text = text.replace(new RegExp('&gt;', 'gim'), '>');
@@ -814,26 +815,6 @@ export const htmlToMarkdownLegacy = (text: string): string => {
       { pattern: '<[/]?i>', sub: '_' },
       { pattern: '<[/]?b>', sub: '*' },
       { pattern: '<[/]?u>', sub: '~' },
-      { pattern: '<[/]?code>', sub: '`' },
-      { pattern: '<[/]?pre>', sub: '```' },
-    ];
-    replacements.map((rep) => {
-      text = text.replace(new RegExp(rep['pattern'], 'gim'), rep['sub']);
-    });
-    text = text.replace(new RegExp('&lt;', 'gim'), '<');
-    text = text.replace(new RegExp('&gt;', 'gim'), '>');
-  }
-  return text;
-};
-
-export const htmlToDiscordMarkdown = (text: string): string => {
-  if (text) {
-    const replacements = [
-      { pattern: '<code class="language-([\\w]+)">([\\S\\s]+)</code>', sub: '```$1\n$2```' },
-      { pattern: '<a href="(.[^<]+)">(.[^<]+)</a>', sub: '$1' },
-      { pattern: '<[/]?i>', sub: '_' },
-      { pattern: '<[/]?b>', sub: '**' },
-      { pattern: '<[/]?u>', sub: '__' },
       { pattern: '<[/]?code>', sub: '`' },
       { pattern: '<[/]?pre>', sub: '```' },
     ];
