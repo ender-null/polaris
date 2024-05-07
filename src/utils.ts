@@ -791,7 +791,7 @@ export const escapeRegExp = (text: string): string => {
   return text;
 };
 
-export const htmlToMarkdown = (text) => {
+export const htmlToMarkdown = (text: string): string => {
   if (text) {
     text = text.replace(/<a href="(.*?)">(.*?)<\/a>/gim, '[$2]($1)');
     text = text.replace(/<i>(.*?)<\/i>/gim, '_$1_');
