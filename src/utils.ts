@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { exec } from 'child_process';
+import { execSync } from 'child_process';
 import fs from 'fs';
 import mime from 'mime-types';
 import fetch, { BodyInit, HeadersInit, RequestInit, Response } from 'node-fetch';
@@ -980,15 +980,14 @@ export const loggerFormat = winstonFormat.printf(({ level, message, timestamp, .
 });
 
 export const transport = new winston.transports.DailyRotateFile({
-  dirname: 'logs',
-  filename: 'polaris-%DATE%.log',
+  dirname: '/var/log/polaris',
+  filename: 'core-%DATE%.log',
   datePattern: 'YYYY-MM-DD-HH',
   zippedArchive: true,
   maxSize: '20m',
   maxFiles: '7d',
 });
 
-// Configure logger
 export const logger = createLogger({
   level: 'info',
   format: winstonFormat.combine(winstonFormat.timestamp(), winstonFormat.json()),
@@ -1008,8 +1007,8 @@ export const logger = createLogger({
 
 export const execResult = async (command: string): Promise<string> => {
   try {
-    const { stdout } = await util.promisify(exec)(command);
-    return stdout;
+    const stdout = await execSync(command);
+    return stdout.toString();
   } catch (e) {
     catchException(e);
     return e.message;
