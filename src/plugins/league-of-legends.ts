@@ -4,11 +4,13 @@ import format from 'string-format';
 
 import { PluginBase } from '../plugin';
 import {
+  allButNWord,
   capitalize,
   formatNumber,
   generateCommandHelp,
   getInput,
   getTags,
+  getWord,
   isCommand,
   sendRequest,
   setTag,
@@ -31,6 +33,10 @@ export class LeagueOfLegendsPlugin extends PluginBase {
         aliases: ['/lol'],
         parameters: [
           {
+            name: 'region',
+            required: true,
+          },
+          {
             name: 'riot id',
             required: false,
           },
@@ -40,6 +46,10 @@ export class LeagueOfLegendsPlugin extends PluginBase {
       {
         command: '/lolset',
         parameters: [
+          {
+            name: 'region',
+            required: true,
+          },
           {
             name: 'riot id',
             required: true,
@@ -58,9 +68,55 @@ export class LeagueOfLegendsPlugin extends PluginBase {
       losses: 'Losses',
       lp: 'LP',
       invalidRegion: 'Invalid LoL region',
-      summonerSet: 'Your summoner is set as <b>{0}</b>, you can now just use {2}lol',
+      summonerSet: 'Your summoner is set as <b>{0}</b> from region <b>{1}</b>, you can now just use {2}lol',
     };
     this.baseUrl = 'api.riotgames.com';
+    this.regions = {
+      euw: {
+        platform: 'euw1',
+        region: 'europe',
+      },
+      eune: {
+        platform: 'eun1',
+        region: 'europe',
+      },
+      tr: {
+        platform: 'tr1',
+        region: 'europe',
+      },
+      na: {
+        platform: 'na1',
+        region: 'americas',
+      },
+      lan: {
+        platform: 'la1',
+        region: 'americas',
+      },
+      las: {
+        platform: 'la2',
+        region: 'americas',
+      },
+      br: {
+        platform: 'br1',
+        region: 'americas',
+      },
+      ru: {
+        platform: 'ru',
+        region: 'asia',
+      },
+      jp: {
+        platform: 'jp1',
+        region: 'asia',
+      },
+      kr: {
+        platform: 'kr',
+        region: 'asia',
+      },
+      oce: {
+        platform: 'oc1',
+        region: 'asia',
+      },
+    };
   }
   async run(msg: Message): Promise<void> {
     const input = getInput(msg);
@@ -79,17 +135,29 @@ export class LeagueOfLegendsPlugin extends PluginBase {
         this.championIds = await this.generateChampionIds();
       }
       let riotId = null;
+      this.region = this.regions['euw'];
 
       if (!input) {
         const tags = await getTags(this.bot, uid, 'riot:?');
         if (tags && tags.length > 0) {
+          const summonerInfo = tags[0].split(':')[1];
+          if (summonerInfo.indexOf('/') > -1) {
+            this.region = this.regions[summonerInfo.split('/')[0]];
+            riotId = summonerInfo.split('/')[1].replace(new RegExp('_', 'gim'), ' ');
+          }
           riotId = tags[0].split(':')[1];
         }
         if (!riotId) {
           return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
         }
       } else {
-        riotId = input;
+        if (getWord(input, 1).toLowerCase() in this.regions) {
+          this.region = this.regions[getWord(input, 1).toLowerCase()];
+          riotId = allButNWord(input, 1);
+        } else {
+          this.region = this.regions['euw'];
+          riotId = input;
+        }
       }
       const [gameName, tagLine] = riotId.split('#');
       const account = await this.accountByRiotId(gameName, tagLine);
@@ -158,9 +226,18 @@ export class LeagueOfLegendsPlugin extends PluginBase {
       if (!input) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       } else {
-        const riotId = input;
-        setTag(this.bot, uid, `riot:${riotId}`);
-        text = format(this.strings.summonerSet, riotId.replace(new RegExp('_', 'gim'), ' '), this.bot.config.prefix);
+        const region = getWord(input, 1).toLowerCase();
+        if (!(region in this.regions)) {
+          return this.bot.replyMessage(msg, this.strings['invalidRegion']);
+        }
+        const riotId = allButNWord(input, 1).replace(new RegExp(' ', 'gim'), '_');
+        setTag(this.bot, uid, `riot:${region}/${riotId}`);
+        text = format(
+          this.strings.summonerSet,
+          riotId.replace(new RegExp('_', 'gim'), ' '),
+          region.toUpperCase(),
+          this.bot.config.prefix,
+        );
       }
     }
 
@@ -170,15 +247,13 @@ export class LeagueOfLegendsPlugin extends PluginBase {
   async apiRequest(method: string, regional = false): Promise<Response> {
     let endpoint;
     if (regional) {
-      endpoint = `https://europe.${this.baseUrl}`;
+      endpoint = `https://${this.region['region']}.${this.baseUrl}`;
     } else {
-      endpoint = `https://euw1.${this.baseUrl}`;
+      endpoint = `https://${this.region['platform']}.${this.baseUrl}`;
     }
 
-    const headers = {
-      'X-Riot-Token': this.bot.config.apiKeys.riotApi,
-    };
-    const resp = await sendRequest(endpoint + method, {}, headers, null, false, this.bot);
+    const url = endpoint + method + `?api_key=${this.bot.config.apiKeys.riotApi}`;
+    const resp = await sendRequest(url, {}, null, null, false, this.bot);
     const content = (await resp.json()) as any;
     return content;
   }
