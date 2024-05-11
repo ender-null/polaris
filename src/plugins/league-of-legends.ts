@@ -137,15 +137,14 @@ export class LeagueOfLegendsPlugin extends PluginBase {
       let riotId = null;
       this.region = this.regions['euw'];
 
+      const tags = await getTags(this.bot, uid, 'riot:?');
       if (!input) {
-        const tags = await getTags(this.bot, uid, 'riot:?');
         if (tags && tags.length > 0) {
           const summonerInfo = tags[0].split(':')[1];
           if (summonerInfo.indexOf('/') > -1) {
             this.region = this.regions[summonerInfo.split('/')[0]];
             riotId = summonerInfo.split('/')[1].replace(new RegExp('_', 'gim'), ' ');
           }
-          riotId = tags[0].split(':')[1];
         }
         if (!riotId) {
           return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
@@ -157,6 +156,16 @@ export class LeagueOfLegendsPlugin extends PluginBase {
         } else {
           this.region = this.regions['euw'];
           riotId = input;
+        }
+        if (!tags || tags.length === 0) {
+          setTag(this.bot, uid, `riot:${this.region.platform}/${riotId}`);
+          const lolset = format(
+            this.strings.summonerSet,
+            riotId.replace(new RegExp('_', 'gim'), ' '),
+            this.region.platform.toUpperCase(),
+            this.bot.config.prefix,
+          );
+          this.bot.replyMessage(msg, lolset);
         }
       }
       const [gameName, tagLine] = riotId.split('#');
@@ -177,30 +186,27 @@ export class LeagueOfLegendsPlugin extends PluginBase {
           summoner['profileIconId'],
         );
       }
-      text = format('{0} ({1}: {2})\n', summoner['name'], this.strings['lv'], summoner['summonerLevel']);
+      text = format('{0} ({1}: {2})\n', riotId, this.strings['lv'], summoner['summonerLevel']);
       if (masteries) {
         text += `\n${this.strings.masteries}:`;
-        let limit = 5;
-        Object.keys(masteries).map((i) => {
-          const mastery = masteries[i];
-          text += format(
-            '\n\t{0}: {1} {2} ({3})',
-            this.championIds[String(mastery['championId'])],
-            this.strings.lv,
-            mastery['championLevel'],
-            formatNumber(mastery['championPoints']),
-          );
-          limit -= 1;
-          if (limit == 0) {
-            return;
-          }
-        });
+        Object.keys(masteries)
+          .slice(0, 5)
+          .map((i) => {
+            const mastery = masteries[i];
+            text += format(
+              '\n- {0}: {1} {2} ({3})',
+              this.championIds[String(mastery['championId'])],
+              this.strings.lv,
+              mastery['championLevel'],
+              formatNumber(mastery['championPoints']),
+            );
+          });
       }
       if (ranked) {
         Object.keys(ranked).map((i) => {
           const queue = ranked[i];
           text += format(
-            '\n\n{0}:\n\t{1}: {2} {3} ({4}{5})',
+            '\n\n{0}:\n- {1}: {2} {3} ({4}{5})',
             this.rankedQueueType(queue['queueType']),
             this.strings.league,
             this.rankedTier(queue['tier']),
@@ -209,7 +215,7 @@ export class LeagueOfLegendsPlugin extends PluginBase {
             this.strings.lp,
           );
           text += format(
-            '\n\t{0}/{1}: {2} / {3} ({4}%)',
+            '\n- {0}/{1}: {2} / {3} ({4}%)',
             this.strings.wins,
             this.strings.losses,
             queue['wins'],
@@ -271,8 +277,8 @@ export class LeagueOfLegendsPlugin extends PluginBase {
     return await this.apiRequest(`/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}`);
   }
 
-  async leagueEntries(puuid: string): Promise<Response> {
-    return await this.apiRequest(`/lol/league/v4/entries/by-by-puuid/${puuid}`);
+  async leagueEntries(summonerId: string): Promise<Response> {
+    return await this.apiRequest(`/lol/league/v4/entries/by-summoner/${summonerId}`);
   }
 
   async ddragonVersions(): Promise<string> {

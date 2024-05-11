@@ -135,12 +135,20 @@ export const setTag = async (bot: Bot, target: number | string, tag: string): Pr
         const targetTag = currentTags.list[i];
         if (targetTag.startsWith(tag.split(':')[0] + ':')) {
           currentTags.list[i] = tag;
+          tags.updateOne(
+            { id: target },
+            {
+              $set: {
+                list: currentTags.list.sort(),
+              },
+            },
+          );
           found = true;
           break;
         }
       }
     }
-    if (found == false) {
+    if (found === false) {
       if (currentTags && currentTags.list.length) {
         tags.updateOne(
           { id: target },

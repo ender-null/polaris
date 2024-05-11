@@ -124,6 +124,14 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         const words = input.split(' ');
         characterName = words.pop().toLowerCase();
         realm = words.join('-').toLowerCase();
+        setTag(this.bot, uid, `wow:${realm}/${characterName}`);
+        const wowset = format(
+          this.strings.characterSet,
+          capitalize(characterName),
+          capitalizeEachWord(realm.replace(new RegExp('-', 'gim'), ' ')),
+          this.bot.config.prefix,
+        );
+        this.bot.replyMessage(msg, wowset);
       }
       const [character, media, raids, pvp, professions, statistics, raiderIO] = await Promise.all([
         this.getCharacter(region, realm, characterName),
@@ -149,9 +157,9 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       let guild = null;
       if ('guild' in character) {
         if (character.realm.name == character.guild.realm.name) {
-          guild = `-${character.guild.name}-`;
+          guild = `- ${character.guild.name}`;
         } else {
-          guild = `-${character.guild.name}-${character.guild.realm.name}-`;
+          guild = `- ${character.guild.name}-${character.guild.realm.name}`;
         }
       }
       let mainStat = 'strength';
@@ -165,7 +173,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         mainStatAmount = statistics.intellect.effective;
       }
       const stats = format(
-        `${this.strings['statistics']}:\n\t${this.strings['health']}: {0} \n\t{1}: {2}\n\t${this.strings[mainStat]}: {3}\n\t${this.strings['stamina']}: {4}\n\t${this.strings['armor']}: {5}`,
+        `${this.strings['statistics']}:\n- ${this.strings['health']}: {0} \n- {1}: {2}\n- ${this.strings[mainStat]}: {3}\n- ${this.strings['stamina']}: {4}\n- ${this.strings['armor']}: {5}`,
         formatNumber(statistics.health),
         statistics.power_type.name,
         formatNumber(statistics.power),
@@ -206,7 +214,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         const lastRaid = lastExp.instances[lastExp.instances.length - 1];
         raidProgression = `${lastRaid.instance.name}:`;
         lastRaid.modes.map((mode) => {
-          raidProgression += `\n\t${mode.difficulty.name}: ${mode.progress.completed_count}/${mode.progress.total_count}`;
+          raidProgression += `\n- ${mode.difficulty.name}: ${mode.progress.completed_count}/${mode.progress.total_count}`;
         });
       }
       let mythicScore = null;
@@ -216,7 +224,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         let empty = true;
         const scores = ['dps', 'healer', 'tank'];
         scores.map((score) => {
-          mythicScore += `\n\t${this.strings[score]}: ${lastSeason.scores[score]}`;
+          mythicScore += `\n- ${this.strings[score]}: ${lastSeason.scores[score]}`;
           if (lastSeason.scores[score] > 0) {
             empty = false;
           }
@@ -239,9 +247,9 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         }
         photo = `${asset.value}?update=${Math.trunc(now() / 3600)}`;
       }
-      text = `${title ? title + '\n\t' : ''}${name}\n${
+      text = `${title ? title + '\n- ' : ''}${name}\n${
         guild ? guild + '\n\n' : ''
-      }${characterClass}\n\t${race}\n\n${info}\n\n${stats}\n\n${professionLevels ? professionLevels + '\n\n' : ''}${
+      }${characterClass}\n- ${race}\n\n${info}\n\n${stats}\n\n${professionLevels ? professionLevels + '\n\n' : ''}${
         mythicScore ? mythicScore + '\n\n' : ''
       }${raidProgression ? raidProgression + '\n\n' : ''}`;
       if (photo) {
