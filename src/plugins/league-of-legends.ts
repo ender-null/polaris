@@ -4,13 +4,11 @@ import format from 'string-format';
 
 import { PluginBase } from '../plugin';
 import {
-  allButNWord,
   capitalize,
   formatNumber,
   generateCommandHelp,
   getInput,
   getTags,
-  getWord,
   isCommand,
   sendRequest,
   setTag,
