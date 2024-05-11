@@ -80,8 +80,6 @@ export class LeagueOfLegendsPlugin extends PluginBase {
       }
       let riotId = null;
 
-      this.region = this.regions['euw'];
-
       if (!input) {
         const tags = await getTags(this.bot, uid, 'riot:?');
         if (tags && tags.length > 0) {
@@ -172,9 +170,9 @@ export class LeagueOfLegendsPlugin extends PluginBase {
   async apiRequest(method: string, regional = false): Promise<Response> {
     let endpoint;
     if (regional) {
-      endpoint = `https://${this.region['region']}.${this.baseUrl}`;
+      endpoint = `https://europe.${this.baseUrl}`;
     } else {
-      endpoint = `https://${this.region['platform']}.${this.baseUrl}`;
+      endpoint = `https://euw1.${this.baseUrl}`;
     }
 
     const headers = {
