@@ -30,11 +30,16 @@ process.on('exit', () => {
   logger.info('❎ Exit process');
 });
 
+if (!process.env.MONGODB_URI) {
+  logger.warn(`Missing env variable MONGODB_URI`);
+  close();
+}
+
 export const bots: BotSet = {};
 export const db: MongoDatabases = {};
 
 const start = () => {
-  logger.info('🟡 WebSocket server waiting for connections...');
+  logger.info(`🟡 WebSocket server waiting for connections...`);
   wss.on('connection', (ws: WebSocket) => {
     logger.info('🟢 Client connected');
     let bot: Bot;

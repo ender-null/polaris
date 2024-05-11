@@ -455,7 +455,9 @@ export class Bot {
     const conversation = broadcast.message.conversation;
     let config = this.config;
     if (!Array.isArray(broadcast.target)) {
-      config = bots[broadcast.target].config;
+      if (bots[broadcast.target]) {
+        config = bots[broadcast.target].config;
+      }
     }
     const ownerName = await getFullName(this, config.owner);
     if (conversation.id === 'alerts') {
