@@ -251,9 +251,10 @@ export class LeagueOfLegendsPlugin extends PluginBase {
     } else {
       endpoint = `https://${this.region['platform']}.${this.baseUrl}`;
     }
-
-    const url = endpoint + method + `?api_key=${this.bot.config.apiKeys.riotApi}`;
-    const resp = await sendRequest(url, {}, null, null, false, this.bot);
+    const params = {
+      api_key: this.bot.config.apiKeys.riotApi,
+    };
+    const resp = await sendRequest(endpoint + method, params, null, null, false, this.bot);
     const content = (await resp.json()) as any;
     return content;
   }
