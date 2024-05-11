@@ -29,10 +29,12 @@ export class GifPlugin extends PluginBase {
     if (!input) {
       return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
     }
-    const url = 'https://api.tenor.com/v1/search';
+    const url = 'https://tenor.googleapis.com/v2/search';
     const params = {
       q: input,
       key: this.bot.config.apiKeys.tenor,
+      client_key: 'polaris',
+      limit: 1,
     };
     const resp = await sendRequest(url, params, null, null, false, this.bot);
     const content = (await resp.json()) as any;
