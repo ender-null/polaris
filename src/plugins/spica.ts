@@ -42,6 +42,7 @@ export class SpicaPlugin extends PluginBase {
     logger.info('before websocket');
     const ws: WebSocket = new WebSocket('wss://spica.end.works/wired');
     logger.info('after websocket');
+
     ws.on('ready', () => {
       logger.info('spica ready');
       if (isCommand(this, 1, msg.content)) {
@@ -51,6 +52,15 @@ export class SpicaPlugin extends PluginBase {
       } else if (isCommand(this, 3, msg.content)) {
         ws.send(input);
       }
+    });
+
+    ws.on('error', async (error: ErrorEvent) => {
+      logger.info('spica error');
+      logger.error(error);
+    });
+
+    ws.on('close', (code) => {
+      logger.info(`spica close ${code}`);
     });
 
     ws.on('message', (data: string) => {
