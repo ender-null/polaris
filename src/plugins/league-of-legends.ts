@@ -274,7 +274,7 @@ export class LeagueOfLegendsPlugin extends PluginBase {
   }
 
   async championMasteries(puuid: string): Promise<Response> {
-    return await this.apiRequest(`/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}`);
+    return await this.apiRequest(`/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}/top`);
   }
 
   async leagueEntries(summonerId: string): Promise<Response> {

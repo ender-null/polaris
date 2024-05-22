@@ -53,6 +53,7 @@ export class CorePlugin extends PluginBase {
             required: true,
           },
         ],
+        hidden: true,
       },
       {
         command: '/javascript',
@@ -64,6 +65,7 @@ export class CorePlugin extends PluginBase {
             required: true,
           },
         ],
+        hidden: true,
       },
     ];
     this.strings = {

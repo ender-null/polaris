@@ -17,6 +17,7 @@ export class QRPlugin extends PluginBase {
           },
         ],
         description: 'Converts the given string of text to a QR code',
+        skipHelp: true,
       },
     ];
   }

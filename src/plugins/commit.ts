@@ -10,6 +10,7 @@ export class CommitPlugin extends PluginBase {
       {
         command: '/commit',
         description: 'Returns a commit message from whatthecommit.com',
+        skipHelp: true,
       },
     ];
   }
