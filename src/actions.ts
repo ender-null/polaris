@@ -139,4 +139,10 @@ export class Actions {
     });
     return null;
   }
+  async setCommands(commands: any[]): Promise<boolean> {
+    this.bot.sendCommand('setCommands', {
+      commands,
+    });
+    return null;
+  }
 }

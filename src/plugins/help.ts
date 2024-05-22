@@ -37,10 +37,10 @@ export class HelpPlugin extends PluginBase {
 
     // Iterates the initialized plugin
     this.bot.plugins.map((plugin) => {
-      if ('commands' in plugin) {
+      if (plugin.commands) {
         plugin.commands.map((command) => {
           // If the command is hidden, ignore it
-          if (!('hidden' in command) || !command.hidden) {
+          if (command.command && !command.hidden) {
             const doc = generateCommandHelp(plugin, command.command, false, true);
             if (doc) {
               const lines = doc.split('\n');
@@ -55,14 +55,14 @@ export class HelpPlugin extends PluginBase {
 
                 const commandInfo = {
                   command: getWord(lines[0], 1).slice(1),
+                  parameters: command.parameters,
                   description: this.strings.noDescription,
-                  type: command.parameters ? 'string' : null,
                 };
 
                 if (lines.length > 1) {
                   commandInfo.description = removeHtml(lines[1]);
                 }
-                commands.push(command);
+                commands.push(commandInfo);
               }
             }
           }
@@ -71,21 +71,7 @@ export class HelpPlugin extends PluginBase {
     });
 
     if (isCommand(this, 3, msg.content)) {
-      if (this.bot.config.platform == 'TelegramTDlibBindings') {
-        this.bot.replyMessage(msg, 'setMyCommands', 'api', null, {
-          commands: JSON.stringify(commands),
-        });
-      } else if (this.bot.config.platform == 'DiscordBindings') {
-        const data = [];
-        commands.map(({ command, description }) => {
-          data.push({
-            name: command.slice(1),
-            description,
-          });
-        });
-        //const rest = new REST({ version: '10' }).setToken(this.bot.config.apiKeys.discordBotToken);
-        //await rest.put(Routes.applicationCommands(String(this.bot.config.apiKeys.discordClientId)), { body: data });
-      }
+      this.bot.bindings.setCommands(commands);
     }
 
     this.bot.replyMessage(msg, text);

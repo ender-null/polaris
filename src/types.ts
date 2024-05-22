@@ -279,7 +279,7 @@ export interface WSBroadcast extends WSData {
 }
 
 export interface WSCommandPayload {
-  [id: string]: string | number | boolean;
+  [id: string]: string | number | boolean | any[];
 }
 
 export interface DatabaseUser {
