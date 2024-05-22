@@ -29,6 +29,7 @@ export { RedditPlugin } from './reddit';
 export { ReminderPlugin } from './reminder';
 export { RussianRoulettePlugin } from './russian-roulette';
 export { SearchPlugin } from './search';
+export { SpicaPlugin } from './spica';
 export { StatusPlugin } from './status';
 export { TagPlugin } from './tag';
 export { TelegramPlugin } from './telegram';
