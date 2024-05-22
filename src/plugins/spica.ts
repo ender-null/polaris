@@ -18,14 +18,21 @@ export class SpicaPlugin extends PluginBase {
         hidden: true,
       },
       {
-        command: '/run',
+        command: '/shell',
+        aliases: ['/sh', '/bash'],
+        parameters: [
+          {
+            name: 'code',
+            required: true,
+          },
+        ],
         description: 'Run shell commands in system',
         hidden: true,
       },
     ];
     this.strings = {
       systemLoad: 'System load',
-      dockerPs: 'Docker ps.',
+      dockerPs: 'Docker processes',
       diskUsage: 'Disk usage',
       memoryUsage: 'Memory usage',
       systemUptime: 'System uptime',
@@ -38,12 +45,9 @@ export class SpicaPlugin extends PluginBase {
       return this.bot.replyMessage(msg, this.bot.errors.permissionRequired);
     }
     const input = getInput(msg);
-    logger.info('before websocket');
     const ws: WebSocket = new WebSocket('wss://spica.end.works/wired');
-    logger.info('after websocket');
 
     ws.onopen = () => {
-      logger.info('spica ready');
       if (isCommand(this, 1, msg.content)) {
         ws.send('status');
       } else if (isCommand(this, 2, msg.content)) {
@@ -54,31 +58,25 @@ export class SpicaPlugin extends PluginBase {
     };
 
     ws.onerror = (error: ErrorEvent) => {
-      logger.info('spica error');
-      logger.error(error);
-    };
-
-    ws.onclose = (code) => {
-      logger.info(`spica close ${code}`);
+      this.bot.replyMessage(msg, error.message);
     };
 
     ws.onmessage = (ev: MessageEvent) => {
-      logger.info('spica message');
       const data = ev.data as string;
       let text = this.bot.errors.noResults;
       if (isCommand(this, 1, msg.content)) {
         const result = JSON.parse(data.slice(7));
         text = `⚖️ ${this.strings.systemLoad}: <code>${result.system_load}</code>`;
-        text += `⏳ ${this.strings.systemUptime}: <code>${result.system_uptime}</code>`;
-        text += `🌐 ${this.strings.publicIp}: <code>${result.public_ip}</code>`;
-        text += `📊 ${this.strings.dockerPs}: <code>${result.docker_ps}</code>`;
-        text += `📂 ${this.strings.diskUsage}: <code>${result.disk_usage}</code>`;
-        text += `⚙️ ${this.strings.memoryUsage}: <code>${result.memory_usage}</code>`;
+        text += `\n⏳ ${this.strings.systemUptime}: <code>${result.system_uptime}</code>`;
+        text += `\n🌐 ${this.strings.publicIp}: <code>${result.public_ip}</code>`;
+        text += `\n📊 ${this.strings.dockerPs}: <code>${result.docker_ps}</code>`;
+        text += `\n📂 ${this.strings.diskUsage}: <code>${result.disk_usage}</code>`;
+        text += `\n⚙️ ${this.strings.memoryUsage}: <code>${result.memory_usage}</code>`;
       } else if (isCommand(this, 2, msg.content)) {
         const result = JSON.parse(data.slice(9));
         text = '';
         for (const key in result) {
-          text += `${result[key] ? '✅' : '🆘'} ${key}`;
+          text += `\n- ${result[key] ? '✅' : '🅾️'} <code>${key}</code>`;
         }
       } else {
         text = `<code class="language-shell">$ ${input}\n\n${data.toString()}</code>`;
