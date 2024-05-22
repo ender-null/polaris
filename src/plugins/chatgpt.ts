@@ -43,7 +43,7 @@ export class ChatGPTPlugin extends PluginBase {
     }
     messages.push({ role: 'user', content: input });
     const completion = await client.chat.completions.create({
-      model: 'gpt-3.5-turbo',
+      model: 'gpt-4o',
       user: crypto.createHash('md5').update(String(msg.sender.id)).digest('hex'),
       messages: messages as any,
     });
