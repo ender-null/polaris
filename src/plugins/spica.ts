@@ -2,7 +2,7 @@ import { WebSocket } from 'ws';
 import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
 import { Message } from '../types';
-import { getInput, isCommand, isOwner, isTrusted } from '../utils';
+import { getInput, isCommand, isOwner, isTrusted, logger } from '../utils';
 
 export class SpicaPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -39,8 +39,11 @@ export class SpicaPlugin extends PluginBase {
       return this.bot.replyMessage(msg, this.bot.errors.permissionRequired);
     }
     const input = getInput(msg);
+    logger.info('before websocket');
     const ws: WebSocket = new WebSocket('wss://spica.end.works/wired');
+    logger.info('after websocket');
     ws.on('ready', () => {
+      logger.info('spica ready');
       if (isCommand(this, 1, msg.content)) {
         ws.send('status');
       } else if (isCommand(this, 2, msg.content)) {
@@ -51,6 +54,7 @@ export class SpicaPlugin extends PluginBase {
     });
 
     ws.on('message', (data: string) => {
+      logger.info('spica message');
       let text = this.bot.errors.noResults;
       if (isCommand(this, 1, msg.content)) {
         const result = JSON.parse(data.slice(7));
@@ -64,7 +68,7 @@ export class SpicaPlugin extends PluginBase {
         const result = JSON.parse(data.slice(9));
         text = '';
         for (const key in result) {
-          text += `${key} ${result[key] ? '✅' : '🆘'}`;
+          text += `${result[key] ? '✅' : '🆘'} ${key}`;
         }
       } else {
         text = `<code class="language-shell">$ ${input}\n\n${data.toString()}</code>`;
