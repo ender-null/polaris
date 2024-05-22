@@ -1,7 +1,7 @@
 import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
 import { Message } from '../types';
-import { getInput, isCommand, isOwner, isTrusted, logger } from '../utils';
+import { getInput, isCommand, isOwner, isTrusted } from '../utils';
 
 export class SpicaPlugin extends PluginBase {
   constructor(bot: Bot) {

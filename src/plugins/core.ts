@@ -1,7 +1,7 @@
 import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
 import { Message } from '../types';
-import { execResult, generateCommandHelp, getInput, isCommand, isOwner, isTrusted } from '../utils';
+import { generateCommandHelp, getInput, isCommand, isOwner, isTrusted } from '../utils';
 
 export class CorePlugin extends PluginBase {
   constructor(bot: Bot) {
