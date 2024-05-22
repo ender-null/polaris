@@ -14,6 +14,7 @@ export class EchoPlugin extends PluginBase {
           {
             name: 'text',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Repeat the input',

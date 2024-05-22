@@ -15,6 +15,7 @@ export class InfoPlugin extends PluginBase {
           {
             name: 'target',
             required: false,
+            type: 'user',
           },
         ],
         description: 'Info about the user and group',

@@ -17,6 +17,7 @@ export class YouTubePlugin extends PluginBase {
           {
             name: 'query',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Returns first YouTube video.',
@@ -27,6 +28,7 @@ export class YouTubePlugin extends PluginBase {
           {
             name: 'query',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Returns a list with 8 YouTube videos.',

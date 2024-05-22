@@ -27,14 +27,17 @@ export class ReminderPlugin extends PluginBase {
           {
             name: 'delay',
             required: true,
+            type: 'integer',
           },
           {
             name: 'unit',
             required: true,
+            type: 'string',
           },
           {
             name: 'text',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Remind you things after a delay.',

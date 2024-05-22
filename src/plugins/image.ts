@@ -17,6 +17,7 @@ export class ImagePlugin extends PluginBase {
           {
             name: 'query',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Returns an image on the internet',

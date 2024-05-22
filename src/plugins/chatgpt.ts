@@ -18,6 +18,7 @@ export class ChatGPTPlugin extends PluginBase {
           {
             name: 'text',
             required: true,
+            type: 'string',
           },
         ],
         friendly: `^@${this.bot.user.username}`,

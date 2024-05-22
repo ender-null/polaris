@@ -18,6 +18,7 @@ export class SearchPlugin extends PluginBase {
           {
             name: 'query',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Returns first web result',
@@ -28,6 +29,7 @@ export class SearchPlugin extends PluginBase {
           {
             name: 'query',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Returns a list with 8 web results',

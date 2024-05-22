@@ -24,6 +24,7 @@ export class SpicaPlugin extends PluginBase {
           {
             name: 'code',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Run shell commands in system',

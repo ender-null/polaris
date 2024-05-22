@@ -15,6 +15,7 @@ export class RAEPlugin extends PluginBase {
           {
             name: 'term',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Look for definitions in the Real Academia de la Lengua',

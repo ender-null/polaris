@@ -16,6 +16,7 @@ export class ValenciaPlugin extends PluginBase {
           {
             name: 'station number',
             required: true,
+            type: 'integer',
           },
         ],
         description: 'Wait times of EMT Valencia bus',

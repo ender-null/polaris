@@ -16,6 +16,7 @@ export class UrbanDictionaryPlugin extends PluginBase {
           {
             name: 'term',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Look for definitions in the Urban Dictionary',

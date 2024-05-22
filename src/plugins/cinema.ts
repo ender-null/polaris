@@ -16,6 +16,7 @@ export class CinemaPlugin extends PluginBase {
           {
             name: 'cinema id',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Returns the films available at cinema',

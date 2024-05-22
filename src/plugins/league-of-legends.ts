@@ -35,10 +35,12 @@ export class LeagueOfLegendsPlugin extends PluginBase {
           {
             name: 'region',
             required: false,
+            type: 'string',
           },
           {
             name: 'riot id',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Show summoner stats',
@@ -49,10 +51,12 @@ export class LeagueOfLegendsPlugin extends PluginBase {
           {
             name: 'region',
             required: true,
+            type: 'string',
           },
           {
             name: 'riot id',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Set Riot ID',

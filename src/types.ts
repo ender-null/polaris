@@ -115,7 +115,10 @@ export abstract class Command {
 export abstract class Parameter {
   name: string;
   required: boolean;
+  type?: ParameterType;
 }
+
+export type ParameterType = 'string' | 'integer' | 'boolean' | 'number' | 'user';
 
 export class User {
   id: number | string;

@@ -16,6 +16,7 @@ export class ConfigPlugin extends PluginBase {
           {
             name: 'parameter',
             required: false,
+            type: 'string',
           },
         ],
         keepDefault: true,

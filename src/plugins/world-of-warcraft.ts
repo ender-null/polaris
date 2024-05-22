@@ -30,10 +30,12 @@ export class WorldOfWarcraftPlugin extends PluginBase {
           {
             name: 'realm',
             required: false,
+            type: 'string',
           },
           {
             name: 'character name',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Show character stats',
@@ -44,10 +46,12 @@ export class WorldOfWarcraftPlugin extends PluginBase {
           {
             name: 'realm',
             required: true,
+            type: 'string',
           },
           {
             name: 'character name',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Set character name and realm',

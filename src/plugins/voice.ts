@@ -18,6 +18,7 @@ export class VoicePlugin extends PluginBase {
           {
             name: 'text',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Sends an audio file with the input',

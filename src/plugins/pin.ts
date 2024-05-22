@@ -20,6 +20,7 @@ export class PinPlugin extends PluginBase {
           {
             name: 'name',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Sets a pin.',
@@ -30,6 +31,7 @@ export class PinPlugin extends PluginBase {
           {
             name: 'name',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Deletes a pin.',

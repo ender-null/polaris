@@ -17,6 +17,7 @@ export class LastFMPlugin extends PluginBase {
           {
             name: 'username',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Shows the last track played on Last.fm',
@@ -27,6 +28,7 @@ export class LastFMPlugin extends PluginBase {
           {
             name: 'username',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Set Last.fm username',

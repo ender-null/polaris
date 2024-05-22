@@ -16,6 +16,7 @@ export class NickPlugin extends PluginBase {
           {
             name: 'name',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Sets your nickname',

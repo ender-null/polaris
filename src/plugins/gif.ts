@@ -17,6 +17,7 @@ export class GifPlugin extends PluginBase {
           {
             name: 'query',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Send a GIF for input query',

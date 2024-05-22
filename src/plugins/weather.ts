@@ -18,6 +18,7 @@ export class WeatherPlugin extends PluginBase {
           {
             name: 'place',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Current weather',

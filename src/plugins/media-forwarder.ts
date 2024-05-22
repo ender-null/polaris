@@ -34,10 +34,12 @@ export class MediaForwarderPlugin extends PluginBase {
           {
             name: 'origin',
             required: true,
+            type: 'string',
           },
           {
             name: 'destination',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Resend all media from origin to destination',
@@ -49,6 +51,7 @@ export class MediaForwarderPlugin extends PluginBase {
           {
             name: 'origin',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Remove all resends from origin',

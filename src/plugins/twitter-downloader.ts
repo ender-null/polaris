@@ -16,6 +16,7 @@ export class TwitterDownloaderPlugin extends PluginBase {
           {
             name: 'tweet url',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Download media from tweets',
@@ -28,6 +29,7 @@ export class TwitterDownloaderPlugin extends PluginBase {
           {
             name: 'tweet url',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Download media from tweets and send as files',

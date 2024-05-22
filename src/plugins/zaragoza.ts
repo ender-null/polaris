@@ -16,6 +16,7 @@ export class ZaragozaPlugin extends PluginBase {
           {
             name: 'station number',
             required: true,
+            type: 'integer',
           },
         ],
         description: 'Wait times of Zaragoza bus station',
@@ -28,6 +29,7 @@ export class ZaragozaPlugin extends PluginBase {
           {
             name: 'station number',
             required: true,
+            type: 'integer',
           },
         ],
         description: 'Wait times of Zaragoza tram station',
@@ -40,6 +42,7 @@ export class ZaragozaPlugin extends PluginBase {
           {
             name: 'station number',
             required: true,
+            type: 'integer',
           },
         ],
         description: 'Zaragoza Bizi station data',

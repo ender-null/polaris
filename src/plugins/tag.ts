@@ -25,10 +25,12 @@ export class TagPlugin extends PluginBase {
           {
             name: 'target',
             required: false,
+            type: 'string',
           },
           {
             name: 'tag',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Sets a tag for an user or group.',
@@ -40,10 +42,12 @@ export class TagPlugin extends PluginBase {
           {
             name: 'target',
             required: false,
+            type: 'string',
           },
           {
             name: 'tag',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Removes a tag of an user or group.',
