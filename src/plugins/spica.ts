@@ -40,7 +40,17 @@ export class SpicaPlugin extends PluginBase {
     }
     const input = getInput(msg);
     const ws: WebSocket = new WebSocket('wss://spica.end.works/wired');
-    ws.on('message', async (data: string) => {
+    ws.on('ready', () => {
+      if (isCommand(this, 1, msg.content)) {
+        ws.send('status');
+      } else if (isCommand(this, 2, msg.content)) {
+        ws.send('services');
+      } else if (isCommand(this, 3, msg.content)) {
+        ws.send(input);
+      }
+    });
+
+    ws.on('message', (data: string) => {
       let text = this.bot.errors.noResults;
       if (isCommand(this, 1, msg.content)) {
         const result = JSON.parse(data.slice(7));
@@ -62,13 +72,5 @@ export class SpicaPlugin extends PluginBase {
       this.bot.replyMessage(msg, text);
       ws.close();
     });
-
-    if (isCommand(this, 1, msg.content)) {
-      ws.send('status');
-    } else if (isCommand(this, 2, msg.content)) {
-      ws.send('services');
-    } else if (isCommand(this, 3, msg.content)) {
-      ws.send(input);
-    }
   }
 }
