@@ -1,4 +1,3 @@
-import { WebSocket } from 'ws';
 import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
 import { Message } from '../types';
@@ -43,7 +42,7 @@ export class SpicaPlugin extends PluginBase {
     const ws: WebSocket = new WebSocket('wss://spica.end.works/wired');
     logger.info('after websocket');
 
-    ws.on('ready', () => {
+    ws.onopen = () => {
       logger.info('spica ready');
       if (isCommand(this, 1, msg.content)) {
         ws.send('status');
@@ -52,19 +51,20 @@ export class SpicaPlugin extends PluginBase {
       } else if (isCommand(this, 3, msg.content)) {
         ws.send(input);
       }
-    });
+    };
 
-    ws.on('error', async (error: ErrorEvent) => {
+    ws.onerror = (error: ErrorEvent) => {
       logger.info('spica error');
       logger.error(error);
-    });
+    };
 
-    ws.on('close', (code) => {
+    ws.onclose = (code) => {
       logger.info(`spica close ${code}`);
-    });
+    };
 
-    ws.on('message', (data: string) => {
+    ws.onmessage = (ev: MessageEvent) => {
       logger.info('spica message');
+      const data = ev.data as string;
       let text = this.bot.errors.noResults;
       if (isCommand(this, 1, msg.content)) {
         const result = JSON.parse(data.slice(7));
@@ -85,6 +85,6 @@ export class SpicaPlugin extends PluginBase {
       }
       this.bot.replyMessage(msg, text);
       ws.close();
-    });
+    };
   }
 }
