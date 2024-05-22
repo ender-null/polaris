@@ -34,11 +34,11 @@ export class LeagueOfLegendsPlugin extends PluginBase {
         parameters: [
           {
             name: 'region',
-            required: true,
+            required: false,
           },
           {
             name: 'riot id',
-            required: false,
+            required: true,
           },
         ],
         description: 'Show summoner stats',
@@ -150,19 +150,21 @@ export class LeagueOfLegendsPlugin extends PluginBase {
           return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
         }
       } else {
-        if (getWord(input, 1).toLowerCase() in this.regions) {
-          this.region = this.regions[getWord(input, 1).toLowerCase()];
+        let region = getWord(input, 1).toLowerCase();
+        if (region in this.regions) {
+          this.region = this.regions[region];
           riotId = allButNWord(input, 1);
         } else {
           this.region = this.regions['euw'];
+          region = 'euw';
           riotId = input;
         }
         if (!tags || tags.length === 0) {
-          setTag(this.bot, uid, `riot:${this.region.platform}/${riotId}`);
+          setTag(this.bot, uid, `riot:${region}/${riotId}`);
           const lolset = format(
             this.strings.summonerSet,
             riotId.replace(new RegExp('_', 'gim'), ' '),
-            this.region.platform.toUpperCase(),
+            region.toUpperCase(),
             this.bot.config.prefix,
           );
           this.bot.replyMessage(msg, lolset);
