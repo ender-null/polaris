@@ -46,10 +46,10 @@ export class HelpPlugin extends PluginBase {
               const lines = doc.split('\n');
               if (!isCommand(this, 3, msg.content) || this.bot.config.prefix == '/' || command.keepDefault) {
                 if (showAll) {
-                  text += `\n- ${lines[0]}`;
+                  text += `\n${lines[0]}`;
                 } else {
                   if (!command.skipHelp) {
-                    text += `\n- ${lines[0]}\n   ${lines[1]}`;
+                    text += `\n${lines[0]}\n   ${lines[1]}`;
                   }
                 }
 

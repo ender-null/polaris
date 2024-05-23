@@ -67,17 +67,17 @@ export class SpicaPlugin extends PluginBase {
       let text = this.bot.errors.noResults;
       if (isCommand(this, 1, msg.content)) {
         const result = JSON.parse(data.slice(7));
-        text = `⚖️ ${this.strings.systemLoad}: <code>${result.system_load}</code>`;
-        text += `\n⏳ ${this.strings.systemUptime}: <code>${result.system_uptime}</code>`;
+        text = `⚖️ ${this.strings.systemLoad}: <b>${result.system_load}</b>`;
+        text += `\n⏳ ${this.strings.systemUptime}: <b>${result.system_uptime}</b>`;
         text += `\n🌐 ${this.strings.publicIp}: <code>${result.public_ip}</code>`;
-        text += `\n📊 ${this.strings.dockerPs}: <code>${result.docker_ps}</code>`;
-        text += `\n📂 ${this.strings.diskUsage}: <code>${result.disk_usage}</code>`;
-        text += `\n⚙️ ${this.strings.memoryUsage}: <code>${result.memory_usage}</code>`;
+        text += `\n📊 ${this.strings.dockerPs}: <b>${result.docker_ps}</b>`;
+        text += `\n📂 ${this.strings.diskUsage}: <b>${result.disk_usage}</b>`;
+        text += `\n⚙️ ${this.strings.memoryUsage}: <b>${result.memory_usage}</b>`;
       } else if (isCommand(this, 2, msg.content)) {
         const result = JSON.parse(data.slice(9));
         text = '';
         for (const key in result) {
-          text += `\n- ${result[key] ? '✅' : '🅾️'} <code>${key}</code>`;
+          text += `\n${result[key] ? '✅' : '🅾️'} <code>${key}</code>`;
         }
       } else {
         text = `<code class="language-shell">$ ${input}\n\n${data.toString()}</code>`;
