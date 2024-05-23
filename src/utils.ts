@@ -332,22 +332,22 @@ export const getUsername = async (bot: Bot, uid: number | string, includeNick = 
   const groups = db[bot.platform].collection('groups');
   const group = await groups.findOne({ id: uid });
   if (user) {
-    if (includeNick && user.nick !== undefined) {
+    if (includeNick && user.nick) {
       name += user.nick;
     } else {
-      if (user.first_name !== undefined) {
+      if (user.first_name) {
         name += user.first_name;
       }
-      if (user.last_name !== undefined) {
+      if (user.last_name) {
         name += ' ' + user.last_name;
       }
     }
-    if (user.username !== undefined && user.username !== '') {
+    if (user.username && user.username !== '') {
       name = `@${user.username}`;
     }
-  } else if (group !== undefined) {
+  } else if (group) {
     name = group.title;
-    if (group.username !== undefined && group.username !== '') {
+    if (group.username && group.username !== '') {
       name = `@${group.username}`;
     }
   } else {
