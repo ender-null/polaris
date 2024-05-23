@@ -39,10 +39,10 @@ export class HelpPlugin extends PluginBase {
     this.bot.plugins.map((plugin) => {
       if (plugin.commands) {
         plugin.commands.map((command) => {
-          // If the command is hidden, ignore it
-          if (command.command && !command.hidden) {
+          if (command.command) {
             const doc = generateCommandHelp(plugin, command.command, false, true);
-            if (doc) {
+            // If the command is hidden, ignore it
+            if (doc && !command.hidden) {
               const lines = doc.split('\n');
               if (!isCommand(this, 3, msg.content) || this.bot.config.prefix == '/' || command.keepDefault) {
                 if (showAll) {
@@ -52,18 +52,22 @@ export class HelpPlugin extends PluginBase {
                     text += `\n${lines[0]}\n   ${lines[1]}`;
                   }
                 }
-
-                const commandInfo = {
-                  command: getWord(lines[0], 1).slice(1),
-                  parameters: command.parameters,
-                  description: this.strings.noDescription,
-                };
-
-                if (lines.length > 1) {
-                  commandInfo.description = removeHtml(lines[1]);
-                }
-                commands.push(commandInfo);
               }
+            }
+            const docAlt = generateCommandHelp(plugin, command.command, true, true);
+            if (docAlt) {
+              const linesAlt = docAlt.split('\n');
+              const commandInfo = {
+                command: getWord(linesAlt[0], 1).slice(1),
+                parameters: command.parameters || null,
+                description: this.strings.noDescription,
+                hidden: command.hidden || false,
+              };
+
+              if (linesAlt.length > 1) {
+                commandInfo.description = removeHtml(linesAlt[1]);
+              }
+              commands.push(commandInfo);
             }
           }
         });

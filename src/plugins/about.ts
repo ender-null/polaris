@@ -22,7 +22,6 @@ export class AboutPlugin extends PluginBase {
       {
         command: '/start',
         keepDefault: true,
-        hidden: true,
       },
     ];
     this.strings = {
