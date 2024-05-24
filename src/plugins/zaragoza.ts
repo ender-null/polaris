@@ -14,7 +14,7 @@ export class ZaragozaPlugin extends PluginBase {
         friendly: '^bus ',
         parameters: [
           {
-            name: 'station number',
+            name: 'station',
             required: true,
             type: 'integer',
           },
@@ -27,7 +27,7 @@ export class ZaragozaPlugin extends PluginBase {
         friendly: '^tram ',
         parameters: [
           {
-            name: 'station number',
+            name: 'station',
             required: true,
             type: 'integer',
           },
@@ -40,7 +40,7 @@ export class ZaragozaPlugin extends PluginBase {
         friendly: '^bizi ',
         parameters: [
           {
-            name: 'station number',
+            name: 'station',
             required: true,
             type: 'integer',
           },

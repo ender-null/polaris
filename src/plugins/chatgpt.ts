@@ -13,7 +13,7 @@ export class ChatGPTPlugin extends PluginBase {
     this.commands = [
       {
         command: `/chatgpt`,
-        aliases: ['/ai', '/gpt'],
+        aliases: ['/ask', '/ai', '/gpt'],
         parameters: [
           {
             name: 'text',

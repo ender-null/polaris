@@ -38,7 +38,7 @@ export class LeagueOfLegendsPlugin extends PluginBase {
             type: 'string',
           },
           {
-            name: 'riot id',
+            name: 'riot-id',
             required: true,
             type: 'string',
           },
@@ -54,7 +54,7 @@ export class LeagueOfLegendsPlugin extends PluginBase {
             type: 'string',
           },
           {
-            name: 'riot id',
+            name: 'riot-id',
             required: true,
             type: 'string',
           },

@@ -33,7 +33,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
             type: 'string',
           },
           {
-            name: 'character name',
+            name: 'character',
             required: false,
             type: 'string',
           },
@@ -49,7 +49,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
             type: 'string',
           },
           {
-            name: 'character name',
+            name: 'character',
             required: true,
             type: 'string',
           },

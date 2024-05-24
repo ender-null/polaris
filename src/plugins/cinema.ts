@@ -14,7 +14,7 @@ export class CinemaPlugin extends PluginBase {
         friendly: '^cinema',
         parameters: [
           {
-            name: 'cinema id',
+            name: 'cinema-id',
             required: false,
             type: 'string',
           },

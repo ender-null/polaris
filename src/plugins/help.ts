@@ -49,7 +49,7 @@ export class HelpPlugin extends PluginBase {
                   text += `\n${lines[0]}`;
                 } else {
                   if (!command.skipHelp) {
-                    text += `\n${lines[0]}\n${lines[1] || this.strings.noDescription}`;
+                    text += `\n${lines[0]}\n\s${lines[1] || this.strings.noDescription}`;
                   }
                 }
               }

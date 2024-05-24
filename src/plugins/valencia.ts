@@ -14,7 +14,7 @@ export class ValenciaPlugin extends PluginBase {
         friendly: '^emt ',
         parameters: [
           {
-            name: 'station number',
+            name: 'station',
             required: true,
             type: 'integer',
           },

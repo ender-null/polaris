@@ -14,7 +14,7 @@ export class TwitterDownloaderPlugin extends PluginBase {
         aliases: ['/twdl'],
         parameters: [
           {
-            name: 'tweet url',
+            name: 'tweet',
             required: true,
             type: 'string',
           },
@@ -27,7 +27,7 @@ export class TwitterDownloaderPlugin extends PluginBase {
         aliases: ['/twdlhd'],
         parameters: [
           {
-            name: 'tweet url',
+            name: 'tweet',
             required: true,
             type: 'string',
           },
