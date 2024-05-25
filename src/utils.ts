@@ -405,13 +405,10 @@ export const setInput = (message: Message, trigger: string): Message => {
   if (message.type == 'text') {
     trigger = trigger.replace('$', '');
     // Get the text that is next to the pattern
-    const inputMatch = new RegExp(`${trigger}(.+)$`, 'gim').exec(message.content);
+    const regex = new RegExp(`${trigger}(.+)$`, 'gim');
+    const inputMatch = regex.exec(message.content);
     if (inputMatch && inputMatch.length > 0 && inputMatch[1]) {
-      if (inputMatch[1].startsWith(' ')) {
-        message.extra.input = inputMatch[1].slice(1);
-      } else {
-        message.extra.input = inputMatch[1];
-      }
+      message.extra.input = inputMatch[1].trim();
     }
 
     // Get the text that is next to the pattern
@@ -433,9 +430,9 @@ export const setInput = (message: Message, trigger: string): Message => {
 
 export const getInput = (message: Message, ignoreReply = true): string => {
   if (Object.keys(message.extra).length > 0) {
-    if (ignoreReply && 'input' in message.extra) {
+    if (ignoreReply && message.extra.input) {
       return message.extra.input;
-    } else if (!ignoreReply && 'inputReply' in message.extra) {
+    } else if (!ignoreReply && message.extra.inputReply) {
       return message.extra.inputReply;
     }
   }

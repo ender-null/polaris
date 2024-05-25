@@ -98,7 +98,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
     if (!this.accessToken) {
       this.accessToken = await this.retrievingAccessToken();
     }
-    const input = getInput(msg, false);
+    const input = getInput(msg);
     let text = '';
     const uid = String(msg.sender.id);
 
@@ -136,6 +136,9 @@ export class WorldOfWarcraftPlugin extends PluginBase {
           this.bot.config.prefix,
         );
         this.bot.replyMessage(msg, wowset);
+      }
+      if (!realm.length || !characterName.length) {
+        return this.bot.replyMessage(msg, this.bot.errors.missingParameter);
       }
       const [character, media, raids, pvp, professions, statistics, raiderIO] = await Promise.all([
         this.getCharacter(region, realm, characterName),

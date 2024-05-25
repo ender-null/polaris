@@ -421,7 +421,7 @@ export class Bot {
         this.send(message).then();
       });
     } else {
-      const message = new Message(null, chat, this.user, content, type, now(), reply, extra);
+      const message = new Message(null, chat, this.user, content.trim(), type, now(), reply, extra);
       this.send(message).then();
     }
   }

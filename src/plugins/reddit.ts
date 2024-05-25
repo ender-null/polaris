@@ -7,7 +7,7 @@ export class RedditPlugin extends PluginBase {
     super(bot);
     this.commands = [
       {
-        friendly: 'r',
+        friendly: 'r/',
         description: 'Links to subreddit',
         hidden: true,
       },
