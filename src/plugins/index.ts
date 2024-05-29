@@ -1,5 +1,4 @@
 export { AboutPlugin } from './about';
-export { AddToDiscordPlugin } from './add-to-discord';
 export { AnimalPlugin } from './animal';
 export { AntiSpamPlugin } from './anti-spam';
 export { AscoDeVidaPlugin } from './asco-de-vida';
