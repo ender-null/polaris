@@ -384,16 +384,44 @@ export class Bot {
     } else {
       conversation.title = await getFullName(this, conversation.id);
     }
-    const message: WSMessage = {
-      bot: this.config.name,
-      platform: this.platform,
-      type: 'message',
-      message: {
-        ...msg,
-        conversation,
-      },
-    };
-    this.websocket.send(JSON.stringify(message));
+    if (msg.content.startsWith('/') && msg.type !== 'text') {
+      toBase64(msg.content).then((base64String) => {
+        const msgWithFile = new Message(
+          msg.id,
+          msg.conversation,
+          msg.sender,
+          base64String,
+          msg.type,
+          msg.date,
+          msg.reply,
+          {
+            ...msg.extra,
+            attachment: msg.content,
+          },
+        );
+        const message: WSMessage = {
+          bot: this.config.name,
+          platform: this.platform,
+          type: 'message',
+          message: {
+            ...msgWithFile,
+            conversation,
+          },
+        };
+        this.websocket.send(JSON.stringify(message));
+      });
+    } else {
+      const message: WSMessage = {
+        bot: this.config.name,
+        platform: this.platform,
+        type: 'message',
+        message: {
+          ...msg,
+          conversation,
+        },
+      };
+      this.websocket.send(JSON.stringify(message));
+    }
   }
 
   sendCommand(method: string, payload: WSCommandPayload) {
@@ -415,18 +443,8 @@ export class Bot {
     if (!extra.format) {
       extra.format = 'HTML';
     }
-    if (content.startsWith('/') && type !== 'text') {
-      toBase64(content).then((base64String) => {
-        const message = new Message(null, chat, this.user, base64String, type, now(), reply, {
-          ...extra,
-          attachment: content,
-        });
-        this.send(message).then();
-      });
-    } else {
-      const message = new Message(null, chat, this.user, content.trim(), type, now(), reply, extra);
-      this.send(message).then();
-    }
+    const message = new Message(null, chat, this.user, content.trim(), type, now(), reply, extra);
+    this.send(message).then();
   }
 
   forwardMessage(msg: Message, chatId: number | string): void {
