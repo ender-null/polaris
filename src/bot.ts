@@ -417,7 +417,10 @@ export class Bot {
     }
     if (content.startsWith('/') && type !== 'text') {
       toBase64(content).then((base64String) => {
-        const message = new Message(null, chat, this.user, base64String, type, now(), reply, extra);
+        const message = new Message(null, chat, this.user, base64String, type, now(), reply, {
+          ...extra,
+          attachment: content,
+        });
         this.send(message).then();
       });
     } else {
