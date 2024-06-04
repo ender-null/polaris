@@ -34,6 +34,7 @@ import {
   t,
   toBase64,
 } from './utils';
+import path from 'path';
 
 export class Bot {
   platform: string;
@@ -386,7 +387,7 @@ export class Bot {
     }
     if (msg.content.startsWith('/') && msg.type !== 'text') {
       toBase64(msg.content).then((base64String) => {
-        const msgWithFile = new Message(
+        const msgWithAttachment = new Message(
           msg.id,
           msg.conversation,
           msg.sender,
@@ -396,7 +397,7 @@ export class Bot {
           msg.reply,
           {
             ...msg.extra,
-            attachment: msg.content,
+            attachment: path.parse(msg.content).base,
           },
         );
         const message: WSMessage = {
@@ -404,7 +405,7 @@ export class Bot {
           platform: this.platform,
           type: 'message',
           message: {
-            ...msgWithFile,
+            ...msgWithAttachment,
             conversation,
           },
         };

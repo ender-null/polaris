@@ -40,9 +40,8 @@ export class VoicePlugin extends PluginBase {
     });
     const buffer = Buffer.from(await mp3.arrayBuffer());
     await fs.promises.writeFile(speechFile.name, buffer);
-    this.bot.replyMessage(msg, speechFile.name, 'voice');
-
     const voice = await mp3ToOgg(speechFile.name);
+
     if (voice) {
       this.bot.replyMessage(msg, voice, 'voice');
     } else if (speechFile) {
