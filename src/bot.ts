@@ -385,44 +385,23 @@ export class Bot {
     } else {
       conversation.title = await getFullName(this, conversation.id);
     }
+    const message: WSMessage = {
+      bot: this.config.name,
+      platform: this.platform,
+      type: 'message',
+      message: {
+        ...msg,
+        conversation,
+      },
+    };
     if (msg.content.startsWith('/') && msg.type !== 'text') {
-      toBase64(msg.content).then((base64String) => {
-        const msgWithAttachment = new Message(
-          msg.id,
-          msg.conversation,
-          msg.sender,
-          base64String,
-          msg.type,
-          msg.date,
-          msg.reply,
-          {
-            ...msg.extra,
-            attachment: path.parse(msg.content).base,
-          },
-        );
-        const message: WSMessage = {
-          bot: this.config.name,
-          platform: this.platform,
-          type: 'message',
-          message: {
-            ...msgWithAttachment,
-            conversation,
-          },
-        };
-        this.websocket.send(JSON.stringify(message));
-      });
-    } else {
-      const message: WSMessage = {
-        bot: this.config.name,
-        platform: this.platform,
-        type: 'message',
-        message: {
-          ...msg,
-          conversation,
-        },
+      message.message.content = await toBase64(msg.content);
+      message.message.extra = {
+        ...message.message.extra,
+        attachment: path.parse(msg.content).base,
       };
-      this.websocket.send(JSON.stringify(message));
     }
+    this.websocket.send(JSON.stringify(message));
   }
 
   sendCommand(method: string, payload: WSCommandPayload) {
