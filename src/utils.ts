@@ -1006,7 +1006,7 @@ export const logger = createLogger({
         loggerFormat,
       ),
     }),
-    transport,
+    transport as any,
   ],
 });
 
