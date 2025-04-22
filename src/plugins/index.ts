@@ -4,6 +4,7 @@ export { AntiSpamPlugin } from './anti-spam';
 export { AscoDeVidaPlugin } from './asco-de-vida';
 export { ChatGPTPlugin } from './chatgpt';
 export { CinemaPlugin } from './cinema';
+export { CoffeePlugin } from './coffee';
 export { CommitPlugin } from './commit';
 export { ConfigPlugin } from './config';
 export { CorePlugin } from './core';

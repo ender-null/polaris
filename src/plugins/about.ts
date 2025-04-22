@@ -32,7 +32,7 @@ export class AboutPlugin extends PluginBase {
       help: 'Write {0}help to know what I can do!',
       about: 'Use {0}about to know more about me',
       donations: 'You can make {0}donations at https://revolut.me/endernull',
-      stats: '👤 {0} users\n👥 {1} groups',
+      stats: '👤 <b>{0}</b> users\n👥 <b>{1}</b> groups',
       donationsExplanation: 'You can make donations at https://revolut.me/endernull',
       supportersTitle: '<b>Supporters:</b>',
     };
