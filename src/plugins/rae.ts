@@ -1,5 +1,8 @@
-import { Bot, Message } from '..';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
+import { Message } from '../types';
 import { generateCommandHelp, getInput, sendRequest } from '../utils';
 
 export class RAEPlugin extends PluginBase {
@@ -12,6 +15,7 @@ export class RAEPlugin extends PluginBase {
           {
             name: 'term',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Look for definitions in the Real Academia de la Lengua',

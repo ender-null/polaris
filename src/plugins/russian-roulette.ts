@@ -1,7 +1,9 @@
 import format from 'string-format';
-import { Bot, Message } from '..';
+
 import { PluginBase } from '../plugin';
 import { delTag, getTags, getUsername, hasTag, isAdmin, isGroupAdmin, now, random, setTag } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class RussianRoulettePlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -25,13 +27,13 @@ export class RussianRoulettePlugin extends PluginBase {
     if (+gid > 0) {
       return this.bot.replyMessage(msg, this.bot.errors.groupOnly);
     }
-    if (hasTag(this.bot, gid, 'noroulette')) {
+    if (await hasTag(this.bot, gid, 'noroulette')) {
       delTag(this.bot, gid, 'roulette:?');
       return;
     }
     let text;
     let bullets = null;
-    const roulette = getTags(this.bot, gid, 'roulette:?');
+    const roulette = await getTags(this.bot, gid, 'roulette:?');
     if (roulette.length > 0) {
       bullets = +roulette[0].split(':')[1];
     }
@@ -46,17 +48,17 @@ export class RussianRoulettePlugin extends PluginBase {
       if (isGroupAdmin(this.bot, uid, msg) && !isAdmin(this.bot, uid)) {
         const res = await this.bot.bindings.kickConversationMember(msg.conversation.id, uid);
         if (!res) {
-          text = format(this.strings.saved, getUsername(uid));
+          text = format(this.strings.saved, await getUsername(this.bot, uid));
         } else {
-          text = format(this.strings.shot, getUsername(uid));
+          text = format(this.strings.shot, await getUsername(this.bot, uid));
         }
       } else {
-        text = format(this.strings.saved, getUsername(uid));
+        text = format(this.strings.saved, await getUsername(this.bot, uid));
       }
     } else {
       bullets -= 1;
       setTag(this.bot, gid, `roulette:${bullets}`);
-      text = format(this.strings.miss, getUsername(uid), bullets);
+      text = format(this.strings.miss, await getUsername(this.bot, uid), bullets);
     }
     setTag(this.bot, gid, `lastroulette:${now()}`);
 

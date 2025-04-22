@@ -1,5 +1,8 @@
-import { Bot, Message } from '..';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
+import { Message } from '../types';
 import { getInput, sendRequest } from '../utils';
 
 export class CinemaPlugin extends PluginBase {
@@ -11,8 +14,9 @@ export class CinemaPlugin extends PluginBase {
         friendly: '^cinema',
         parameters: [
           {
-            name: 'cinema id',
+            name: 'cinema-id',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Returns the films available at cinema',
@@ -45,11 +49,25 @@ export class CinemaPlugin extends PluginBase {
         const sessions = item.sessions
           .map((session) => {
             let label = session.time;
-            if (session.type) label = `${label} [${session.type}]`;
-            return `<a href="${session.url}">${label}</a>`;
+            if (session.type) label = `${label} ${session.type}`;
+            if (this.bot.platform === 'telegram') {
+              return `<a href="${session.url}">${label}</a>`;
+            } else {
+              return label;
+            }
           })
           .join(', ');
-        text += `\n<b>${item.name}</b>\n<a href="${item.source}">🔗</a> <a href="${item.trailer}">🎬</a> ⌛ ${item.durationReadable}\n🎫 ${sessions}\n`;
+        text += `\n<b>${item.name}</b>\n`;
+        if (this.bot.platform === 'telegram') {
+          text += `<a href="${item.source}">🔗</a>`;
+          if (item.trailer) {
+            text += `<a href="${item.trailer}">🎬</a>`;
+          }
+        } else {
+          text += `<a href="${item.source}">🔗</a>\n`;
+        }
+        text += `⌛ ${item.durationReadable}`;
+        text += `\n🎫 ${sessions}\n`;
       });
     }
 

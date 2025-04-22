@@ -1,8 +1,9 @@
 import * as cheerio from 'cheerio';
 import { URLSearchParams } from 'url';
-import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
 import { generateCommandHelp, getInput, sendRequest } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class ValenciaPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -13,8 +14,9 @@ export class ValenciaPlugin extends PluginBase {
         friendly: '^emt ',
         parameters: [
           {
-            name: 'station number',
+            name: 'station',
             required: true,
+            type: 'integer',
           },
         ],
         description: 'Wait times of EMT Valencia bus',
@@ -56,7 +58,7 @@ export class ValenciaPlugin extends PluginBase {
       line = $('img').eq(i).attr('title');
       const show = $(elem).text().replace('.', '. ').trim();
       const showSplit = show.split(' - ');
-      text += ` • <b>${showSplit[1]}</b>  ${line} <i>${showSplit[0]}</i>\n`;
+      text += `- <b>${showSplit[1]}</b>  ${line} <i>${showSplit[0]}</i>\n`;
     });
 
     if (line == '') {

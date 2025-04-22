@@ -1,9 +1,10 @@
-import { set } from 'firebase/database';
 import format from 'string-format';
-import { Bot, Message } from '..';
+
 import { db } from '../main';
 import { PluginBase } from '../plugin';
 import { generateCommandHelp, getInput, isCommand } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class PinPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -19,6 +20,7 @@ export class PinPlugin extends PluginBase {
           {
             name: 'name',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Sets a pin.',
@@ -29,6 +31,7 @@ export class PinPlugin extends PluginBase {
           {
             name: 'name',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Deletes a pin.',
@@ -52,20 +55,16 @@ export class PinPlugin extends PluginBase {
 
   async run(msg: Message): Promise<void> {
     const input = getInput(msg);
+    const uid = String(msg.sender.id);
+    const bid = String(this.bot.user.id);
+    const pins = db[this.bot.platform].collection('pins');
+    const ownPins = await pins.find({ creator: uid, bot: bid }).toArray();
     if (isCommand(this, 1, msg.content)) {
-      const pins = [];
-      if (db.pins) {
-        Object.keys(db.pins).map((pin) => {
-          if (db.pins[pin].creator == msg.sender.id && db.pins[pin].bot == this.bot.user.id) {
-            pins.push(pin);
-          }
-        });
-      }
       let text = '';
-      if (pins.length > 0) {
-        text = format(this.strings.pins, pins.length);
-        pins.map((pin) => {
-          text += `\n • #${pin}`;
+      if (ownPins.length > 0) {
+        text = format(this.strings.pins, ownPins.length);
+        ownPins.map((pin) => {
+          text += `\n- #${pin.tag}`;
         });
       } else {
         text = this.strings.noPins;
@@ -83,7 +82,7 @@ export class PinPlugin extends PluginBase {
         tag = input.slice(1);
       }
       tag = tag.toLowerCase();
-      if (db.pins && Object.keys(db.pins).indexOf(tag) > -1) {
+      if (ownPins.length && ownPins.find((pin) => pin['tag'] === tag)) {
         return this.bot.replyMessage(msg, format(this.strings.alreadyPinned, tag));
       }
       let pinType;
@@ -92,18 +91,13 @@ export class PinPlugin extends PluginBase {
       } else {
         pinType = msg.reply.type;
       }
-      set(db.pinsSnap.child(tag).ref, {
+      pins.insertOne({
+        tag,
         content: msg.reply.content.replace(/</gim, '&lt;').replace(/>/gim, '&gt;'),
-        creator: msg.sender.id,
+        creator: uid,
         type: pinType,
-        bot: this.bot.user.id,
+        bot: bid,
       });
-      db.pins[tag] = {
-        content: msg.reply.content.replace(/</gim, '&lt;').replace(/>/gim, '&gt;'),
-        creator: msg.sender.id,
-        type: pinType,
-        bot: this.bot.user.id,
-      };
       this.bot.replyMessage(msg, format(this.strings.pinned, tag));
       this.updateTriggers();
     } else if (isCommand(this, 3, msg.content)) {
@@ -115,34 +109,35 @@ export class PinPlugin extends PluginBase {
         tag = input.slice(1);
       }
       tag = tag.toLowerCase();
-      if (db.pins && Object.keys(db.pins).indexOf(tag) == -1) {
+      if (ownPins.length && ownPins.map((pin) => pin.tag).indexOf(tag) == -1) {
         return this.bot.replyMessage(msg, format(this.strings.notFound, tag));
       }
-      if (db.pins && msg.sender.id != db.pins[tag].creator) {
+      const foundPin = await pins.findOne({ tag });
+      if (uid != foundPin.creator) {
         return this.bot.replyMessage(msg, format(this.strings.notCreator, tag));
       }
-      set(db.pinsSnap.child(tag).ref, null);
-      delete db.pins[tag];
+      pins.deleteOne({ tag });
       this.bot.replyMessage(msg, format(this.strings.unpinned, tag));
       this.updateTriggers();
     } else {
       // Finds the first 3 pins of the message and sends them.
-      const pins = new RegExp('#(\\w+)', 'gim').exec(msg.content);
+      const pinsInMsg = new RegExp('#(\\w+)', 'gim').exec(msg.content);
       let count = 3;
-      if (pins) {
-        pins.map((pin) => {
-          if (pin in db.pins && count > 0) {
+      if (pinsInMsg) {
+        pinsInMsg.map(async (pin) => {
+          const foundPin = await pins.findOne({ tag: pin });
+          if (foundPin && count > 0) {
             if (
-              db.pins[pin].content != undefined &&
-              db.pins[pin].type != undefined &&
-              db.pins[pin].bot == this.bot.user.id
+              foundPin['content'] != undefined &&
+              foundPin['type'] != undefined &&
+              foundPin['bot'] == this.bot.user.id
             ) {
-              if (db.pins[pin].type == 'command') {
-                msg.content = db.pins[pin].content;
+              if (foundPin['type'] == 'command') {
+                msg.content = foundPin['content'];
                 return this.bot.onMessageReceive(msg);
               } else {
                 const reply = msg.reply ? msg.reply : msg;
-                this.bot.replyMessage(msg, db.pins[pin].content, db.pins[pin].type, reply);
+                this.bot.replyMessage(msg, foundPin['content'], foundPin['type'], reply);
               }
               count -= 1;
             }
@@ -155,29 +150,41 @@ export class PinPlugin extends PluginBase {
   }
 
   updateTriggers(): void {
-    if (db.pins) {
-      const addedPins = [];
-      this.commands.map((command) => {
-        if (command.command.startsWith('#')) {
-          addedPins.push(command.command.slice(1));
-        }
-      });
-
-      // Add new triggers
-      Object.keys(db.pins).map((pin) => {
-        if (addedPins.indexOf(pin) == -1)
-          this.commands.push({
-            command: '#' + pin,
-            hidden: true,
+    const pins = db[this.bot.platform].collection('pins');
+    pins
+      .find({ bot: String(this.bot.user.id) })
+      .toArray()
+      .then((pins_) => {
+        if (pins_) {
+          const addedPins = [];
+          this.commands.map((command) => {
+            if (command.command.startsWith('#')) {
+              addedPins.push(command.command.slice(1));
+            }
           });
-      });
 
-      // Remove unused triggers
-      this.commands.map((command, i) => {
-        if ('hidden' in command && command.hidden && Object.keys(db.pins).indexOf(command.command.slice(1)) == -1) {
-          this.commands.splice(i, 1);
+          pins_.map((pin) => {
+            console.log('addedPins', addedPins, 'pin.tag', pin.tag, addedPins.indexOf(pin.tag));
+            if (addedPins.indexOf(pin.tag) == -1) {
+              console.log('not added', pin.tag);
+              this.commands.push({
+                command: '#' + pin.tag,
+                hidden: true,
+              });
+            }
+          });
+
+          // Remove unused triggers
+          this.commands.map((command, i) => {
+            if (
+              'hidden' in command &&
+              command.hidden &&
+              pins_.map((pin) => pin.tag).indexOf(command.command.slice(1)) == -1
+            ) {
+              this.commands.splice(i, 1);
+            }
+          });
         }
       });
-    }
   }
 }

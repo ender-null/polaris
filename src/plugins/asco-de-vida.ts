@@ -1,7 +1,9 @@
 import * as cheerio from 'cheerio';
-import { Bot, Message } from '..';
+
 import { PluginBase } from '../plugin';
 import { sendRequest } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class AscoDeVidaPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -27,8 +29,7 @@ export class AscoDeVidaPlugin extends PluginBase {
     const published = story.find('.pre').text();
     let content = story.find('.advlink').text();
     content = content.replace('<br/>', '\n');
-    content = content.replace('ADV', '<b>ADV</b>');
-    const text = `${content}\n\n<i>${published.trim()}</i>`;
+    const text = `<blockquote>${content}</blockquote>\n\n<i>${published.trim()}</i>`;
     this.bot.replyMessage(msg, text);
   }
 }

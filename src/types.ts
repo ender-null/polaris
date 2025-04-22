@@ -1,4 +1,7 @@
-import { Config } from '.';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Db } from 'mongodb';
+import { Bot } from './bot';
+import { Config } from './config';
 
 export class ErrorMessages {
   adminRequired?: string;
@@ -59,6 +62,8 @@ export interface ApiKeys {
   googleDeveloperConsole?: string;
   lastfm?: string;
   openWeather?: string;
+  openAIKey?: string;
+  openAIPrompt?: string;
   tenor?: string;
   riotApi?: string;
   wolframAlpha?: string;
@@ -110,7 +115,10 @@ export abstract class Command {
 export abstract class Parameter {
   name: string;
   required: boolean;
+  type?: ParameterType;
 }
+
+export type ParameterType = 'string' | 'integer' | 'boolean' | 'number' | 'user';
 
 export class User {
   id: number | string;
@@ -171,6 +179,28 @@ export class Message {
   }
 }
 
+export interface BotSet {
+  [id: string]: Bot;
+}
+
+export interface MongoDatabases {
+  [id: string]: Db;
+}
+
+export class BroadcastMessage {
+  conversation: Conversation;
+  content: string;
+  type: string;
+  extra: Extra;
+
+  constructor(conversation: Conversation, content: string, type?: string, extra?: Extra) {
+    this.conversation = conversation;
+    this.content = content;
+    this.type = type;
+    this.extra = extra;
+  }
+}
+
 export class HTTPResponseError extends Error {
   response: Response;
   constructor(response: Response) {
@@ -188,6 +218,7 @@ export interface Extra {
   preview?: boolean;
   caption?: string;
   message?: number | string;
+  attachment?: string;
   title?: string;
   description?: string;
   photo?: string;
@@ -212,6 +243,47 @@ export interface CoordinatesResult {
   lng: number;
   locality: string;
   country: string;
+}
+
+export interface WSData {
+  bot: string;
+  platform: string;
+  type: string;
+}
+
+export interface WSInit extends WSData {
+  type: 'init';
+  user: User;
+  config: Config;
+}
+
+export interface WSMessage extends WSData {
+  type: 'message';
+  message: Message;
+}
+
+export interface WSCommand extends WSData {
+  type: 'command';
+  method: string;
+  payload: WSCommandPayload;
+}
+
+export interface WSPing extends WSData {
+  type: 'ping';
+}
+
+export interface WSPong extends WSData {
+  type: 'pong';
+}
+
+export interface WSBroadcast extends WSData {
+  type: 'broadcast' | 'redirect';
+  target: string | string[];
+  message: BroadcastMessage;
+}
+
+export interface WSCommandPayload {
+  [id: string]: string | number | boolean | any[];
 }
 
 export interface DatabaseUser {
@@ -331,6 +403,7 @@ export interface iGroupAdministration {
 }
 
 export interface Translation {
+  name: string;
   extends?: string;
   errors?: ErrorMessages;
   plugins?: iPluginTranslation;

@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import format from 'string-format';
-import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
 import { generateCommandHelp, getInput, isCommand, sendRequest } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class YouTubePlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -15,6 +17,7 @@ export class YouTubePlugin extends PluginBase {
           {
             name: 'query',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Returns first YouTube video.',
@@ -25,6 +28,7 @@ export class YouTubePlugin extends PluginBase {
           {
             name: 'query',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Returns a list with 8 YouTube videos.',
@@ -46,7 +50,7 @@ export class YouTubePlugin extends PluginBase {
       type: 'video',
       maxResults: '10',
       q: input,
-      regionCode: this.bot.config.locale.slice(3),
+      regionCode: (this.bot.config.locale || 'en_US').slice(3),
       key: this.bot.config.apiKeys.googleDeveloperConsole,
     };
     const resp = await sendRequest(url, params, null, null, false, this.bot);
@@ -69,7 +73,7 @@ export class YouTubePlugin extends PluginBase {
         if (item.snippet.title.length > 26) {
           item.snippet.title = item.snippet.title.split(0, 23) + '...';
         }
-        text += `\n • <a href="https://youtu.be/${item.id.videoId}">${item.snippet.title}</a>`;
+        text += `\n- <a href="https://youtu.be/${item.id.videoId}">${item.snippet.title}</a>`;
       });
       this.bot.replyMessage(msg, text, 'text', null, { preview: false });
     }

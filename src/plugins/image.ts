@@ -1,5 +1,8 @@
-import { Bot, Message } from '..';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
+import { Message } from '../types';
 import { generateCommandHelp, getInput, hasTag, random, sendRequest } from '../utils';
 
 export class ImagePlugin extends PluginBase {
@@ -14,6 +17,7 @@ export class ImagePlugin extends PluginBase {
           {
             name: 'query',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Returns an image on the internet',
@@ -49,13 +53,13 @@ export class ImagePlugin extends PluginBase {
       'sec-fetch-site': 'same-origin',
       'sec-fetch-mode': 'cors',
       referer: 'https://duckduckgo.com/',
-      'accept-language': this.bot.config.locale + ';q=0.9',
+      'accept-language': (this.bot.config.locale || 'en_US') + ';q=0.9',
     };
     const params = {
-      l: this.bot.config.locale,
-      dl: this.bot.config.locale.slice(0, 2),
-      ct: this.bot.config.locale.slice(0, 2).toUpperCase(),
-      ss_mkt: this.bot.config.locale.slice(0, 2),
+      l: this.bot.config.locale || 'en_US',
+      dl: (this.bot.config.locale || 'en_US').slice(0, 2),
+      ct: (this.bot.config.locale || 'en_US').slice(0, 2).toUpperCase(),
+      ss_mkt: (this.bot.config.locale || 'en_US').slice(0, 2),
       o: 'json',
       q: input,
       vqd: searchObj[1],
@@ -63,7 +67,7 @@ export class ImagePlugin extends PluginBase {
       p: '1',
       v7exp: 'a',
     };
-    if (!hasTag(this.bot, msg.conversation.id, 'nonsfw')) {
+    if (!(await hasTag(this.bot, msg.conversation.id, 'nonsfw'))) {
       params['kp'] = -2;
     }
 

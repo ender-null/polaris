@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import FormData from 'form-data';
 import format from 'string-format';
-import { Bot, Message } from '..';
+import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
+import { Message } from '../types';
 import {
   btoa,
   capitalize,
@@ -28,10 +30,12 @@ export class WorldOfWarcraftPlugin extends PluginBase {
           {
             name: 'realm',
             required: false,
+            type: 'string',
           },
           {
-            name: 'character name',
+            name: 'character',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Show character stats',
@@ -42,10 +46,12 @@ export class WorldOfWarcraftPlugin extends PluginBase {
           {
             name: 'realm',
             required: true,
+            type: 'string',
           },
           {
-            name: 'character name',
+            name: 'character',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Set character name and realm',
@@ -92,7 +98,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
     if (!this.accessToken) {
       this.accessToken = await this.retrievingAccessToken();
     }
-    const input = getInput(msg, false);
+    const input = getInput(msg);
     let text = '';
     const uid = String(msg.sender.id);
 
@@ -103,11 +109,11 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       let characterName = null;
 
       if (!input) {
-        const tags = getTags(this.bot, uid, 'wow:?');
+        const tags = await getTags(this.bot, uid, 'wow:?');
         if (tags && tags.length > 0) {
-          const summonerInfo = tags[0].split(':')[1];
-          if (summonerInfo.indexOf('/') > -1) {
-            const split = summonerInfo.split('/');
+          const characterInfo = tags[0].split(':')[1];
+          if (characterInfo.indexOf('/') > -1) {
+            const split = characterInfo.split('/');
             realm = split[0];
             characterName = split[1];
             if (split.length > 2) {
@@ -120,8 +126,19 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         }
       } else {
         const words = input.split(' ');
-        characterName = words.pop();
+        characterName = words.pop().toLowerCase();
         realm = words.join('-').toLowerCase();
+        setTag(this.bot, uid, `wow:${realm}/${characterName}`);
+        const wowset = format(
+          this.strings.characterSet,
+          capitalize(characterName),
+          capitalizeEachWord(realm.replace(new RegExp('-', 'gim'), ' ')),
+          this.bot.config.prefix,
+        );
+        this.bot.replyMessage(msg, wowset);
+      }
+      if (!realm.length || !characterName.length) {
+        return this.bot.replyMessage(msg, this.bot.errors.missingParameter);
       }
       const [character, media, raids, pvp, professions, statistics, raiderIO] = await Promise.all([
         this.getCharacter(region, realm, characterName),
@@ -132,7 +149,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         this.getCharacterStatistics(region, realm, characterName),
         this.getRaiderIO(region, realm, characterName),
       ]);
-      if (!character || !media || !raids || !pvp || !professions) {
+      if (!character || !raids || !pvp || !professions) {
         this.accessToken = await this.retrievingAccessToken();
         return this.bot.replyMessage(msg, this.bot.errors.connectionError);
       }
@@ -147,9 +164,9 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       let guild = null;
       if ('guild' in character) {
         if (character.realm.name == character.guild.realm.name) {
-          guild = `<${character.guild.name}>`;
+          guild = `- ${character.guild.name}`;
         } else {
-          guild = `<${character.guild.name}-${character.guild.realm.name}>`;
+          guild = `- ${character.guild.name}-${character.guild.realm.name}`;
         }
       }
       let mainStat = 'strength';
@@ -163,7 +180,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         mainStatAmount = statistics.intellect.effective;
       }
       const stats = format(
-        `${this.strings['statistics']}:\n\t${this.strings['health']}: {0} \n\t{1}: {2}\n\t${this.strings[mainStat]}: {3}\n\t${this.strings['stamina']}: {4}\n\t${this.strings['armor']}: {5}`,
+        `${this.strings['statistics']}:\n- ${this.strings['health']}: {0} \n- {1}: {2}\n- ${this.strings[mainStat]}: {3}\n- ${this.strings['stamina']}: {4}\n- ${this.strings['armor']}: {5}`,
         formatNumber(statistics.health),
         statistics.power_type.name,
         formatNumber(statistics.power),
@@ -204,17 +221,17 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         const lastRaid = lastExp.instances[lastExp.instances.length - 1];
         raidProgression = `${lastRaid.instance.name}:`;
         lastRaid.modes.map((mode) => {
-          raidProgression += `\n\t${mode.difficulty.name}: ${mode.progress.completed_count}/${mode.progress.total_count}`;
+          raidProgression += `\n- ${mode.difficulty.name}: ${mode.progress.completed_count}/${mode.progress.total_count}`;
         });
       }
-      let mythicScore = '';
-      if (raiderIO.mythic_plus_scores_by_season && raiderIO.mythic_plus_scores_by_season.length > 0) {
+      let mythicScore = null;
+      if (raiderIO && raiderIO.mythic_plus_scores_by_season && raiderIO.mythic_plus_scores_by_season.length > 0) {
         const lastSeason = raiderIO.mythic_plus_scores_by_season[0];
         mythicScore = `${this.strings['mythicPlusScores']}:`;
         let empty = true;
         const scores = ['dps', 'healer', 'tank'];
         scores.map((score) => {
-          mythicScore += `\n\t${this.strings[score]}: ${lastSeason.scores[score]}`;
+          mythicScore += `\n- ${this.strings[score]}: ${lastSeason.scores[score]}`;
           if (lastSeason.scores[score] > 0) {
             empty = false;
           }
@@ -227,19 +244,25 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         mythicScore = null;
       }
       let photo = null;
-      media.assets.map((asset) => {
-        if (asset.key == 'main') {
-          photo = `${asset.value}?update=${Math.trunc(now() / 3600)}`;
-          return;
+      if (media) {
+        let asset = media.assets.find((asset) => asset.key === 'main');
+        if (!asset) {
+          asset = media.assets.find((asset) => asset.key === 'inset');
         }
-      });
-      text = `${title ? title + '\n\t' : ''}${name}\n${
+        if (!asset) {
+          asset = media.assets.find((asset) => asset.key === 'avatar');
+        }
+        photo = `${asset.value}?update=${Math.trunc(now() / 3600)}`;
+      }
+      text = `${title ? title + '\n- ' : ''}${name}\n${
         guild ? guild + '\n\n' : ''
-      }${characterClass}\n\t${race}\n\n${info}\n\n${stats}\n\n${professionLevels ? professionLevels + '\n\n' : ''}${
+      }${characterClass}\n- ${race}\n\n${info}\n\n${stats}\n\n${professionLevels ? professionLevels + '\n\n' : ''}${
         mythicScore ? mythicScore + '\n\n' : ''
       }${raidProgression ? raidProgression + '\n\n' : ''}`;
       if (photo) {
         return this.bot.replyMessage(msg, photo, 'photo', null, { caption: text });
+      } else {
+        return this.bot.replyMessage(msg, text, 'text', null);
       }
     } else if (isCommand(this, 2, msg.content)) {
       if (!input) {
@@ -302,7 +325,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
     const url = `https://${region}.api.blizzard.com/profile/wow/character/${realm}/${characterName}${method}`;
     const params = {
       namespace: `profile-${region}`,
-      locale: this.bot.config.locale,
+      locale: this.bot.config.locale || 'en_US',
       access_token: this.accessToken,
     };
     const resp = await sendRequest(url, params, null, null, false, this.bot);

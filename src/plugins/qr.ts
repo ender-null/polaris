@@ -1,5 +1,6 @@
-import { Bot, Message } from '..';
+import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
+import { Message } from '../types';
 import { generateCommandHelp, getInput } from '../utils';
 
 export class QRPlugin extends PluginBase {
@@ -13,9 +14,11 @@ export class QRPlugin extends PluginBase {
           {
             name: 'text',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Converts the given string of text to a QR code',
+        skipHelp: true,
       },
     ];
   }

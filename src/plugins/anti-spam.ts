@@ -1,6 +1,5 @@
-import { set } from 'firebase/database';
 import format from 'string-format';
-import { Bot, Message } from '..';
+
 import { db } from '../main';
 import { PluginBase } from '../plugin';
 import {
@@ -14,6 +13,8 @@ import {
   setTag,
   telegramLinkRegExp,
 } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class AntiSpamPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -37,19 +38,19 @@ export class AntiSpamPlugin extends PluginBase {
       return;
     }
 
-    if (hasTag(this.bot, msg.sender.id, `ban:${msg.conversation.id}`)) {
+    if (await hasTag(this.bot, msg.sender.id, `ban:${msg.conversation.id}`)) {
       await this.kickSpammer(msg, 'ban', 'id');
     }
 
     const spamTypes = ['spam', 'arab', 'russian', 'ethiopic'];
     spamTypes.map(async (spamType) => {
-      if (!hasTag(this.bot, msg.sender.id, `allow${spamType}`)) {
-        if (hasTag(this.bot, msg.sender.id, spamType)) {
+      if (!(await hasTag(this.bot, msg.sender.id, `allow${spamType}`))) {
+        if (await hasTag(this.bot, msg.sender.id, spamType)) {
           if (!isAdmin(this.bot, msg.sender.id, msg)) {
             await this.kickSpammer(msg, spamType, 'tag');
           } else if (isTrusted(this.bot, msg.sender.id, msg)) {
             delTag(this.bot, msg.sender.id, spamType);
-            const name = getFullName(msg.sender.id);
+            const name = await getFullName(this.bot, msg.sender.id);
             const gid = String(msg.conversation.id);
             this.bot.sendAdminAlert(
               format(
@@ -65,10 +66,10 @@ export class AntiSpamPlugin extends PluginBase {
         }
         if (
           String(msg.conversation.id).startsWith('-') &&
-          hasTag(this.bot, msg.conversation.id, spamType) &&
-          !hasTag(this.bot, msg.conversation.id, 'safe') &&
-          !hasTag(this.bot, msg.conversation.id, 'resend:?') &&
-          !hasTag(this.bot, msg.conversation.id, 'fwd:?')
+          (await hasTag(this.bot, msg.conversation.id, spamType)) &&
+          !(await hasTag(this.bot, msg.conversation.id, 'safe')) &&
+          !(await hasTag(this.bot, msg.conversation.id, 'resend:?')) &&
+          !(await hasTag(this.bot, msg.conversation.id, 'fwd:?'))
         ) {
           return await this.kickMyself(msg);
         }
@@ -95,9 +96,9 @@ export class AntiSpamPlugin extends PluginBase {
       }
 
       if (
-        !hasTag(this.bot, msg.conversation.id, 'safe') &&
-        !hasTag(this.bot, msg.conversation.id, 'resend:?') &&
-        !hasTag(this.bot, msg.conversation.id, 'fwd:?')
+        !(await hasTag(this.bot, msg.conversation.id, 'safe')) &&
+        !(await hasTag(this.bot, msg.conversation.id, 'resend:?')) &&
+        !(await hasTag(this.bot, msg.conversation.id, 'fwd:?'))
       ) {
         if (msg.type == 'text') {
           if (this.detectArab(msg.content)) {
@@ -126,8 +127,11 @@ export class AntiSpamPlugin extends PluginBase {
   }
 
   async kickSpammer(m: Message, spamType = 'spam', content = 'content'): Promise<void> {
-    const name = getFullName(m.sender.id);
+    const uid = String(m.sender.id);
     const gid = String(m.conversation.id);
+    const name = await getFullName(this.bot, uid);
+    const groups = db[this.bot.platform].collection('groups');
+    const group = await groups.findOne({ id: gid });
     let text;
     if (content == 'name') {
       text = m.sender['first_name'];
@@ -142,8 +146,8 @@ export class AntiSpamPlugin extends PluginBase {
     }
     if (
       spamType != 'ban' &&
-      !hasTag(this.bot, m.sender.id, spamType) &&
-      !hasTag(this.bot, m.sender.id, `allow${spamType}`)
+      !(await hasTag(this.bot, uid, spamType)) &&
+      !(await hasTag(this.bot, uid, `allow${spamType}`))
     ) {
       this.bot.sendAdminAlert(
         format(
@@ -151,30 +155,28 @@ export class AntiSpamPlugin extends PluginBase {
           spamType,
           name,
           m.sender.id,
-          db.groups[gid] ? db.groups[gid].title : '[no title]',
+          group ? group.title : '[no title]',
           gid,
           content,
           text,
         ),
       );
-      setTag(this.bot, m.sender.id, spamType);
-      if (db.groups[gid][spamType]) {
-        db.groups[gid][spamType] = db.groups[gid][spamType] + 1;
-        set(db.groupsSnap.child(gid).child(spamType).ref, db.groups[gid][spamType] + 1);
+      setTag(this.bot, uid, spamType);
+      if (group[spamType]) {
+        group[spamType] = db.groups[gid][spamType] + 1;
+        groups.updateOne({ id: gid }, { $set: group });
       } else {
         db.groups[gid][spamType] = 1;
-        set(db.groupsSnap.child(gid).child(spamType).ref, 1);
+        groups.insertOne(group);
       }
 
-      if (db.groups[gid][spamType] >= 10 || String(m.sender.id) == gid) {
+      if (group[spamType] >= 10 || uid == gid) {
         setTag(this.bot, gid, spamType);
-        this.bot.sendAdminAlert(
-          format(this.strings.markedGroup, spamType, db.groups[gid] ? db.groups[gid].title : '[no title]', gid),
-        );
+        this.bot.sendAdminAlert(format(this.strings.markedGroup, spamType, group ? group.title : '[no title]', gid));
         if (
-          !hasTag(this.bot, m.conversation.id, 'safe') &&
-          !hasTag(this.bot, gid, 'resend:?') &&
-          !hasTag(this.bot, gid, 'fwd:?')
+          !(await hasTag(this.bot, gid, 'safe')) &&
+          !(await hasTag(this.bot, gid, 'resend:?')) &&
+          !(await hasTag(this.bot, gid, 'fwd:?'))
         ) {
           await this.kickMyself(m);
         }
@@ -183,24 +185,15 @@ export class AntiSpamPlugin extends PluginBase {
 
     if (
       isGroupAdmin(this.bot, this.bot.user.id, m) &&
-      !isAdmin(this.bot, m.sender.id) &&
-      (hasTag(this.bot, m.conversation.id, 'anti' + spamType) || spamType == 'ban')
+      !isAdmin(this.bot, uid) &&
+      ((await hasTag(this.bot, gid, 'anti' + spamType)) || spamType == 'ban')
     ) {
-      await this.bot.bindings.kickConversationMember(m.conversation.id, m.sender.id);
+      await this.bot.bindings.kickConversationMember(gid, uid);
       this.bot.sendAdminAlert(
-        format(
-          this.strings['kicked'],
-          spamType,
-          name,
-          m.sender.id,
-          db.groups[gid] ? db.groups[gid].title : '[no title]',
-          gid,
-          content,
-          text,
-        ),
+        format(this.strings['kicked'], spamType, name, uid, group ? group.title : '[no title]', gid, content, text),
       );
       this.bot.replyMessage(m, this.bot.errors.idiotKicked);
-      this.bot.bindings.deleteMessage(m.conversation.id, m.id);
+      this.bot.bindings.deleteMessage(gid, m.id);
     }
   }
 
@@ -233,7 +226,7 @@ export class AntiSpamPlugin extends PluginBase {
         });
       }
       if (trustedGroup && !isAdmin(this.bot, m.sender.id, m)) {
-        const name = getFullName(m.sender.id);
+        const name = await getFullName(this.bot, m.sender.id);
         const gid = String(m.conversation.id);
         this.bot.sendAdminAlert(
           format(

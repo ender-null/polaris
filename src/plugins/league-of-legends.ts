@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Response } from 'node-fetch';
 import format from 'string-format';
-import { Bot, iString, iStringNested, Message } from '..';
+
 import { PluginBase } from '../plugin';
 import {
   allButNWord,
@@ -14,6 +15,8 @@ import {
   sendRequest,
   setTag,
 } from '../utils';
+import { Bot } from '../bot';
+import { iStringNested, iString, Message } from '../types';
 
 export class LeagueOfLegendsPlugin extends PluginBase {
   baseUrl: string;
@@ -32,10 +35,12 @@ export class LeagueOfLegendsPlugin extends PluginBase {
           {
             name: 'region',
             required: false,
+            type: 'string',
           },
           {
-            name: 'summoner name',
-            required: false,
+            name: 'riot-id',
+            required: true,
+            type: 'string',
           },
         ],
         description: 'Show summoner stats',
@@ -46,13 +51,15 @@ export class LeagueOfLegendsPlugin extends PluginBase {
           {
             name: 'region',
             required: true,
+            type: 'string',
           },
           {
-            name: 'summoner name',
+            name: 'riot-id',
             required: true,
+            type: 'string',
           },
         ],
-        description: 'Set summoner name and region',
+        description: 'Set Riot ID',
       },
     ];
     this.strings = {
@@ -131,37 +138,50 @@ export class LeagueOfLegendsPlugin extends PluginBase {
       if (!this.championIds) {
         this.championIds = await this.generateChampionIds();
       }
-      let summonerName = null;
-
+      let riotId = null;
       this.region = this.regions['euw'];
 
+      const tags = await getTags(this.bot, uid, 'riot:?');
       if (!input) {
-        const tags = getTags(this.bot, uid, 'lol:?');
         if (tags && tags.length > 0) {
           const summonerInfo = tags[0].split(':')[1];
           if (summonerInfo.indexOf('/') > -1) {
             this.region = this.regions[summonerInfo.split('/')[0]];
-            summonerName = summonerInfo.split('/')[1].replace(new RegExp('_', 'gim'), ' ');
+            riotId = summonerInfo.split('/')[1].replace(new RegExp('_', 'gim'), ' ');
           }
         }
-        if (!summonerName) {
+        if (!riotId) {
           return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
         }
       } else {
-        if (getWord(input, 1).toLowerCase() in this.regions) {
-          this.region = this.regions[getWord(input, 1).toLowerCase()];
-          summonerName = allButNWord(input, 1);
+        let region = getWord(input, 1).toLowerCase();
+        if (region in this.regions) {
+          this.region = this.regions[region];
+          riotId = allButNWord(input, 1);
         } else {
           this.region = this.regions['euw'];
-          summonerName = input;
+          region = 'euw';
+          riotId = input;
+        }
+        if (!tags || tags.length === 0) {
+          setTag(this.bot, uid, `riot:${region}/${riotId}`);
+          const lolset = format(
+            this.strings.summonerSet,
+            riotId.replace(new RegExp('_', 'gim'), ' '),
+            region.toUpperCase(),
+            this.bot.config.prefix,
+          );
+          this.bot.replyMessage(msg, lolset);
         }
       }
-      const summoner = await this.summonerByName(summonerName);
+      const [gameName, tagLine] = riotId.split('#');
+      const account = await this.accountByRiotId(gameName, tagLine);
+      const summoner = await this.summonerByPUUID(account['puuid']);
       if (!summoner || ('status' in summoner && summoner['status']['status_code'] != 200)) {
         return this.bot.replyMessage(msg, this.bot.errors.connectionError);
       }
       const [masteries, ranked] = await Promise.all([
-        this.championMasteries(summoner['id']),
+        this.championMasteries(account['puuid']),
         this.leagueEntries(summoner['id']),
       ]);
       let iconUrl = null;
@@ -172,30 +192,27 @@ export class LeagueOfLegendsPlugin extends PluginBase {
           summoner['profileIconId'],
         );
       }
-      text = format('{0} ({1}: {2})\n', summoner['name'], this.strings['lv'], summoner['summonerLevel']);
+      text = format('{0} ({1}: {2})\n', riotId, this.strings['lv'], summoner['summonerLevel']);
       if (masteries) {
         text += `\n${this.strings.masteries}:`;
-        let limit = 5;
-        Object.keys(masteries).map((i) => {
-          const mastery = masteries[i];
-          text += format(
-            '\n\t{0}: {1} {2} ({3})',
-            this.championIds[String(mastery['championId'])],
-            this.strings.lv,
-            mastery['championLevel'],
-            formatNumber(mastery['championPoints']),
-          );
-          limit -= 1;
-          if (limit == 0) {
-            return;
-          }
-        });
+        Object.keys(masteries)
+          .slice(0, 5)
+          .map((i) => {
+            const mastery = masteries[i];
+            text += format(
+              '\n- {0}: {1} {2} ({3})',
+              this.championIds[String(mastery['championId'])],
+              this.strings.lv,
+              mastery['championLevel'],
+              formatNumber(mastery['championPoints']),
+            );
+          });
       }
       if (ranked) {
         Object.keys(ranked).map((i) => {
           const queue = ranked[i];
           text += format(
-            '\n\n{0}:\n\t{1}: {2} {3} ({4}{5})',
+            '\n\n{0}:\n- {1}: {2} {3} ({4}{5})',
             this.rankedQueueType(queue['queueType']),
             this.strings.league,
             this.rankedTier(queue['tier']),
@@ -204,7 +221,7 @@ export class LeagueOfLegendsPlugin extends PluginBase {
             this.strings.lp,
           );
           text += format(
-            '\n\t{0}/{1}: {2} / {3} ({4}%)',
+            '\n- {0}/{1}: {2} / {3} ({4}%)',
             this.strings.wins,
             this.strings.losses,
             queue['wins'],
@@ -225,11 +242,11 @@ export class LeagueOfLegendsPlugin extends PluginBase {
         if (!(region in this.regions)) {
           return this.bot.replyMessage(msg, this.strings['invalidRegion']);
         }
-        const summonerName = allButNWord(input, 1).replace(new RegExp(' ', 'gim'), '_');
-        setTag(this.bot, uid, `lol:${region}/${summonerName}`);
+        const riotId = allButNWord(input, 1).replace(new RegExp(' ', 'gim'), '_');
+        setTag(this.bot, uid, `riot:${region}/${riotId}`);
         text = format(
           this.strings.summonerSet,
-          summonerName.replace(new RegExp('_', 'gim'), ' '),
+          riotId.replace(new RegExp('_', 'gim'), ' '),
           region.toUpperCase(),
           this.bot.config.prefix,
         );
@@ -246,29 +263,28 @@ export class LeagueOfLegendsPlugin extends PluginBase {
     } else {
       endpoint = `https://${this.region['platform']}.${this.baseUrl}`;
     }
-
-    const headers = {
-      'X-Riot-Token': this.bot.config.apiKeys.riotApi,
+    const params = {
+      api_key: this.bot.config.apiKeys.riotApi,
     };
-    const resp = await sendRequest(endpoint + method, {}, headers, null, false, this.bot);
+    const resp = await sendRequest(endpoint + method, params, null, null, false, this.bot);
     const content = (await resp.json()) as any;
     return content;
   }
 
-  async summonerByName(summonerName: string): Promise<Response> {
-    return await this.apiRequest(`/lol/summoner/v4/summoners/by-name/${summonerName}`);
+  async accountByRiotId(gameName: string, tagLine: string): Promise<Response> {
+    return await this.apiRequest(`/riot/account/v1/accounts/by-riot-id/${gameName}/${tagLine}`, true);
   }
 
-  async accountByPuuid(puuid: string): Promise<Response> {
-    return await this.apiRequest(`/riot/account/v1/accounts/by-puuid/${puuid}`, true);
+  async summonerByPUUID(puuid: string): Promise<Response> {
+    return await this.apiRequest(`/lol/summoner/v4/summoners/by-puuid/${puuid}`);
   }
 
-  async championMasteries(encryptedSummonerId: string): Promise<Response> {
-    return await this.apiRequest(`/lol/champion-mastery/v4/champion-masteries/by-summoner/${encryptedSummonerId}`);
+  async championMasteries(puuid: string): Promise<Response> {
+    return await this.apiRequest(`/lol/champion-mastery/v4/champion-masteries/by-puuid/${puuid}/top`);
   }
 
-  async leagueEntries(encryptedSummonerId: string): Promise<Response> {
-    return await this.apiRequest(`/lol/league/v4/entries/by-summoner/${encryptedSummonerId}`);
+  async leagueEntries(summonerId: string): Promise<Response> {
+    return await this.apiRequest(`/lol/league/v4/entries/by-summoner/${summonerId}`);
   }
 
   async ddragonVersions(): Promise<string> {

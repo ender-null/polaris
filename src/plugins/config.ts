@@ -1,7 +1,9 @@
 import format from 'string-format';
-import { Bot, Message } from '..';
+
 import { PluginBase } from '../plugin';
 import { delTag, getInput, hasTag, isAdmin, isTrusted, setTag } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class ConfigPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -14,6 +16,7 @@ export class ConfigPlugin extends PluginBase {
           {
             name: 'parameter',
             required: false,
+            type: 'string',
           },
         ],
         keepDefault: true,
@@ -42,12 +45,12 @@ export class ConfigPlugin extends PluginBase {
     const enabled = ['reactions', 'roulette', 'replies', 'pole', 'fiesta', 'nsfw'];
     const disabled = ['antispam', 'antiarab', 'antirussian', 'polereset'];
     const config = {};
-    enabled.map((param) => {
-      config[param] = !hasTag(this.bot, msg.conversation.id, 'no' + param);
+    enabled.map(async (param) => {
+      config[param] = !(await hasTag(this.bot, msg.conversation.id, 'no' + param));
     });
 
-    disabled.map((param) => {
-      config[param] = hasTag(this.bot, msg.conversation.id, param);
+    disabled.map(async (param) => {
+      config[param] = await hasTag(this.bot, msg.conversation.id, param);
     });
 
     let text = '';

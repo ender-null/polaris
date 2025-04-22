@@ -1,7 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import format from 'string-format';
-import { Bot, Message } from '..';
+
 import { PluginBase } from '../plugin';
 import { capitalize, generateCommandHelp, getCoords, getInput, sendRequest } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class WeatherPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -15,6 +18,7 @@ export class WeatherPlugin extends PluginBase {
           {
             name: 'place',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Current weather',
@@ -44,7 +48,7 @@ export class WeatherPlugin extends PluginBase {
       lon: coords.lng,
       lat: coords.lat,
       units: 'metric',
-      lang: this.bot.config.locale.slice(0, 2),
+      lang: (this.bot.config.locale || 'en_US').slice(0, 2),
     };
     const resp = await sendRequest(url, params, null, null, false, this.bot);
     if (!resp) {

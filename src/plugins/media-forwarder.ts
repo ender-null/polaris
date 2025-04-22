@@ -1,6 +1,9 @@
-import { Bot, Message } from '..';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import { Bot } from '../bot';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
+import { Message } from '../types';
 import {
   delTag,
   generateCommandHelp,
@@ -31,10 +34,12 @@ export class MediaForwarderPlugin extends PluginBase {
           {
             name: 'origin',
             required: true,
+            type: 'string',
           },
           {
             name: 'destination',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Resend all media from origin to destination',
@@ -46,6 +51,7 @@ export class MediaForwarderPlugin extends PluginBase {
           {
             name: 'origin',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Remove all resends from origin',
@@ -79,14 +85,16 @@ export class MediaForwarderPlugin extends PluginBase {
       let text = '';
 
       Object.keys(db.tags).map((gid) => {
-        getTags(this.bot, gid).map((tag) => {
-          if (tag.indexOf('resend:') > -1) {
-            resends.push(`${gid}:${tag.split(':')[1]}`);
-          }
-          if (tag.indexOf('fwd:') > -1) {
-            forwards.push(`${gid}:${tag.split(':')[1]}`);
-          }
-        });
+        getTags(this.bot, gid).then((tags) =>
+          tags.map((tag) => {
+            if (tag.indexOf('resend:') > -1) {
+              resends.push(`${gid}:${tag.split(':')[1]}`);
+            }
+            if (tag.indexOf('fwd:') > -1) {
+              forwards.push(`${gid}:${tag.split(':')[1]}`);
+            }
+          }),
+        );
       });
 
       if (clean) {
@@ -194,7 +202,7 @@ export class MediaForwarderPlugin extends PluginBase {
       logger.debug(`ignoring anonymous message: ${msg.sender['firstName']} [${msg.sender.id}]`);
       return;
     }
-    if (hasTag(this.bot, msg.sender.id, 'muted')) {
+    if (await hasTag(this.bot, msg.sender.id, 'muted')) {
       logger.debug(`ignoring muted user: ${msg.sender['firstName']} [${msg.sender.id}]`);
       return;
     }
@@ -212,26 +220,117 @@ export class MediaForwarderPlugin extends PluginBase {
       return;
     }
 
-    if (hasTag(this.bot, gid, 'resend:?') || hasTag(this.bot, gid, 'fwd:?')) {
-      getTags(this.bot, gid).map((tag) => {
-        let forward = false;
-        if (tag.startsWith('resend:') || tag.startsWith('fwd:')) {
-          const cid = tag.split(':')[1];
-          if (msg.extra.fromChatId) {
-            if (String(msg.extra['from_chat_id']) == String(cid)) {
-              return;
-            } else if (String(msg.extra.fromChatId) != '0') {
-              if (hasTag(this.bot, cid, 'resend:?') || hasTag(this.bot, cid, 'fwd:?')) {
-                logger.debug('forward');
-                forward = true;
+    if ((await hasTag(this.bot, gid, 'resend:?')) || (await hasTag(this.bot, gid, 'fwd:?'))) {
+      getTags(this.bot, gid).then((tags) =>
+        tags.map(async (tag) => {
+          let forward = false;
+          if (tag.startsWith('resend:') || tag.startsWith('fwd:')) {
+            const cid = tag.split(':')[1];
+            if (msg.extra.fromChatId) {
+              if (String(msg.extra['from_chat_id']) == String(cid)) {
+                return;
+              } else if (String(msg.extra.fromChatId) != '0') {
+                if ((await hasTag(this.bot, cid, 'resend:?')) || (await hasTag(this.bot, cid, 'fwd:?'))) {
+                  logger.debug('forward');
+                  forward = true;
+                }
               }
             }
+            logger.debug(`tag: ${tag}, forward: ${forward}`);
           }
-          logger.debug(`tag: ${tag}, forward: ${forward}`);
-        }
-        if (tag.startsWith('resend:') && !forward) {
-          const cid = tag.split(':')[1];
+          if (tag.startsWith('resend:') && !forward) {
+            const cid = tag.split(':')[1];
 
+            if (
+              msg.type == 'photo' ||
+              msg.type == 'video' ||
+              msg.type == 'animation' ||
+              msg.type == 'document' ||
+              (msg.type == 'text' && msg.extra.urls)
+            ) {
+              const r: Message = { ...msg };
+              r.conversation.id = cid;
+              if (cid.startsWith('-')) {
+                if (db.groups[cid]) {
+                  r.conversation.title = db.groups[cid].title;
+                } else {
+                  r.conversation.title = tag.toUpperCase();
+                }
+              } else {
+                if (db.users[cid]) {
+                  r.conversation.title = await getFullName(this.bot, cid);
+                } else {
+                  r.conversation.title = tag.toUpperCase();
+                }
+              }
+              r.conversation.title = tag.toUpperCase();
+              if (r.extra.urls) {
+                r.extra.urls.map(async (url) => {
+                  const inputMatch = telegramLinkRegExp.exec(url);
+                  if (inputMatch && inputMatch.length > 0) {
+                    logger.debug(`ignoring telegram url: ${url}`);
+                  } else {
+                    if (url.startsWith('https://x.com') || url.startsWith('https://twitter.com')) {
+                      logger.debug(`tweet url: ${url}`);
+                      const tweetIdPattern = new RegExp('status/(\\d+)', 'gim');
+                      const twInputMatch = tweetIdPattern.exec(url);
+                      if (twInputMatch && twInputMatch.length > 0) {
+                        logger.debug(`tweet id: ${twInputMatch[1]}`);
+                        const tweetResp = await sendRequest(
+                          `https://on.my.end.works/twdl/getMediaUrls/${twInputMatch[1]}`,
+                          null,
+                          null,
+                          null,
+                          false,
+                          this.bot,
+                        );
+                        if (tweetResp) {
+                          const tweetContent: any = await tweetResp.json();
+                          tweetContent.mediaUrls.forEach((mediaUrl: string) => {
+                            logger.debug(`tweet media url: ${mediaUrl}`);
+                            if (mediaUrl.includes('.mp4')) {
+                              this.bot.replyMessage(r, mediaUrl, 'video');
+                            } else {
+                              this.bot.replyMessage(r, mediaUrl, 'photo');
+                            }
+                          });
+                        }
+                      }
+                    } else {
+                      if (url.indexOf('instagram') > -1) {
+                        url = url.split('?')[0];
+                      }
+                      this.bot.replyMessage(r, url, 'text', null, { preview: true });
+                    }
+                  }
+                });
+              } else {
+                this.bot.replyMessage(r, msg.content, msg.type, null, { preview: true });
+              }
+            } else if (msg.type != 'text') {
+              logger.debug(`invalid type: ${msg.type}`);
+            }
+          } else if (tag.startsWith('fwd:') || forward) {
+            const cid = tag.split(':')[1];
+            if (
+              msg.type == 'photo' ||
+              msg.type == 'video' ||
+              msg.type == 'animation' ||
+              msg.type == 'document' ||
+              (msg.type == 'text' && msg.extra.urls)
+            ) {
+              this.bot.forwardMessage(msg, cid);
+            }
+          }
+        }),
+      );
+    }
+
+    if (await hasTag(this.bot, gid, 'discord:?')) {
+      getTags(this.bot, gid, 'discord:?').then((tags) =>
+        tags.map(async (tag) => {
+          const token = tag.split(':')[1];
+          const webhookUrl = `https://discord.com/api/webhooks/${token}`;
           if (
             msg.type == 'photo' ||
             msg.type == 'video' ||
@@ -239,146 +338,59 @@ export class MediaForwarderPlugin extends PluginBase {
             msg.type == 'document' ||
             (msg.type == 'text' && msg.extra.urls)
           ) {
-            const r: Message = { ...msg };
-            r.conversation.id = cid;
-            if (cid.startsWith('-')) {
-              if (db.groups[cid]) {
-                r.conversation.title = db.groups[cid].title;
-              } else {
-                r.conversation.title = tag.toUpperCase();
-              }
-            } else {
-              if (db.users[cid]) {
-                r.conversation.title = getFullName(cid);
-              } else {
-                r.conversation.title = tag.toUpperCase();
-              }
-            }
-            r.conversation.title = tag.toUpperCase();
-            if (r.extra.urls) {
-              r.extra.urls.map(async (url) => {
+            if (msg.extra.urls) {
+              msg.extra.urls.map(async (url) => {
                 const inputMatch = telegramLinkRegExp.exec(url);
                 if (inputMatch && inputMatch.length > 0) {
                   logger.debug(`ignoring telegram url: ${url}`);
                 } else {
-                  if (url.startsWith('https://twitter.com')) {
-                    logger.debug(`tweet url: ${url}`);
-                    const tweetIdPattern = new RegExp('status/(\\d+)', 'gim');
-                    const twInputMatch = tweetIdPattern.exec(url);
-                    if (twInputMatch && twInputMatch.length > 0) {
-                      logger.debug(`tweet id: ${twInputMatch[1]}`);
-                      const tweetResp = await sendRequest(
-                        `https://on.my.end.works/twdl/getMediaUrls/${twInputMatch[1]}`,
-                        null,
-                        null,
-                        null,
-                        false,
-                        this.bot,
-                      );
-                      if (tweetResp) {
-                        const tweetContent: any = await tweetResp.json();
-                        tweetContent.mediaUrls.forEach((mediaUrl: string) => {
-                          logger.debug(`tweet media url: ${mediaUrl}`);
-                          if (mediaUrl.includes('.mp4')) {
-                            this.bot.replyMessage(r, mediaUrl, 'video');
-                          } else {
-                            this.bot.replyMessage(r, mediaUrl, 'photo');
-                          }
-                        });
-                      }
-                    }
-                  } else {
-                    if (url.indexOf('instagram') > -1) {
-                      url = url.split('?')[0];
-                    }
-                    this.bot.replyMessage(r, url, 'text', null, { preview: true });
+                  if (url.indexOf('instagram') > -1) {
+                    url = url.split('?')[0];
                   }
                 }
-              });
-            } else {
-              this.bot.replyMessage(r, msg.content, msg.type, null, { preview: true });
-            }
-          } else if (msg.type != 'text') {
-            logger.debug(`invalid type: ${msg.type}`);
-          }
-        } else if (tag.startsWith('fwd:') || forward) {
-          const cid = tag.split(':')[1];
-          if (
-            msg.type == 'photo' ||
-            msg.type == 'video' ||
-            msg.type == 'animation' ||
-            msg.type == 'document' ||
-            (msg.type == 'text' && msg.extra.urls)
-          ) {
-            this.bot.forwardMessage(msg, cid);
-          }
-        }
-      });
-    }
-
-    if (hasTag(this.bot, gid, 'discord:?')) {
-      getTags(this.bot, gid, 'discord:?').map(async (tag) => {
-        const token = tag.split(':')[1];
-        const webhookUrl = `https://discord.com/api/webhooks/${token}`;
-        if (
-          msg.type == 'photo' ||
-          msg.type == 'video' ||
-          msg.type == 'animation' ||
-          msg.type == 'document' ||
-          (msg.type == 'text' && msg.extra.urls)
-        ) {
-          if (msg.extra.urls) {
-            msg.extra.urls.map(async (url) => {
-              const inputMatch = telegramLinkRegExp.exec(url);
-              if (inputMatch && inputMatch.length > 0) {
-                logger.debug(`ignoring telegram url: ${url}`);
-              } else {
-                if (url.indexOf('instagram') > -1) {
-                  url = url.split('?')[0];
-                }
-              }
-              await sendRequest(
-                webhookUrl,
-                { content: url },
-                {
-                  'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                null,
-                true,
-                this.bot,
-              );
-            });
-          } else {
-            if (msg.content.startsWith('http')) {
-              await sendRequest(
-                webhookUrl,
-                { content: msg.content },
-                {
-                  'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                null,
-                true,
-                this.bot,
-              );
-            } else {
-              const file = await this.bot.bindings.getFile(msg.content);
-              // TODO
-              if (file) {
                 await sendRequest(
                   webhookUrl,
-                  { content: file },
+                  { content: url },
                   {
-                    'Content-Type': 'multipart/form-data',
+                    'Content-Type': 'application/x-www-form-urlencoded',
                   },
                   null,
                   true,
                   this.bot,
                 );
+              });
+            } else {
+              if (msg.content.startsWith('http')) {
+                await sendRequest(
+                  webhookUrl,
+                  { content: msg.content },
+                  {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                  },
+                  null,
+                  true,
+                  this.bot,
+                );
+              } else {
+                const file = await this.bot.bindings.getFile(msg.content);
+                // TODO
+                if (file) {
+                  await sendRequest(
+                    webhookUrl,
+                    { content: file },
+                    {
+                      'Content-Type': 'multipart/form-data',
+                    },
+                    null,
+                    true,
+                    this.bot,
+                  );
+                }
               }
             }
           }
-        }
-      });
+        }),
+      );
     }
   }
 }

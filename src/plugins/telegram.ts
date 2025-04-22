@@ -1,5 +1,6 @@
-import { Bot, Message } from '..';
+import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
+import { Message } from '../types';
 import { generateCommandHelp, getInput, getTarget, isAdmin, isCommand, isGroupAdmin, isMod } from '../utils';
 
 export class TelegramPlugin extends PluginBase {
@@ -122,7 +123,7 @@ export class TelegramPlugin extends PluginBase {
       commands: '<b>Commands</b>:',
       noDescription: 'No description',
     };
-    this.bindings = ['TelegramTDlibBindings'];
+    this.bindings = ['telegram'];
   }
   async run(msg: Message): Promise<void> {
     const input = getInput(msg);
@@ -141,7 +142,7 @@ export class TelegramPlugin extends PluginBase {
         if (doc) {
           const lines = doc.split('\n');
 
-          text += `\n • ${lines[0]}`;
+          text += `\n- ${lines[0]}`;
 
           if (lines.length > 1) {
             text += `\n   ${lines[1]}`;
@@ -183,7 +184,7 @@ export class TelegramPlugin extends PluginBase {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       }
       if (await this.checkPermissions(msg)) {
-        const target = getTarget(this.bot, msg, input);
+        const target = await getTarget(this.bot, msg, input);
         ok = await this.bot.bindings.promoteConversationMember(msg.conversation.id, target);
       }
     } else if (isCommand(this, 6, msg.content)) {
@@ -191,7 +192,7 @@ export class TelegramPlugin extends PluginBase {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       }
       if (await this.checkPermissions(msg)) {
-        const target = getTarget(this.bot, msg, input);
+        const target = await getTarget(this.bot, msg, input);
         if (!(await isGroupAdmin(this.bot, target, msg))) {
           ok = await this.bot.bindings.kickConversationMember(msg.conversation.id, target);
         } else {
@@ -206,7 +207,7 @@ export class TelegramPlugin extends PluginBase {
         if (!input && !msg.reply) {
           return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
         }
-        const target = getTarget(this.bot, msg, input);
+        const target = await getTarget(this.bot, msg, input);
         if (!(await isGroupAdmin(this.bot, target, msg))) {
           ok = await this.bot.bindings.banConversationMember(msg.conversation.id, target);
         } else {
@@ -218,7 +219,7 @@ export class TelegramPlugin extends PluginBase {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       }
       if (await this.checkPermissions(msg)) {
-        const target = getTarget(this.bot, msg, input);
+        const target = await getTarget(this.bot, msg, input);
         ok = await this.bot.bindings.unbanConversationMember(msg.conversation.id, target);
       }
     } else if (isCommand(this, 9, msg.content)) {
