@@ -277,7 +277,7 @@ export class MediaForwarderPlugin extends PluginBase {
                       if (twInputMatch && twInputMatch.length > 0) {
                         logger.debug(`tweet id: ${twInputMatch[1]}`);
                         const tweetResp = await sendRequest(
-                          `https://on.my.end.works/twdl/getMediaUrls/${twInputMatch[1]}`,
+                          `https://api.end.works/twdl/getMediaUrls/${twInputMatch[1]}`,
                           null,
                           null,
                           null,
