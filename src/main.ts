@@ -3,6 +3,11 @@ import { WebSocket, WebSocketServer } from 'ws';
 import { Bot } from './bot';
 import { BotSet, MongoDatabases, WSInit, WSMessage, WSPong } from './types';
 import { catchException, logger } from './utils';
+import { init, trackEvent } from '@aptabase/web';
+
+init(process.env.APTABASE_APP_KEY, {
+  host: process.env.APTABASE_HOST,
+});
 
 let mongo: MongoClient;
 export const wss: WebSocketServer = new WebSocketServer({ port: 8080 });
@@ -73,9 +78,19 @@ const start = () => {
           logger.info(
             `✅ Connected as ${bot.config.icon} ${bot.user.firstName} (@${bot.user.username}) [${bot.user.id}] on platform '${init.platform}'`,
           );
+          trackEvent('connected', {
+            platform: init.platform,
+            id: bot.user.id,
+            username: bot.user.username,
+          });
           bot.scheduleCronJobs();
         } else if (json.type === 'message') {
           const msg: WSMessage = json;
+          trackEvent('message', {
+            platform: msg.platform,
+            type: msg.message.type,
+            group: Boolean(String(msg.message.conversation.id).startsWith('-')),
+          });
           if (bot) {
             bot.messagesHandler(msg.message);
           }

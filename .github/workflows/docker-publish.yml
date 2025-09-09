@@ -150,6 +150,8 @@ jobs:
           KEY: op://end.works/SSH Key/private key
           FINGERPRINT: op://end.works/SSH Key/fingerprint
           MONGODB_URI: op://end.works/Polaris Config/mongodb uri
+          APTABASE_HOST: op://end.works/Polaris Aptabase/username
+          APTABASE_APP_KEY: op://end.works/Polaris Aptabase/credential
 
       - name: Run container on host
         uses: appleboy/ssh-action@v1.0.3
@@ -162,7 +164,7 @@ jobs:
             docker pull ghcr.io/${{ github.repository }}:${{ env.TAG }}
             docker stop ${{ env.CONTAINER_NAME }}
             docker rm ${{ env.CONTAINER_NAME }}
-            docker run -e MONGODB_URI=${{ env.MONGODB_URI }} -v $PWD/logs:/usr/src/app/logs -p 8040:8080 -e TZ=Europe/Madrid -ti -d --restart unless-stopped --name ${{ env.CONTAINER_NAME }} ghcr.io/${{ github.repository }}:${{ env.TAG }}
+            docker run -e APTABASE_HOST=${{ env.APTABASE_HOST }} -e APTABASE_APP_KEY=${{ env.APTABASE_APP_KEY }} -e MONGODB_URI=${{ env.MONGODB_URI }} -v $PWD/logs:/usr/src/app/logs -p 8040:8080 -e TZ=Europe/Madrid -ti -d --restart unless-stopped --name ${{ env.CONTAINER_NAME }} ghcr.io/${{ github.repository }}:${{ env.TAG }}
 
       - name: Generate summary
         id: generate-summary
