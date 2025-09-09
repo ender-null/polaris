@@ -1018,7 +1018,7 @@ const getSystemProps = (): {
   Platform: string;
 } => ({
   SdkVersion: 'aptabase-node/1.0.0',
-  AppVersion: '1.0.0',
+  AppVersion: '2.0.0',
   OsName: os.platform(),
   OsVersion: os.release(),
   Platform: 'node',
@@ -1030,18 +1030,22 @@ export const trackEvent = async (
 ): Promise<void> => {
   try {
     const payload = {
-      EventName: eventName,
-      Timestamp: new Date().toISOString(),
-      SessionId: sessionId,
-      SystemProps: getSystemProps(),
-      CustomProps: eventProperties,
+      timestamp: new Date().toISOString(),
+      sessionId,
+      eventName,
+      systemProps: {
+        isDebug: false,
+        appVersion: getSystemProps().AppVersion ?? '',
+        sdkVersion: getSystemProps().SdkVersion,
+      },
+      props: eventProperties,
     };
 
     const response = await fetch(`${process.env.APTABASE_HOST}/api/v0/event`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'X-Aptabase-App-Key': process.env.APTABASE_APP_KEY,
+        'App-Key': process.env.APTABASE_APP_KEY,
       },
       body: JSON.stringify(payload),
     });
