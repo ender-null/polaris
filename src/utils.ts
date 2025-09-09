@@ -1010,21 +1010,39 @@ export const logger = createLogger({
   ],
 });
 
+const getSystemProps = (): {
+  SdkVersion: string;
+  AppVersion?: string;
+  OsName: string;
+  OsVersion: string;
+  Platform: string;
+} => ({
+  SdkVersion: 'aptabase-node/1.0.0',
+  AppVersion: '1.0.0',
+  OsName: os.platform(),
+  OsVersion: os.release(),
+  Platform: 'node',
+});
+
 export const trackEvent = async (
   eventName: string,
   eventProperties: Record<string, string | number | boolean | null> = {},
 ): Promise<void> => {
   try {
+    const payload = {
+      EventName: eventName,
+      SessionId: sessionId,
+      SystemProps: getSystemProps(),
+      CustomProps: eventProperties,
+    };
+
     const response = await fetch(`${process.env.APTABASE_HOST}/api/v0/event`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-Aptabase-App-Key': process.env.APTABASE_APP_KEY,
       },
-      body: JSON.stringify({
-        name: eventName,
-        properties: { session_id: sessionId, ...eventProperties },
-      }),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
