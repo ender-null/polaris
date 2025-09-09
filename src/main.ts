@@ -2,14 +2,11 @@ import { MongoClient } from 'mongodb';
 import { WebSocket, WebSocketServer } from 'ws';
 import { Bot } from './bot';
 import { BotSet, MongoDatabases, WSInit, WSMessage, WSPong } from './types';
-import { catchException, logger } from './utils';
-import { init, trackEvent } from '@aptabase/web';
-
-init(process.env.APTABASE_APP_KEY, {
-  host: process.env.APTABASE_HOST,
-});
+import { catchException, logger, trackEvent } from './utils';
+import { v4 } from 'uuid';
 
 let mongo: MongoClient;
+export const sessionId = v4();
 export const wss: WebSocketServer = new WebSocketServer({ port: 8080 });
 
 const close = () => {

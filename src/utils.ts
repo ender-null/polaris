@@ -4,13 +4,14 @@ import fs from 'fs';
 import mime from 'mime-types';
 import fetch, { BodyInit, HeadersInit, RequestInit, Response } from 'node-fetch';
 import os from 'os';
+import https from 'https';
 import { ParsedUrlQueryInput } from 'querystring';
 import { pipeline } from 'stream';
 import { FileResult, fileSync } from 'tmp';
 import util from 'util';
 import winston, { createLogger, transports, format as winstonFormat } from 'winston';
 import 'winston-daily-rotate-file';
-import { db } from './main';
+import { db, sessionId } from './main';
 import { CoordinatesResult, HTTPResponseError, Message, iString } from './types';
 import { Bot } from './bot';
 import { PluginBase } from './plugin';
@@ -1009,6 +1010,41 @@ export const logger = createLogger({
     transport as any,
   ],
 });
+
+export const trackEvent = (eventName, eventProperties) => {
+  const data = JSON.stringify({
+    timestamp: new Date().toISOString(),
+    eventName,
+    sessionId,
+    systemProps: {
+      osName: 'Node.js',
+      osVersion: process.versions.node,
+    },
+    props: eventProperties,
+  });
+
+  const options = {
+    hostname: process.env.APTABASE_HOST.replace('https://', ''),
+    port: 443,
+    path: `/v1/${process.env.APTABASE_APP_KEY}`,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': data.length,
+    },
+  };
+
+  const req = https.request(options, (res) => {
+    logger.info(`Status: ${res.statusCode}`);
+  });
+
+  req.on('error', (e) => {
+    logger.error(`Problem with request: ${e.message}`);
+  });
+
+  req.write(data);
+  req.end();
+};
 
 export const execResult = async (command: string): Promise<string> => {
   try {
