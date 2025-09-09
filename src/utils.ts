@@ -1031,6 +1031,7 @@ export const trackEvent = async (
   try {
     const payload = {
       EventName: eventName,
+      Timestamp: new Date().toISOString(),
       SessionId: sessionId,
       SystemProps: getSystemProps(),
       CustomProps: eventProperties,
