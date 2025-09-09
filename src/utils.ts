@@ -1011,39 +1011,30 @@ export const logger = createLogger({
   ],
 });
 
-export const trackEvent = (eventName, eventProperties) => {
-  const data = JSON.stringify({
-    timestamp: new Date().toISOString(),
-    eventName,
-    sessionId,
-    systemProps: {
-      osName: 'Node.js',
-      osVersion: process.versions.node,
-    },
-    props: eventProperties,
-  });
+export const trackEvent = async (
+  eventName: string,
+  eventProperties: Record<string, string | number | boolean | null> = {},
+): Promise<void> => {
+  try {
+    const response = await fetch(`${process.env.APTABASE_HOST}/api/v0/event`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Aptabase-App-Key': process.env.APTABASE_APP_KEY,
+      },
+      body: JSON.stringify({
+        name: eventName,
+        properties: eventProperties,
+      }),
+    });
 
-  const options = {
-    hostname: process.env.APTABASE_HOST.replace('https://', ''),
-    port: 443,
-    path: `/v1/${process.env.APTABASE_APP_KEY}`,
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Content-Length': data.length,
-    },
-  };
-
-  const req = https.request(options, (res) => {
-    logger.info(`Status: ${res.statusCode}`);
-  });
-
-  req.on('error', (e) => {
-    logger.error(`Problem with request: ${e.message}`);
-  });
-
-  req.write(data);
-  req.end();
+    if (!response.ok) {
+      const errorText = await response.text();
+      logger.error(`[Aptabase] Failed to track "${eventName}": ${response.status} - ${errorText}`);
+    }
+  } catch (error) {
+    logger.error(`[Aptabase] Error tracking "${eventName}":`, error);
+  }
 };
 
 export const execResult = async (command: string): Promise<string> => {
