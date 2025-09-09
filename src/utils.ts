@@ -4,7 +4,6 @@ import fs from 'fs';
 import mime from 'mime-types';
 import fetch, { BodyInit, HeadersInit, RequestInit, Response } from 'node-fetch';
 import os from 'os';
-import https from 'https';
 import { ParsedUrlQueryInput } from 'querystring';
 import { pipeline } from 'stream';
 import { FileResult, fileSync } from 'tmp';
@@ -1024,7 +1023,7 @@ export const trackEvent = async (
       },
       body: JSON.stringify({
         name: eventName,
-        properties: eventProperties,
+        properties: { session_id: sessionId, ...eventProperties },
       }),
     });
 
