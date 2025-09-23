@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Bot } from './bot';
 import { Command, iString, Message } from './types';
 import { logger } from './utils';

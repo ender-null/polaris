@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import OpenAI from 'openai';
 import crypto from 'crypto';
-
 import { PluginBase } from '../plugin';
 import { generateCommandHelp, getInput } from '../utils';
 import { Bot } from '../bot';

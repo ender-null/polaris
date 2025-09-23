@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import format from 'string-format';
-
 import { PluginBase } from '../plugin';
 import { generateCommandHelp, getInput, hasTag, isCommand, removeHtml, sendRequest } from '../utils';
 import { Bot } from '../bot';
@@ -94,7 +92,7 @@ export class SearchPlugin extends PluginBase {
     let content;
     try {
       content = (await resp.json()) as any;
-    } catch (error) {
+    } catch {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);
     }
 

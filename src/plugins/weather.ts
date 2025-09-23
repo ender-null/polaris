@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import format from 'string-format';
-
 import { PluginBase } from '../plugin';
 import { capitalize, generateCommandHelp, getCoords, getInput, sendRequest } from '../utils';
 import { Bot } from '../bot';

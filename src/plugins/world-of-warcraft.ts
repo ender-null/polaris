@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import FormData from 'form-data';
 import format from 'string-format';
 import { Bot } from '../bot';
@@ -335,7 +334,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
       const content = await resp.text();
       try {
         return JSON.parse(content);
-      } catch (e) {
+      } catch {
         return null;
       }
     }

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Db } from 'mongodb';
 import { Bot } from './bot';
 import { Config } from './config';

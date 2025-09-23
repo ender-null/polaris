@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Response } from 'node-fetch';
 import format from 'string-format';
-
 import { PluginBase } from '../plugin';
 import {
   allButNWord,

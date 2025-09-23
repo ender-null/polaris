@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { execSync } from 'child_process';
 import fs from 'fs';
 import mime from 'mime-types';
@@ -906,7 +905,6 @@ export const merge = (base: any, extension: any): any => {
 
 export const catchException = (exception: Error, bot: Bot = null, message: Message = null): Error => {
   logger.error(`Catch exception: ${exception.message}`);
-  console.error(exception['stack']);
   if (bot) {
     if (exception['response']) {
       (exception as HTTPResponseError).response

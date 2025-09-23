@@ -46,7 +46,7 @@ const start = () => {
     logger.info('🟢 Client connected');
     let bot: Bot;
 
-    ws.on('error', console.error);
+    ws.on('error', logger.error);
 
     ws.on('close', (code: number) => {
       if (code === 1005) {
@@ -57,7 +57,7 @@ const start = () => {
     });
 
     ws.on('open', (code: number) => {
-      console.log('open: %s', code);
+      logger.info('open: %s', code);
     });
 
     ws.on('message', async (data: string) => {

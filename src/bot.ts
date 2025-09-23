@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import * as cron from 'node-cron';
+import { schedule, ScheduledTask } from 'node-cron';
 import { WebSocket } from 'ws';
 import { Actions } from './actions';
 import { Config } from './config';
@@ -43,7 +42,7 @@ export class Bot {
   config: Config;
   user: User;
   plugins: PluginBase[];
-  tasks: cron.Task[];
+  tasks: ScheduledTask[];
   errors: ErrorMessages;
   bindings: Actions;
 
@@ -213,7 +212,7 @@ export class Bot {
     this.plugins.map(async (plugin) => {
       if (plugin.cronExpression && plugin.cron) {
         this.tasks.push(
-          cron.schedule(plugin.cronExpression, async () => {
+          schedule(plugin.cronExpression, async () => {
             logger.debug(`Running ${plugin.constructor.name} cron job of @${this.user.username}`);
             await plugin.cron();
           }),

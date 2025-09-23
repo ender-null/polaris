@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import format from 'string-format';
 import { PluginBase } from '../plugin';
 import { generateCommandHelp, getInput, isCommand, sendRequest } from '../utils';

@@ -1,5 +1,4 @@
 import format from 'string-format';
-
 import { db } from '../main';
 import { PluginBase } from '../plugin';
 import { generateCommandHelp, getInput, isCommand } from '../utils';
@@ -164,9 +163,7 @@ export class PinPlugin extends PluginBase {
           });
 
           pins_.map((pin) => {
-            console.log('addedPins', addedPins, 'pin.tag', pin.tag, addedPins.indexOf(pin.tag));
             if (addedPins.indexOf(pin.tag) == -1) {
-              console.log('not added', pin.tag);
               this.commands.push({
                 command: '#' + pin.tag,
                 hidden: true,
