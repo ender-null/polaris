@@ -144,6 +144,7 @@ jobs:
           export-env: true
         env:
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          CR_PAT: op://end.works/GitHub Token/credential
           HOST: op://end.works/end.works/URL
           PORT: op://end.works/end.works/port
           USERNAME: op://end.works/end.works/username
@@ -161,6 +162,7 @@ jobs:
           username: ${{ env.USERNAME }}
           key: ${{ env.KEY }}
           script: |
+            echo ${{ env.CR_PAT }} | docker login ghcr.io -u USERNAME --password-stdin
             docker pull ghcr.io/${{ github.repository }}:${{ env.TAG }}
             docker stop ${{ env.CONTAINER_NAME }}
             docker rm ${{ env.CONTAINER_NAME }}
