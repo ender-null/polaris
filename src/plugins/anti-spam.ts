@@ -46,10 +46,10 @@ export class AntiSpamPlugin extends PluginBase {
     spamTypes.map(async (spamType) => {
       if (!(await hasTag(this.bot, msg.sender.id, `allow${spamType}`))) {
         if (await hasTag(this.bot, msg.sender.id, spamType)) {
-          if (!isAdmin(this.bot, msg.sender.id, msg)) {
+          if (!(await isAdmin(this.bot, msg.sender.id, msg))) {
             await this.kickSpammer(msg, spamType, 'tag');
-          } else if (isTrusted(this.bot, msg.sender.id, msg)) {
-            delTag(this.bot, msg.sender.id, spamType);
+          } else if (await isTrusted(this.bot, msg.sender.id, msg)) {
+            await delTag(this.bot, msg.sender.id, spamType);
             const name = await getFullName(this.bot, msg.sender.id);
             const gid = String(msg.conversation.id);
             this.bot.sendAdminAlert(
@@ -161,7 +161,7 @@ export class AntiSpamPlugin extends PluginBase {
           text,
         ),
       );
-      setTag(this.bot, uid, spamType);
+      await setTag(this.bot, uid, spamType);
       if (group[spamType]) {
         group[spamType] = db.groups[gid][spamType] + 1;
         groups.updateOne({ id: gid }, { $set: group });
@@ -171,7 +171,7 @@ export class AntiSpamPlugin extends PluginBase {
       }
 
       if (group[spamType] >= 10 || uid == gid) {
-        setTag(this.bot, gid, spamType);
+        await setTag(this.bot, gid, spamType);
         this.bot.sendAdminAlert(format(this.strings.markedGroup, spamType, group ? group.title : '[no title]', gid));
         if (
           !(await hasTag(this.bot, gid, 'safe')) &&
@@ -184,8 +184,8 @@ export class AntiSpamPlugin extends PluginBase {
     }
 
     if (
-      isGroupAdmin(this.bot, this.bot.user.id, m) &&
-      !isAdmin(this.bot, uid) &&
+      (await isGroupAdmin(this.bot, this.bot.user.id, m)) &&
+      !(await isAdmin(this.bot, uid)) &&
       ((await hasTag(this.bot, gid, 'anti' + spamType)) || spamType == 'ban')
     ) {
       await this.bot.bindings.kickConversationMember(gid, uid);
@@ -225,7 +225,7 @@ export class AntiSpamPlugin extends PluginBase {
           }
         });
       }
-      if (trustedGroup && !isAdmin(this.bot, m.sender.id, m)) {
+      if (trustedGroup && !(await isAdmin(this.bot, m.sender.id, m))) {
         const name = await getFullName(this.bot, m.sender.id);
         const gid = String(m.conversation.id);
         this.bot.sendAdminAlert(

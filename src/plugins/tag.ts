@@ -92,14 +92,14 @@ export class TagPlugin extends PluginBase {
     if (isCommand(this, 1, msg.content)) {
       tags.map(async (tag) => {
         if (!(await hasTag(this.bot, target, tag))) {
-          setTag(this.bot, target, tag);
+          await setTag(this.bot, target, tag);
         }
       });
       this.bot.replyMessage(msg, `<b>👤 ${name}</b>\n🏷 +<code>${tags.join('</code>\n🏷 +<code>')}</code>`);
     } else if (isCommand(this, 2, msg.content)) {
       tags.map(async (tag) => {
         if (await hasTag(this.bot, target, tag)) {
-          delTag(this.bot, target, tag);
+          await delTag(this.bot, target, tag);
         }
       });
       this.bot.replyMessage(msg, `<b>👤 ${name}</b>\n🏷 -<code>${tags.join('</code>\n🏷 -<code>')}</code>`);

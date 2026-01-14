@@ -281,12 +281,12 @@ export class TelegramPlugin extends PluginBase {
   }
 
   async checkPermissions(msg: Message): Promise<boolean> {
-    if (!isGroupAdmin(this.bot, this.bot.user.id, msg)) {
+    if (!(await isGroupAdmin(this.bot, this.bot.user.id, msg))) {
       this.bot.replyMessage(msg, this.bot.errors.adminRequired);
       return false;
     }
 
-    if ((await !isAdmin(this.bot, msg.sender.id)) && !isMod(this.bot, msg.sender.id, msg.conversation.id)) {
+    if (!(await isAdmin(this.bot, msg.sender.id)) && !(await isMod(this.bot, msg.sender.id, msg.conversation.id))) {
       this.bot.replyMessage(msg, this.bot.errors.permissionRequired);
       return false;
     }

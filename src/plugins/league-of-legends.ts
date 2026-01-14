@@ -162,7 +162,7 @@ export class LeagueOfLegendsPlugin extends PluginBase {
           riotId = input;
         }
         if (!tags || tags.length === 0) {
-          setTag(this.bot, uid, `riot:${region}/${riotId}`);
+          await setTag(this.bot, uid, `riot:${region}/${riotId}`);
           const lolset = format(
             this.strings.summonerSet,
             riotId.replace(new RegExp('_', 'gim'), ' '),
@@ -241,7 +241,7 @@ export class LeagueOfLegendsPlugin extends PluginBase {
           return this.bot.replyMessage(msg, this.strings['invalidRegion']);
         }
         const riotId = allButNWord(input, 1).replace(new RegExp(' ', 'gim'), '_');
-        setTag(this.bot, uid, `riot:${region}/${riotId}`);
+        await setTag(this.bot, uid, `riot:${region}/${riotId}`);
         text = format(
           this.strings.summonerSet,
           riotId.replace(new RegExp('_', 'gim'), ' '),

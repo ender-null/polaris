@@ -127,7 +127,7 @@ export class LastFMPlugin extends PluginBase {
       if (!input) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       } else {
-        setTag(this.bot, msg.sender.id, `lastfm:${input}`);
+        await setTag(this.bot, msg.sender.id, `lastfm:${input}`);
         const text = format(this.strings.usernameSet, this.bot.config.prefix);
         this.bot.replyMessage(msg, text);
       }

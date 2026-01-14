@@ -151,7 +151,7 @@ export class MediaForwarderPlugin extends PluginBase {
       if (!isInt(orig) || !isInt(dest)) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       }
-      setTag(this.bot, orig, `resend:${dest}`);
+      await setTag(this.bot, orig, `resend:${dest}`);
       this.bot.replyMessage(msg, '✅');
     } else if (isCommand(this, 3, msg.content)) {
       const input = getInput(msg, false);
@@ -159,8 +159,8 @@ export class MediaForwarderPlugin extends PluginBase {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       }
       const orig = getWord(input, 1);
-      delTag(this.bot, orig, 'resend:?');
-      delTag(this.bot, orig, 'fwd:?');
+      await delTag(this.bot, orig, 'resend:?');
+      await delTag(this.bot, orig, 'fwd:?');
       this.bot.replyMessage(msg, '✅');
     }
   }

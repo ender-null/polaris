@@ -127,7 +127,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         const words = input.split(' ');
         characterName = words.pop().toLowerCase();
         realm = words.join('-').toLowerCase();
-        setTag(this.bot, uid, `wow:${realm}/${characterName}`);
+        await setTag(this.bot, uid, `wow:${realm}/${characterName}`);
         const wowset = format(
           this.strings.characterSet,
           capitalize(characterName),
@@ -270,7 +270,7 @@ export class WorldOfWarcraftPlugin extends PluginBase {
         const words = input.split(' ');
         const characterName = words.pop().toLowerCase();
         const realm = words.join('-').toLowerCase();
-        setTag(this.bot, uid, `wow:${realm}/${characterName}`);
+        await setTag(this.bot, uid, `wow:${realm}/${characterName}`);
         text = format(
           this.strings.characterSet,
           capitalize(characterName),
