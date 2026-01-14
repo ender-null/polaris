@@ -426,7 +426,7 @@ export class Bot {
     const requestId = crypto.randomUUID();
 
     return new Promise((resolve, reject) => {
-      const timeoutInSeconds = 5;
+      const timeoutInSeconds = 10;
 
       const timeout = setTimeout(() => {
         this.pendingActions.delete(requestId);
