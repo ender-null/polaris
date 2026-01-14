@@ -93,7 +93,7 @@ const start = () => {
         if (bot) {
           bot.messagesHandler(msg.message);
         }
-      } else if (json.type === 'command') {
+      } else if (json.type === 'command_response') {
         const msg: WSCommandResponse = json;
         trackEvent('message', {
           platform: msg.platform,
@@ -113,7 +113,7 @@ const start = () => {
       } else if (json.type === 'broadcast' || json.type === 'redirect') {
         bot.sendBroadcast(json).then();
       } else {
-        logger.warning(`Unsupported data: ${data}`);
+        logger.warn(`Unsupported data: ${data}`);
       }
     });
   });
