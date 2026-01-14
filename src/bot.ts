@@ -17,6 +17,7 @@ import {
   WSBroadcast,
   WSCommand,
   WSCommandPayload,
+  WSCommandResponse,
   WSMessage,
 } from './types';
 import {
@@ -45,6 +46,7 @@ export class Bot {
   tasks: ScheduledTask[];
   errors: ErrorMessages;
   bindings: Actions;
+  pendingActions: Map<string, { resolve: Function; reject: Function; timeout: NodeJS.Timeout }>;
 
   constructor(websocket: WebSocket, config: Config, user: User, platform: string) {
     this.platform = platform;
@@ -55,6 +57,7 @@ export class Bot {
     this.tasks = [];
     this.errors = new ErrorMessages();
     this.bindings = new Actions(this);
+    this.pendingActions = new Map<string, { resolve: Function; reject: Function; timeout: NodeJS.Timeout }>();
   }
 
   async messageSender({ conversation, content }: Message): Promise<void> {
@@ -93,6 +96,19 @@ export class Bot {
     }
   }
 
+  async commandHandler(msg: WSCommandResponse): Promise<void> {
+    const pending = this.pendingActions.get(msg.requestId);
+    if (!pending) return;
+
+    clearTimeout(pending.timeout);
+    this.pendingActions.delete(msg.requestId);
+
+    if (msg.response.success) {
+      pending.resolve(msg.response.data);
+    } else {
+      pending.reject(msg.response.error);
+    }
+  }
   initPlugins(): void {
     this.plugins = [];
     Object.keys(plugins).map((name) => {
@@ -124,6 +140,7 @@ export class Bot {
     if (db.polaris) {
       const translations = db.polaris.collection('translations');
       const translation = await translations.findOne({ name: this.config.translation });
+      logger.info(`🌐 Translation: '${this.config.translation}' ${translation ? 'found' : 'not found'}`);
       if (translation) {
         let trans: Translation = translation as any;
         if (trans.extends) {
@@ -405,14 +422,29 @@ export class Bot {
 
   sendCommand(method: string, payload: WSCommandPayload) {
     this.commandSender(method, payload);
-    const message: WSCommand = {
-      bot: this.config.name,
-      platform: this.platform,
-      type: 'command',
-      method,
-      payload,
-    };
-    this.websocket.send(JSON.stringify(message));
+
+    const requestId = crypto.randomUUID();
+
+    return new Promise((resolve, reject) => {
+      const timeoutInSeconds = 5;
+
+      const timeout = setTimeout(() => {
+        this.pendingActions.delete(requestId);
+        reject(new Error(`Command "${method}" timed out after ${timeoutInSeconds} seconds`));
+      }, timeoutInSeconds * 1000);
+
+      this.pendingActions.set(requestId, { resolve, reject, timeout });
+
+      const message: WSCommand = {
+        bot: this.config.name,
+        platform: this.platform,
+        type: 'command',
+        requestId,
+        method,
+        payload,
+      };
+      this.websocket.send(JSON.stringify(message));
+    });
   }
 
   sendMessage(chat: Conversation, content: string, type = 'text', reply?: Message, extra?: Extra): void {

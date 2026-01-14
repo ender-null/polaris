@@ -9,26 +9,23 @@ export class Actions {
   }
 
   async getMessage(chatId: string | number, messageId: string | number, ignoreReply?: boolean): Promise<Message> {
-    this.bot.sendCommand('getMessage', {
+    return this.bot.sendCommand('getMessage', {
       chatId,
       messageId,
       ignoreReply,
-    });
-    return null;
+    }) as Promise<Message>;
   }
   async deleteMessage(chatId: string | number, messageId: string | number): Promise<boolean> {
-    this.bot.sendCommand('deleteMessage', {
+    return this.bot.sendCommand('deleteMessage', {
       chatId,
       messageId,
-    });
-    return null;
+    }) as Promise<boolean>;
   }
   async getFile(fileId: string | number, link?: boolean): Promise<string> {
-    this.bot.sendCommand('getFile', {
+    return this.bot.sendCommand('getFile', {
       fileId,
       link,
-    });
-    return null;
+    }) as Promise<string>;
   }
   async createInviteLink(
     conversationId: string | number,
@@ -37,112 +34,96 @@ export class Actions {
     expirationDate?: number,
     memberLimit?: number,
   ): Promise<string> {
-    this.bot.sendCommand('createInviteLink', {
+    return this.bot.sendCommand('createInviteLink', {
       conversationId,
       name,
       createsJoinRequest,
       expirationDate,
       memberLimit,
-    });
-    return null;
+    }) as Promise<string>;
   }
   async checkInviteLink(inviteLink: string | number): Promise<boolean> {
-    this.bot.sendCommand('checkInviteLink', {
+    return this.bot.sendCommand('checkInviteLink', {
       inviteLink,
-    });
-    return null;
+    }) as Promise<boolean>;
   }
   async joinByInviteLink(inviteLink: string | number): Promise<boolean> {
-    this.bot.sendCommand('joinByInviteLink', {
+    return this.bot.sendCommand('joinByInviteLink', {
       inviteLink,
-    });
-    return null;
+    }) as Promise<boolean>;
   }
   async inviteConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    this.bot.sendCommand('inviteConversationMember', {
+    return this.bot.sendCommand('inviteConversationMember', {
       conversationId,
       userId,
-    });
-    return null;
+    }) as Promise<boolean>;
   }
   async promoteConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    this.bot.sendCommand('promoteConversationMember', {
+    return this.bot.sendCommand('promoteConversationMember', {
       conversationId,
       userId,
-    });
-    return null;
+    }) as Promise<boolean>;
   }
   async kickConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    this.bot.sendCommand('kickConversationMember', {
+    return this.bot.sendCommand('kickConversationMember', {
       conversationId,
       userId,
-    });
-    return null;
+    }) as Promise<boolean>;
   }
   async leaveConversation(conversationId: string | number): Promise<boolean> {
-    this.bot.sendCommand('leaveConversation', {
+    return this.bot.sendCommand('leaveConversation', {
       conversationId,
-    });
-    return null;
+    }) as Promise<boolean>;
   }
   async banConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    this.bot.sendCommand('banConversationMember', {
+    return this.bot.sendCommand('banConversationMember', {
       conversationId,
       userId,
-    });
-    return null;
+    }) as Promise<boolean>;
   }
   async unbanConversationMember(conversationId: string | number, userId: string | number): Promise<boolean> {
-    this.bot.sendCommand('unbanConversationMember', {
+    return this.bot.sendCommand('unbanConversationMember', {
       conversationId,
       userId,
-    });
-    return null;
+    }) as Promise<boolean>;
   }
   async renameConversation(conversationId: string | number, title: string): Promise<boolean> {
-    this.bot.sendCommand('renameConversation', {
+    return this.bot.sendCommand('renameConversation', {
       conversationId,
       title,
-    });
-    return null;
+    }) as Promise<boolean>;
   }
   async changeConversationDescription(conversationId: string | number, description: string): Promise<boolean> {
-    this.bot.sendCommand('changeConversationDescription', {
+    return this.bot.sendCommand('changeConversationDescription', {
       conversationId,
       description,
-    });
-    return null;
+    }) as Promise<boolean>;
   }
   async changeConversationPhoto(conversationId: string | number, photo: string): Promise<boolean> {
-    this.bot.sendCommand('changeConversationPhoto', {
+    return this.bot.sendCommand('changeConversationPhoto', {
       conversationId,
       photo,
-    });
-    return null;
+    }) as Promise<boolean>;
   }
   async createCall(conversationId: string | number, isVideo: boolean): Promise<boolean> {
-    this.bot.sendCommand('createCall', {
+    return this.bot.sendCommand('createCall', {
       conversationId,
       isVideo,
-    });
-    return null;
+    }) as Promise<boolean>;
   }
   async conversationInfo(conversationId: string | number): Promise<ConversationInfo> {
-    this.bot.sendCommand('conversationInfo', {
+    return this.bot.sendCommand('conversationInfo', {
       conversationId,
-    });
-    return null;
+    }) as Promise<ConversationInfo>;
   }
   async getChatAdministrators(conversationId: string | number): Promise<User[]> {
-    this.bot.sendCommand('getChatAdministrators', {
+    return this.bot.sendCommand('getChatAdministrators', {
       conversationId,
-    });
-    return null;
+    }) as Promise<User[]>;
   }
   async setCommands(commands: any[]): Promise<boolean> {
-    this.bot.sendCommand('setCommands', {
+    return this.bot.sendCommand('setCommands', {
       commands,
-    });
-    return null;
+    }) as Promise<boolean>;
   }
 }

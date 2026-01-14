@@ -1,7 +1,7 @@
 import { MongoClient } from 'mongodb';
 import { WebSocket, WebSocketServer } from 'ws';
 import { Bot } from './bot';
-import { BotSet, MongoDatabases, WSInit, WSMessage, WSPong } from './types';
+import { BotSet, MongoDatabases, WSCommandResponse, WSInit, WSMessage, WSPong } from './types';
 import { catchException, logger, trackEvent } from './utils';
 import { v4 } from 'uuid';
 
@@ -30,6 +30,9 @@ process.on('SIGUSR1', () => close());
 process.on('SIGUSR2', () => close());
 process.on('exit', () => {
   logger.info('❎ Exit process');
+});
+process.on('unhandledRejection', (reason: Error) => {
+  catchException(reason);
 });
 
 if (!process.env.MONGODB_URI) {
@@ -61,51 +64,56 @@ const start = () => {
     });
 
     ws.on('message', async (data: string) => {
-      try {
-        const json = JSON.parse(data);
-        if (json.type === 'init') {
-          const init: WSInit = json;
-          bot = new Bot(ws, init.config, init.user, init.platform);
-          if (!db[init.platform]) {
-            db[init.platform] = mongo.db(init.platform);
-          }
-          bot.initPlugins();
-          bots[bot.user.id] = bot;
-          await bot.initTranslations();
-          logger.info(
-            `✅ Connected as ${bot.config.icon} ${bot.user.firstName} (@${bot.user.username}) [${bot.user.id}] on platform '${init.platform}'`,
-          );
-          trackEvent('connected', {
-            platform: init.platform,
-            id: bot.user.id,
-            username: bot.user.username,
-          });
-          bot.scheduleCronJobs();
-        } else if (json.type === 'message') {
-          const msg: WSMessage = json;
-          trackEvent('message', {
-            platform: msg.platform,
-            type: msg.message.type,
-            group: Boolean(String(msg.message.conversation.id).startsWith('-')),
-          });
-          if (bot) {
-            bot.messagesHandler(msg.message);
-          }
-        } else if (json.type === 'ping') {
-          logger.debug('Ping');
-          const pong: WSPong = {
-            bot: bot ? bot.config.name : '?',
-            platform: bot ? bot.platform : '?',
-            type: 'pong',
-          };
-          ws.send(JSON.stringify(pong));
-        } else if (json.type === 'broadcast' || json.type === 'redirect') {
-          bot.sendBroadcast(json).then();
-        } else {
-          logger.warning(`Unsupported data: ${data}`);
+      const json = JSON.parse(data);
+      if (json.type === 'init') {
+        const init: WSInit = json;
+        bot = new Bot(ws, init.config, init.user, init.platform);
+        if (!db[init.platform]) {
+          db[init.platform] = mongo.db(init.platform);
         }
-      } catch (error) {
-        catchException(error);
+        bot.initPlugins();
+        bots[bot.user.id] = bot;
+        await bot.initTranslations();
+        logger.info(
+          `✅ Connected as ${bot.config.icon} ${bot.user.firstName} (@${bot.user.username}) [${bot.user.id}] on platform '${init.platform}'`,
+        );
+        trackEvent('connected', {
+          platform: init.platform,
+          id: bot.user.id,
+          username: bot.user.username,
+        });
+        bot.scheduleCronJobs();
+      } else if (json.type === 'message') {
+        const msg: WSMessage = json;
+        trackEvent('message', {
+          platform: msg.platform,
+          type: msg.message.type,
+          group: Boolean(String(msg.message.conversation.id).startsWith('-')),
+        });
+        if (bot) {
+          bot.messagesHandler(msg.message);
+        }
+      } else if (json.type === 'command') {
+        const msg: WSCommandResponse = json;
+        trackEvent('message', {
+          platform: msg.platform,
+          type: msg.method,
+        });
+        if (bot) {
+          bot.commandHandler(msg);
+        }
+      } else if (json.type === 'ping') {
+        logger.debug('Ping');
+        const pong: WSPong = {
+          bot: bot ? bot.config.name : '?',
+          platform: bot ? bot.platform : '?',
+          type: 'pong',
+        };
+        ws.send(JSON.stringify(pong));
+      } else if (json.type === 'broadcast' || json.type === 'redirect') {
+        bot.sendBroadcast(json).then();
+      } else {
+        logger.warning(`Unsupported data: ${data}`);
       }
     });
   });

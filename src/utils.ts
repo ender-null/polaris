@@ -1026,6 +1026,9 @@ export const trackEvent = async (
   eventName: string,
   eventProperties: Record<string, string | number | boolean | null> = {},
 ): Promise<void> => {
+  if (!process.env.APTABASE_HOST || !process.env.APTABASE_APP_KEY) {
+    return;
+  }
   try {
     const payload = {
       timestamp: new Date().toISOString(),

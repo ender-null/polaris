@@ -263,8 +263,20 @@ export interface WSMessage extends WSData {
 
 export interface WSCommand extends WSData {
   type: 'command';
+  requestId: string;
   method: string;
   payload: WSCommandPayload;
+}
+
+export interface WSCommandResponse extends WSData {
+  type: 'command_response';
+  requestId: string;
+  method: string;
+  response: {
+    success?: boolean;
+    error?: string;
+    data?: WSCommandPayload;
+  };
 }
 
 export interface WSPing extends WSData {
