@@ -138,12 +138,16 @@ export class User {
 export class Conversation {
   id: number | string;
   title: string;
+  type: ConversationType;
 
-  constructor(id: number | string, title?: string) {
+  constructor(id: number | string, title?: string, type?: ConversationType) {
     this.id = id;
     this.title = title;
+    this.type = type;
   }
 }
+
+type ConversationType = 'private' | 'group' | 'channel';
 
 export class ConversationInfo extends Conversation {}
 
