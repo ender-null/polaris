@@ -1,5 +1,6 @@
-import { Bot, Message } from '..';
+import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
+import { Message } from '../types';
 import { capitalize, generateCommandHelp, getInput, isCommand, lstrip, sendRequest } from '../utils';
 
 export class ZaragozaPlugin extends PluginBase {
@@ -11,8 +12,9 @@ export class ZaragozaPlugin extends PluginBase {
         friendly: '^bus ',
         parameters: [
           {
-            name: 'station number',
+            name: 'station',
             required: true,
+            type: 'integer',
           },
         ],
         description: 'Wait times of Zaragoza bus station',
@@ -23,8 +25,9 @@ export class ZaragozaPlugin extends PluginBase {
         friendly: '^tram ',
         parameters: [
           {
-            name: 'station number',
+            name: 'station',
             required: true,
+            type: 'integer',
           },
         ],
         description: 'Wait times of Zaragoza tram station',
@@ -35,8 +38,9 @@ export class ZaragozaPlugin extends PluginBase {
         friendly: '^bizi ',
         parameters: [
           {
-            name: 'station number',
+            name: 'station',
             required: true,
+            type: 'integer',
           },
         ],
         description: 'Zaragoza Bizi station data',
@@ -54,9 +58,9 @@ export class ZaragozaPlugin extends PluginBase {
     }
     let text;
     if (isCommand(this, 1, msg.content) || isCommand(this, 2, msg.content)) {
-      let url = `https://on.my.end.works/zgz/bus/stations/${input}`;
+      let url = `https://api.end.works/zgz/bus/stations/${input}`;
       if (isCommand(this, 2, msg.content)) {
-        url = `https://on.my.end.works/zgz/tram/stations/${input}`;
+        url = `https://api.end.works/zgz/tram/stations/${input}`;
       }
       const resp = await sendRequest(url, null, null, null, false, this.bot);
       if (!resp) {
@@ -72,14 +76,14 @@ export class ZaragozaPlugin extends PluginBase {
       }
 
       if (content.street) {
-        text = `<b>${content.street}</b>\n   ${this.strings.station}: <b>${content.id}</b>  [${content.lines}]\n\n`;
+        text = `<b>${content.street}</b>\n ${this.strings.station}: <b>${content.id}</b> [${content.lines.join(', ')}]\n`;
       } else {
-        text = `<b>${this.strings.station}: ${content.id}</b>\n\n`;
+        text = `<b>${this.strings.station}: ${content.id}</b>\n`;
       }
 
       if (content.times && Array.isArray(content.times)) {
         content.times.map((bus) => {
-          text += ` • <b>${bus.time}</b>  ${bus.line} <i>${bus.destination}</i>\n`;
+          text += `\n- <b>${bus.time}</b>  ${bus.line} <i>${bus.destination}</i>`;
         });
       } else {
         return this.bot.replyMessage(msg, this.bot.errors.noResults);
@@ -106,9 +110,9 @@ export class ZaragozaPlugin extends PluginBase {
           return this.bot.replyMessage(msg, this.bot.errors.connectionError);
         }
       }
-      text = `<b>${capitalize(content.title)}</b>\n   ${this.strings.station}: <b>${
+      text = `<b>${capitalize(content.title)}</b>\n ${this.strings.station}: <b>${
         content.id
-      }</b>\n\n • Bicis Disponibles: <b>${content.bicisDisponibles}</b>\n • Anclajes Disponibles: <b>${
+      }</b>\n\n- Bicis Disponibles: <b>${content.bicisDisponibles}</b>\n- Anclajes Disponibles: <b>${
         content.anclajesDisponibles
       }</b>`;
     }

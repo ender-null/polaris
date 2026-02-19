@@ -1,5 +1,6 @@
-import { Bot, Message } from '..';
+import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
+import { Message } from '../types';
 import { generateCommandHelp, getInput, sendRequest } from '../utils';
 
 export class RAEPlugin extends PluginBase {
@@ -12,6 +13,7 @@ export class RAEPlugin extends PluginBase {
           {
             name: 'term',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Look for definitions in the Real Academia de la Lengua',
@@ -24,7 +26,7 @@ export class RAEPlugin extends PluginBase {
     if (!input) {
       return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
     }
-    const url = `https://on.my.end.works/rae/search/${input}`;
+    const url = `https://api.end.works/rae/search/${input}`;
     const resp = await sendRequest(url, null, null, null, false, this.bot);
     if (!resp) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);

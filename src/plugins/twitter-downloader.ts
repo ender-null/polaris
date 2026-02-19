@@ -1,5 +1,6 @@
-import { Bot, Message } from '..';
+import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
+import { Message } from '../types';
 import { generateCommandHelp, getInput, isCommand, sendRequest } from '../utils';
 
 export class TwitterDownloaderPlugin extends PluginBase {
@@ -11,8 +12,9 @@ export class TwitterDownloaderPlugin extends PluginBase {
         aliases: ['/twdl'],
         parameters: [
           {
-            name: 'tweet url',
+            name: 'tweet',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Download media from tweets',
@@ -23,8 +25,9 @@ export class TwitterDownloaderPlugin extends PluginBase {
         aliases: ['/twdlhd'],
         parameters: [
           {
-            name: 'tweet url',
+            name: 'tweet',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Download media from tweets and send as files',
@@ -45,7 +48,7 @@ export class TwitterDownloaderPlugin extends PluginBase {
     } else {
       return this.bot.replyMessage(msg, this.bot.errors.missingParameter);
     }
-    const url = `https://on.my.end.works/twdl/getMediaUrls/${tweetId}`;
+    const url = `https://api.end.works/twdl/getMediaUrls/${tweetId}`;
     const resp = await sendRequest(url, null, null, null, false, this.bot);
     if (!resp) {
       return this.bot.replyMessage(msg, this.bot.errors.connectionError);

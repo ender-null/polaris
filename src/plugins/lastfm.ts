@@ -1,7 +1,8 @@
 import format from 'string-format';
-import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
 import { generateCommandHelp, getInput, getTags, isCommand, sendRequest, setTag } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class LastFMPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -14,6 +15,7 @@ export class LastFMPlugin extends PluginBase {
           {
             name: 'username',
             required: false,
+            type: 'string',
           },
         ],
         description: 'Shows the last track played on Last.fm',
@@ -24,6 +26,7 @@ export class LastFMPlugin extends PluginBase {
           {
             name: 'username',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Set Last.fm username',
@@ -41,7 +44,7 @@ export class LastFMPlugin extends PluginBase {
     if (isCommand(this, 1, msg.content)) {
       let username = input;
       if (!input) {
-        const tags = getTags(this.bot, msg.sender.id, 'lastfm:?');
+        const tags = await getTags(this.bot, msg.sender.id, 'lastfm:?');
         if (tags && tags.length > 0) {
           username = tags[0].split(':')[1];
         }
@@ -85,6 +88,7 @@ export class LastFMPlugin extends PluginBase {
       const artist = last.artist['#text'];
       const track = last.name;
       const album = last.album['#text'];
+      const albumArt = last.image[3]['#text'];
       const nowplaying = !!(last['@attr'] && last['@attr'].nowplaying);
 
       if (nowplaying) {
@@ -104,23 +108,26 @@ export class LastFMPlugin extends PluginBase {
         part: 'snippet',
         maxResults: '8',
         q: `${track} ${artist}`,
-        regionCode: this.bot.config.locale.slice(2, 2),
+        regionCode: (this.bot.config.locale || 'en_US').slice(3),
         key: this.bot.config.apiKeys.googleDeveloperConsole,
       };
       const ytResp = await sendRequest(ytUrl, ytParams, null, null, false, this.bot);
-      if (!ytResp) {
-        return this.bot.replyMessage(msg, this.bot.errors.connectionError);
+      if (ytResp) {
+        const ytContent = (await ytResp.json()) as any;
+        if (!ytContent.error && ytContent.pageInfo.totalResults > 0) {
+          text += `\n\n🎬 ${this.strings.mightBe}:\n${ytContent['items'][0].snippet.title}\nhttps://youtu.be/${ytContent['items'][0].id.videoId}`;
+        }
       }
-      const ytContent = (await ytResp.json()) as any;
-      if (!ytContent.error && ytContent.pageInfo.totalResults > 0) {
-        text += `\n\n🎬 ${this.strings.mightBe}:\n${ytContent['items'][0].snippet.title}\nhttps://youtu.be/${ytContent['items'][0].id.videoId}`;
+      if (albumArt) {
+        return this.bot.replyMessage(msg, albumArt, 'photo', null, { caption: text, preview: false });
+      } else {
+        this.bot.replyMessage(msg, text, 'text', null, { preview: false });
       }
-      this.bot.replyMessage(msg, text, 'text', null, { preview: false });
     } else if (isCommand(this, 2, msg.content)) {
       if (!input) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       } else {
-        setTag(this.bot, msg.sender.id, `lastfm:${input}`);
+        await setTag(this.bot, msg.sender.id, `lastfm:${input}`);
         const text = format(this.strings.usernameSet, this.bot.config.prefix);
         this.bot.replyMessage(msg, text);
       }

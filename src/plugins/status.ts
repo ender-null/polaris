@@ -1,8 +1,9 @@
 import os from 'os';
 import process from 'process';
-import { Bot, Message } from '..';
 import { PluginBase } from '../plugin';
 import { formatTimeInSeconds } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class StatusPlugin extends PluginBase {
   constructor(bot: Bot) {

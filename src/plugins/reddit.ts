@@ -1,12 +1,13 @@
-import { Bot, Message } from '..';
+import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
+import { Message } from '../types';
 
 export class RedditPlugin extends PluginBase {
   constructor(bot: Bot) {
     super(bot);
     this.commands = [
       {
-        friendly: 'r',
+        friendly: 'r/',
         description: 'Links to subreddit',
         hidden: true,
       },

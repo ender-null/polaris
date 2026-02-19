@@ -1,5 +1,6 @@
-import { Bot, Message } from '..';
+import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
+import { Message } from '../types';
 import { hasTag, isCommand, sendRequest } from '../utils';
 
 export class AnimalPlugin extends PluginBase {
@@ -24,7 +25,7 @@ export class AnimalPlugin extends PluginBase {
     ];
   }
   async run(msg: Message): Promise<void> {
-    if (hasTag(this.bot, msg.conversation.id, 'noanimals')) {
+    if (await hasTag(this.bot, msg.conversation.id, 'noanimals')) {
       return;
     }
     let url;

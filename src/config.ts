@@ -1,34 +1,35 @@
-import { readFileSync } from 'fs';
-import { ApiKeys } from '.';
-import { Instance } from './types';
-import { merge } from './utils';
+import { ApiKeys } from './types';
 
 export class Config {
   icon?: string;
-  name?: string;
+  name: string;
+  platform: string;
   prefix?: string;
   locale?: string;
-  owner?: string;
-  enabled?: boolean;
+  owner: string;
+  enabled: boolean;
   plugins?: string | string[];
   excludedPlugins?: string[];
   translation?: string;
-  bindings?: string;
-  adminConversationId?: string;
+  alertsPlatform?: string;
+  alertsTarget?: string;
   alertsConversationId?: string;
+  adminConversationId?: string;
   apiKeys?: ApiKeys;
-  instances?: Instance[];
 
   constructor() {
-    (this.icon = '👤'), (this.name = null), (this.prefix = '/');
+    this.icon = '👤';
+    this.name = null;
+    this.prefix = '/';
     this.locale = 'en_US';
     this.owner = null;
     this.plugins = '*';
-    (this.excludedPlugins = []),
-      (this.translation = 'default'),
-      (this.bindings = null),
-      (this.adminConversationId = null);
+    this.excludedPlugins = [];
+    this.translation = 'default';
+    this.alertsPlatform = null;
+    this.alertsTarget = null;
     this.alertsConversationId = null;
+    this.adminConversationId = null;
     this.apiKeys = {
       telegramBotToken: null,
       telegramPhoneNumber: null,
@@ -37,36 +38,5 @@ export class Config {
       databaseEncryptionKey: null,
       discordBotToken: null,
     };
-    this.instances = null;
-  }
-
-  static loadFromFile(path: string): Config {
-    try {
-      const file = readFileSync(path, 'utf-8');
-      const config: Config = { ...JSON.parse(file) };
-      return config;
-    } catch (error) {
-      return null;
-    }
-  }
-
-  static loadInstancesFromJSON(config: Config): Config[] {
-    const configs = [];
-    if (!config.instances) {
-      configs.push(config);
-    } else {
-      Object.keys(config.instances).map((instance) => {
-        const iConfig = merge(config, config.instances[instance]);
-        delete iConfig['instances'];
-        configs.push(iConfig);
-      });
-    }
-    return configs;
-  }
-
-  static loadInstancesFromFile(path: string): Config[] {
-    const config = this.loadFromFile(path);
-    const configs = this.loadInstancesFromJSON(config);
-    return configs;
   }
 }

@@ -1,18 +1,7 @@
-import { set, update } from 'firebase/database';
-import { Bot, Message } from '..';
-import { db } from '../main';
+import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
-import {
-  execResult,
-  fixTelegramLink,
-  generateCommandHelp,
-  getInput,
-  isCommand,
-  isOwner,
-  isTrusted,
-  logger,
-  telegramLinkRegExp,
-} from '../utils';
+import { Message } from '../types';
+import { generateCommandHelp, getInput, isCommand, isOwner, isTrusted } from '../utils';
 
 export class CorePlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -55,17 +44,6 @@ export class CorePlugin extends PluginBase {
         hidden: true,
       },
       {
-        command: '/shell',
-        aliases: ['/sh', '/bash'],
-        description: 'Runs shell code',
-        parameters: [
-          {
-            name: 'code',
-            required: true,
-          },
-        ],
-      },
-      {
         command: '/javascript',
         aliases: ['/js'],
         description: 'Runs JavaScript code',
@@ -75,6 +53,7 @@ export class CorePlugin extends PluginBase {
             required: true,
           },
         ],
+        hidden: true,
       },
     ];
     this.strings = {
@@ -92,11 +71,11 @@ export class CorePlugin extends PluginBase {
     let text = this.bot.errors.noResults;
 
     if (isCommand(this, 1, msg.content)) {
-      await this.bot.stop();
+      //await this.bot.stop();
       text = this.strings.shuttingDown;
     } else if (isCommand(this, 2, msg.content)) {
-      await this.bot.stop();
-      await this.bot.start();
+      //await this.bot.stop();
+      //await this.bot.start();
       text = this.strings.restarting;
     } else if (isCommand(this, 3, msg.content)) {
       this.bot.initPlugins();
@@ -104,18 +83,12 @@ export class CorePlugin extends PluginBase {
     } else if (isCommand(this, 4, msg.content)) {
       text = this.bot.errors.notImplemented;
     } else if (isCommand(this, 5, msg.content)) {
-      if (this.bot.user.isBot || this.bot.config.bindings != 'TelegramTDlibBindings') {
+      if (this.bot.user.isBot || this.bot.config.platform != 'TelegramTDlibBindings') {
         text = this.bot.errors.notImplemented;
       } else {
         text = 'TODO';
       }
     } else if (isCommand(this, 6, msg.content)) {
-      if (!input) {
-        return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
-      }
-      const result = await execResult(input);
-      text = `<code class="language-shell">$ ${input}\n\n${result}</code>`;
-    } else if (isCommand(this, 7, msg.content)) {
       if (!input) {
         return this.bot.replyMessage(msg, generateCommandHelp(this, msg.content));
       }
@@ -162,7 +135,7 @@ export class CorePlugin extends PluginBase {
       }
     }
 
-    urls.map((url) => {
+    /*urls.map((url) => {
       const inputMatch = telegramLinkRegExp.exec(url);
       if (inputMatch && inputMatch.length > 0) {
         logger.info(`Found Telegram link: ${url}`);
@@ -206,6 +179,6 @@ export class CorePlugin extends PluginBase {
           }
         }
       }
-    });
+    });*/
   }
 }

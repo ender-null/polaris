@@ -1,5 +1,6 @@
-import { Bot, Message } from '..';
+import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
+import { Message } from '../types';
 import { generateCommandHelp, getInput, sendRequest } from '../utils';
 
 export class UrbanDictionaryPlugin extends PluginBase {
@@ -13,6 +14,7 @@ export class UrbanDictionaryPlugin extends PluginBase {
           {
             name: 'term',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Look for definitions in the Urban Dictionary',
@@ -40,9 +42,9 @@ export class UrbanDictionaryPlugin extends PluginBase {
     }
 
     const entry = content.list[0];
-    let text = `<b>${term}</b>\n\n${entry.definition}`;
+    let text = `<b>${term}</b>\n${entry.definition}`;
     if (entry.example) {
-      text += `\n\n<i>${entry.example}</i>`;
+      text += `\n\n<blockquote>${entry.example}</blockquote>`;
     }
     this.bot.replyMessage(msg, text);
   }

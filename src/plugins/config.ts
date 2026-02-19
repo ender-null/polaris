@@ -1,7 +1,9 @@
 import format from 'string-format';
-import { Bot, Message } from '..';
+
 import { PluginBase } from '../plugin';
 import { delTag, getInput, hasTag, isAdmin, isTrusted, setTag } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class ConfigPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -14,6 +16,7 @@ export class ConfigPlugin extends PluginBase {
           {
             name: 'parameter',
             required: false,
+            type: 'string',
           },
         ],
         keepDefault: true,
@@ -42,12 +45,12 @@ export class ConfigPlugin extends PluginBase {
     const enabled = ['reactions', 'roulette', 'replies', 'pole', 'fiesta', 'nsfw'];
     const disabled = ['antispam', 'antiarab', 'antirussian', 'polereset'];
     const config = {};
-    enabled.map((param) => {
-      config[param] = !hasTag(this.bot, msg.conversation.id, 'no' + param);
+    enabled.map(async (param) => {
+      config[param] = !(await hasTag(this.bot, msg.conversation.id, 'no' + param));
     });
 
-    disabled.map((param) => {
-      config[param] = hasTag(this.bot, msg.conversation.id, param);
+    disabled.map(async (param) => {
+      config[param] = await hasTag(this.bot, msg.conversation.id, param);
     });
 
     let text = '';
@@ -57,21 +60,21 @@ export class ConfigPlugin extends PluginBase {
         text += `\n${config[param] ? '✔️' : '❌'} ${this.strings[param]}`;
       });
     } else if (enabled.indexOf(input) > -1 || disabled.indexOf(input) > -1) {
-      if ((await !isAdmin(this.bot, msg.sender.id, msg)) && !isTrusted(this.bot, msg.sender.id, msg)) {
+      if (!(await isAdmin(this.bot, msg.sender.id, msg)) && !(await isTrusted(this.bot, msg.sender.id, msg))) {
         return this.bot.replyMessage(msg, this.bot.errors.permissionRequired);
       }
 
       if (config[input]) {
         if (enabled.indexOf(input) > -1) {
-          setTag(this.bot, msg.conversation.id, 'no' + input);
+          await setTag(this.bot, msg.conversation.id, 'no' + input);
         } else if (disabled.indexOf(input) > -1) {
-          delTag(this.bot, msg.conversation.id, input);
+          await delTag(this.bot, msg.conversation.id, input);
         }
       } else {
         if (enabled.indexOf(input) > -1) {
-          delTag(this.bot, msg.conversation.id, 'no' + input);
+          await delTag(this.bot, msg.conversation.id, 'no' + input);
         } else if (disabled.indexOf(input) > -1) {
-          setTag(this.bot, msg.conversation.id, input);
+          await setTag(this.bot, msg.conversation.id, input);
         }
       }
 

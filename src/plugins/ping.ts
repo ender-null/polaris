@@ -1,5 +1,6 @@
-import { Bot, Message } from '..';
+import { Bot } from '../bot';
 import { PluginBase } from '../plugin';
+import { Message } from '../types';
 
 export class PingPlugin extends PluginBase {
   constructor(bot: Bot) {

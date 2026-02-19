@@ -1,9 +1,10 @@
-import { remove, update } from 'firebase/database';
 import format from 'string-format';
-import { Bot, Message } from '..';
+
 import { db } from '../main';
 import { PluginBase } from '../plugin';
 import { getFullName, getInput, getTarget, isTrusted } from '../utils';
+import { Bot } from '../bot';
+import { Message } from '../types';
 
 export class NickPlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -15,6 +16,7 @@ export class NickPlugin extends PluginBase {
           {
             name: 'name',
             required: true,
+            type: 'string',
           },
         ],
         description: 'Sets your nickname',
@@ -29,29 +31,41 @@ export class NickPlugin extends PluginBase {
   }
   async run(msg: Message): Promise<void> {
     const input = getInput(msg);
-    const uid = getTarget(this.bot, msg, null, true);
+    const uid = await getTarget(this.bot, msg, null, true);
     if (uid != String(msg.sender.id) && !isTrusted(this.bot, msg.sender.id, msg)) {
       return this.bot.replyMessage(msg, this.bot.errors.permissionRequired);
     }
-    const name = getFullName(uid, false, false);
+    const name = await getFullName(this.bot, uid, false);
+    const users = db[this.bot.platform].collection('users');
+    const user = await users.findOne({ id: uid });
     let text;
     if (!input) {
-      if (db.users[uid] !== undefined && db.users[uid].nick) {
-        text = format(this.strings.currentNick, name, db.users[uid].nick);
+      if (user !== undefined && user.nick) {
+        text = format(this.strings.currentNick, name, user.nick);
       } else {
         text = format(this.strings.noNick, name);
       }
     } else {
       if (input == '--') {
-        delete db.users[uid].nick;
-        remove(db.usersSnap.child(uid).child('nick').ref);
+        await users.updateOne(
+          { id: uid },
+          {
+            $set: {
+              nick: null,
+            },
+          },
+        );
         text = format(this.strings.deletedNick, name);
       } else {
-        if (db.users[uid] !== undefined) {
-          db.users[uid].nick = input;
-          update(db.usersSnap.child(uid).ref, {
-            nick: db.users[uid].nick,
-          });
+        if (user !== undefined) {
+          await users.updateOne(
+            { id: uid },
+            {
+              $set: {
+                nick: input,
+              },
+            },
+          );
         }
         text = format(this.strings.nickSet, name, input);
       }
