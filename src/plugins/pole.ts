@@ -1,5 +1,6 @@
 import format from 'string-format';
 
+import { Bot } from '../bot';
 import { db } from '../main';
 import { PluginBase } from '../plugin';
 import { DatabasePoleList, Message, SortedPole } from '../types';
@@ -15,7 +16,6 @@ import {
   time,
   timeInRange,
 } from '../utils';
-import { Bot } from '../bot';
 
 export class PolePlugin extends PluginBase {
   constructor(bot: Bot) {
@@ -122,7 +122,7 @@ export class PolePlugin extends PluginBase {
     if (String(msg.sender.id).startsWith('-100')) {
       return;
     }
-    if (msg.conversation.type ? msg.conversation.type !== 'group' : !String(msg.conversation.id).startsWith('-')) {
+    if (!String(msg.conversation.id).startsWith('-')) {
       return this.bot.replyMessage(msg, this.bot.errors.groupOnly);
     }
     if (await hasTag(this.bot, msg.conversation.id, 'nopole')) {

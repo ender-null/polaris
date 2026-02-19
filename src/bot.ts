@@ -1,4 +1,5 @@
 import { schedule, ScheduledTask } from 'node-cron';
+import path from 'path';
 import { WebSocket } from 'ws';
 import { Actions } from './actions';
 import { Config } from './config';
@@ -34,7 +35,6 @@ import {
   t,
   toBase64,
 } from './utils';
-import path from 'path';
 
 export class Bot {
   platform: string;
@@ -247,6 +247,10 @@ export class Bot {
 
       if (msg.type != 'text' || msg.sender['isBot']) {
         ignoreMessage = true;
+      }
+
+      if (msg.conversation.type !== 'private' && !String(msg.conversation.id).startsWith('-')) {
+        msg.conversation.id = `-${msg.conversation.id}`;
       }
 
       if (
