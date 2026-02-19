@@ -1,9 +1,9 @@
 import { MongoClient } from 'mongodb';
+import { v4 } from 'uuid';
 import { WebSocket, WebSocketServer } from 'ws';
 import { Bot } from './bot';
 import { BotSet, MongoDatabases, WSCommandResponse, WSInit, WSMessage, WSPong } from './types';
 import { catchException, logger, trackEvent } from './utils';
-import { v4 } from 'uuid';
 
 let mongo: MongoClient;
 export const sessionId = v4();
@@ -85,6 +85,9 @@ const start = () => {
         bot.scheduleCronJobs();
       } else if (json.type === 'message') {
         const msg: WSMessage = json;
+        if (msg.message.conversation.type !== 'private' && !String(msg.message.conversation.id).startsWith('-')) {
+          msg.message.conversation.id = `-${msg.message.conversation.id}`;
+        }
         trackEvent('message', {
           platform: msg.platform,
           type: msg.message.type,

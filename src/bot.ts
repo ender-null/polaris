@@ -249,10 +249,6 @@ export class Bot {
         ignoreMessage = true;
       }
 
-      if (msg.conversation.type !== 'private' && !String(msg.conversation.id).startsWith('-')) {
-        msg.conversation.id = `-${msg.conversation.id}`;
-      }
-
       if (
         msg.sender.id != +this.config.owner &&
         !isTrusted(this, msg.sender.id, msg) &&
